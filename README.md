@@ -28,7 +28,7 @@ Costura · Primeros auxilios · Gasfitería · Electricidad · Limpieza de emerg
 |---|---|
 | Frontend web | React (aplicación responsiva y panel de administración) |
 | App móvil | Android / iOS |
-| Backend | API REST (Spring Boot y Django, según los documentos de planificación) |
+| Backend | API REST con Django |
 | Tiempo real | WebSocket |
 | Notificaciones | Firebase Cloud Messaging |
 | IA | Módulo de recomendación y clasificación integrado al backend |

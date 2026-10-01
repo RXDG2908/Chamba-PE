@@ -39,10 +39,12 @@ Costura · Primeros auxilios · Gasfitería · Electricidad · Limpieza de emerg
 
 | Sprint | Fechas | Historias | Meta |
 |---|---|---|---|
-| 1 | 17/09 – 30/09/2026 | HU-1 a HU-4 | MVP: el prestador se registra y el cliente lo encuentra y le envía una solicitud |
-| 2 | 01/10 – 14/10/2026 | HU-5 a HU-9 | Cuentas, disponibilidad, mapa, notificaciones y verificación de prestadores |
-| 3 | 15/10 – 28/10/2026 | HU-10 a HU-13 | Recomendación con IA, seguimiento en tiempo real, calificación y moderación |
-| 4 | 29/10 – 11/11/2026 | HU-14 a HU-18 | Prestadores alternativos, chatbot con IA y administración del negocio |
+| 1 | 01/10 – 14/10/2026 | HU-1 a HU-4 | MVP: el prestador se registra y el cliente lo encuentra y le envía una solicitud |
+| 2 | 15/10 – 28/10/2026 | HU-5 a HU-9 | Cuentas, disponibilidad, mapa, notificaciones y verificación de prestadores |
+| 3 | 29/10 – 11/11/2026 | HU-10 a HU-13 | Recomendación con IA, seguimiento en tiempo real, calificación y moderación |
+| 4 | 12/11 – 25/11/2026 | HU-14 a HU-18 | Prestadores alternativos, chatbot con IA y administración del negocio |
+
+Reparto de tareas y horas por integrante en [`docs/sprints/`](docs/sprints/README.md).
 
 Detalle completo de historias, criterios de aceptación, tareas y estimaciones en [`docs/Lab07_CPS_ChambaYa.md`](docs/Lab07_CPS_ChambaYa.md). Visión del producto en [`docs/CHAMBA_PE.md`](docs/CHAMBA_PE.md).
 

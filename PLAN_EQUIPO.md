@@ -22,7 +22,7 @@ Cómo se organiza el equipo, cómo se reparten las horas y cómo se trabaja en e
 | Dedicación por integrante | 1 h diaria × 5 días = 5 h por semana |
 | Horas por integrante por sprint | **10 h** |
 | Capacidad del equipo por sprint | 3 × 10 h = **30 h** |
-| Total del proyecto | 4 sprints × 30 h = **120 h** · 51 story points |
+| Total del proyecto | 4 sprints × 30 h = **120 h** de capacidad · **114 h** planificadas · 51 story points |
 
 ---
 
@@ -44,7 +44,8 @@ Cómo se organiza el equipo, cómo se reparten las horas y cómo se trabaja en e
 | App móvil | _por definir_ |
 | Tiempo real | WebSocket (Django Channels) |
 | Notificaciones | Firebase Cloud Messaging |
-| IA | Módulo de recomendación y clasificación integrado al backend |
+| Verificación de identidad | OCR (EasyOCR), consulta a eldni.com, reconocimiento facial (DeepFace), prueba de vida (MediaPipe) |
+| IA | Reconocimiento facial y recomendación del prestador, integrados al backend |
 
 ---
 
@@ -56,9 +57,10 @@ Cada app de Django tiene un dueño que revisa los cambios que otros hagan en ell
 |---|---|---|---|
 | `prestadores` | Renzo | Perfil, rubros, cobertura, certificaciones | HU-1, HU-2 |
 | `usuarios` | Renzo | Cuentas, login con roles, disponibilidad | HU-5, HU-6 |
-| `servicios` | Luis | Búsqueda, mapa, solicitudes, notificaciones, seguimiento, calificación | HU-3, HU-4, HU-7, HU-8, HU-11, HU-12, HU-14 |
-| `administracion` | David | Verificación, moderación, rubros, comisiones, parámetros, métricas | HU-9, HU-13, HU-16, HU-17, HU-18 |
-| `ia` | _por asignar_ | Recomendación y chatbot clasificador | HU-10, HU-15 |
+| `servicios` | Luis | Búsqueda, mapa, solicitudes, notificaciones, seguimiento, calificación | HU-3, HU-4, HU-7, HU-8, HU-11, HU-12 |
+| `administracion` | David | Revisión manual de prestadores, suspensión y bloqueo | HU-9, HU-13 |
+| `verificacion` | _por asignar_ | Escaneo del DNI (OCR), consulta a eldni.com, reconocimiento facial, consentimiento | HU-19, HU-20, HU-21 |
+| `ia` | _por asignar_ | Recomendación del prestador | HU-10 |
 
 ---
 

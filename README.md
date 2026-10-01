@@ -36,13 +36,26 @@ Chamba PE conecta a quien tiene el problema con quien puede resolverlo, **al ins
 - Seguimiento del servicio: Confirmado → En camino → En servicio → Finalizado
 - Notificaciones push al prestador
 - Historial de servicios y módulo de pagos
-- Panel de administración: verificación, moderación, rubros, comisiones, parámetros del matching y métricas
+- Panel de administración: revisión manual de prestadores, suspensión y bloqueo de cuentas (rubros, comisiones y métricas en una fase posterior)
+
+## Seguridad: verificación del prestador
+
+La confianza es lo más importante: el cliente deja entrar a un desconocido a su casa u oficina. Por eso todo prestador pasa por una verificación de identidad antes de poder trabajar:
+
+1. **Escanea su DNI** → la app lee el número y los nombres automáticamente.
+2. **Se valida el DNI** consultando la fuente pública eldni.com.
+3. **Se toma una selfie en vivo** con prueba de vida (parpadeo).
+4. **Reconocimiento facial:** se compara la selfie con la foto del DNI.
+5. Si todo coincide, obtiene la insignia **"Identidad verificada"**; si hay dudas, lo revisa un administrador.
+
+Los datos biométricos se usan solo con el consentimiento del prestador (Ley 29733 de Protección de Datos Personales).
 
 ## Inteligencia Artificial
 
+- **Reconocimiento facial:** confirma que el prestador es el titular del DNI.
 - **Recomendación:** sugiere al prestador más adecuado según distancia, calificación, disponibilidad y tipo de servicio.
-- **Chatbot clasificador:** el cliente describe su problema en texto libre y la IA lo asigna al oficio correcto.
-- **Prioridades:** estima tiempos de llegada y ordena la atención en momentos de alta demanda.
+- **Chatbot clasificador** _(fase posterior)_: el cliente describe su problema en texto libre y la IA lo asigna al oficio correcto.
+- **Tiempo estimado de llegada:** la recomendación indica cuánto tardará el prestador.
 
 ## Público objetivo
 
@@ -66,14 +79,14 @@ Costura · Primeros auxilios · Gasfitería · Electricidad · Limpieza de emerg
 
 ## Planificación
 
-18 historias de usuario · 51 story points · 4 sprints de 2 semanas · 30 h por sprint
+16 historias de usuario · 51 story points · 114 h · 4 sprints de 2 semanas
 
 | Sprint | Fechas | Meta |
 |:---:|:---:|---|
 | 1 | 01/10 – 14/10/2026 | MVP: el prestador se registra y el cliente lo encuentra y le envía una solicitud |
 | 2 | 15/10 – 28/10/2026 | Cuentas, disponibilidad, mapa, notificaciones y verificación de prestadores |
-| 3 | 29/10 – 11/11/2026 | Recomendación con IA, seguimiento en tiempo real, calificación y moderación |
-| 4 | 12/11 – 25/11/2026 | Prestadores alternativos, chatbot con IA y administración del negocio |
+| 3 | 29/10 – 11/11/2026 | Verificación de identidad del prestador (DNI + reconocimiento facial) y moderación |
+| 4 | 12/11 – 25/11/2026 | Recomendación con IA, seguimiento en tiempo real y calificación |
 
 Detalle de tareas y horas en [SPRINTS.md](SPRINTS.md).
 

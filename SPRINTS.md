@@ -1,6 +1,6 @@
 # Sprints — Chamba PE
 
-18 historias · 51 story points · 4 sprints de 2 semanas · 30 h por sprint (10 h por integrante).
+16 historias en alcance · 51 story points · 114 h · 4 sprints de 2 semanas · capacidad de 30 h por sprint (10 h por integrante).
 
 Reglas de reparto y flujo de trabajo en [PLAN_EQUIPO.md](PLAN_EQUIPO.md). Detalle original de historias y criterios en [docs/Lab07_CPS_ChambaYa.md](docs/Lab07_CPS_ChambaYa.md).
 
@@ -10,10 +10,16 @@ Reglas de reparto y flujo de trabajo en [PLAN_EQUIPO.md](PLAN_EQUIPO.md). Detall
 |:---:|:---:|:---:|:---:|:---:|:---:|
 | [1](#sprint-1--0110--14102026) | 01/10 – 14/10/2026 | HU-1 a HU-4 | 13 | 30 h | 🟢 En curso |
 | [2](#sprint-2--1510--28102026) | 15/10 – 28/10/2026 | HU-5 a HU-9 | 13 | 30 h | ⚪ Por planificar |
-| [3](#sprint-3--2910--11112026) | 29/10 – 11/11/2026 | HU-10 a HU-13 | 14 | 30 h | ⚪ Por planificar |
-| [4](#sprint-4--1211--25112026) | 12/11 – 25/11/2026 | HU-14 a HU-18 | 11 | 30 h | ⚪ Por planificar |
+| [3](#sprint-3--2910--11112026) | 29/10 – 11/11/2026 | HU-19, HU-20, HU-21, HU-13 | 13 | 28 h | ⚪ Por planificar |
+| [4](#sprint-4--1211--25112026) | 12/11 – 25/11/2026 | HU-10, HU-11, HU-12 | 12 | 26 h | ⚪ Por planificar |
+| [—](#backlog-futuro) | — | HU-14 a HU-18 | 11 | 30 h | 📦 Backlog futuro |
 
-> Las fechas se recorrieron 2 semanas respecto del Lab 07 porque el Sprint 1 empezó el 01/10/2026.
+### Cambios respecto al Lab 07
+
+- Las fechas se recorrieron 2 semanas porque el Sprint 1 empezó el 01/10/2026.
+- Se priorizó la **seguridad del prestador**: se agregan HU-19 (escaneo y validación del DNI), HU-20 (reconocimiento facial) y HU-21 (consentimiento biométrico) en el Sprint 3.
+- HU-10, HU-11 y HU-12 pasan al Sprint 4; HU-14 a HU-18 salen al [backlog futuro](#backlog-futuro).
+- Los Sprints 3 y 4 dejan holgura (2 h y 4 h) por el riesgo técnico de la verificación facial.
 
 ---
 
@@ -176,15 +182,93 @@ Horas pendientes al final de cada día. La línea ideal baja 3 h por día.
 
 ---
 
+
 # Sprint 3 · 29/10 – 11/11/2026
 
-> ⚪ **Plantilla — por planificar en el Sprint Planning.** Las tareas y horas vienen del Lab 07; los responsables se asignan en la reunión.
+> ⚪ **Plantilla: por planificar en el Sprint Planning.** Los responsables se asignan en la reunión.
 
-**Meta:** Recomendación con IA, seguimiento en tiempo real, calificación y moderación de cuentas.
+**Meta:** Verificación de identidad del prestador (escaneo del DNI + reconocimiento facial) y moderación de cuentas.
 
-| Story points | Horas | Capacidad |
-|:---:|:---:|:---:|
-| 14 SP | 30 h | 3 × 10 h |
+| Story points | Horas | Capacidad | Holgura |
+|:---:|:---:|:---:|:---:|
+| 13 SP | 28 h | 3 × 10 h | 2 h |
+
+> ⚠️ **Sprint de mayor riesgo técnico.** HU-19 y HU-20 dependen de la calidad del OCR, de la calibración del umbral de similitud facial y de que eldni.com esté disponible. Por eso se dejan **2 h de holgura** y el Sprint 4 sirve de margen si hay que ajustar algo. Requiere terminados HU-1 (modelo del prestador) y HU-9 (panel de revisión manual).
+
+## Flujo de verificación del prestador
+
+1. **Escanear el DNI** con la cámara → el OCR extrae número y nombres y recorta la foto del DNI.
+2. **Consultar eldni.com** con el número → los nombres deben coincidir con los leídos.
+3. **Selfie en vivo** (solo cámara, sin galería) con **parpadeo** como prueba de vida.
+4. **Comparar** el rostro del DNI con la selfie → porcentaje de similitud.
+5. **Decidir:**
+
+| Resultado | Acción |
+|---|---|
+| Similitud alta y nombres coinciden | ✅ Verificado automáticamente |
+| Zona gris o eldni.com no responde | 🟡 Revisión manual del administrador (HU-9) |
+| Similitud baja | ❌ Rechazado, puede reintentar |
+
+## Historias y tareas
+
+| HU | Tarea | Descripción | Tipo | Horas | Responsable |
+|:---:|:---:|---|:---:|:---:|:---:|
+| HU-19 · Escaneo y validación del DNI | T19.1 | Pantalla de escaneo del DNI con la cámara (móvil) | Frontend | 3 | |
+| | T19.2 | OCR del DNI: extraer número y nombres y recortar la foto | Backend | 4 | |
+| | T19.3 | Consulta a eldni.com con validador intercambiable y paso a revisión manual si falla | Backend | 2 | |
+| | T19.4 | Pruebas con DNIs de muestra (lectura y coincidencia de nombres) | Pruebas | 2 | |
+| HU-20 · Reconocimiento facial | T20.1 | Selfie en vivo con detección de parpadeo (MediaPipe) | Frontend | 3 | |
+| | T20.2 | Servicio de comparación facial DNI vs selfie (DeepFace) | Backend | 4 | |
+| | T20.3 | Reglas de decisión (verificado / revisión / rechazado) e integración con el panel de HU-9 | Backend | 2 | |
+| | T20.4 | Calibrar el umbral de similitud con fotos del equipo | Pruebas | 2 | |
+| HU-21 · Consentimiento biométrico | T21.1 | Pantalla de consentimiento y registro de la aceptación | Frontend | 1 | |
+| | T21.2 | Endpoint para solicitar la eliminación de los datos biométricos | Backend | 1 | |
+| HU-13 · Suspensión y bloqueo | T13.1 | API en Django para suspender y bloquear cuentas | Backend | 2 | |
+| | T13.2 | Pantalla web (React) de gestión de cuentas reportadas | Frontend | 2 | |
+| | | **Total** | | **28** | |
+
+### Criterios de aceptación de las historias nuevas
+
+| HU | Historia | Criterios |
+|:---:|---|---|
+| HU-19 | Como **prestador**, quiero escanear mi DNI para que mis datos se lean y validen solos, a fin de registrarme sin escribirlos. | • El número leído pasa la validación del dígito verificador.<br>• Los nombres consultados en eldni.com coinciden con los del DNI (sin importar tildes ni mayúsculas).<br>• Si la fuente no responde o no coinciden, pasa a revisión manual; nunca se aprueba solo. |
+| HU-20 | Como **prestador**, quiero tomarme una selfie en vivo que se compare con la foto de mi DNI, a fin de demostrar que soy el titular. | • Solo se acepta foto desde la cámara y tras detectar un parpadeo.<br>• Se guarda el porcentaje de similitud y la decisión con fecha y hora.<br>• En zona gris, el administrador ve ambas fotos lado a lado. |
+| HU-21 | Como **prestador**, quiero aceptar el uso de mis datos biométricos y poder pedir que se borren, a fin de que se respete mi privacidad (Ley 29733). | • Sin consentimiento no se inicia la verificación facial.<br>• La solicitud de eliminación queda registrada y se atiende. |
+
+## Carga por integrante
+
+| Integrante | Backend | Frontend | Pruebas | Total |
+|---|:---:|:---:|:---:|:---:|
+| | | | | |
+| | | | | |
+| | | | | |
+
+## Burndown
+
+| Día | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 |
+|---|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
+| **Ideal (h)** | 25.2 | 22.4 | 19.6 | 16.8 | 14 | 11.2 | 8.4 | 5.6 | 2.8 | 0 |
+| **Real (h)** | | | | | | | | | | |
+
+## Retrospectiva
+
+| ¿Qué salió bien? | ¿Qué mejorar? | Acciones para el Sprint 4 |
+|---|---|---|
+| | | |
+
+---
+
+# Sprint 4 · 12/11 – 25/11/2026
+
+> ⚪ **Plantilla: por planificar en el Sprint Planning.** Las tareas y horas vienen del Lab 07; los responsables se asignan en la reunión.
+
+**Meta:** Recomendación con IA, seguimiento en tiempo real y calificación del servicio.
+
+| Story points | Horas | Capacidad | Holgura |
+|:---:|:---:|:---:|:---:|
+| 12 SP | 26 h | 3 × 10 h | 4 h |
+
+> La holgura de 4 h sirve para terminar ajustes de la verificación del Sprint 3 si hiciera falta.
 
 ## Historias y tareas
 
@@ -200,9 +284,7 @@ Horas pendientes al final de cada día. La línea ideal baja 3 h por día.
 | HU-12 · Calificación del servicio | T12.1 | API para registrar calificaciones | Backend | 1 | |
 | | T12.2 | Pantalla de calificación (1 a 5 estrellas y comentario) | Frontend | 2 | |
 | | T12.3 | Pruebas: solo se califica con el servicio Finalizado | Pruebas | 1 | |
-| HU-13 · Suspensión y bloqueo | T13.1 | API en Django para suspender y bloquear cuentas | Backend | 2 | |
-| | T13.2 | Pantalla web (React) de gestión de cuentas reportadas | Frontend | 2 | |
-| | | **Total** | | **30** | |
+| | | **Total** | | **26** | |
 
 ## Carga por integrante
 
@@ -216,61 +298,7 @@ Horas pendientes al final de cada día. La línea ideal baja 3 h por día.
 
 | Día | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 |
 |---|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
-| **Ideal (h)** | 27 | 24 | 21 | 18 | 15 | 12 | 9 | 6 | 3 | 0 |
-| **Real (h)** | | | | | | | | | | |
-
-## Retrospectiva
-
-| ¿Qué salió bien? | ¿Qué mejorar? | Acciones para el Sprint 4 |
-|---|---|---|
-| | | |
-
----
-
-# Sprint 4 · 12/11 – 25/11/2026
-
-> ⚪ **Plantilla — por planificar en el Sprint Planning.** Las tareas y horas vienen del Lab 07; los responsables se asignan en la reunión.
-
-**Meta:** Prestadores alternativos, chatbot con IA y administración del negocio (rubros, parámetros y métricas).
-
-| Story points | Horas | Capacidad |
-|:---:|:---:|:---:|
-| 11 SP | 30 h | 3 × 10 h |
-
-## Historias y tareas
-
-| HU | Tarea | Descripción | Tipo | Horas | Responsable |
-|:---:|:---:|---|:---:|:---:|:---:|
-| HU-14 · Alternativos y reasignación | T14.1 | Temporizador de no respuesta y reasignación automática | Backend | 3 | |
-| | T14.2 | Pantalla con prestadores alternativos sugeridos | Frontend | 1 | |
-| | T14.3 | Pruebas de reasignación | Pruebas | 1 | |
-| HU-15 · Chatbot clasificador (IA) | T15.1 | Definir las categorías de oficios y diseñar el prompt de clasificación | Backend | 2 | |
-| | T15.2 | Endpoint de clasificación conectado al servicio de IA | Backend | 3 | |
-| | T15.3 | Pantalla de chat (móvil y web) | Frontend | 2 | |
-| | T15.4 | Pruebas con 20 descripciones de ejemplo | Pruebas | 1 | |
-| HU-16 · Rubros y comisiones | T16.1 | API en Django para rubros, categorías y comisiones | Backend | 3 | |
-| | T16.2 | Pantalla web (React) de gestión de rubros y comisiones | Frontend | 2 | |
-| HU-17 · Parámetros del matching | T17.1 | API en Django de parámetros de matching | Backend | 2 | |
-| | T17.2 | Lectura de los parámetros desde el motor de recomendación | Backend | 2 | |
-| | T17.3 | Pantalla web (React) de configuración | Frontend | 2 | |
-| HU-18 · Dashboard de métricas | T18.1 | Consultas de métricas (servicios, tiempo promedio y demanda por zona) | Backend | 2 | |
-| | T18.2 | Panel web (React) con gráficos | Frontend | 3 | |
-| | T18.3 | Pruebas de las métricas | Pruebas | 1 | |
-| | | **Total** | | **30** | |
-
-## Carga por integrante
-
-| Integrante | Backend | Frontend | Pruebas | Total |
-|---|:---:|:---:|:---:|:---:|
-| | | | | |
-| | | | | |
-| | | | | |
-
-## Burndown
-
-| Día | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 |
-|---|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
-| **Ideal (h)** | 27 | 24 | 21 | 18 | 15 | 12 | 9 | 6 | 3 | 0 |
+| **Ideal (h)** | 23.4 | 20.8 | 18.2 | 15.6 | 13 | 10.4 | 7.8 | 5.2 | 2.6 | 0 |
 | **Real (h)** | | | | | | | | | | |
 
 ## Retrospectiva
@@ -278,3 +306,17 @@ Horas pendientes al final de cada día. La línea ideal baja 3 h por día.
 | ¿Qué salió bien? | ¿Qué mejorar? | Acciones finales |
 |---|---|---|
 | | | |
+
+---
+
+# Backlog futuro
+
+Historias del Lab 07 que salen del alcance de los 4 sprints para dar prioridad a la seguridad del prestador. Se retoman si sobra capacidad o en una ampliación posterior.
+
+| HU | Historia | SP | Horas | Motivo |
+|:---:|---|:---:|:---:|---|
+| HU-14 | Prestadores alternativos y reasignación | 2 | 5 | Depende de HU-10; mejora la experiencia pero no es crítica |
+| HU-15 | Chatbot clasificador de oficios (IA) | 3 | 8 | La IA del proyecto ya se cubre con HU-10 y el reconocimiento facial (HU-20) |
+| HU-16 | Gestión de rubros, categorías y comisiones | 2 | 5 | Los rubros del MVP pueden cargarse con datos iniciales |
+| HU-17 | Configuración de parámetros del matching | 2 | 6 | Los parámetros pueden quedar fijos en la configuración |
+| HU-18 | Dashboard de métricas operativas | 2 | 6 | Administrativo; no afecta al usuario final |

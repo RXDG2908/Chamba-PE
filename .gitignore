@@ -1,24 +1,24 @@
-# Entorno virtual de Python
+# Python / Django
 venv/
 env/
 ENV/
-
-# Archivos compilados de Python
 __pycache__/
 *.pyc
 *.pyo
 *.pyd
-
-# Base de datos local de desarrollo
 db.sqlite3
-
-# Archivos multimedia subidos (certificaciones de prueba)
 media/
 
-# Configuraciones del editor
+# Node / General
+node_modules/
+.env
+.env.*
+target/
+build/
+dist/
+
+# Editores y OS
 .vscode/
 .idea/
-
-# Sistema operativo
 .DS_Store
 Thumbs.db

@@ -1,0 +1,24 @@
+# Entorno virtual de Python
+venv/
+env/
+ENV/
+
+# Archivos compilados de Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Base de datos local de desarrollo
+db.sqlite3
+
+# Archivos multimedia subidos (certificaciones de prueba)
+media/
+
+# Configuraciones del editor
+.vscode/
+.idea/
+
+# Sistema operativo
+.DS_Store
+Thumbs.db

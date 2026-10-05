@@ -28,7 +28,7 @@ Estados: ✅ terminada · 🟡 en curso / parcial · ⚪ sin iniciar · 🔴 blo
 
 | Tarea | HU | Descripción | Responsable | Horas | Estado | Rama / PR | Fecha | Notas |
 |:---:|:---:|---|---|:---:|:---:|---|:---:|---|
-| T1.1 | HU-1 | Modelo de datos del prestador | Renzo León | 2 | ✅ | PR 1 unido a `main` | 05/10 | App `prestadores`: `Rubro` y `Prestador` (DNI, rubros, cobertura centro + radio km, estado "Pendiente de verificación"). Migración 0001. |
+| T1.1 | HU-1 | Modelo de datos del prestador | Renzo León | 2 | ✅ | `hu-1-registro-prestador` (sin PR aún) | 05/10 | App `prestadores`: `Rubro` y `Prestador` (DNI, rubros, cobertura centro + radio km, estado "Pendiente de verificación"). Migración 0001. |
 | T1.2 | HU-1 | API de registro de prestadores | Renzo León | 3 | ⚪ | — | — | Planificada 05/10–09/10. |
 | T1.3 | HU-1 | Formulario de registro (web y móvil) | Renzo León | 2 | ⚪ | — | — | Planificada 05/10–09/10. |
 | T4.1 | HU-4 | Flujo de solicitud: envío y aceptación/rechazo | Renzo León | 3 | ⚪ | — | — | Planificada 12/10–14/10. Depende de HU-3. |
@@ -82,7 +82,7 @@ Una línea por entrega, la más reciente arriba.
 
 | Fecha | Quién | Qué se hizo | Tarea |
 |:---:|---|---|:---:|
-| 05/10 | Renzo León | PR 1 unido a `main`. Modelo `Prestador`/`Rubro` con cobertura y estado; migración y admin; app registrada en `settings`. | T1.1 |
+| 05/10 | Renzo León | Modelo `Prestador`/`Rubro` con cobertura y estado; migración y admin; app registrada en `settings`. | T1.1 |
 | 04/10 | Luis Abad | Documentó el avance del frontend en `frontend/README.md`. | T3.2 |
 | 04/10 | Luis Abad | Frontend React + Vite con el listado de prestadores en tarjetas. | T3.2 |
 | 03/10 | David Valcarcel | Resolvió conflicto en `.gitignore`. | — |
@@ -94,7 +94,7 @@ Una línea por entrega, la más reciente arriba.
 
 | # | Fecha | Impedimento / riesgo | Afecta a | Responsable | Estado |
 |:---:|:---:|---|---|---|:---:|
-| 1 | 05/10 | T1.1 llegaba con 3 días de retraso y bloqueaba la búsqueda y las certificaciones. Resuelto: PR 1 unido a `main` el 05/10. | HU-2, HU-3 | Renzo | ✅ |
+| 1 | 05/10 | T1.1 llegaba con 3 días de retraso y bloqueaba la búsqueda y las certificaciones. Ya está hecha, falta el Pull Request a `main`. | HU-2, HU-3 | Renzo | 🟡 |
 | 2 | 05/10 | La carga de certificaciones no está asociada a un prestador (criterio de HU-2). | HU-2 | David | 🟡 |
 | 3 | 05/10 | El listado de Luis usa datos de ejemplo; falta conectarlo a la búsqueda real (T3.1). | HU-3 | Luis | 🟡 |
 | 4 | 05/10 | T4.1 queda para los últimos 3 días del sprint y depende de HU-3. | HU-4 | Renzo | ⚪ |

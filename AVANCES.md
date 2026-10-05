@@ -14,12 +14,12 @@ Estados: ✅ terminada · 🟡 en curso / parcial · ⚪ sin iniciar · 🔴 blo
 | Indicador | Valor |
 |---|---|
 | Horas comprometidas | 30 h |
-| Horas terminadas (tareas ✅) | 7 h |
-| Horas pendientes | 23 h |
+| Horas terminadas (tareas ✅) | 5 h |
+| Horas pendientes | 25 h |
 | Ideal de horas pendientes al 05/10 (día 3) | 21 h |
-| Tareas terminadas | 3 de 13 |
+| Tareas terminadas | 2 de 13 |
 | Tareas en curso | 2 (T2.1, T3.2) |
-| Historias terminadas | 1 de 4 (HU-1; falta la prueba de Luis, T2.3) |
+| Historias terminadas | 0 de 4 |
 | Estado general | 🔴 Atrasado respecto al burndown ideal |
 
 > Las horas solo cuentan como terminadas cuando la tarea cumple la [definición de terminado](PLAN_EQUIPO.md#8-definición-de-terminado).
@@ -30,7 +30,7 @@ Estados: ✅ terminada · 🟡 en curso / parcial · ⚪ sin iniciar · 🔴 blo
 |:---:|:---:|---|---|:---:|:---:|---|:---:|---|
 | T1.1 | HU-1 | Modelo de datos del prestador | Renzo León | 2 | ✅ | PR 1 unido a `main` | 05/10 | App `prestadores`: `Rubro` y `Prestador` (DNI, rubros, cobertura centro + radio km, estado "Pendiente de verificación"). Migración 0001. |
 | T1.2 | HU-1 | API de registro de prestadores | Renzo León | 3 | ✅ | `main` | 05/10 | `POST /api/prestadores/registro/` crea usuario y prestador; exige DNI (8 dígitos, único), ≥ 1 rubro y cobertura; queda "Pendiente de verificación". `GET /api/prestadores/rubros/`. 7 pruebas pasan. Se agregó Django REST Framework (`requirements.txt`). |
-| T1.3 | HU-1 | Formulario de registro (web y móvil) | Renzo León | 2 | ✅ | `main` | 05/10 | Formulario React (`frontend/src/RegistroPrestador.jsx`): datos, cuenta, rubros desde la API y mapa Leaflet con círculo de cobertura y radio. Valida en el cliente y muestra los errores del servidor. Diseño responsive (sirve en navegador móvil); la app móvil nativa sigue por definir. Probado de punta a punta contra la API. |
+| T1.3 | HU-1 | Formulario de registro (web y móvil) | Renzo León | 2 | ⚪ | — | — | Planificada 05/10–09/10. |
 | T4.1 | HU-4 | Flujo de solicitud: envío y aceptación/rechazo | Renzo León | 3 | ⚪ | — | — | Planificada 12/10–14/10. Depende de HU-3. |
 | T3.1 | HU-3 | Búsqueda por rubro, radio y disponibilidad | Luis Abad | 3 | ⚪ | — | — | Necesita el modelo `Prestador` (T1.1). |
 | T3.2 | HU-3 | Pantalla de resultados con lista de prestadores | Luis Abad | 4 | 🟡 | `main` (`50a030c`, `3eceea7`) | 04/10 | Frontend React + Vite con tarjetas de prestadores, responsive. Aún sin conectar a la API. |
@@ -46,7 +46,7 @@ Estados: ✅ terminada · 🟡 en curso / parcial · ⚪ sin iniciar · 🔴 blo
 
 | HU | Historia | SP | Horas | Tareas | Estado | Pruebas a cargo |
 |:---:|---|:---:|:---:|---|:---:|---|
-| HU-1 | Registro del prestador | 3 | 7 h | T1.1 ✅ · T1.2 ✅ · T1.3 ✅ | ✅ 7 de 7 h | Luis (T2.3) |
+| HU-1 | Registro del prestador | 3 | 7 h | T1.1 ✅ · T1.2 ✅ · T1.3 ⚪ | 🟡 5 de 7 h | Luis (T2.3) |
 | HU-2 | Carga de certificaciones | 2 | 5 h | T2.1 🟡 · T2.2 ⚪ · T2.3 ⚪ | 🟡 | Luis (T2.3) |
 | HU-3 | Búsqueda de prestadores | 5 | 11 h | T3.1 ⚪ · T3.2 🟡 · T3.3 ⚪ · T3.4 ⚪ | 🟡 | David (T3.4) |
 | HU-4 | Solicitud y aceptación | 3 | 7 h | T4.1 ⚪ · T4.2 ⚪ · T4.3 ⚪ | ⚪ | Luis (T4.3) |
@@ -55,10 +55,10 @@ Estados: ✅ terminada · 🟡 en curso / parcial · ⚪ sin iniciar · 🔴 blo
 
 | Integrante | Rol | Horas plan | Horas terminadas | Tareas terminadas | Tareas en curso |
 |---|---|:---:|:---:|:---:|---|
-| Renzo León | Scrum Master / Desarrollador | 10 h | 7 h | T1.1, T1.2, T1.3 | — |
+| Renzo León | Scrum Master / Desarrollador | 10 h | 5 h | T1.1, T1.2 | — |
 | Luis Abad | Development Team | 10 h | 0 h | — | T3.2 |
 | David Valcarcel | Product Owner / Desarrollador | 10 h | 0 h | — | T2.1 |
-| **Equipo** | | **30 h** | **7 h** | **3** | **2** |
+| **Equipo** | | **30 h** | **5 h** | **2** | **2** |
 
 ## 5. Burndown (horas pendientes)
 
@@ -67,7 +67,7 @@ Estados: ✅ terminada · 🟡 en curso / parcial · ⚪ sin iniciar · 🔴 blo
 | Inicio | 01/10 | 30 | 30 |
 | 1 | 01/10 | 27 | 30 |
 | 2 | 02/10 | 24 | 30 |
-| 3 | 05/10 | 21 | 23 |
+| 3 | 05/10 | 21 | 25 |
 | 4 | 06/10 | 18 | |
 | 5 | 07/10 | 15 | |
 | 6 | 08/10 | 12 | |
@@ -82,8 +82,6 @@ Una línea por entrega, la más reciente arriba.
 
 | Fecha | Quién | Qué se hizo | Tarea |
 |:---:|---|---|:---:|
-| 05/10 | Renzo León | Formulario de registro con rubros y mapa de cobertura (Leaflet); proxy `/api` a Django en Vite. | T1.3 |
-| 05/10 | Renzo León | Migración 0002 con 10 rubros iniciales (Gasfitería, Electricidad, Carpintería, etc.). | T1.1 |
 | 05/10 | Renzo León | API de registro: `POST /api/prestadores/registro/` y `GET /api/prestadores/rubros/`, con validaciones y 7 pruebas. | T1.2 |
 | 05/10 | Renzo León | PR 1 unido a `main`. Modelo `Prestador`/`Rubro` con cobertura y estado; migración y admin; app registrada en `settings`. | T1.1 |
 | 04/10 | Luis Abad | Documentó el avance del frontend en `frontend/README.md`. | T3.2 |
@@ -101,14 +99,12 @@ Una línea por entrega, la más reciente arriba.
 | 2 | 05/10 | La carga de certificaciones no está asociada a un prestador (criterio de HU-2). | HU-2 | David | 🟡 |
 | 3 | 05/10 | El listado de Luis usa datos de ejemplo; falta conectarlo a la búsqueda real (T3.1). | HU-3 | Luis | 🟡 |
 | 4 | 05/10 | T4.1 queda para los últimos 3 días del sprint y depende de HU-3. | HU-4 | Renzo | ⚪ |
-| 5 | 05/10 | App móvil "por definir" en el stack: el formulario es web responsive, no una app nativa. | HU-1 | Equipo | ⚪ |
+| 5 | 05/10 | App móvil "por definir" en el stack, y T1.3 pide formulario web y móvil con mapa. | HU-1 | Equipo | ⚪ |
 
 ## 8. Decisiones técnicas
 
 | Fecha | Decisión | Motivo |
 |:---:|---|---|
-| 05/10 | Mapa con Leaflet + OpenStreetMap; en desarrollo el frontend usa un proxy `/api` hacia Django (puerto 8000). | Sin claves ni costo; evita configurar CORS. |
-| 05/10 | Rubros iniciales cargados con una migración de datos. | Todos los entornos arrancan con los mismos rubros. |
 | 01/10 | Backend en Django + Django REST Framework. | Definido en el plan del equipo. |
 | 05/10 | Se agrega Django REST Framework; el registro crea el usuario y el prestador en una sola operación. | La API necesita un usuario (relación 1:1); el login con roles llega en HU-5. |
 | 05/10 | Cobertura del prestador como centro (latitud, longitud) + radio en km, sin PostGIS. | Más simple; basta para la búsqueda por radio y por distancia. |

@@ -50,7 +50,3 @@
   .detalles > div { flex: 1; }
   .resumen { flex-wrap: wrap; gap: 4px 16px; }
 }
-
-.menu { display: flex; gap: 8px; margin-top: 16px; }
-.menu button { padding: 8px 16px; border: 1px solid #cbded3; border-radius: 999px; background: #fff; font: inherit; font-size: 14px; cursor: pointer; }
-.menu button[aria-current='true'] { background: #16734f; border-color: #16734f; color: #fff; }

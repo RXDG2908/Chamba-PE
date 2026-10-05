@@ -32,6 +32,7 @@ Cómo se organiza el equipo, cómo se reparten las horas y cómo se trabaja en e
 2. **10 h por integrante en cada sprint.** No se compromete más trabajo del que cabe; si algo no entra, pasa al siguiente sprint.
 3. **Pruebas cruzadas.** Las tareas de pruebas las hace un integrante distinto de quien construyó la historia. Así todos conocen el código de los demás.
 4. **Cada uno tiene backend.** En cada sprint, cada integrante tiene al menos una tarea de backend en Django.
+5. **Siempre se llena [AVANCES.md](AVANCES.md).** Es una regla obligatoria: al terminar cada tarea o al cierre del día de trabajo, cada integrante actualiza ahí el estado de su tarea, la bitácora, los impedimentos y el burndown. Una tarea no se da por terminada si AVANCES.md no está actualizado.
 
 ---
 
@@ -92,3 +93,4 @@ Una tarea está terminada cuando:
 - [ ] Cumple los criterios de aceptación de su historia.
 - [ ] Sus pruebas pasan.
 - [ ] La tarea está marcada en [SPRINTS.md](SPRINTS.md).
+- [ ] [AVANCES.md](AVANCES.md) está actualizado (estado, bitácora, impedimentos y burndown).

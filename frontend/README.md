@@ -1,16 +1,38 @@
-# React + Vite
+# ChambaPe - Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Frontend del proyecto integrador **ChambaPe**, desarrollado con React y Vite.
 
-Currently, two official plugins are available:
+## Avance Sprint 1 - T3.2
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+Se implementó la interfaz inicial correspondiente al listado de prestadores de servicios.
 
-## React Compiler
+### Funcionalidades realizadas
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- Creación del frontend utilizando React + Vite.
+- Diseño de la interfaz principal de ChambaPe.
+- Implementación del listado de prestadores.
+- Visualización de información de los prestadores mediante tarjetas.
+- Incorporación de recursos gráficos e iconos.
+- Diseño responsive inicial de la interfaz.
 
-## Expanding the ESLint configuration
+## Tecnologías utilizadas
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+- React
+- Vite
+- JavaScript
+- HTML
+- CSS
+
+## Ejecutar el proyecto
+
+Instalar las dependencias:
+
+npm install
+
+Iniciar el servidor de desarrollo:
+
+npm run dev
+
+Luego ingresar a la dirección mostrada por Vite, normalmente:
+
+http://localhost:5173/

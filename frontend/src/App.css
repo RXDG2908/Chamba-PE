@@ -1,0 +1,56 @@
+﻿.cabecera {
+  background: #fff;
+  border-bottom: 1px solid #e0e7e4;
+  padding: 24px 0;
+}
+
+.contenedor {
+  width: min(920px, calc(100% - 40px));
+  margin-inline: auto;
+}
+
+.cabecera h1 {
+  margin: 0;
+  font-size: 30px;
+  letter-spacing: -1px;
+}
+
+.cabecera h1 span { color: #16734f; }
+.cabecera p { margin: 4px 0 0; color: #58675f; font-size: 14px; }
+.resultados { padding-block: 44px 24px; }
+.etiqueta { color: #16734f; font-size: 12px; font-weight: 700; letter-spacing: 1.4px; }
+.introduccion h2 { margin: 10px 0; font-size: clamp(26px, 5vw, 36px); line-height: 1.2; letter-spacing: -0.8px; }
+.introduccion > p:last-child { color: #58675f; }
+.aviso { margin: 26px 0 32px; padding: 16px 20px; border: 1px solid #cbded3; border-radius: 12px; background: #eaf4ee; color: #355342; font-size: 14px; }
+.resumen { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; margin-bottom: 16px; }
+.resumen h3 { margin: 0; font-size: 18px; }
+.resumen > span { color: #58675f; font-size: 14px; }
+.lista-prestadores { list-style: none; padding: 0; margin: 0; display: grid; gap: 16px; }
+.tarjeta { display: flex; align-items: center; gap: 20px; padding: 24px; background: #fff; border: 1px solid #e0e7e4; border-radius: 16px; box-shadow: 0 3px 12px #173b2610; }
+.avatar { display: grid; place-items: center; width: 60px; height: 60px; flex-shrink: 0; border-radius: 16px; font-size: 20px; font-weight: 700; }
+.verde { background: #e0f0e5; color: #226340; }
+.azul { background: #e3edf9; color: #2d5986; }
+.naranja { background: #fbecd9; color: #885519; }
+.perfil { flex: 1; min-width: 0; }
+.perfil h4 { margin: 0 0 6px; font-size: 18px; overflow-wrap: anywhere; }
+.rubro { color: #58675f; font-size: 15px; }
+.detalles { display: flex; gap: 32px; margin: 0; }
+.detalles dt { color: #58675f; font-size: 13px; margin-bottom: 5px; }
+.detalles dd { margin: 0; font-size: 17px; font-weight: 600; white-space: nowrap; }
+.estrella { color: #946000; }
+.escala { font-size: 13px; font-weight: 400; color: #58675f; }
+.nota { margin-top: 28px; text-align: center; color: #58675f; font-size: 12px; }
+
+@media (max-width: 600px) {
+  .contenedor { width: calc(100% - 32px); }
+  .resultados { padding-top: 28px; }
+  .tarjeta { flex-wrap: wrap; gap: 16px; padding: 20px; }
+  .avatar { width: 52px; height: 52px; }
+  .detalles { width: 100%; gap: 24px; padding-top: 16px; border-top: 1px solid #edf0ee; }
+  .detalles > div { flex: 1; }
+  .resumen { flex-wrap: wrap; gap: 4px 16px; }
+}
+
+.menu { display: flex; gap: 8px; margin-top: 16px; }
+.menu button { padding: 8px 16px; border: 1px solid #cbded3; border-radius: 999px; background: #fff; font: inherit; font-size: 14px; cursor: pointer; }
+.menu button[aria-current='true'] { background: #16734f; border-color: #16734f; color: #fff; }

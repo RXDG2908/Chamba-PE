@@ -14,10 +14,10 @@ Estados: ✅ terminada · 🟡 en curso / parcial · ⚪ sin iniciar · 🔴 blo
 | Indicador | Valor |
 |---|---|
 | Horas comprometidas | 30 h |
-| Horas terminadas (tareas ✅) | 5 h |
-| Horas pendientes | 25 h |
+| Horas terminadas (tareas ✅) | 2 h |
+| Horas pendientes | 28 h |
 | Ideal de horas pendientes al 05/10 (día 3) | 21 h |
-| Tareas terminadas | 2 de 13 |
+| Tareas terminadas | 1 de 13 |
 | Tareas en curso | 2 (T2.1, T3.2) |
 | Historias terminadas | 0 de 4 |
 | Estado general | 🔴 Atrasado respecto al burndown ideal |
@@ -29,7 +29,7 @@ Estados: ✅ terminada · 🟡 en curso / parcial · ⚪ sin iniciar · 🔴 blo
 | Tarea | HU | Descripción | Responsable | Horas | Estado | Rama / PR | Fecha | Notas |
 |:---:|:---:|---|---|:---:|:---:|---|:---:|---|
 | T1.1 | HU-1 | Modelo de datos del prestador | Renzo León | 2 | ✅ | PR 1 unido a `main` | 05/10 | App `prestadores`: `Rubro` y `Prestador` (DNI, rubros, cobertura centro + radio km, estado "Pendiente de verificación"). Migración 0001. |
-| T1.2 | HU-1 | API de registro de prestadores | Renzo León | 3 | ✅ | `main` | 05/10 | `POST /api/prestadores/registro/` crea usuario y prestador; exige DNI (8 dígitos, único), ≥ 1 rubro y cobertura; queda "Pendiente de verificación". `GET /api/prestadores/rubros/`. 7 pruebas pasan. Se agregó Django REST Framework (`requirements.txt`). |
+| T1.2 | HU-1 | API de registro de prestadores | Renzo León | 3 | ⚪ | — | — | Planificada 05/10–09/10. |
 | T1.3 | HU-1 | Formulario de registro (web y móvil) | Renzo León | 2 | ⚪ | — | — | Planificada 05/10–09/10. |
 | T4.1 | HU-4 | Flujo de solicitud: envío y aceptación/rechazo | Renzo León | 3 | ⚪ | — | — | Planificada 12/10–14/10. Depende de HU-3. |
 | T3.1 | HU-3 | Búsqueda por rubro, radio y disponibilidad | Luis Abad | 3 | ⚪ | — | — | Necesita el modelo `Prestador` (T1.1). |
@@ -46,7 +46,7 @@ Estados: ✅ terminada · 🟡 en curso / parcial · ⚪ sin iniciar · 🔴 blo
 
 | HU | Historia | SP | Horas | Tareas | Estado | Pruebas a cargo |
 |:---:|---|:---:|:---:|---|:---:|---|
-| HU-1 | Registro del prestador | 3 | 7 h | T1.1 ✅ · T1.2 ✅ · T1.3 ⚪ | 🟡 5 de 7 h | Luis (T2.3) |
+| HU-1 | Registro del prestador | 3 | 7 h | T1.1 ✅ · T1.2 ⚪ · T1.3 ⚪ | 🟡 2 de 7 h | Luis (T2.3) |
 | HU-2 | Carga de certificaciones | 2 | 5 h | T2.1 🟡 · T2.2 ⚪ · T2.3 ⚪ | 🟡 | Luis (T2.3) |
 | HU-3 | Búsqueda de prestadores | 5 | 11 h | T3.1 ⚪ · T3.2 🟡 · T3.3 ⚪ · T3.4 ⚪ | 🟡 | David (T3.4) |
 | HU-4 | Solicitud y aceptación | 3 | 7 h | T4.1 ⚪ · T4.2 ⚪ · T4.3 ⚪ | ⚪ | Luis (T4.3) |
@@ -55,10 +55,10 @@ Estados: ✅ terminada · 🟡 en curso / parcial · ⚪ sin iniciar · 🔴 blo
 
 | Integrante | Rol | Horas plan | Horas terminadas | Tareas terminadas | Tareas en curso |
 |---|---|:---:|:---:|:---:|---|
-| Renzo León | Scrum Master / Desarrollador | 10 h | 5 h | T1.1, T1.2 | — |
+| Renzo León | Scrum Master / Desarrollador | 10 h | 2 h | T1.1 | — |
 | Luis Abad | Development Team | 10 h | 0 h | — | T3.2 |
 | David Valcarcel | Product Owner / Desarrollador | 10 h | 0 h | — | T2.1 |
-| **Equipo** | | **30 h** | **5 h** | **2** | **2** |
+| **Equipo** | | **30 h** | **2 h** | **1** | **2** |
 
 ## 5. Burndown (horas pendientes)
 
@@ -67,7 +67,7 @@ Estados: ✅ terminada · 🟡 en curso / parcial · ⚪ sin iniciar · 🔴 blo
 | Inicio | 01/10 | 30 | 30 |
 | 1 | 01/10 | 27 | 30 |
 | 2 | 02/10 | 24 | 30 |
-| 3 | 05/10 | 21 | 25 |
+| 3 | 05/10 | 21 | 28 |
 | 4 | 06/10 | 18 | |
 | 5 | 07/10 | 15 | |
 | 6 | 08/10 | 12 | |
@@ -82,7 +82,6 @@ Una línea por entrega, la más reciente arriba.
 
 | Fecha | Quién | Qué se hizo | Tarea |
 |:---:|---|---|:---:|
-| 05/10 | Renzo León | API de registro: `POST /api/prestadores/registro/` y `GET /api/prestadores/rubros/`, con validaciones y 7 pruebas. | T1.2 |
 | 05/10 | Renzo León | PR 1 unido a `main`. Modelo `Prestador`/`Rubro` con cobertura y estado; migración y admin; app registrada en `settings`. | T1.1 |
 | 04/10 | Luis Abad | Documentó el avance del frontend en `frontend/README.md`. | T3.2 |
 | 04/10 | Luis Abad | Frontend React + Vite con el listado de prestadores en tarjetas. | T3.2 |
@@ -106,7 +105,6 @@ Una línea por entrega, la más reciente arriba.
 | Fecha | Decisión | Motivo |
 |:---:|---|---|
 | 01/10 | Backend en Django + Django REST Framework. | Definido en el plan del equipo. |
-| 05/10 | Se agrega Django REST Framework; el registro crea el usuario y el prestador en una sola operación. | La API necesita un usuario (relación 1:1); el login con roles llega en HU-5. |
 | 05/10 | Cobertura del prestador como centro (latitud, longitud) + radio en km, sin PostGIS. | Más simple; basta para la búsqueda por radio y por distancia. |
 
 ## 9. Retrospectiva del Sprint 1 (se llena el 14/10)

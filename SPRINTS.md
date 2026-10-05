@@ -47,7 +47,7 @@ Reglas de reparto y flujo de trabajo en [PLAN_EQUIPO.md](PLAN_EQUIPO.md). Detall
 | Tarea | Descripción | Tipo | Horas | ✔ |
 |:---:|---|:---:|:---:|:---:|
 | T1.1 | Diseñar el modelo de datos del prestador (datos, rubros y cobertura) | Backend | 2 | ✅ |
-| T1.2 | Implementar la API de registro de prestadores (Django) | Backend | 3 | ✅ |
+| T1.2 | Implementar la API de registro de prestadores (Django) | Backend | 3 | ☐ |
 | T1.3 | Maquetar el formulario de registro (web y móvil) con rubros y mapa de cobertura | Frontend | 2 | ☐ |
 | T4.1 | Implementar el flujo de solicitud: envío y aceptación o rechazo | Backend | 3 | ☐ |
 | | **Subtotal** | | **10** | |

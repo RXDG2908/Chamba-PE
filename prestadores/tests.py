@@ -6,7 +6,7 @@ from .models import Prestador, Rubro
 
 class RegistroPrestadorTests(TestCase):
     def setUp(self):
-        self.rubro = Rubro.objects.create(nombre='Gasfitería')
+        self.rubro = Rubro.objects.get(nombre='Gasfitería')  # cargado por la migración 0002
         self.url = reverse('registro_prestador')
         self.datos = {
             'username': 'juan', 'email': 'juan@example.com', 'password': 'Clave-segura-123',
@@ -52,4 +52,5 @@ class RegistroPrestadorTests(TestCase):
 
     def test_lista_de_rubros(self):
         r = self.client.get(reverse('rubros'))
-        self.assertEqual(r.json(), [{'id': self.rubro.id, 'nombre': 'Gasfitería'}])
+        self.assertEqual(len(r.json()), Rubro.objects.count())
+        self.assertIn({'id': self.rubro.id, 'nombre': 'Gasfitería'}, r.json())

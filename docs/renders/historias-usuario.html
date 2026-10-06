@@ -85,7 +85,9 @@ h1 span { color: var(--accent); }
 .filter small { color: var(--muted); font-weight: 500; font-variant-numeric: tabular-nums; }
 .filter[aria-pressed="true"] { background: var(--ink); color: var(--bg); border-color: var(--ink); }
 .filter[aria-pressed="true"] small { color: inherit; opacity: .7; }
-.present-btn { margin-left: auto; border: 0; background: var(--accent); color: var(--surface); border-radius: 999px; padding: 7px 16px; font-weight: 700; font-size: 13px; cursor: pointer; }
+.theme-btn { margin-left: auto; border: 1px solid var(--line); background: var(--surface); border-radius: 999px; padding: 6px 14px; cursor: pointer; font-size: 13px; font-weight: 600; }
+.pbar .theme-btn { margin-left: 0; }
+.present-btn { border: 0; background: var(--accent); color: var(--surface); border-radius: 999px; padding: 7px 16px; font-weight: 700; font-size: 13px; cursor: pointer; }
 
 /* ---------- Sprints ---------- */
 .sprint-head { display: grid; grid-template-columns: auto 1fr; gap: 4px 18px; align-items: baseline; padding-block: 44px 8px; }
@@ -305,7 +307,7 @@ body.present .story.current .ac li { font-size: 17px; }
 
 @media (max-width: 860px) {
   .story, .story.wide { grid-template-columns: minmax(0, 1fr); }
-  .present-btn { margin-left: 0; }
+  .theme-btn { margin-left: 0; }
   .sprint-head .num { font-size: 48px; }
 }
 @media (max-width: 480px) {
@@ -339,6 +341,7 @@ body.present .story.current .ac li { font-size: 17px; }
     <button class="filter" id="f-3" data-filter="3" aria-pressed="false">Sprint 3 <small>4 HU</small></button>
     <button class="filter" id="f-4" data-filter="4" aria-pressed="false">Sprint 4 <small>3 HU</small></button>
     <button class="filter" id="f-b" data-filter="b" aria-pressed="false">Backlog futuro <small>5 HU</small></button>
+    <button class="theme-btn" id="theme" type="button" aria-label="Cambiar a modo oscuro">◐ Modo oscuro</button>
     <button class="present-btn" id="present">Presentar ▸</button>
   </nav>
 
@@ -1068,13 +1071,14 @@ body.present .story.current .ac li { font-size: 17px; }
     </article>
   </section>
 
-  <p class="note">Maquetas de referencia (no son capturas del sistema). Los nombres, direcciones y cifras son datos de ejemplo. Historias, prioridades, estimaciones y criterios tomados de <code>docs/Lab07_CPS_ChambaYa.md</code>. En modo presentación usa ← → para avanzar y Esc para salir.</p>
+  <p class="note">Maquetas de referencia (no son capturas del sistema). Los nombres, direcciones y cifras son datos de ejemplo. Historias, prioridades, estimaciones y criterios tomados de <code>docs/Lab07_CPS_ChambaYa.md</code>. En modo presentación usa ← → para avanzar, T para cambiar entre modo claro y oscuro, y Esc para salir.</p>
 </div>
 
 <div class="pbar" id="pbar" hidden>
   <button id="prev" aria-label="Historia anterior">← Anterior</button>
   <span class="count" id="count">1 / 21</span>
   <button id="next" aria-label="Historia siguiente">Siguiente →</button>
+  <button class="theme-btn" id="theme-p" type="button" aria-label="Cambiar a modo oscuro">◐</button>
   <button class="exit" id="exit">Salir</button>
 </div>
 
@@ -1085,6 +1089,28 @@ body.present .story.current .ac li { font-size: 17px; }
   const pbar = document.getElementById('pbar');
   const count = document.getElementById('count');
   let list = [], idx = 0;
+
+  const root = document.documentElement;
+  const themeBtns = [document.getElementById('theme'), document.getElementById('theme-p')];
+  const darkQuery = window.matchMedia('(prefers-color-scheme: dark)');
+  function isDark() {
+    const t = root.getAttribute('data-theme');
+    return t ? t === 'dark' : darkQuery.matches;
+  }
+  function syncThemeBtns() {
+    const next = isDark() ? 'claro' : 'oscuro';
+    themeBtns.forEach(b => b.setAttribute('aria-label', 'Cambiar a modo ' + next));
+    themeBtns[0].textContent = '◐ Modo ' + next;
+  }
+  function setTheme(t) {
+    root.setAttribute('data-theme', t);
+    try { localStorage.setItem('hu-theme', t); } catch (e) {}
+    syncThemeBtns();
+  }
+  themeBtns.forEach(b => b.addEventListener('click', () => setTheme(isDark() ? 'light' : 'dark')));
+  try { const t = localStorage.getItem('hu-theme'); if (t === 'light' || t === 'dark') root.setAttribute('data-theme', t); } catch (e) {}
+  if (darkQuery.addEventListener) darkQuery.addEventListener('change', syncThemeBtns);
+  syncThemeBtns();
 
   function applyFilter(f) {
     filters.forEach(b => b.setAttribute('aria-pressed', String(b.dataset.filter === f)));
@@ -1123,6 +1149,7 @@ body.present .story.current .ac li { font-size: 17px; }
     if (e.key === 'ArrowRight' || e.key === 'PageDown' || e.key === ' ') { e.preventDefault(); show(idx + 1); }
     else if (e.key === 'ArrowLeft' || e.key === 'PageUp') { e.preventDefault(); show(idx - 1); }
     else if (e.key === 'Escape') exit();
+    else if (e.key === 't' || e.key === 'T') setTheme(isDark() ? 'light' : 'dark');
   });
 })();
 </script>

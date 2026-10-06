@@ -1,0 +1,1128 @@
+<title>Historias Chamba PE</title>
+<meta name="description" content="Maquetas de pantalla de las 21 historias de usuario de Chamba PE, agrupadas por sprint.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Figtree:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap">
+<style>
+/* Layout: catálogo por sprint; cada historia = maqueta de pantalla (izq.) + ficha con criterios (der.), con modo presentación una a una */
+:root {
+  --bg: #F2F3EF;
+  --surface: #FFFFFF;
+  --ink: #17211D;
+  --muted: #5B6862;
+  --line: #D8DDD7;
+  --accent: #C2410C;
+  --accent-soft: #FBE6DA;
+  --teal: #0F6E66;
+  --teal-soft: #DCEFEC;
+  --frame: #1C211F;
+  --shadow: 0 1px 2px rgba(20, 30, 25, .08), 0 18px 40px -18px rgba(20, 30, 25, .35);
+
+  /* Paleta de la app (las capturas se ven igual en ambos temas) */
+  --a-bg: #F6F7F4;
+  --a-card: #FFFFFF;
+  --a-ink: #15201B;
+  --a-muted: #6A7570;
+  --a-line: #E2E6E1;
+  --a-brand: #E8590C;
+  --a-brand-soft: #FFEDE2;
+  --a-on-brand: #FFFFFF;
+  --a-teal: #0F766E;
+  --a-teal-soft: #DDF2EF;
+  --a-teal-fill: rgba(15, 118, 110, .13);
+  --a-ok: #2B8A3E;
+  --a-ok-soft: #E3F4E6;
+  --a-warn: #E09A00;
+  --a-warn-soft: #FFF4D6;
+  --a-bad: #D6336C;
+  --a-bad-soft: #FDE3EC;
+  --a-map: #E7ECE3;
+  --a-road: #FFFFFF;
+  --a-park: #CFE5C6;
+  --a-water: #CBE0EA;
+  --a-cam: #0E1311;
+  --a-cam-ink: #F1F4F2;
+  --av1: #FFD8A8; --av2: #B2F2BB; --av3: #A5D8FF; --av4: #E5DBFF;
+
+  --display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --ui: "Figtree", "Segoe UI", system-ui, sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #101513; --surface: #171D1A; --ink: #E7ECE8; --muted: #9AA7A0; --line: #29322E;
+    --accent: #FF8F52; --accent-soft: #3B2216; --teal: #5CD0C1; --teal-soft: #12302B;
+    --frame: #050706; --shadow: 0 1px 2px rgba(0,0,0,.5), 0 18px 40px -18px rgba(0,0,0,.8);
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #101513; --surface: #171D1A; --ink: #E7ECE8; --muted: #9AA7A0; --line: #29322E;
+  --accent: #FF8F52; --accent-soft: #3B2216; --teal: #5CD0C1; --teal-soft: #12302B;
+  --frame: #050706; --shadow: 0 1px 2px rgba(0,0,0,.5), 0 18px 40px -18px rgba(0,0,0,.8);
+  color-scheme: dark;
+}
+*, *::before, *::after { box-sizing: border-box; }
+[hidden] { display: none !important; }
+body { background: var(--bg); color: var(--ink); font-family: var(--ui); font-size: 15px; line-height: 1.55; margin: 0; }
+.wrap { max-width: 1120px; margin: 0 auto; padding-inline: 16px; padding-block: 40px 96px; }
+button { font: inherit; color: inherit; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+/* ---------- Cabecera ---------- */
+.top { display: grid; gap: 20px; padding-bottom: 28px; }
+.eyebrow { font-family: var(--mono); font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin: 0; }
+h1 { font-family: var(--display); font-weight: 700; font-size: clamp(34px, 6vw, 56px); line-height: 1.02; letter-spacing: -.02em; margin: 0; text-wrap: balance; }
+h1 span { color: var(--accent); }
+.lede { max-width: 62ch; color: var(--muted); margin: 0; font-size: 16px; }
+.totals { display: flex; flex-wrap: wrap; gap: 8px 28px; margin: 0; padding: 0; list-style: none; font-variant-numeric: tabular-nums; }
+.totals li { display: grid; }
+.totals b { font-family: var(--display); font-size: 30px; line-height: 1.1; font-weight: 700; }
+.totals small { color: var(--muted); font-size: 13px; }
+
+.controls { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: var(--bg); padding-block: 12px; border-bottom: 1px solid var(--line); display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.filter { border: 1px solid var(--line); background: var(--surface); border-radius: 999px; padding: 6px 14px; cursor: pointer; font-size: 13px; font-weight: 600; display: inline-flex; gap: 6px; align-items: baseline; }
+.filter small { color: var(--muted); font-weight: 500; font-variant-numeric: tabular-nums; }
+.filter[aria-pressed="true"] { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+.filter[aria-pressed="true"] small { color: inherit; opacity: .7; }
+.present-btn { margin-left: auto; border: 0; background: var(--accent); color: var(--surface); border-radius: 999px; padding: 7px 16px; font-weight: 700; font-size: 13px; cursor: pointer; }
+
+/* ---------- Sprints ---------- */
+.sprint-head { display: grid; grid-template-columns: auto 1fr; gap: 4px 18px; align-items: baseline; padding-block: 44px 8px; }
+.sprint-head .num { font-family: var(--display); font-size: 64px; line-height: .9; font-weight: 700; color: var(--accent); grid-row: span 2; font-variant-numeric: tabular-nums; }
+.sprint[data-sprint="b"] .sprint-head .num { color: var(--muted); }
+.sprint-head h2 { font-family: var(--display); font-size: 26px; font-weight: 700; margin: 0; letter-spacing: -.01em; }
+.sprint-head p { margin: 0; color: var(--muted); max-width: 70ch; }
+.sprint-head p b { color: var(--ink); font-weight: 600; font-variant-numeric: tabular-nums; }
+
+/* ---------- Historia ---------- */
+.story { display: grid; grid-template-columns: 290px minmax(0, 1fr); gap: 24px 48px; align-items: center; padding-block: 36px; border-top: 1px solid var(--line); }
+.story.wide { grid-template-columns: minmax(0, 540px) minmax(0, 1fr); }
+.mock { display: grid; justify-items: center; gap: 10px; min-width: 0; }
+.mock figcaption { font-family: var(--mono); font-size: 11px; color: var(--muted); letter-spacing: .04em; text-transform: uppercase; }
+.info { min-width: 0; display: grid; gap: 12px; }
+.meta { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; font-size: 13px; }
+.hu-id { font-family: var(--mono); font-weight: 500; font-size: 13px; background: var(--ink); color: var(--bg); padding: 2px 8px; border-radius: 6px; }
+.tag { border: 1px solid var(--line); border-radius: 999px; padding: 1px 10px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.tag.sp { border-color: transparent; background: var(--teal-soft); color: var(--teal); font-weight: 600; }
+.tag.now { border-color: transparent; background: var(--accent-soft); color: var(--accent); font-weight: 600; }
+.info h3 { font-family: var(--display); font-size: 28px; line-height: 1.1; font-weight: 700; margin: 0; letter-spacing: -.01em; text-wrap: balance; }
+.say { margin: 0; font-size: 17px; max-width: 58ch; }
+.say b { color: var(--accent); font-weight: 600; }
+.ac-title { font-family: var(--mono); font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin: 6px 0 0; }
+.ac { margin: 0; padding: 0; list-style: none; display: grid; gap: 8px; max-width: 62ch; }
+.ac li { display: grid; grid-template-columns: 18px 1fr; gap: 8px; color: var(--ink); }
+.ac li::before { content: ""; width: 12px; height: 12px; margin-top: 6px; border: 1.5px solid var(--teal); border-radius: 3px; }
+
+/* ---------- Teléfono ---------- */
+.phone { width: 270px; height: 560px; max-width: 100%; border-radius: 40px; background: var(--frame); padding: 9px; box-shadow: var(--shadow); position: relative; }
+.phone::before { content: ""; position: absolute; top: 17px; left: 50%; width: 76px; height: 20px; margin-left: -38px; border-radius: 12px; background: var(--frame); z-index: 3; }
+.screen { height: 100%; border-radius: 32px; overflow: hidden; background: var(--a-bg); color: var(--a-ink); font-family: var(--ui); font-size: 11.5px; line-height: 1.4; display: flex; flex-direction: column; position: relative; }
+.sb { display: flex; justify-content: space-between; padding: 12px 22px 6px; font-weight: 700; font-size: 11px; font-variant-numeric: tabular-nums; }
+.sb i { font-style: normal; letter-spacing: 1px; font-weight: 600; }
+.appbar { display: flex; align-items: center; gap: 8px; padding: 6px 14px 10px; font-weight: 700; font-size: 14px; }
+.appbar .back { font-size: 20px; line-height: 1; color: var(--a-muted); font-weight: 400; }
+.appbar .sub { margin-left: auto; font-size: 10.5px; font-weight: 500; color: var(--a-muted); }
+.sbody { flex: 1; padding: 0 14px 14px; display: flex; flex-direction: column; gap: 9px; overflow: hidden; }
+.sbody.center { justify-content: center; }
+.foot { margin-top: auto; display: grid; gap: 7px; }
+
+.lbl { font-size: 10px; color: var(--a-muted); font-weight: 600; text-transform: uppercase; letter-spacing: .05em; }
+.field { display: grid; gap: 3px; }
+.input { background: var(--a-card); border: 1px solid var(--a-line); border-radius: 10px; padding: 8px 10px; display: flex; justify-content: space-between; gap: 6px; align-items: center; }
+.input.ok { border-color: var(--a-ok); }
+.input.err { border-color: var(--a-bad); }
+.input .ph { color: var(--a-muted); }
+.hint { font-size: 10px; color: var(--a-muted); }
+.hint.ok { color: var(--a-ok); font-weight: 600; }
+.hint.err { color: var(--a-bad); font-weight: 600; }
+.btn { border-radius: 12px; padding: 10px; text-align: center; font-weight: 700; background: var(--a-brand); color: var(--a-on-brand); }
+.btn.ghost { background: var(--a-card); color: var(--a-ink); border: 1px solid var(--a-line); }
+.btn.teal { background: var(--a-teal); }
+.btn.bad { background: var(--a-bad-soft); color: var(--a-bad); }
+.btn.ok { background: var(--a-ok); }
+.btn-row { display: grid; grid-template-columns: 1fr 1fr; gap: 7px; }
+.chips { display: flex; flex-wrap: wrap; gap: 5px; }
+.c { border: 1px solid var(--a-line); background: var(--a-card); border-radius: 999px; padding: 3px 9px; font-size: 10.5px; font-weight: 600; }
+.c.on { background: var(--a-brand-soft); border-color: var(--a-brand); color: var(--a-brand); }
+.c.t { background: var(--a-teal-soft); border-color: transparent; color: var(--a-teal); }
+.card { background: var(--a-card); border: 1px solid var(--a-line); border-radius: 14px; padding: 9px 10px; display: grid; gap: 4px; }
+.row { display: flex; align-items: center; gap: 8px; min-width: 0; }
+.row .grow { flex: 1; min-width: 0; }
+.name { font-weight: 700; font-size: 12px; }
+.sm { font-size: 10.5px; color: var(--a-muted); }
+.av { width: 32px; height: 32px; flex: none; border-radius: 50%; display: grid; place-items: center; font-weight: 700; font-size: 11px; background: var(--av1); color: var(--a-ink); }
+.av.b { background: var(--av2); } .av.c3 { background: var(--av3); } .av.d { background: var(--av4); }
+.av.lg { width: 46px; height: 46px; font-size: 15px; }
+.star { color: var(--a-warn); }
+.dist { font-weight: 700; font-variant-numeric: tabular-nums; color: var(--a-teal); font-size: 11px; }
+.pill { display: inline-block; border-radius: 999px; padding: 2px 8px; font-size: 10px; font-weight: 700; }
+.pill.warn { background: var(--a-warn-soft); color: #8A5A00; }
+.pill.ok { background: var(--a-ok-soft); color: var(--a-ok); }
+.pill.bad { background: var(--a-bad-soft); color: var(--a-bad); }
+.pill.teal { background: var(--a-teal-soft); color: var(--a-teal); }
+.banner { border-radius: 12px; padding: 8px 10px; font-weight: 600; }
+.banner.ok { background: var(--a-ok-soft); color: var(--a-ok); }
+.banner.warn { background: var(--a-warn-soft); color: #7A5000; }
+.banner.teal { background: var(--a-teal-soft); color: var(--a-teal); }
+.tabbar { display: grid; grid-template-columns: repeat(4, 1fr); border-top: 1px solid var(--a-line); background: var(--a-card); padding: 7px 4px 14px; font-size: 9.5px; text-align: center; color: var(--a-muted); font-weight: 600; }
+.tabbar .on { color: var(--a-brand); }
+
+/* Mapa */
+.map { position: relative; border-radius: 14px; overflow: hidden; background:
+  linear-gradient(90deg, transparent 46%, var(--a-road) 46%, var(--a-road) 52%, transparent 52%),
+  linear-gradient(0deg, transparent 30%, var(--a-road) 30%, var(--a-road) 35%, transparent 35%),
+  linear-gradient(0deg, transparent 72%, var(--a-road) 72%, var(--a-road) 76%, transparent 76%),
+  linear-gradient(90deg, transparent 15%, var(--a-road) 15%, var(--a-road) 18%, transparent 18%),
+  linear-gradient(90deg, transparent 80%, var(--a-road) 80%, var(--a-road) 83%, transparent 83%),
+  linear-gradient(35deg, transparent 58%, var(--a-road) 58%, var(--a-road) 61%, transparent 61%),
+  var(--a-map); }
+.map .park { position: absolute; background: var(--a-park); border-radius: 6px; }
+.map .ring { position: absolute; border-radius: 50%; border: 1.5px dashed var(--a-teal); background: var(--a-teal-fill); transform: translate(-50%, -50%); }
+.map .me { position: absolute; width: 14px; height: 14px; border-radius: 50%; background: var(--a-teal); border: 3px solid var(--a-card); box-shadow: 0 0 0 5px var(--a-teal-fill); transform: translate(-50%, -50%); }
+.map .pin { position: absolute; width: 22px; height: 22px; border-radius: 50% 50% 50% 0; transform: translate(-50%, -100%) rotate(-45deg); background: var(--a-brand); border: 2px solid var(--a-card); }
+.map .pin.off { background: var(--a-muted); opacity: .5; }
+.map .pop { position: absolute; left: 8px; right: 8px; bottom: 8px; background: var(--a-card); border-radius: 12px; padding: 8px; box-shadow: 0 6px 18px rgba(0,0,0,.15); }
+.map .route { position: absolute; border-top: 3px dotted var(--a-brand); transform-origin: left center; }
+
+/* Cámara */
+.cam { background: var(--a-cam); color: var(--a-cam-ink); }
+.cam .sb, .cam .appbar { color: var(--a-cam-ink); }
+.cam .appbar .back, .cam .sm { color: var(--a-cam-ink); opacity: .75; }
+.viewfinder { position: relative; flex: 1; border-radius: 16px; background: radial-gradient(circle at 50% 45%, #2C3A34, var(--a-cam)); display: grid; place-items: center; overflow: hidden; }
+.dni { width: 84%; aspect-ratio: 1.58; border-radius: 10px; background: linear-gradient(135deg, #E9F1F7, #CFE0EC); color: #22313B; padding: 8px; display: grid; grid-template-columns: 34% 1fr; gap: 6px; font-size: 7.5px; position: relative; }
+.dni .photo { background: linear-gradient(#B9C8D3, #8FA3B2); border-radius: 4px; position: relative; }
+.dni .photo::after { content: ""; position: absolute; left: 30%; top: 18%; width: 40%; height: 36%; border-radius: 50%; background: #6F8597; }
+.dni .lines { display: grid; gap: 3px; align-content: start; }
+.dni .lines span { height: 4px; border-radius: 2px; background: #9DB3C3; }
+.dni .lines b { font-size: 8px; }
+.corners { position: absolute; inset: 22% 6%; border: 2px solid var(--a-brand); border-radius: 12px; }
+.scanline { position: absolute; left: 8%; right: 8%; top: 50%; height: 2px; background: var(--a-brand); box-shadow: 0 0 12px var(--a-brand); }
+.face-ring { width: 150px; height: 190px; border-radius: 50%; border: 3px solid var(--a-ok); display: grid; place-items: center; position: relative; background: radial-gradient(ellipse at 50% 40%, #3D4B45, #1E2824); }
+.face { width: 70px; height: 92px; border-radius: 45%; background: #B48A6E; position: relative; }
+.face::before, .face::after { content: ""; position: absolute; top: 38%; width: 12px; height: 3px; border-radius: 2px; background: #3B2A20; }
+.face::before { left: 18%; } .face::after { right: 18%; }
+.meter { height: 7px; border-radius: 4px; background: var(--a-line); overflow: hidden; }
+.meter i { display: block; height: 100%; background: var(--a-ok); border-radius: 4px; }
+.cam .meter { background: rgba(255,255,255,.18); }
+
+/* Navegador (vistas de administrador) */
+.browser { width: 100%; max-width: 540px; border-radius: 12px; background: var(--frame); padding: 0 6px 6px; box-shadow: var(--shadow); }
+.browser .bar { display: flex; align-items: center; gap: 6px; padding: 8px 6px; }
+.browser .bar i { width: 9px; height: 9px; border-radius: 50%; background: var(--a-muted); opacity: .6; }
+.browser .url { flex: 1; margin-left: 8px; background: rgba(255,255,255,.08); color: var(--a-line); border-radius: 6px; padding: 3px 10px; font-family: var(--mono); font-size: 10px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.dsk { background: var(--a-bg); color: var(--a-ink); border-radius: 6px; font-family: var(--ui); font-size: 11px; line-height: 1.4; display: grid; grid-template-columns: 112px minmax(0, 1fr); min-height: 330px; overflow: hidden; }
+.side { background: var(--a-card); border-right: 1px solid var(--a-line); padding: 12px 8px; display: grid; gap: 3px; align-content: start; font-weight: 600; color: var(--a-muted); }
+.side b { color: var(--a-brand); font-family: var(--display); font-size: 14px; padding: 0 6px 8px; }
+.side span { padding: 5px 6px; border-radius: 6px; }
+.side span.on { background: var(--a-brand-soft); color: var(--a-brand); }
+.main { padding: 12px 14px; display: grid; gap: 10px; align-content: start; min-width: 0; }
+.main h4 { margin: 0; font-size: 14px; font-family: var(--ui); }
+.tbl { width: 100%; border-collapse: collapse; background: var(--a-card); border-radius: 10px; overflow: hidden; font-size: 10.5px; }
+.tbl th { text-align: left; font-weight: 600; color: var(--a-muted); font-size: 9.5px; text-transform: uppercase; letter-spacing: .04em; padding: 6px 8px; border-bottom: 1px solid var(--a-line); }
+.tbl td { padding: 6px 8px; border-bottom: 1px solid var(--a-line); font-variant-numeric: tabular-nums; }
+.tbl tr:last-child td { border-bottom: 0; }
+.tbl tr.sel td { background: var(--a-brand-soft); }
+.split { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.doc { background: var(--a-card); border: 1px solid var(--a-line); border-radius: 10px; padding: 8px; display: grid; gap: 4px; }
+.thumb { height: 64px; border-radius: 6px; background: linear-gradient(135deg, #E9F1F7, #CFE0EC); }
+.thumb.pdf { background: repeating-linear-gradient(0deg, var(--a-card) 0 7px, var(--a-line) 7px 8px); border: 1px solid var(--a-line); }
+.modal { background: var(--a-card); border: 1px solid var(--a-line); border-radius: 12px; padding: 10px 12px; box-shadow: 0 10px 30px rgba(0,0,0,.15); display: grid; gap: 7px; }
+.toggle { width: 28px; height: 16px; border-radius: 999px; background: var(--a-line); position: relative; flex: none; }
+.toggle::after { content: ""; position: absolute; top: 2px; left: 2px; width: 12px; height: 12px; border-radius: 50%; background: var(--a-card); }
+.toggle.on { background: var(--a-ok); }
+.toggle.on::after { left: 14px; }
+.slider { height: 5px; border-radius: 3px; background: var(--a-line); position: relative; margin: 8px 0 4px; }
+.slider i { position: absolute; left: 0; top: 0; bottom: 0; background: var(--a-brand); border-radius: 3px; }
+.slider i::after { content: ""; position: absolute; right: -7px; top: -5px; width: 14px; height: 14px; border-radius: 50%; background: var(--a-card); border: 2px solid var(--a-brand); }
+.kpis { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.kpi { background: var(--a-card); border: 1px solid var(--a-line); border-radius: 10px; padding: 8px; }
+.kpi b { display: block; font-size: 18px; font-family: var(--display); font-variant-numeric: tabular-nums; }
+.bars { display: grid; gap: 5px; background: var(--a-card); border: 1px solid var(--a-line); border-radius: 10px; padding: 8px 10px; }
+.bars div { display: grid; grid-template-columns: 74px 1fr 28px; gap: 6px; align-items: center; font-variant-numeric: tabular-nums; }
+.bars i { display: block; height: 9px; border-radius: 0 3px 3px 0; background: var(--a-teal); }
+
+/* Chat */
+.bub { max-width: 82%; padding: 7px 10px; border-radius: 14px; }
+.bub.me { align-self: flex-end; background: var(--a-brand); color: var(--a-on-brand); border-bottom-right-radius: 4px; }
+.bub.bot { align-self: flex-start; background: var(--a-card); border: 1px solid var(--a-line); border-bottom-left-radius: 4px; }
+
+/* Línea de estados */
+.steps { display: grid; gap: 0; }
+.step { display: grid; grid-template-columns: 18px 1fr auto; gap: 8px; align-items: start; position: relative; padding-bottom: 10px; }
+.step::before { content: ""; position: absolute; left: 8px; top: 14px; bottom: 0; width: 2px; background: var(--a-line); }
+.step:last-child::before { display: none; }
+.step .dot { width: 18px; height: 18px; border-radius: 50%; border: 2px solid var(--a-line); background: var(--a-card); position: relative; z-index: 1; display: grid; place-items: center; font-size: 10px; color: var(--a-on-brand); font-weight: 700; }
+.step.done .dot { background: var(--a-ok); border-color: var(--a-ok); }
+.step.done::before { background: var(--a-ok); }
+.step.cur .dot { background: var(--a-brand); border-color: var(--a-brand); box-shadow: 0 0 0 4px var(--a-brand-soft); }
+.step .t { font-variant-numeric: tabular-nums; color: var(--a-muted); font-size: 10px; }
+
+/* Notificación sobre pantalla de bloqueo */
+.lock { background: linear-gradient(170deg, #2F4A43, #18231F 70%); color: var(--a-cam-ink); }
+.lock .sb { color: var(--a-cam-ink); }
+.clock { text-align: center; font-family: var(--display); font-size: 54px; font-weight: 500; line-height: 1; margin-top: 18px; font-variant-numeric: tabular-nums; }
+.date { text-align: center; opacity: .8; font-size: 12px; }
+.push { background: rgba(255,255,255,.92); color: var(--a-ink); border-radius: 18px; padding: 10px 11px; display: grid; gap: 6px; box-shadow: 0 10px 30px rgba(0,0,0,.3); }
+.app-ico { width: 18px; height: 18px; border-radius: 5px; background: var(--a-brand); color: var(--a-on-brand); display: grid; place-items: center; font-weight: 800; font-size: 9px; font-family: var(--display); }
+
+.big-toggle { width: 120px; height: 64px; border-radius: 999px; background: var(--a-ok); margin: 0 auto; position: relative; box-shadow: 0 0 0 8px var(--a-ok-soft); }
+.big-toggle::after { content: ""; position: absolute; right: 6px; top: 6px; width: 52px; height: 52px; border-radius: 50%; background: var(--a-card); box-shadow: 0 2px 8px rgba(0,0,0,.2); }
+.stars { font-size: 30px; letter-spacing: 4px; text-align: center; color: var(--a-warn); }
+.stars s { text-decoration: none; color: var(--a-line); }
+.drop { border: 1.5px dashed var(--a-brand); background: var(--a-brand-soft); border-radius: 14px; padding: 14px; text-align: center; display: grid; gap: 2px; color: var(--a-brand); font-weight: 700; }
+.drop .sm { color: var(--a-muted); font-weight: 500; }
+.file { display: grid; grid-template-columns: 30px 1fr auto; gap: 8px; align-items: center; }
+.ext { width: 30px; height: 36px; border-radius: 5px; display: grid; place-items: end center; padding-bottom: 4px; font-size: 8px; font-weight: 800; background: var(--a-bad-soft); color: var(--a-bad); }
+.ext.jpg { background: var(--a-teal-soft); color: var(--a-teal); }
+.ext.x { background: var(--a-line); color: var(--a-muted); }
+.logo { font-family: var(--display); font-weight: 700; font-size: 28px; text-align: center; letter-spacing: -.02em; }
+.logo span { color: var(--a-brand); }
+.seg { display: grid; grid-template-columns: 1fr 1fr; background: var(--a-line); border-radius: 10px; padding: 3px; font-weight: 700; text-align: center; }
+.seg span { padding: 6px; border-radius: 8px; color: var(--a-muted); }
+.seg .on { background: var(--a-card); color: var(--a-ink); box-shadow: 0 1px 3px rgba(0,0,0,.1); }
+.check { display: grid; grid-template-columns: 16px 1fr; gap: 8px; align-items: start; }
+.box { width: 16px; height: 16px; border-radius: 4px; border: 2px solid var(--a-line); background: var(--a-card); }
+.box.on { background: var(--a-teal); border-color: var(--a-teal); position: relative; }
+.box.on::after { content: ""; position: absolute; left: 3px; top: 0; width: 5px; height: 9px; border: solid var(--a-on-brand); border-width: 0 2px 2px 0; transform: rotate(45deg); }
+.legal { background: var(--a-card); border: 1px solid var(--a-line); border-radius: 12px; padding: 10px; display: grid; gap: 6px; }
+.legal p { margin: 0; }
+.legal ul { margin: 0; padding-left: 16px; display: grid; gap: 2px; }
+.link { color: var(--a-teal); font-weight: 700; text-decoration: underline; text-underline-offset: 2px; }
+
+/* ---------- Modo presentación ---------- */
+.pbar { position: fixed; left: 0; right: 0; bottom: 0; z-index: 10; background: var(--surface); border-top: 1px solid var(--line); padding: 10px 16px calc(10px + env(safe-area-inset-bottom, 0px)); display: flex; gap: 10px; align-items: center; justify-content: center; font-variant-numeric: tabular-nums; }
+.pbar button { border: 1px solid var(--line); background: var(--bg); border-radius: 999px; padding: 6px 16px; cursor: pointer; font-weight: 600; }
+.pbar .count { min-width: 64px; text-align: center; font-family: var(--mono); font-size: 13px; }
+.pbar .exit { margin-left: 12px; }
+body.present .top, body.present .controls, body.present .sprint-head, body.present .story, body.present .note { display: none; }
+body.present .story.current { display: grid; border-top: 0; min-height: calc(100vh - 160px); }
+body.present .story.current .info h3 { font-size: 40px; }
+body.present .story.current .say { font-size: 20px; }
+body.present .story.current .ac li { font-size: 17px; }
+
+.note { margin-top: 48px; padding-top: 16px; border-top: 1px solid var(--line); color: var(--muted); font-size: 13px; max-width: 75ch; }
+
+@media (max-width: 860px) {
+  .story, .story.wide { grid-template-columns: minmax(0, 1fr); }
+  .present-btn { margin-left: 0; }
+  .sprint-head .num { font-size: 48px; }
+}
+@media (max-width: 480px) {
+  .dsk { grid-template-columns: minmax(0, 1fr); }
+  .side { display: none; }
+  .kpis { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .scanline { animation: scan 2.4s ease-in-out infinite alternate; }
+  @keyframes scan { from { top: 26%; } to { top: 74%; } }
+}
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <p class="eyebrow">Chamba PE · Product Backlog · Laboratorio 07</p>
+    <h1>Historias de usuario, <span>pantalla por pantalla</span></h1>
+    <p class="lede">Una maqueta por cada historia del backlog, en el orden de prioridad definido por el Product Owner. Cada ficha muestra la historia, su estimación y los criterios de aceptación que la maqueta debe cumplir.</p>
+    <ul class="totals">
+      <li><b>21</b><small>historias de usuario</small></li>
+      <li><b>62</b><small>story points en total</small></li>
+      <li><b>16</b><small>comprometidas en 4 sprints (51 SP)</small></li>
+      <li><b>5</b><small>en backlog futuro (11 SP)</small></li>
+    </ul>
+  </header>
+
+  <nav class="controls" aria-label="Filtrar por sprint">
+    <button class="filter" id="f-all" data-filter="all" aria-pressed="true">Todas <small>21</small></button>
+    <button class="filter" id="f-1" data-filter="1" aria-pressed="false">Sprint 1 <small>4 HU</small></button>
+    <button class="filter" id="f-2" data-filter="2" aria-pressed="false">Sprint 2 <small>5 HU</small></button>
+    <button class="filter" id="f-3" data-filter="3" aria-pressed="false">Sprint 3 <small>4 HU</small></button>
+    <button class="filter" id="f-4" data-filter="4" aria-pressed="false">Sprint 4 <small>3 HU</small></button>
+    <button class="filter" id="f-b" data-filter="b" aria-pressed="false">Backlog futuro <small>5 HU</small></button>
+    <button class="present-btn" id="present">Presentar ▸</button>
+  </nav>
+
+  <!-- ===================== SPRINT 1 ===================== -->
+  <section class="sprint" data-sprint="1">
+    <header class="sprint-head">
+      <span class="num">1</span>
+      <h2>Sprint 1 · MVP</h2>
+      <p><b>01/10 – 14/10/2026 · 13 SP · 30 h.</b> El prestador se registra y el cliente lo encuentra y le envía una solicitud.</p>
+    </header>
+
+    <article class="story" id="hu-1">
+      <figure class="mock">
+        <div class="phone"><div class="screen">
+          <div class="sb">9:41<i>●●● 87%</i></div>
+          <div class="appbar"><span class="back">‹</span>Registro de prestador<span class="sub">Paso 1 de 2</span></div>
+          <div class="sbody">
+            <div class="field"><span class="lbl">DNI *</span><div class="input ok">45871236 <span class="hint ok">✓</span></div></div>
+            <div class="field"><span class="lbl">Nombre completo</span><div class="input">Carlos Mendoza Ríos</div></div>
+            <div class="field"><span class="lbl">Rubros * (al menos uno)</span>
+              <div class="chips"><span class="c on">Gasfitería</span><span class="c on">Electricidad</span><span class="c">Costura</span><span class="c">Primeros auxilios</span><span class="c">Cerrajería</span></div>
+            </div>
+            <div class="field"><span class="lbl">Área de cobertura *</span>
+              <div class="map" style="height:104px">
+                <div class="park" style="left:60%;top:8%;width:22%;height:20%"></div>
+                <div class="ring" style="left:48%;top:52%;width:92px;height:92px"></div>
+                <div class="me" style="left:48%;top:52%"></div>
+              </div>
+              <div class="row sm"><span class="grow">Centro: Lince · Radio</span><b style="color:var(--a-ink)">5 km</b></div>
+              <div class="slider"><i style="width:45%"></i></div>
+            </div>
+            <div class="foot">
+              <div class="banner warn">Al guardar, tu perfil queda “Pendiente de verificación”.</div>
+              <div class="btn">Registrarme</div>
+            </div>
+          </div>
+        </div></div>
+        <figcaption>Prestador · app móvil</figcaption>
+      </figure>
+      <div class="info">
+        <div class="meta"><span class="hu-id">HU-1</span><span class="tag now">Sprint 1 · en curso</span><span class="tag sp">3 SP</span><span class="tag">Prioridad 21</span></div>
+        <h3>Registro del prestador</h3>
+        <p class="say">Como <b>prestador de servicios</b>, quiero registrarme indicando mis datos, rubros de servicio y área de cobertura, a fin de que los clientes cercanos puedan encontrarme.</p>
+        <p class="ac-title">Criterios de aceptación</p>
+        <ul class="ac">
+          <li>No se completa el registro sin DNI, al menos un rubro y un área de cobertura.</li>
+          <li>Al guardar, el perfil queda en estado “Pendiente de verificación”.</li>
+        </ul>
+      </div>
+    </article>
+
+    <article class="story" id="hu-2">
+      <figure class="mock">
+        <div class="phone"><div class="screen">
+          <div class="sb">9:41<i>●●● 87%</i></div>
+          <div class="appbar"><span class="back">‹</span>Mis certificaciones</div>
+          <div class="sbody">
+            <div class="drop">+ Subir certificación<span class="sm">PDF o JPG · máximo 5 MB</span></div>
+            <span class="lbl">Cargadas en tu perfil</span>
+            <div class="card file"><span class="ext">PDF</span><div><div class="name">Cruz Roja – Primeros auxilios</div><div class="sm">cert_cruzroja.pdf · 1.2 MB</div></div><span class="pill warn">Pendiente</span></div>
+            <div class="card file"><span class="ext jpg">JPG</span><div><div class="name">SENATI – Electricidad</div><div class="sm">senati_2024.jpg · 3.4 MB</div></div><span class="pill warn">Pendiente</span></div>
+            <div class="card file" style="border-color:var(--a-bad)"><span class="ext x">MP4</span><div><div class="name">video_trabajo.mp4</div><div class="hint err">Formato no permitido. Usa PDF o JPG.</div></div><span class="pill bad">✕</span></div>
+            <div class="card file" style="border-color:var(--a-bad)"><span class="ext">PDF</span><div><div class="name">constancia_escaneada.pdf</div><div class="hint err">Pesa 8.1 MB. El máximo es 5 MB.</div></div><span class="pill bad">✕</span></div>
+            <div class="foot"><div class="btn ghost">Listo</div></div>
+          </div>
+        </div></div>
+        <figcaption>Prestador · app móvil</figcaption>
+      </figure>
+      <div class="info">
+        <div class="meta"><span class="hu-id">HU-2</span><span class="tag now">Sprint 1 · en curso</span><span class="tag sp">2 SP</span><span class="tag">Prioridad 20</span></div>
+        <h3>Carga de certificaciones</h3>
+        <p class="say">Como <b>prestador de servicios</b>, quiero cargar mis certificaciones (PDF o JPG), a fin de demostrar mi experiencia y generar confianza en los clientes.</p>
+        <p class="ac-title">Criterios de aceptación</p>
+        <ul class="ac">
+          <li>Acepta certificaciones en PDF o JPG de hasta 5 MB y rechaza otros formatos o tamaños.</li>
+          <li>Las certificaciones cargadas quedan asociadas al perfil del prestador.</li>
+        </ul>
+      </div>
+    </article>
+
+    <article class="story" id="hu-3">
+      <figure class="mock">
+        <div class="phone"><div class="screen">
+          <div class="sb">9:41<i>●●● 87%</i></div>
+          <div class="appbar">¿Qué necesitas?</div>
+          <div class="sbody">
+            <div class="input"><b>Gasfitería</b><span class="ph">▾</span></div>
+            <div class="sm">Cerca de: Av. Arequipa 1250, Lince</div>
+            <div class="row sm"><span class="grow">3 disponibles · ordenados por distancia</span><span class="pill teal">0.8 s</span></div>
+            <div class="card"><div class="row"><span class="av">CM</span><div class="grow"><div class="name">Carlos Mendoza</div><div class="sm"><span class="star">★</span> 4.8 · 126 servicios</div></div><span class="dist">0.8 km</span></div></div>
+            <div class="card"><div class="row"><span class="av b">PQ</span><div class="grow"><div class="name">Pedro Quispe</div><div class="sm"><span class="star">★</span> 4.6 · 58 servicios</div></div><span class="dist">1.4 km</span></div></div>
+            <div class="card"><div class="row"><span class="av c3">JH</span><div class="grow"><div class="name">Julio Huamán</div><div class="sm"><span class="star">★</span> 4.9 · 203 servicios</div></div><span class="dist">2.9 km</span></div></div>
+            <div class="sm" style="text-align:center">Solo prestadores disponibles con cobertura en tu ubicación</div>
+          </div>
+          <div class="tabbar"><span class="on">Buscar</span><span>Mapa</span><span>Solicitudes</span><span>Perfil</span></div>
+        </div></div>
+        <figcaption>Cliente · app móvil</figcaption>
+      </figure>
+      <div class="info">
+        <div class="meta"><span class="hu-id">HU-3</span><span class="tag now">Sprint 1 · en curso</span><span class="tag sp">5 SP</span><span class="tag">Prioridad 19</span></div>
+        <h3>Búsqueda de prestadores</h3>
+        <p class="say">Como <b>cliente</b>, quiero buscar prestadores disponibles cerca de mí por tipo de servicio, a fin de resolver una necesidad urgente sin agendar con anticipación.</p>
+        <p class="ac-title">Criterios de aceptación</p>
+        <ul class="ac">
+          <li>Solo se muestran prestadores disponibles, del rubro elegido y con cobertura sobre la ubicación del cliente.</li>
+          <li>Los resultados aparecen en menos de 3 segundos, ordenados por distancia.</li>
+        </ul>
+      </div>
+    </article>
+
+    <article class="story" id="hu-4">
+      <figure class="mock">
+        <div class="phone"><div class="screen">
+          <div class="sb">10:03<i>●●● 85%</i></div>
+          <div class="appbar"><span class="back">‹</span>Mi solicitud</div>
+          <div class="sbody">
+            <div class="card"><div class="row"><span class="av lg">CM</span><div class="grow"><div class="name">Carlos Mendoza</div><div class="sm">Gasfitería · <span class="star">★</span> 4.8</div></div><span class="dist">0.8 km</span></div></div>
+            <div class="card"><span class="lbl">Detalle</span><div>Fuga en la tubería del lavadero de la cocina.</div><div class="sm">Av. Arequipa 1250, dpto. 402 · Lince</div></div>
+            <div class="banner ok">Carlos aceptó tu solicitud</div>
+            <div class="steps">
+              <div class="step done"><span class="dot">✓</span><span>Solicitud enviada</span><span class="t">10:02</span></div>
+              <div class="step done"><span class="dot">✓</span><span>Aceptada por el prestador</span><span class="t">10:03</span></div>
+              <div class="step"><span class="dot"></span><span class="sm">Rechazada → puedes elegir a otro prestador</span><span class="t"></span></div>
+            </div>
+            <div class="foot"><div class="btn teal">Ver datos de contacto</div><div class="btn ghost">Cancelar solicitud</div></div>
+          </div>
+        </div></div>
+        <figcaption>Cliente · app móvil</figcaption>
+      </figure>
+      <div class="info">
+        <div class="meta"><span class="hu-id">HU-4</span><span class="tag now">Sprint 1 · en curso</span><span class="tag sp">3 SP</span><span class="tag">Prioridad 18</span></div>
+        <h3>Solicitud y aceptación</h3>
+        <p class="say">Como <b>cliente</b>, quiero enviar una solicitud al prestador elegido y que él pueda aceptarla o rechazarla, a fin de contratar el servicio en pocos minutos.</p>
+        <p class="ac-title">Criterios de aceptación</p>
+        <ul class="ac">
+          <li>El prestador recibe la solicitud y puede aceptarla o rechazarla.</li>
+          <li>El cliente ve el cambio de estado de su solicitud.</li>
+        </ul>
+      </div>
+    </article>
+  </section>
+
+  <!-- ===================== SPRINT 2 ===================== -->
+  <section class="sprint" data-sprint="2">
+    <header class="sprint-head">
+      <span class="num">2</span>
+      <h2>Sprint 2 · Cuentas y operación</h2>
+      <p><b>15/10 – 28/10/2026 · 13 SP · 30 h.</b> Cuentas, disponibilidad, mapa y notificaciones; prestadores verificados por administración.</p>
+    </header>
+
+    <article class="story" id="hu-5">
+      <figure class="mock">
+        <div class="phone"><div class="screen">
+          <div class="sb">9:41<i>●●● 87%</i></div>
+          <div class="sbody center" style="gap:12px">
+            <div class="logo">Chamba<span>PE</span></div>
+            <div class="sm" style="text-align:center">Servicios al instante, cerca de ti</div>
+            <div class="seg"><span class="on">Soy cliente</span><span>Soy prestador</span></div>
+            <div class="field"><span class="lbl">Correo</span><div class="input ok">ana.rojas@gmail.com <span class="hint ok">✓</span></div></div>
+            <div class="field"><span class="lbl">Contraseña</span><div class="input err">•••••<span class="ph">👁</span></div><span class="hint err">Mínimo 8 caracteres, con una letra y un número.</span></div>
+            <div class="btn">Crear cuenta</div>
+            <div class="btn ghost">Ya tengo cuenta · Iniciar sesión</div>
+            <div class="sm" style="text-align:center">Sin sesión no puedes buscar ni enviar solicitudes</div>
+          </div>
+        </div></div>
+        <figcaption>Cliente o prestador · app móvil</figcaption>
+      </figure>
+      <div class="info">
+        <div class="meta"><span class="hu-id">HU-5</span><span class="tag">Sprint 2</span><span class="tag sp">3 SP</span><span class="tag">Prioridad 17</span></div>
+        <h3>Registro e inicio de sesión</h3>
+        <p class="say">Como <b>cliente o prestador</b>, quiero registrarme e iniciar sesión de forma segura, a fin de acceder a las funciones de mi perfil.</p>
+        <p class="ac-title">Criterios de aceptación</p>
+        <ul class="ac">
+          <li>El registro valida correo y contraseña y asigna el rol (cliente o prestador).</li>
+          <li>Sin sesión iniciada no se accede a las funciones privadas.</li>
+        </ul>
+      </div>
+    </article>
+
+    <article class="story" id="hu-6">
+      <figure class="mock">
+        <div class="phone"><div class="screen">
+          <div class="sb">9:41<i>●●● 87%</i></div>
+          <div class="appbar">Hola, Carlos<span class="sub">Gasfitería · Electricidad</span></div>
+          <div class="sbody" style="gap:12px">
+            <div class="card" style="padding:18px 10px;gap:12px;text-align:center">
+              <span class="lbl">Tu estado</span>
+              <div class="big-toggle" aria-hidden="true"></div>
+              <div style="font-size:20px;font-weight:800;color:var(--a-ok)">Activo</div>
+              <div class="sm">Apareces en las búsquedas y recibes solicitudes dentro de tus 5 km.</div>
+            </div>
+            <div class="row"><div class="card grow"><span class="sm">Activo hoy</span><b style="font-size:16px">3 h 20 min</b></div><div class="card grow"><span class="sm">Solicitudes hoy</span><b style="font-size:16px">4</b></div></div>
+            <div class="banner teal">Si te pones Inactivo, desapareces de las búsquedas al instante y no recibes solicitudes.</div>
+          </div>
+          <div class="tabbar"><span class="on">Inicio</span><span>Solicitudes</span><span>Perfil</span><span>Ayuda</span></div>
+        </div></div>
+        <figcaption>Prestador · app móvil</figcaption>
+      </figure>
+      <div class="info">
+        <div class="meta"><span class="hu-id">HU-6</span><span class="tag">Sprint 2</span><span class="tag sp">2 SP</span><span class="tag">Prioridad 16</span></div>
+        <h3>Disponibilidad activo / inactivo</h3>
+        <p class="say">Como <b>prestador de servicios</b>, quiero activar o desactivar mi disponibilidad en tiempo real, a fin de recibir solicitudes solo cuando esté listo para trabajar.</p>
+        <p class="ac-title">Criterios de aceptación</p>
+        <ul class="ac">
+          <li>El prestador cambia su estado entre Activo e Inactivo desde la app.</li>
+          <li>Un prestador inactivo no aparece en las búsquedas ni recibe solicitudes.</li>
+        </ul>
+      </div>
+    </article>
+
+    <article class="story" id="hu-7">
+      <figure class="mock">
+        <div class="phone"><div class="screen">
+          <div class="sb">9:41<i>●●● 87%</i></div>
+          <div class="appbar">Mapa<span class="sub">Electricidad · 3 km</span></div>
+          <div class="sbody" style="padding:0 0 0">
+            <div class="map" style="flex:1;border-radius:0">
+              <div class="park" style="left:6%;top:10%;width:26%;height:16%"></div>
+              <div class="park" style="left:62%;top:80%;width:30%;height:14%"></div>
+              <div class="ring" style="left:50%;top:44%;width:210px;height:210px"></div>
+              <div class="me" style="left:50%;top:44%"></div>
+              <div class="pin" style="left:34%;top:32%"></div>
+              <div class="pin" style="left:68%;top:52%;box-shadow:0 0 0 3px var(--a-brand-soft)"></div>
+              <div class="pin" style="left:44%;top:62%"></div>
+              <div class="pin off" style="left:90%;top:14%"></div>
+              <div class="pin off" style="left:8%;top:78%"></div>
+              <div class="pop">
+                <div class="row"><span class="av c3">JQ</span><div class="grow"><div class="name">Jorge Quispe</div><div class="sm">Electricista · <span class="star">★</span> 4.9</div></div><span class="dist">1.2 km</span></div>
+                <div class="btn" style="margin-top:6px;padding:7px">Solicitar</div>
+              </div>
+            </div>
+          </div>
+          <div class="tabbar"><span>Buscar</span><span class="on">Mapa</span><span>Solicitudes</span><span>Perfil</span></div>
+        </div></div>
+        <figcaption>Cliente · app móvil</figcaption>
+      </figure>
+      <div class="info">
+        <div class="meta"><span class="hu-id">HU-7</span><span class="tag">Sprint 2</span><span class="tag sp">3 SP</span><span class="tag">Prioridad 15</span></div>
+        <h3>Mapa de prestadores</h3>
+        <p class="say">Como <b>cliente</b>, quiero ver en un mapa a los prestadores dentro del radio de cobertura, a fin de saber qué tan cerca están de mi ubicación.</p>
+        <p class="ac-title">Criterios de aceptación</p>
+        <ul class="ac">
+          <li>El mapa muestra solo prestadores dentro del radio de cobertura de la ubicación del cliente.</li>
+          <li>Al tocar un marcador se ve nombre, rubro, calificación y distancia.</li>
+        </ul>
+      </div>
+    </article>
+
+    <article class="story" id="hu-8">
+      <figure class="mock">
+        <div class="phone"><div class="screen lock">
+          <div class="sb">10:02<i>●●● 85%</i></div>
+          <div class="clock">10:02</div>
+          <div class="date">martes, 20 de octubre</div>
+          <div class="sbody" style="margin-top:22px">
+            <div class="push">
+              <div class="row sm"><span class="app-ico">C</span><b class="grow" style="color:var(--a-ink)">CHAMBA PE</b><span>ahora · 2 s</span></div>
+              <div class="name">Nueva solicitud de Gasfitería</div>
+              <div>Ana R. · fuga en lavadero · a 0.8 km (Lince)</div>
+              <div class="btn-row"><div class="btn ok" style="padding:7px">Aceptar</div><div class="btn bad" style="padding:7px">Rechazar</div></div>
+            </div>
+            <div class="sm" style="text-align:center;margin-top:auto;color:var(--a-cam-ink)">Tienes 2 min para responder</div>
+          </div>
+        </div></div>
+        <figcaption>Prestador · notificación push</figcaption>
+      </figure>
+      <div class="info">
+        <div class="meta"><span class="hu-id">HU-8</span><span class="tag">Sprint 2</span><span class="tag sp">3 SP</span><span class="tag">Prioridad 14</span></div>
+        <h3>Notificaciones instantáneas</h3>
+        <p class="say">Como <b>prestador de servicios</b>, quiero recibir una notificación inmediata en mi móvil cuando me llegue una solicitud, a fin de aceptarla o rechazarla en pocos segundos.</p>
+        <p class="ac-title">Criterios de aceptación</p>
+        <ul class="ac">
+          <li>La notificación llega en menos de 5 segundos tras enviarse la solicitud.</li>
+          <li>Desde la notificación el prestador puede aceptar o rechazar.</li>
+        </ul>
+      </div>
+    </article>
+
+    <article class="story wide" id="hu-9">
+      <figure class="mock">
+        <div class="browser"><div class="bar"><i></i><i></i><i></i><span class="url">localhost:5173/admin/verificacion/45871236</span></div>
+          <div class="dsk">
+            <nav class="side"><b>Chamba<span style="color:var(--a-ink)">PE</span></b><span class="on">Verificación</span><span>Cuentas</span><span>Rubros</span><span>Matching</span><span>Métricas</span></nav>
+            <div class="main">
+              <div class="row"><h4 class="grow">Carlos Mendoza Ríos · DNI 45871236</h4><span class="pill warn">Pendiente de verificación</span></div>
+              <div class="split">
+                <div class="doc"><div class="thumb"></div><b>DNI (anverso)</b><span class="sm">Escaneado 12/10 · OCR ✓</span></div>
+                <div class="doc"><div class="thumb pdf"></div><b>Cruz Roja – Primeros auxilios</b><span class="sm">PDF · 1.2 MB</span></div>
+              </div>
+              <div class="doc"><div class="row"><b class="grow">SENATI – Electricidad</b><span class="sm">JPG · 3.4 MB</span></div></div>
+              <div class="field"><span class="lbl">Motivo (obligatorio si rechazas)</span><div class="input"><span class="ph">Ej.: la certificación está ilegible</span></div></div>
+              <div class="btn-row"><div class="btn ok">Aprobar → Verificado</div><div class="btn bad">Rechazar</div></div>
+            </div>
+          </div>
+        </div>
+        <figcaption>Administrador · panel web</figcaption>
+      </figure>
+      <div class="info">
+        <div class="meta"><span class="hu-id">HU-9</span><span class="tag">Sprint 2</span><span class="tag sp">2 SP</span><span class="tag">Prioridad 13</span></div>
+        <h3>Validación de identidad y certificaciones</h3>
+        <p class="say">Como <b>administrador</b>, quiero validar la identidad y las certificaciones de los prestadores antes de activarlos, a fin de garantizar la seguridad de los usuarios.</p>
+        <p class="ac-title">Criterios de aceptación</p>
+        <ul class="ac">
+          <li>El administrador ve el DNI y las certificaciones, y puede aprobarlas o rechazarlas indicando un motivo.</li>
+          <li>Al aprobar, el estado cambia a “Verificado” y el prestador ya puede recibir solicitudes.</li>
+        </ul>
+      </div>
+    </article>
+  </section>
+
+  <!-- ===================== SPRINT 3 ===================== -->
+  <section class="sprint" data-sprint="3">
+    <header class="sprint-head">
+      <span class="num">3</span>
+      <h2>Sprint 3 · Verificación de identidad</h2>
+      <p><b>29/10 – 11/11/2026 · 13 SP · 28 h.</b> Escaneo del DNI, reconocimiento facial y moderación de cuentas.</p>
+    </header>
+
+    <article class="story" id="hu-19">
+      <figure class="mock">
+        <div class="phone"><div class="screen cam">
+          <div class="sb">9:41<i>●●● 87%</i></div>
+          <div class="appbar"><span class="back">‹</span>Escanea tu DNI<span class="sub" style="color:var(--a-cam-ink)">Paso 2 de 5</span></div>
+          <div class="sbody">
+            <div class="viewfinder">
+              <div class="dni"><div class="photo"></div><div class="lines"><b>REPÚBLICA DEL PERÚ</b><span style="width:90%"></span><span style="width:70%"></span><span style="width:80%"></span><b>45871236-7</b></div></div>
+              <div class="corners"></div>
+              <div class="scanline"></div>
+            </div>
+            <div class="push" style="gap:5px">
+              <div class="row"><span class="grow sm" style="color:var(--a-muted)">Número leído</span><b>45871236-7</b></div>
+              <div class="row"><span class="grow">Dígito verificador</span><span class="pill ok">✓ Válido</span></div>
+              <div class="row"><span class="grow">Nombres en eldni.com</span><span class="pill ok">✓ Coinciden</span></div>
+              <div class="sm" style="color:var(--a-muted)">MENDOZA RIOS, CARLOS = Mendoza Ríos, Carlos</div>
+            </div>
+            <div class="btn">Continuar a la selfie</div>
+          </div>
+        </div></div>
+        <figcaption>Prestador · cámara del móvil</figcaption>
+      </figure>
+      <div class="info">
+        <div class="meta"><span class="hu-id">HU-19</span><span class="tag">Sprint 3</span><span class="tag sp">5 SP</span><span class="tag">Prioridad 12</span></div>
+        <h3>Escaneo del DNI y validación</h3>
+        <p class="say">Como <b>prestador de servicios</b>, quiero escanear mi DNI para que mis datos se lean y se validen automáticamente (consulta en eldni.com), a fin de registrarme sin escribirlos y demostrar que soy una persona real.</p>
+        <p class="ac-title">Criterios de aceptación</p>
+        <ul class="ac">
+          <li>El número leído del DNI pasa la validación del dígito verificador.</li>
+          <li>Los nombres consultados en eldni.com coinciden con los del DNI (sin importar tildes ni mayúsculas).</li>
+          <li>Si la fuente no responde o los datos no coinciden, el caso pasa a revisión manual (HU-9); nunca se aprueba automáticamente.</li>
+        </ul>
+      </div>
+    </article>
+
+    <article class="story" id="hu-20">
+      <figure class="mock">
+        <div class="phone"><div class="screen cam">
+          <div class="sb">9:42<i>●●● 87%</i></div>
+          <div class="appbar"><span class="back">‹</span>Selfie en vivo<span class="sub" style="color:var(--a-cam-ink)">Paso 4 de 5</span></div>
+          <div class="sbody" style="align-items:center;gap:12px">
+            <div class="face-ring"><div class="face"></div></div>
+            <div style="font-weight:700;font-size:14px">Parpadeo detectado ✓</div>
+            <div class="sm" style="text-align:center">Solo con cámara frontal. No se aceptan fotos de la galería.</div>
+            <div class="push" style="width:100%">
+              <div class="row"><span class="grow">Similitud con la foto del DNI</span><b>92 %</b></div>
+              <div class="meter"><i style="width:92%"></i></div>
+              <div class="row sm" style="color:var(--a-muted)"><span class="grow">Umbral: ≥ 85 % verificado · 60–85 % revisión manual</span></div>
+              <div class="row"><span class="pill ok">Verificado</span><span class="grow"></span><span class="sm" style="color:var(--a-muted)">12/10/2026 · 09:42:18</span></div>
+            </div>
+          </div>
+        </div></div>
+        <figcaption>Prestador · cámara frontal</figcaption>
+      </figure>
+      <div class="info">
+        <div class="meta"><span class="hu-id">HU-20</span><span class="tag">Sprint 3</span><span class="tag sp">5 SP</span><span class="tag">Prioridad 11</span></div>
+        <h3>Selfie en vivo y reconocimiento facial</h3>
+        <p class="say">Como <b>prestador de servicios</b>, quiero tomarme una selfie en vivo que se compare con la foto de mi DNI (reconocimiento facial), a fin de demostrar que soy el titular del documento.</p>
+        <p class="ac-title">Criterios de aceptación</p>
+        <ul class="ac">
+          <li>Solo se acepta una foto tomada con la cámara (no de la galería) y tras detectar un parpadeo (prueba de vida).</li>
+          <li>Se guarda el porcentaje de similitud y la decisión (verificado, revisión manual o rechazado) con fecha y hora.</li>
+          <li>En la zona gris, el administrador ve ambas fotos lado a lado.</li>
+        </ul>
+      </div>
+    </article>
+
+    <article class="story" id="hu-21">
+      <figure class="mock">
+        <div class="phone"><div class="screen">
+          <div class="sb">9:41<i>●●● 87%</i></div>
+          <div class="appbar"><span class="back">‹</span>Tus datos biométricos<span class="sub">Paso 1 de 5</span></div>
+          <div class="sbody">
+            <div class="legal">
+              <p>Para verificar que eres el titular de tu DNI usaremos:</p>
+              <ul><li>La foto de tu DNI</li><li>Una selfie en vivo</li><li>Un patrón facial para compararlas</li></ul>
+              <p class="sm">Son datos sensibles según la Ley N.º 29733 de Protección de Datos Personales. Solo se usan para tu verificación y no se comparten con clientes.</p>
+            </div>
+            <div class="check"><span class="box on"></span><span>Acepto el tratamiento de mis datos biométricos para verificar mi identidad.</span></div>
+            <div class="check"><span class="box"></span><span class="sm">Quiero recibir novedades de Chamba PE (opcional).</span></div>
+            <div class="foot">
+              <div class="btn">Aceptar y empezar verificación</div>
+              <div class="sm" style="text-align:center">¿Ya te verificaste? <span class="link">Solicitar eliminación de mis datos biométricos</span></div>
+            </div>
+          </div>
+        </div></div>
+        <figcaption>Prestador · app móvil</figcaption>
+      </figure>
+      <div class="info">
+        <div class="meta"><span class="hu-id">HU-21</span><span class="tag">Sprint 3</span><span class="tag sp">1 SP</span><span class="tag">Prioridad 10</span></div>
+        <h3>Consentimiento de datos biométricos</h3>
+        <p class="say">Como <b>prestador de servicios</b>, quiero aceptar el uso de mis datos biométricos y poder pedir que se eliminen, a fin de que se respete mi privacidad (Ley 29733).</p>
+        <p class="ac-title">Criterios de aceptación</p>
+        <ul class="ac">
+          <li>Sin consentimiento explícito no se inicia la verificación facial.</li>
+          <li>La solicitud de eliminación de los datos biométricos queda registrada y se atiende.</li>
+        </ul>
+      </div>
+    </article>
+
+    <article class="story wide" id="hu-13">
+      <figure class="mock">
+        <div class="browser"><div class="bar"><i></i><i></i><i></i><span class="url">localhost:5173/admin/cuentas?filtro=reportadas</span></div>
+          <div class="dsk">
+            <nav class="side"><b>Chamba<span style="color:var(--a-ink)">PE</span></b><span>Verificación</span><span class="on">Cuentas</span><span>Rubros</span><span>Matching</span><span>Métricas</span></nav>
+            <div class="main">
+              <h4>Cuentas reportadas</h4>
+              <table class="tbl">
+                <thead><tr><th>Usuario</th><th>Rol</th><th>Reportes</th><th>Estado</th></tr></thead>
+                <tbody>
+                  <tr class="sel"><td>Raúl Paredes</td><td>Prestador</td><td>3</td><td><span class="pill ok">Activo</span></td></tr>
+                  <tr><td>Kevin Salas</td><td>Cliente</td><td>1</td><td><span class="pill warn">Suspendido</span></td></tr>
+                  <tr><td>Marco Ccori</td><td>Prestador</td><td>5</td><td><span class="pill bad">Bloqueado</span></td></tr>
+                </tbody>
+              </table>
+              <div class="modal">
+                <b>Acción sobre Raúl Paredes</b>
+                <div class="seg"><span class="on">Suspender 7 días</span><span>Bloquear</span></div>
+                <div class="field"><span class="lbl">Motivo *</span><div class="input">No se presentó a 3 servicios aceptados</div></div>
+                <div class="sm">Mientras esté suspendida, la cuenta no puede iniciar sesión ni enviar o recibir solicitudes.</div>
+                <div class="btn-row"><div class="btn ghost">Cancelar</div><div class="btn">Suspender cuenta</div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <figcaption>Administrador · panel web</figcaption>
+      </figure>
+      <div class="info">
+        <div class="meta"><span class="hu-id">HU-13</span><span class="tag">Sprint 3</span><span class="tag sp">2 SP</span><span class="tag">Prioridad 9</span></div>
+        <h3>Suspensión y bloqueo de cuentas</h3>
+        <p class="say">Como <b>administrador</b>, quiero suspender o bloquear cuentas reportadas por incumplimiento o conductas inadecuadas, a fin de proteger a la comunidad.</p>
+        <p class="ac-title">Criterios de aceptación</p>
+        <ul class="ac">
+          <li>El administrador suspende o bloquea una cuenta indicando el motivo.</li>
+          <li>Una cuenta bloqueada no puede iniciar sesión ni enviar o recibir solicitudes.</li>
+        </ul>
+      </div>
+    </article>
+  </section>
+
+  <!-- ===================== SPRINT 4 ===================== -->
+  <section class="sprint" data-sprint="4">
+    <header class="sprint-head">
+      <span class="num">4</span>
+      <h2>Sprint 4 · IA y seguimiento</h2>
+      <p><b>12/11 – 25/11/2026 · 12 SP · 26 h.</b> Recomendación con IA, seguimiento en tiempo real y calificación del servicio.</p>
+    </header>
+
+    <article class="story" id="hu-10">
+      <figure class="mock">
+        <div class="phone"><div class="screen">
+          <div class="sb">9:41<i>●●● 87%</i></div>
+          <div class="appbar">Electricidad<span class="sub">Miraflores</span></div>
+          <div class="sbody">
+            <div class="card" style="border:1.5px solid var(--a-brand);gap:8px;padding:12px">
+              <span class="pill teal" style="justify-self:start">✦ Recomendado para ti</span>
+              <div class="row"><span class="av c3 lg">JQ</span><div class="grow"><div class="name" style="font-size:14px">Jorge Quispe</div><div class="sm">Electricista certificado · Verificado</div></div></div>
+              <span class="lbl">Por qué lo recomendamos</span>
+              <div class="chips"><span class="c t">0.9 km de ti</span><span class="c t"><span class="star">★</span> 4.9 (212)</span><span class="c t">Llega en ~12 min</span><span class="c t">Responde en 40 s</span></div>
+              <div class="btn">Solicitar a Jorge</div>
+            </div>
+            <span class="lbl">Otras opciones</span>
+            <div class="card"><div class="row"><span class="av d">LT</span><div class="grow"><div class="name">Luis Torres</div><div class="sm"><span class="star">★</span> 4.7 · ~18 min</div></div><span class="dist">1.6 km</span></div></div>
+            <div class="card"><div class="row"><span class="av b">MF</span><div class="grow"><div class="name">Miguel Flores</div><div class="sm"><span class="star">★</span> 4.5 · ~22 min</div></div><span class="dist">2.3 km</span></div></div>
+          </div>
+        </div></div>
+        <figcaption>Cliente · app móvil</figcaption>
+      </figure>
+      <div class="info">
+        <div class="meta"><span class="hu-id">HU-10</span><span class="tag">Sprint 4</span><span class="tag sp">5 SP</span><span class="tag">Prioridad 8</span></div>
+        <h3>Recomendación automática (IA)</h3>
+        <p class="say">Como <b>cliente</b>, quiero que la plataforma me recomiende automáticamente (IA) al prestador más adecuado según distancia, calificación y disponibilidad, a fin de reducir mi tiempo de espera y elegir con confianza.</p>
+        <p class="ac-title">Criterios de aceptación</p>
+        <ul class="ac">
+          <li>Se muestra al menos 1 prestador recomendado que cumple rubro, ubicación y disponibilidad.</li>
+          <li>Se indica el motivo de la recomendación (distancia, calificación y tiempo estimado de llegada).</li>
+        </ul>
+      </div>
+    </article>
+
+    <article class="story" id="hu-11">
+      <figure class="mock">
+        <div class="phone"><div class="screen">
+          <div class="sb">10:14<i>●●● 82%</i></div>
+          <div class="appbar"><span class="back">‹</span>Seguimiento<span class="sub">En vivo ●</span></div>
+          <div class="sbody">
+            <div class="map" style="height:170px">
+              <div class="park" style="left:58%;top:6%;width:30%;height:22%"></div>
+              <div class="route" style="left:24%;top:70%;width:120px;transform:rotate(-28deg)"></div>
+              <div class="me" style="left:72%;top:40%"></div>
+              <div class="pin" style="left:24%;top:72%"></div>
+              <div class="pop" style="left:auto;right:8px;bottom:auto;top:8px;padding:5px 8px"><b>~6 min</b> <span class="sm">· 1.1 km</span></div>
+            </div>
+            <div class="card"><div class="row"><span class="av c3">JQ</span><div class="grow"><div class="name">Jorge Quispe</div><div class="sm">Electricista · moto placa 4521-AB</div></div></div></div>
+            <div class="steps">
+              <div class="step done"><span class="dot">✓</span><span>Confirmado</span><span class="t">10:05:12</span></div>
+              <div class="step cur"><span class="dot"></span><b>En camino</b><span class="t">10:08:40</span></div>
+              <div class="step"><span class="dot"></span><span class="sm">En servicio</span><span class="t">—</span></div>
+              <div class="step"><span class="dot"></span><span class="sm">Finalizado</span><span class="t">—</span></div>
+            </div>
+          </div>
+        </div></div>
+        <figcaption>Cliente · app móvil</figcaption>
+      </figure>
+      <div class="info">
+        <div class="meta"><span class="hu-id">HU-11</span><span class="tag">Sprint 4</span><span class="tag sp">5 SP</span><span class="tag">Prioridad 7</span></div>
+        <h3>Seguimiento en tiempo real</h3>
+        <p class="say">Como <b>cliente</b>, quiero seguir en tiempo real el estado de mi solicitud, a fin de tener trazabilidad del servicio desde la confirmación hasta su finalización.</p>
+        <p class="ac-title">Criterios de aceptación</p>
+        <ul class="ac">
+          <li>Los estados Confirmado → En camino → En servicio → Finalizado se actualizan sin recargar la pantalla.</li>
+          <li>Cada cambio de estado queda registrado con fecha y hora.</li>
+        </ul>
+      </div>
+    </article>
+
+    <article class="story" id="hu-12">
+      <figure class="mock">
+        <div class="phone"><div class="screen">
+          <div class="sb">11:02<i>●●● 79%</i></div>
+          <div class="appbar"><span class="back">‹</span>Califica el servicio</div>
+          <div class="sbody" style="gap:12px">
+            <div class="banner ok" style="text-align:center">Servicio finalizado · 10:58</div>
+            <div style="display:grid;justify-items:center;gap:4px"><span class="av c3 lg">JQ</span><div class="name" style="font-size:14px">Jorge Quispe</div><div class="sm">Electricidad · 53 min de servicio</div></div>
+            <div class="stars">★★★★<s>★</s></div>
+            <div class="sm" style="text-align:center">4 de 5 · Muy bueno</div>
+            <div class="field"><span class="lbl">Comentario</span><div class="input" style="min-height:62px;align-items:flex-start">Llegó rápido y encontró el corto en el tablero. Dejó todo limpio.</div></div>
+            <div class="foot"><div class="btn">Enviar calificación</div><div class="sm" style="text-align:center">Nuevo promedio de Jorge: 4.9 → 4.89</div></div>
+          </div>
+        </div></div>
+        <figcaption>Cliente · app móvil</figcaption>
+      </figure>
+      <div class="info">
+        <div class="meta"><span class="hu-id">HU-12</span><span class="tag">Sprint 4</span><span class="tag sp">2 SP</span><span class="tag">Prioridad 6</span></div>
+        <h3>Calificación del servicio</h3>
+        <p class="say">Como <b>cliente</b>, quiero calificar al prestador (1 a 5 estrellas y comentario) al finalizar el servicio, a fin de ayudar a otros usuarios a decidir.</p>
+        <p class="ac-title">Criterios de aceptación</p>
+        <ul class="ac">
+          <li>Solo se puede calificar cuando el servicio está Finalizado.</li>
+          <li>La calificación queda guardada y actualiza el promedio del prestador.</li>
+        </ul>
+      </div>
+    </article>
+  </section>
+
+  <!-- ===================== BACKLOG ===================== -->
+  <section class="sprint" data-sprint="b">
+    <header class="sprint-head">
+      <span class="num">+</span>
+      <h2>Backlog futuro</h2>
+      <p><b>5 historias · 11 SP.</b> Fuera de los 4 sprints comprometidos; se planifican cuando haya capacidad.</p>
+    </header>
+
+    <article class="story" id="hu-14">
+      <figure class="mock">
+        <div class="phone"><div class="screen">
+          <div class="sb">10:04<i>●●● 85%</i></div>
+          <div class="appbar"><span class="back">‹</span>Mi solicitud</div>
+          <div class="sbody">
+            <div class="banner warn">Carlos Mendoza no respondió en 2 min. Tu solicitud se canceló sin costo.</div>
+            <span class="lbl">Prestadores alternativos disponibles</span>
+            <div class="card"><div class="row"><span class="av b">PQ</span><div class="grow"><div class="name">Pedro Quispe</div><div class="sm"><span class="star">★</span> 4.6 · responde en ~1 min</div></div><span class="dist">1.4 km</span></div><div class="btn" style="padding:7px">Enviar solicitud</div></div>
+            <div class="card"><div class="row"><span class="av c3">JH</span><div class="grow"><div class="name">Julio Huamán</div><div class="sm"><span class="star">★</span> 4.9 · responde en ~2 min</div></div><span class="dist">2.9 km</span></div><div class="btn ghost" style="padding:7px">Enviar solicitud</div></div>
+            <div class="sm" style="text-align:center;margin-top:auto">Mismo rubro (Gasfitería) y misma ubicación</div>
+          </div>
+        </div></div>
+        <figcaption>Cliente · app móvil</figcaption>
+      </figure>
+      <div class="info">
+        <div class="meta"><span class="hu-id">HU-14</span><span class="tag">Backlog</span><span class="tag sp">2 SP</span><span class="tag">Prioridad 5</span></div>
+        <h3>Prestadores alternativos</h3>
+        <p class="say">Como <b>cliente</b>, quiero que se me sugieran prestadores alternativos si el recomendado no responde a tiempo, a fin de no quedarme sin atención.</p>
+        <p class="ac-title">Criterios de aceptación</p>
+        <ul class="ac">
+          <li>Si el prestador no responde en el tiempo configurado, se sugieren alternativos.</li>
+          <li>El cliente puede elegir uno de ellos y enviarle la solicitud.</li>
+        </ul>
+      </div>
+    </article>
+
+    <article class="story" id="hu-15">
+      <figure class="mock">
+        <div class="phone"><div class="screen">
+          <div class="sb">20:31<i>●●● 64%</i></div>
+          <div class="appbar"><span class="back">‹</span>Asistente Chamba<span class="sub">IA</span></div>
+          <div class="sbody" style="gap:7px">
+            <div class="bub bot">Cuéntame qué pasó y te busco a quien pueda ayudarte.</div>
+            <div class="bub me">tengo un matrimonio en 2 horas y se me descosió el vestido en la espalda</div>
+            <div class="bub bot">Eso lo resuelve alguien de <b>Costura</b>. Hay 2 disponibles cerca:</div>
+            <div class="card"><div class="row"><span class="av">RH</span><div class="grow"><div class="name">Rosa Huamán</div><div class="sm">Costura · <span class="star">★</span> 4.9</div></div><span class="dist">1.1 km</span></div></div>
+            <div class="bub me">algo raro suena en la pared</div>
+            <div class="bub bot">¿Es un ruido de agua, de electricidad o de otra cosa? Así te conecto con el oficio correcto.</div>
+            <div class="foot"><div class="input"><span class="ph">Escribe tu problema…</span><b style="color:var(--a-brand)">➤</b></div></div>
+          </div>
+        </div></div>
+        <figcaption>Cliente · chatbot</figcaption>
+      </figure>
+      <div class="info">
+        <div class="meta"><span class="hu-id">HU-15</span><span class="tag">Backlog</span><span class="tag sp">3 SP</span><span class="tag">Prioridad 4</span></div>
+        <h3>Chatbot clasificador de oficios (IA)</h3>
+        <p class="say">Como <b>cliente</b>, quiero describir mi problema en texto libre y que un chatbot con IA lo clasifique en el oficio correcto, a fin de encontrar el servicio sin conocer su categoría.</p>
+        <p class="ac-title">Criterios de aceptación</p>
+        <ul class="ac">
+          <li>A partir de un texto libre el chatbot sugiere el oficio y muestra prestadores de ese rubro.</li>
+          <li>Si no puede clasificar, pide más detalles al cliente en lugar de inventar una categoría.</li>
+        </ul>
+      </div>
+    </article>
+
+    <article class="story wide" id="hu-16">
+      <figure class="mock">
+        <div class="browser"><div class="bar"><i></i><i></i><i></i><span class="url">localhost:5173/admin/rubros</span></div>
+          <div class="dsk">
+            <nav class="side"><b>Chamba<span style="color:var(--a-ink)">PE</span></b><span>Verificación</span><span>Cuentas</span><span class="on">Rubros</span><span>Matching</span><span>Métricas</span></nav>
+            <div class="main">
+              <div class="row"><h4 class="grow">Rubros y comisiones</h4><div class="btn" style="padding:5px 10px">+ Nuevo rubro</div></div>
+              <table class="tbl">
+                <thead><tr><th>Rubro</th><th>Categoría</th><th>Comisión</th><th>Activo</th></tr></thead>
+                <tbody>
+                  <tr><td>Gasfitería</td><td>Hogar</td><td>12 %</td><td><span class="toggle on"></span></td></tr>
+                  <tr><td>Electricidad</td><td>Hogar</td><td>12 %</td><td><span class="toggle on"></span></td></tr>
+                  <tr class="sel"><td>Costura</td><td>Personal</td><td><b>8 % ✎</b></td><td><span class="toggle on"></span></td></tr>
+                  <tr><td>Primeros auxilios</td><td>Salud</td><td>10 %</td><td><span class="toggle on"></span></td></tr>
+                  <tr><td>Cerrajería</td><td>Hogar</td><td>12 %</td><td><span class="toggle on"></span></td></tr>
+                  <tr><td>Jardinería</td><td>Hogar</td><td>10 %</td><td><span class="toggle"></span></td></tr>
+                </tbody>
+              </table>
+              <div class="banner teal">Comisión de Costura cambiada a 8 %. Se aplica a las solicitudes nuevas desde hoy 10:15.</div>
+            </div>
+          </div>
+        </div>
+        <figcaption>Administrador · panel web</figcaption>
+      </figure>
+      <div class="info">
+        <div class="meta"><span class="hu-id">HU-16</span><span class="tag">Backlog</span><span class="tag sp">2 SP</span><span class="tag">Prioridad 3</span></div>
+        <h3>Rubros, categorías y comisiones</h3>
+        <p class="say">Como <b>administrador</b>, quiero gestionar rubros, categorías de servicio y comisiones, a fin de mantener actualizada la oferta y el modelo de ingresos.</p>
+        <p class="ac-title">Criterios de aceptación</p>
+        <ul class="ac">
+          <li>El administrador crea, edita y desactiva rubros y categorías.</li>
+          <li>Puede definir la comisión por rubro y el cambio se aplica a las nuevas solicitudes.</li>
+        </ul>
+      </div>
+    </article>
+
+    <article class="story wide" id="hu-17">
+      <figure class="mock">
+        <div class="browser"><div class="bar"><i></i><i></i><i></i><span class="url">localhost:5173/admin/matching</span></div>
+          <div class="dsk">
+            <nav class="side"><b>Chamba<span style="color:var(--a-ink)">PE</span></b><span>Verificación</span><span>Cuentas</span><span>Rubros</span><span class="on">Matching</span><span>Métricas</span></nav>
+            <div class="main">
+              <h4>Parámetros del matching</h4>
+              <div class="doc"><div class="row"><b class="grow">Distancia máxima</b><b>8 km</b></div><div class="slider"><i style="width:40%"></i></div><span class="sm">1 km – 20 km</span></div>
+              <div class="doc"><div class="row"><b class="grow">Puntaje mínimo del prestador</b><b><span class="star">★</span> 4.0</b></div><div class="slider"><i style="width:75%"></i></div><span class="sm">1.0 – 5.0</span></div>
+              <div class="doc"><div class="row"><b class="grow">Tiempo para responder</b><b>120 s</b></div><div class="slider"><i style="width:33%"></i></div><span class="sm">30 s – 5 min · luego se sugieren alternativos (HU-14)</span></div>
+              <div class="row"><span class="sm grow">Último cambio: 18/11/2026 16:40 por David V.</span><div class="btn" style="padding:6px 14px">Guardar</div></div>
+            </div>
+          </div>
+        </div>
+        <figcaption>Administrador · panel web</figcaption>
+      </figure>
+      <div class="info">
+        <div class="meta"><span class="hu-id">HU-17</span><span class="tag">Backlog</span><span class="tag sp">2 SP</span><span class="tag">Prioridad 2</span></div>
+        <h3>Parámetros del matching</h3>
+        <p class="say">Como <b>administrador</b>, quiero configurar los parámetros del algoritmo de matching (distancia máxima, puntaje mínimo y tiempo de respuesta), a fin de ajustar la asignación según la operación.</p>
+        <p class="ac-title">Criterios de aceptación</p>
+        <ul class="ac">
+          <li>El administrador define distancia máxima, puntaje mínimo y tiempo de respuesta.</li>
+          <li>El motor de recomendación aplica los valores guardados en la siguiente búsqueda.</li>
+        </ul>
+      </div>
+    </article>
+
+    <article class="story wide" id="hu-18">
+      <figure class="mock">
+        <div class="browser"><div class="bar"><i></i><i></i><i></i><span class="url">localhost:5173/admin/metricas?desde=2026-11-01&amp;hasta=2026-11-30</span></div>
+          <div class="dsk">
+            <nav class="side"><b>Chamba<span style="color:var(--a-ink)">PE</span></b><span>Verificación</span><span>Cuentas</span><span>Rubros</span><span>Matching</span><span class="on">Métricas</span></nav>
+            <div class="main">
+              <div class="row"><h4 class="grow">Operación</h4><div class="input" style="padding:4px 8px">01/11 – 30/11/2026 ▾</div></div>
+              <div class="kpis">
+                <div class="kpi"><span class="sm">Servicios realizados</span><b>1 284</b></div>
+                <div class="kpi"><span class="sm">Tiempo prom. de atención</span><b>23 min</b></div>
+                <div class="kpi"><span class="sm">Calificación prom.</span><b>4.7</b></div>
+              </div>
+              <div class="bars">
+                <span class="lbl">Zonas con mayor demanda (servicios)</span>
+                <div><span>Miraflores</span><i style="width:100%"></i><span>312</span></div>
+                <div><span>San Isidro</span><i style="width:78%"></i><span>244</span></div>
+                <div><span>Surco</span><i style="width:66%"></i><span>205</span></div>
+                <div><span>Lince</span><i style="width:49%"></i><span>153</span></div>
+                <div><span>Jesús María</span><i style="width:37%"></i><span>116</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <figcaption>Administrador · panel web</figcaption>
+      </figure>
+      <div class="info">
+        <div class="meta"><span class="hu-id">HU-18</span><span class="tag">Backlog</span><span class="tag sp">2 SP</span><span class="tag">Prioridad 1</span></div>
+        <h3>Dashboard de métricas</h3>
+        <p class="say">Como <b>administrador</b>, quiero ver un panel con métricas de la operación, a fin de tomar decisiones del negocio.</p>
+        <p class="ac-title">Criterios de aceptación</p>
+        <ul class="ac">
+          <li>El panel muestra servicios realizados, tiempo promedio de atención y zonas con mayor demanda.</li>
+          <li>Los datos se pueden filtrar por rango de fechas.</li>
+        </ul>
+      </div>
+    </article>
+  </section>
+
+  <p class="note">Maquetas de referencia (no son capturas del sistema). Los nombres, direcciones y cifras son datos de ejemplo. Historias, prioridades, estimaciones y criterios tomados de <code>docs/Lab07_CPS_ChambaYa.md</code>. En modo presentación usa ← → para avanzar y Esc para salir.</p>
+</div>
+
+<div class="pbar" id="pbar" hidden>
+  <button id="prev" aria-label="Historia anterior">← Anterior</button>
+  <span class="count" id="count">1 / 21</span>
+  <button id="next" aria-label="Historia siguiente">Siguiente →</button>
+  <button class="exit" id="exit">Salir</button>
+</div>
+
+<script>
+(function () {
+  const sections = [...document.querySelectorAll('.sprint')];
+  const filters = [...document.querySelectorAll('.filter')];
+  const pbar = document.getElementById('pbar');
+  const count = document.getElementById('count');
+  let list = [], idx = 0;
+
+  function applyFilter(f) {
+    filters.forEach(b => b.setAttribute('aria-pressed', String(b.dataset.filter === f)));
+    sections.forEach(s => { s.hidden = f !== 'all' && s.dataset.sprint !== f; });
+    try { localStorage.setItem('hu-filter', f); } catch (e) {}
+  }
+  filters.forEach(b => b.addEventListener('click', () => applyFilter(b.dataset.filter)));
+  try { const saved = localStorage.getItem('hu-filter'); if (saved && filters.some(b => b.dataset.filter === saved)) applyFilter(saved); } catch (e) {}
+
+  function show(i) {
+    idx = (i + list.length) % list.length;
+    list.forEach((s, k) => s.classList.toggle('current', k === idx));
+    count.textContent = (idx + 1) + ' / ' + list.length;
+    window.scrollTo(0, 0);
+  }
+  function enter() {
+    list = [...document.querySelectorAll('.sprint:not([hidden]) .story')];
+    if (!list.length) return;
+    document.body.classList.add('present');
+    pbar.hidden = false;
+    show(0);
+    try { const r = document.documentElement.requestFullscreen && document.documentElement.requestFullscreen(); if (r && r.catch) r.catch(() => {}); } catch (e) {}
+  }
+  function exit() {
+    document.body.classList.remove('present');
+    pbar.hidden = true;
+    list.forEach(s => s.classList.remove('current'));
+    try { if (document.fullscreenElement) document.exitFullscreen().catch(() => {}); } catch (e) {}
+  }
+  document.getElementById('present').addEventListener('click', enter);
+  document.getElementById('exit').addEventListener('click', exit);
+  document.getElementById('prev').addEventListener('click', () => show(idx - 1));
+  document.getElementById('next').addEventListener('click', () => show(idx + 1));
+  document.addEventListener('keydown', e => {
+    if (!document.body.classList.contains('present')) return;
+    if (e.key === 'ArrowRight' || e.key === 'PageDown' || e.key === ' ') { e.preventDefault(); show(idx + 1); }
+    else if (e.key === 'ArrowLeft' || e.key === 'PageUp') { e.preventDefault(); show(idx - 1); }
+    else if (e.key === 'Escape') exit();
+  });
+})();
+</script>

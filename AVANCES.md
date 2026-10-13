@@ -18,11 +18,17 @@ Estados: ✅ terminada · 🟡 en curso / parcial · ⚪ sin iniciar · 🔴 blo
 | Horas pendientes | 23 h |
 | Ideal de horas pendientes al 12/10 (día 8) | 6 h |
 | Tareas terminadas | 3 de 13 |
-| Tareas en curso | 8 (T2.1, T2.2, T3.1, T3.2, T3.3, T3.4, T4.1, T4.2) |
+| Tareas en curso | 10 (T2.1, T2.2, T2.3, T3.1, T3.2, T3.3, T3.4, T4.1, T4.2, T4.3) |
 | Historias terminadas | 1 de 4 (HU-1; falta la prueba de Luis, T2.3) |
 | Estado general | 🔴 Atrasado: casi todo está avanzado, pero solo HU-1 entró a `main` por PR revisado |
 
 > Las horas solo cuentan como terminadas cuando la tarea cumple la [definición de terminado](PLAN_EQUIPO.md#8-definición-de-terminado).
+
+Revisión del 12/10: T3.1 mantiene sus 11 pruebas aprobadas tras el merge ya
+incorporado; T3.2 compila, con comprobaciones de navegador pendientes.
+El lint global falla en el componente de carga de David. El resumen de horas y
+burndown conserva los valores previamente registrados; no se estimaron horas nuevas.
+HU-3 y T2.3 siguen parciales. [Resultados y pendientes](docs/pruebas-T2.3.md).
 
 ## 2. Cuadro de avance por tarea
 
@@ -34,8 +40,8 @@ Estados: ✅ terminada · 🟡 en curso / parcial · ⚪ sin iniciar · 🔴 blo
 | T4.1 | HU-4 | Flujo de solicitud: envío y aceptación/rechazo | Renzo León | 3 | 🟡 | `hu-4-solicitud`; pendiente de PR (se une después del PR 3 de HU-3) | 12/10 | Implementada en `servicios`: modelo `Solicitud` (Pendiente → Aceptada / Rechazada) y migración 0001. `POST /api/servicios/solicitudes/` valida que el prestador esté disponible, ofrezca el rubro y cubra la ubicación del cliente. El prestador ve su bandeja (`GET .../recibidas/`) y acepta o rechaza (`POST .../<id>/aceptar/` y `.../rechazar/`), solo si es el dueño y si sigue Pendiente. El cliente ve el cambio en `GET .../<id>/`. 12 pruebas nuevas; `prestadores` y `servicios`: 30 OK. |
 | T3.1 | HU-3 | Búsqueda por rubro, radio y disponibilidad | Luis Abad | 3 | 🟡 | `hu-3-busqueda`; pendiente de revisión e integración por PR | 06/10 | Implementada y verificada: `GET /api/prestadores/buscar/`, parámetros validados en español, Haversine reutilizable, cobertura inclusiva y datos públicos. 11 pruebas nuevas; suite completa: 18 OK, repetida tras incorporar `ae51360` del equipo. Luis confirmó HTTP 200 vacío y positivo. Sin ordenar por distancia (T3.3). [Documentación](docs/API_BUSQUEDA.md). Pendiente de revisión e integración por PR para cumplir la definición de terminado. |
 | T3.2 | HU-3 | Pantalla de resultados con lista de prestadores | Luis Abad | 4 | 🟡 | `hu-3-busqueda`; base previa `50a030c`, `3eceea7`; pendiente de revisión e integración por PR | 06/10 | Implementada: rubros desde API, ubicación Leaflet/coordenadas, Buscar por proxy Vite, tarjetas con datos reales sin calificaciones y estados en español. Cancela peticiones anteriores y conserva el orden de la API. Lint y build código 0, repetidos tras incorporar cambios del equipo. Proxy HTTP 200; Luis confirmó la tarjeta Demo Gasfitero ficticio, Gasfitería, 0 km. Pendientes revisión visual móvil/errores/concurrencia y PR; [pasos y comprobaciones pendientes](frontend/README.md). |
-| T2.3 | HU-1/2 | Pruebas de registro y carga | Luis Abad | 1 | ⚪ | — | — | Requiere T1.2 y T2.1. |
-| T4.3 | HU-4 | Pruebas buscar → solicitar → aceptar | Luis Abad | 2 | ⚪ | — | — | Requiere el flujo completo. |
+| T2.3 | HU-1/2 | Pruebas de registro y carga | Luis Abad | 1 | 🟡 | `hu-3-busqueda`, entrega de pruebas T2.3 | 12/10 | Casos automatizados ampliados: registro/campos/cobertura y PDF/JPG/límites. Suite: 28 pruebas, 27 OK y 1 FAIL por asociación de certificación al prestador (David, T2.1). BD de pruebas y media temporal. Manuales previas de Luis separadas; UI de carga pendiente. [Evidencia y reproducción](docs/pruebas-T2.3.md). No terminada. |
+| T4.3 | HU-4 | Pruebas buscar → solicitar → aceptar | Luis Abad | 2 | 🟡 | Copia temporal de HEAD `5d2e1db` + T4.1 de `origin/hu-4-solicitud` (`eb39859`), sin integrar la rama | 12/10 | 32 pruebas API OK: 30 existentes y 2 nuevas buscar → solicitar → aceptar/rechazar → consulta cliente. Basic Auth real, bandeja, persistencia y segunda respuesta 409; BD en memoria. Copia eliminada, T2.3/BD/media preservados. React sigue pendiente por T4.2 y T4.1 sin integrar aquí. [Resultados y reproducción](docs/pruebas-T4.3.md). No terminada. |
 | T2.1 | HU-2 | API de carga de certificaciones (PDF/JPG ≤ 5 MB) | David Valcarcel | 2 | 🟡 | `main` (`7533a5e`) | 03/10 | Valida tamaño y formato y devuelve estado "Pendiente de verificación". **Falta asociar la certificación al `Prestador`** (criterio de HU-2); se podrá con el modelo de T1.1. |
 | T2.2 | HU-2 | Componente de carga de archivos | David Valcarcel | 2 | 🟡 | `main` (directo, sin PR) | 05/10 | Componente en `src/UploadCertificado.jsx` (carpeta `src/` de la raíz, no en `frontend/`). Falta integrarlo a la app de `frontend/` y pasar por PR. |
 | T3.3 | HU-3 | Ordenar resultados por distancia | David Valcarcel | 2 | 🟡 | `main` (`ae51360`, directo, sin PR) | 06/10 | Endpoint aparte `GET /api/certificaciones/prestadores/cercanos/` que ordena por distancia, pero sobre un modelo propio (`CertificacionPrestador`), no sobre `Prestador`. Falta aplicar el orden en la búsqueda de T3.1 (`/api/prestadores/buscar/`). |
@@ -47,18 +53,18 @@ Estados: ✅ terminada · 🟡 en curso / parcial · ⚪ sin iniciar · 🔴 blo
 | HU | Historia | SP | Horas | Tareas | Estado | Pruebas a cargo |
 |:---:|---|:---:|:---:|---|:---:|---|
 | HU-1 | Registro del prestador | 3 | 7 h | T1.1 ✅ · T1.2 ✅ · T1.3 ✅ | ✅ 7 de 7 h | Luis (T2.3) |
-| HU-2 | Carga de certificaciones | 2 | 5 h | T2.1 🟡 · T2.2 🟡 · T2.3 ⚪ | 🟡 | Luis (T2.3) |
+| HU-2 | Carga de certificaciones | 2 | 5 h | T2.1 🟡 · T2.2 🟡 · T2.3 🟡 (asociación falla) | 🟡 | Luis (T2.3) |
 | HU-3 | Búsqueda de prestadores | 5 | 11 h | T3.1 🟡 (PR 3) · T3.2 🟡 (PR 3) · T3.3 🟡 · T3.4 🟡 | 🟡 | David (T3.4) |
-| HU-4 | Solicitud y aceptación | 3 | 7 h | T4.1 🟡 (`hu-4-solicitud`) · T4.2 🟡 · T4.3 ⚪ | 🟡 | Luis (T4.3) |
+| HU-4 | Solicitud y aceptación | 3 | 7 h | T4.1 🟡 (PR 4) · T4.2 🟡 (conexión pendiente) · T4.3 🟡 (API verificada; React pendiente) | 🟡 | Luis (T4.3) |
 
 ## 4. Avance por integrante
 
 | Integrante | Rol | Horas plan | Horas terminadas | Tareas terminadas | Tareas en curso |
 |---|---|:---:|:---:|:---:|---|
 | Renzo León | Scrum Master / Desarrollador | 10 h | 7 h | T1.1, T1.2, T1.3 | T4.1 (pendiente de PR) |
-| Luis Abad | Development Team | 10 h | 0 h | — | T3.1 (pendiente de PR), T3.2 (pendientes revisión visual y PR) |
+| Luis Abad | Development Team | 10 h | 0 h | — | T3.1 (pendiente de PR), T3.2 (pendientes revisión visual y PR), T2.3 (asociación pendiente), T4.3 (API verificada; React/integración pendientes) |
 | David Valcarcel | Product Owner / Desarrollador | 10 h | 0 h | — | T2.1, T2.2, T3.3, T3.4, T4.2 (subidas a `main` sin PR; falta integrarlas) |
-| **Equipo** | | **30 h** | **7 h** | **3** | **8** |
+| **Equipo** | | **30 h** | **7 h** | **3** | **10** |
 
 ## 5. Burndown (horas pendientes)
 
@@ -83,6 +89,8 @@ Una línea por entrega, la más reciente arriba.
 | Fecha | Quién | Qué se hizo | Tarea |
 |:---:|---|---|:---:|
 | 12/10 | Renzo León | T4.1 en la rama `hu-4-solicitud` (creada desde `hu-3-busqueda` con `main` incorporado): modelo `Solicitud` y migración, envío con validación de disponibilidad, rubro y cobertura, bandeja del prestador, aceptar/rechazar solo por el dueño y solo una vez (409 si ya se respondió) y consulta del estado para el cliente. 12 pruebas nuevas; `prestadores` y `servicios`: 30 OK. AVANCES actualizado con lo subido por David entre el 05/10 y el 10/10. | T4.1 |
+| 12/10 | Luis Abad | Ejecutó T4.3 en copia temporal de HEAD con API de Renzo `eb39859`: 32 pruebas OK (30 existentes + 2 nuevas encadenando búsqueda/envío/aceptación o rechazo/consulta cliente), Basic Auth real y BD en memoria. Bandeja y cambios persistidos correctos; segunda respuesta 409. Copia eliminada; rama, HEAD, T2.3, BD y media conservados. Añadido ejecutor reproducible y [evidencia](docs/pruebas-T4.3.md). React pendiente por T4.2 e integración T4.1; sin commits, push, fusiones ni horas nuevas. | T4.3 |
+| 12/10 | Luis Abad | Revisión tras merge existente 5d2e1db: búsqueda 11 tests OK; suite ampliada 28, 27 OK/1 FAIL por asociación HU-2. Build OK; lint falla en UploadCertificado de David. Añadidos casos T2.3 con BD/media temporales y documentación de manuales previas, incidencias y pendientes. Sin horas nuevas ni tareas completas. [Informe](docs/pruebas-T2.3.md). | T3.1/T3.2/T2.3 |
 | 09/10 | David Valcarcel | Subió a `main` la pantalla de envío de certificación con estado (`frontend/src/UploadCertificado.jsx`). | T4.2 |
 | 07/10 | David Valcarcel | Script de medición del tiempo de respuesta y `evidencia_rendimiento.txt`. | T3.4 |
 | 06/10 | David Valcarcel | Endpoint `prestadores/cercanos/` que ordena por distancia (Haversine) en `certificaciones`. | T3.3 |
@@ -107,6 +115,10 @@ Una línea por entrega, la más reciente arriba.
 
 | # | Fecha | Impedimento / riesgo | Afecta a | Responsable | Estado |
 |:---:|:---:|---|---|---|:---:|
+| 6 | 12/10 | T2.3 reproduce carga 201 sin registro ni asociación al perfil; prueba permanece fallando. | HU-2, T2.3 | David (T2.1) | 🔴 |
+| 7 | 12/10 | Lint falla por err sin usar en UploadCertificado; CSS importado ausente y componente sin navegación. T4.2 no conecta solicitudes de servicio. | HU-2, HU-4, T4.3 | David (T2.2/T4.2) | 🟡 |
+| 8 | 12/10 | T3.3/T3.4 existentes usan endpoint/modelo de certificaciones; faltan integración y verificación sobre búsqueda real. | HU-3 | David | 🟡 |
+| 9 | 12/10 | API T4.1 probada en copia aislada: 32 OK; aún sin integración en la rama de trabajo. Flujo completo React bloqueado por conexión T4.2. Navegador/PR pendientes. [Evidencia](docs/pruebas-T4.3.md). | T3.2, T4.3 | Luis / Renzo (T4.1) / David (T4.2) | 🟡 |
 | 1 | 05/10 | T1.1 llegaba con 3 días de retraso y bloqueaba la búsqueda y las certificaciones. Resuelto: PR 1 unido a `main` el 05/10. | HU-2, HU-3 | Renzo | ✅ |
 | 2 | 05/10 | La carga de certificaciones no está asociada a un prestador (criterio de HU-2). | HU-2 | David | 🟡 |
 | 3 | 06/10 | T3.1 y la conexión de T3.2 ya están implementadas localmente; faltan comprobaciones visuales de T3.2 y revisión/integración por PR. La pantalla ya consulta datos de la API. | HU-3 | Luis | 🟡 |

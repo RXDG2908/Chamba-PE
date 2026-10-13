@@ -54,3 +54,39 @@ class RegistroPrestadorTests(TestCase):
         r = self.client.get(reverse('rubros'))
         self.assertEqual(len(r.json()), Rubro.objects.count())
         self.assertIn({'id': self.rubro.id, 'nombre': 'Gasfitería'}, r.json())
+
+
+    def test_campos_obligatorios_ausentes_y_vacios(self):
+        from django.contrib.auth import get_user_model
+        for campo in self.datos:
+            for ausente in (True, False):
+                with self.subTest(campo=campo, ausente=ausente):
+                    datos = self.datos.copy()
+                    if ausente:
+                        datos.pop(campo)
+                    else:
+                        datos[campo] = [] if campo == 'rubros' else ''
+                    r = self.client.post(self.url, datos, content_type='application/json')
+                    self.assertEqual(r.status_code, 400)
+                    self.assertIn(campo, r.json())
+                    self.assertEqual(Prestador.objects.count(), 0)
+                    self.assertEqual(get_user_model().objects.count(), 0)
+
+    def test_cobertura_invalida(self):
+        casos = {'latitud': [-90.000001, 90.000001, 'texto', None],
+                 'longitud': [-180.000001, 180.000001, 'texto', None],
+                 'radio_cobertura_km': [0, -1, 101, 'texto', None]}
+        for campo, valores in casos.items():
+            for valor in valores:
+                with self.subTest(campo=campo, valor=valor):
+                    r = self.post(**{campo: valor})
+                    self.assertEqual(r.status_code, 400)
+                    self.assertIn(campo, r.json())
+                    self.assertFalse(Prestador.objects.exists())
+
+    def test_estado_no_puede_aprobarse_desde_registro(self):
+        r = self.post(estado='verificado')
+        self.assertEqual(r.status_code, 201)
+        prestador = Prestador.objects.get()
+        self.assertEqual(prestador.estado, Prestador.Estado.PENDIENTE)
+        self.assertEqual(prestador.get_estado_display(), 'Pendiente de verificación')

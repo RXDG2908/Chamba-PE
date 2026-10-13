@@ -33,12 +33,10 @@
 .naranja { background: #fbecd9; color: #885519; }
 .perfil { flex: 1; min-width: 0; }
 .perfil h4 { margin: 0 0 6px; font-size: 18px; overflow-wrap: anywhere; }
-.rubro { color: #58675f; font-size: 15px; }
+.rubros-tarjeta { color: #58675f; font-size: 15px; overflow-wrap: anywhere; }
 .detalles { display: flex; gap: 32px; margin: 0; }
 .detalles dt { color: #58675f; font-size: 13px; margin-bottom: 5px; }
 .detalles dd { margin: 0; font-size: 17px; font-weight: 600; white-space: nowrap; }
-.estrella { color: #946000; }
-.escala { font-size: 13px; font-weight: 400; color: #58675f; }
 .nota { margin-top: 28px; text-align: center; color: #58675f; font-size: 12px; }
 
 @media (max-width: 600px) {
@@ -51,6 +49,28 @@
   .resumen { flex-wrap: wrap; gap: 4px 16px; }
 }
 
-.menu { display: flex; gap: 8px; margin-top: 16px; }
+.menu { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; }
 .menu button { padding: 8px 16px; border: 1px solid #cbded3; border-radius: 999px; background: #fff; font: inherit; font-size: 14px; cursor: pointer; }
 .menu button[aria-current='true'] { background: #16734f; border-color: #16734f; color: #fff; }
+
+.busqueda { margin-block: 24px 32px; padding: 24px; background: #fff; border: 1px solid #e0e7e4; border-radius: 16px; }
+.campo-busqueda { display: grid; gap: 6px; font-size: 14px; min-width: 0; }
+.campo-busqueda input, .campo-busqueda select { width: 100%; min-width: 0; padding: 10px 12px; border: 1px solid #cbded3; border-radius: 10px; background: #fff; color: #20352a; font: inherit; }
+.busqueda fieldset { min-width: 0; margin: 24px 0 0; padding: 0; border: 0; }
+.busqueda legend { padding: 0; font-weight: 700; color: #16734f; }
+.busqueda fieldset > p { color: #58675f; font-size: 14px; margin-block: 10px; }
+.mapa-busqueda { height: 320px; width: 100%; border-radius: 12px; z-index: 0; }
+.coordenadas-busqueda { display: grid; grid-template-columns: 1fr 1fr auto; gap: 12px; align-items: end; margin-top: 16px; }
+.busqueda button { padding: 12px 16px; border: 1px solid #cbded3; border-radius: 10px; background: #eaf4ee; color: #20352a; font: inherit; cursor: pointer; }
+.busqueda .boton-buscar { width: 100%; margin-top: 16px; border-color: #16734f; background: #16734f; color: #fff; font-weight: 700; }
+.busqueda button:disabled { opacity: 0.6; cursor: not-allowed; }
+.error-busqueda { margin-block: 16px; padding: 12px 16px; border-radius: 10px; background: #fdecea; color: #b3261e; overflow-wrap: anywhere; }
+.error-busqueda button { margin-top: 10px; }
+.resultado-anuncio { margin-bottom: 16px; color: #58675f; font-size: 14px; }
+.busqueda :focus-visible { outline: 3px solid #16734f; outline-offset: 3px; }
+
+@media (max-width: 600px) {
+  .busqueda { padding: 16px; }
+  .coordenadas-busqueda { grid-template-columns: 1fr; }
+  .mapa-busqueda { height: 280px; }
+}

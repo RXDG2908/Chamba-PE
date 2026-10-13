@@ -3,7 +3,7 @@
 > **Regla del equipo:** este archivo se actualiza **siempre**, al terminar cada tarea o al cierre del día de trabajo, antes de dar la tarea por terminada. Ver [PLAN_EQUIPO.md](PLAN_EQUIPO.md#3-reglas-de-reparto).
 > Sirve de base para el cuadro de avances y el informe del Sprint Review.
 
-**Última actualización:** 06/10/2026 · **Sprint actual:** 1 (01/10 – 14/10/2026) · **Meta:** el prestador se registra y el cliente lo encuentra y le envía una solicitud.
+**Última actualización:** 12/10/2026 · **Sprint actual:** 1 (01/10 – 14/10/2026) · **Meta:** el prestador se registra y el cliente lo encuentra y le envía una solicitud.
 
 Estados: ✅ terminada · 🟡 en curso / parcial · ⚪ sin iniciar · 🔴 bloqueada
 
@@ -16,13 +16,19 @@ Estados: ✅ terminada · 🟡 en curso / parcial · ⚪ sin iniciar · 🔴 blo
 | Horas comprometidas | 30 h |
 | Horas terminadas (tareas ✅) | 7 h |
 | Horas pendientes | 23 h |
-| Ideal de horas pendientes al 05/10 (día 3) | 21 h |
+| Ideal de horas pendientes al 06/10 (día 4) | 18 h |
 | Tareas terminadas | 3 de 13 |
-| Tareas en curso | 2 (T2.1, T3.2) |
+| Tareas en curso | 5 (T2.1, T3.1 pendiente de PR, T3.2, T2.3, T4.3 API verificada en copia aislada) |
 | Historias terminadas | 1 de 4 (HU-1; falta la prueba de Luis, T2.3) |
 | Estado general | 🔴 Atrasado respecto al burndown ideal |
 
 > Las horas solo cuentan como terminadas cuando la tarea cumple la [definición de terminado](PLAN_EQUIPO.md#8-definición-de-terminado).
+
+Revisión del 12/10: T3.1 mantiene sus 11 pruebas aprobadas tras el merge ya
+incorporado; T3.2 compila, con comprobaciones de navegador pendientes.
+El lint global falla en el componente de carga de David. El resumen de horas y
+burndown conserva los valores previamente registrados; no se estimaron horas nuevas.
+HU-3 y T2.3 siguen parciales. [Resultados y pendientes](docs/pruebas-T2.3.md).
 
 ## 2. Cuadro de avance por tarea
 
@@ -32,10 +38,10 @@ Estados: ✅ terminada · 🟡 en curso / parcial · ⚪ sin iniciar · 🔴 blo
 | T1.2 | HU-1 | API de registro de prestadores | Renzo León | 3 | ✅ | `main` | 05/10 | `POST /api/prestadores/registro/` crea usuario y prestador; exige DNI (8 dígitos, único), ≥ 1 rubro y cobertura; queda "Pendiente de verificación". `GET /api/prestadores/rubros/`. 7 pruebas pasan. Se agregó Django REST Framework (`requirements.txt`). |
 | T1.3 | HU-1 | Formulario de registro (web y móvil) | Renzo León | 2 | ✅ | `main` | 05/10 | Formulario React (`frontend/src/RegistroPrestador.jsx`): datos, cuenta, rubros desde la API y mapa Leaflet con círculo de cobertura y radio. Valida en el cliente y muestra los errores del servidor. Diseño responsive (sirve en navegador móvil); la app móvil nativa sigue por definir. Probado de punta a punta contra la API. |
 | T4.1 | HU-4 | Flujo de solicitud: envío y aceptación/rechazo | Renzo León | 3 | ⚪ | — | — | Planificada 12/10–14/10. Depende de HU-3. |
-| T3.1 | HU-3 | Búsqueda por rubro, radio y disponibilidad | Luis Abad | 3 | ⚪ | — | — | Necesita el modelo `Prestador` (T1.1). |
-| T3.2 | HU-3 | Pantalla de resultados con lista de prestadores | Luis Abad | 4 | 🟡 | `main` (`50a030c`, `3eceea7`) | 04/10 | Frontend React + Vite con tarjetas de prestadores, responsive. Aún sin conectar a la API. |
-| T2.3 | HU-1/2 | Pruebas de registro y carga | Luis Abad | 1 | ⚪ | — | — | Requiere T1.2 y T2.1. |
-| T4.3 | HU-4 | Pruebas buscar → solicitar → aceptar | Luis Abad | 2 | ⚪ | — | — | Requiere el flujo completo. |
+| T3.1 | HU-3 | Búsqueda por rubro, radio y disponibilidad | Luis Abad | 3 | 🟡 | `hu-3-busqueda`; pendiente de revisi?n e integraci?n por PR | 06/10 | Implementada y verificada: `GET /api/prestadores/buscar/`, parámetros validados en español, Haversine reutilizable, cobertura inclusiva y datos públicos. 11 pruebas nuevas; suite completa: 18 OK, repetida tras incorporar `ae51360` del equipo. Luis confirmó HTTP 200 vacío y positivo. Sin ordenar por distancia (T3.3). [Documentación](docs/API_BUSQUEDA.md). Pendiente de revisión e integración por PR para cumplir la definición de terminado. |
+| T3.2 | HU-3 | Pantalla de resultados con lista de prestadores | Luis Abad | 4 | 🟡 | `hu-3-busqueda`; base previa `50a030c`, `3eceea7`; pendiente de revisi?n e integraci?n por PR | 06/10 | Implementada: rubros desde API, ubicación Leaflet/coordenadas, Buscar por proxy Vite, tarjetas con datos reales sin calificaciones y estados en español. Cancela peticiones anteriores y conserva el orden de la API. Lint y build código 0, repetidos tras incorporar cambios del equipo. Proxy HTTP 200; Luis confirmó la tarjeta Demo Gasfitero ficticio, Gasfitería, 0 km. Pendientes revisión visual móvil/errores/concurrencia y PR; [pasos y comprobaciones pendientes](frontend/README.md). |
+| T2.3 | HU-1/2 | Pruebas de registro y carga | Luis Abad | 1 | 🟡 | `hu-3-busqueda`, entrega de pruebas T2.3 | 12/10 | Casos automatizados ampliados: registro/campos/cobertura y PDF/JPG/límites. Suite: 28 pruebas, 27 OK y 1 FAIL por asociación de certificación al prestador (David, T2.1). BD de pruebas y media temporal. Manuales previas de Luis separadas; UI de carga pendiente. [Evidencia y reproducción](docs/pruebas-T2.3.md). No terminada. |
+| T4.3 | HU-4 | Pruebas buscar → solicitar → aceptar | Luis Abad | 2 | 🟡 | Copia temporal de HEAD `5d2e1db` + T4.1 de `origin/hu-4-solicitud` (`eb39859`), sin integrar la rama | 12/10 | 32 pruebas API OK: 30 existentes y 2 nuevas buscar → solicitar → aceptar/rechazar → consulta cliente. Basic Auth real, bandeja, persistencia y segunda respuesta 409; BD en memoria. Copia eliminada, T2.3/BD/media preservados. React sigue pendiente por T4.2 y T4.1 sin integrar aquí. [Resultados y reproducción](docs/pruebas-T4.3.md). No terminada. |
 | T2.1 | HU-2 | API de carga de certificaciones (PDF/JPG ≤ 5 MB) | David Valcarcel | 2 | 🟡 | `main` (`7533a5e`) | 03/10 | Valida tamaño y formato y devuelve estado "Pendiente de verificación". **Falta asociar la certificación al `Prestador`** (criterio de HU-2); se podrá con el modelo de T1.1. |
 | T2.2 | HU-2 | Componente de carga de archivos | David Valcarcel | 2 | ⚪ | — | — | Planificada 05/10–09/10. |
 | T3.3 | HU-3 | Ordenar resultados por distancia | David Valcarcel | 2 | ⚪ | — | — | Planificada 12/10–14/10. |
@@ -47,18 +53,18 @@ Estados: ✅ terminada · 🟡 en curso / parcial · ⚪ sin iniciar · 🔴 blo
 | HU | Historia | SP | Horas | Tareas | Estado | Pruebas a cargo |
 |:---:|---|:---:|:---:|---|:---:|---|
 | HU-1 | Registro del prestador | 3 | 7 h | T1.1 ✅ · T1.2 ✅ · T1.3 ✅ | ✅ 7 de 7 h | Luis (T2.3) |
-| HU-2 | Carga de certificaciones | 2 | 5 h | T2.1 🟡 · T2.2 ⚪ · T2.3 ⚪ | 🟡 | Luis (T2.3) |
-| HU-3 | Búsqueda de prestadores | 5 | 11 h | T3.1 ⚪ · T3.2 🟡 · T3.3 ⚪ · T3.4 ⚪ | 🟡 | David (T3.4) |
-| HU-4 | Solicitud y aceptación | 3 | 7 h | T4.1 ⚪ · T4.2 ⚪ · T4.3 ⚪ | ⚪ | Luis (T4.3) |
+| HU-2 | Carga de certificaciones | 2 | 5 h | T2.1 🟡 · T2.2 ⚪ · T2.3 🟡 (asociación falla) | 🟡 | Luis (T2.3) |
+| HU-3 | Búsqueda de prestadores | 5 | 11 h | T3.1 🟡 (implementada localmente) · T3.2 🟡 · T3.3 ⚪ · T3.4 ⚪ | 🟡 | David (T3.4) |
+| HU-4 | Solicitud y aceptación | 3 | 7 h | T4.1 ⚪ (API en rama remota, sin integrar aquí) · T4.2 ⚪ (conexión pendiente) · T4.3 🟡 (API verificada en copia; React pendiente) | 🟡 | Luis (T4.3) |
 
 ## 4. Avance por integrante
 
 | Integrante | Rol | Horas plan | Horas terminadas | Tareas terminadas | Tareas en curso |
 |---|---|:---:|:---:|:---:|---|
 | Renzo León | Scrum Master / Desarrollador | 10 h | 7 h | T1.1, T1.2, T1.3 | — |
-| Luis Abad | Development Team | 10 h | 0 h | — | T3.2 |
+| Luis Abad | Development Team | 10 h | 0 h | — | T3.1 (pendiente de PR), T3.2 (pendientes revisión visual y PR), T2.3 (asociación pendiente), T4.3 (API verificada; React/integración pendientes) |
 | David Valcarcel | Product Owner / Desarrollador | 10 h | 0 h | — | T2.1 |
-| **Equipo** | | **30 h** | **7 h** | **3** | **2** |
+| **Equipo** | | **30 h** | **7 h** | **3** | **5** |
 
 ## 5. Burndown (horas pendientes)
 
@@ -68,7 +74,7 @@ Estados: ✅ terminada · 🟡 en curso / parcial · ⚪ sin iniciar · 🔴 blo
 | 1 | 01/10 | 27 | 30 |
 | 2 | 02/10 | 24 | 30 |
 | 3 | 05/10 | 21 | 23 |
-| 4 | 06/10 | 18 | |
+| 4 | 06/10 | 18 | 23 |
 | 5 | 07/10 | 15 | |
 | 6 | 08/10 | 12 | |
 | 7 | 09/10 | 9 | |
@@ -82,6 +88,12 @@ Una línea por entrega, la más reciente arriba.
 
 | Fecha | Quién | Qué se hizo | Tarea |
 |:---:|---|---|:---:|
+| 12/10 | Luis Abad | Ejecutó T4.3 en copia temporal de HEAD con API de Renzo `eb39859`: 32 pruebas OK (30 existentes + 2 nuevas encadenando búsqueda/envío/aceptación o rechazo/consulta cliente), Basic Auth real y BD en memoria. Bandeja y cambios persistidos correctos; segunda respuesta 409. Copia eliminada; rama, HEAD, T2.3, BD y media conservados. Añadido ejecutor reproducible y [evidencia](docs/pruebas-T4.3.md). React pendiente por T4.2 e integración T4.1; sin commits, push, fusiones ni horas nuevas. | T4.3 |
+| 12/10 | Luis Abad | Revisión tras merge existente 5d2e1db: búsqueda 11 tests OK; suite ampliada 28, 27 OK/1 FAIL por asociación HU-2. Build OK; lint falla en UploadCertificado de David. Añadidos casos T2.3 con BD/media temporales y documentación de manuales previas, incidencias y pendientes. Sin horas nuevas ni tareas completas. [Informe](docs/pruebas-T2.3.md). | T3.1/T3.2/T2.3 |
+| 06/10 | Luis Abad | Preparación para revisión de T3.1/T3.2 en `hu-3-busqueda`: incorporado por avance rápido `ae51360` del equipo sin modificar sus archivos. Suite backend repetida: 18 OK en base de pruebas; lint y build repetidos: código 0. Registrada confirmación manual de Luis de HTTP 200 vacío/positivo y tarjeta ficticia a 0 km. Documentación revisada; commit pendiente de aprobación del mensaje y PR pendiente. HU-3 sigue parcial, sin sumar horas terminadas. | T3.1/T3.2 |
+| 06/10 | Luis Abad | Conectó Resultados a Django: selector de rubros, mapa Leaflet y coordenadas exactas, botón Buscar, tarjetas con datos de la API sin calificaciones, estados en español y cancelación de búsquedas anteriores. Conserva registro y navegación, orden del backend, cambios T3.1 y base local. Lint y build en `frontend/`: código 0. Consultas vía proxy Vite: 200 y ficticio a 0 km. Pendientes comprobaciones visuales documentadas y PR; HU-3 parcial, T3.3/T3.4 de David pendientes. Sin commit ni push. | T3.2 |
+| 06/10 | Luis Abad | Prueba positiva local de T3.1: comando idempotente `preparar_busqueda_local` creó un único prestador ficticio (id 2), Gasfitería (id 1), disponible, centro -12.046374/-77.042793 y radio 5 km. Segunda ejecución reutilizó el registro sin cambios. Consulta HTTP al servidor local: 200, prestador ficticio a 0.0 km. Sin alterar registros previos ni filtros; no completa T3.4 de David. | T3.1 |
+| 06/10 | Luis Abad | Implementó T3.1 en `servicios`, reutilizando `Prestador` y `Rubro`: validación en español, filtros de rubro/disponibilidad/cobertura, distancia Haversine y salida pública. Ejecutó `.\venv\Scripts\python.exe manage.py test --noinput`: 18 pruebas OK (7 existentes + 11 nuevas), con base de pruebas creada y destruida. Documentó endpoint y ejemplos. Sin cambios al frontend, commit ni push; pendiente de PR. T3.2 y HU-3 siguen parciales. | T3.1 |
 | 06/10 | Renzo León | Maquetas de las 21 historias de usuario (`docs/renders/historias-usuario.html`) para la presentación; README corregido (tenía un conflicto de merge sin resolver) y ampliado con backlog, estructura y cómo ejecutar. | — |
 | 05/10 | Renzo León | Formulario de registro con rubros y mapa de cobertura (Leaflet); proxy `/api` a Django en Vite. | T1.3 |
 | 05/10 | Renzo León | Migración 0002 con 10 rubros iniciales (Gasfitería, Electricidad, Carpintería, etc.). | T1.1 |
@@ -98,9 +110,13 @@ Una línea por entrega, la más reciente arriba.
 
 | # | Fecha | Impedimento / riesgo | Afecta a | Responsable | Estado |
 |:---:|:---:|---|---|---|:---:|
+| 6 | 12/10 | T2.3 reproduce carga 201 sin registro ni asociación al perfil; prueba permanece fallando. | HU-2, T2.3 | David (T2.1) | 🔴 |
+| 7 | 12/10 | Lint falla por err sin usar en UploadCertificado; CSS importado ausente y componente sin navegación. T4.2 no conecta solicitudes de servicio. | HU-2, HU-4, T4.3 | David (T2.2/T4.2) | 🟡 |
+| 8 | 12/10 | T3.3/T3.4 existentes usan endpoint/modelo de certificaciones; faltan integración y verificación sobre búsqueda real. | HU-3 | David | 🟡 |
+| 9 | 12/10 | API T4.1 probada en copia aislada: 32 OK; aún sin integración en la rama de trabajo. Flujo completo React bloqueado por conexión T4.2. Navegador/PR pendientes. [Evidencia](docs/pruebas-T4.3.md). | T3.2, T4.3 | Luis / Renzo (T4.1) / David (T4.2) | 🟡 |
 | 1 | 05/10 | T1.1 llegaba con 3 días de retraso y bloqueaba la búsqueda y las certificaciones. Resuelto: PR 1 unido a `main` el 05/10. | HU-2, HU-3 | Renzo | ✅ |
 | 2 | 05/10 | La carga de certificaciones no está asociada a un prestador (criterio de HU-2). | HU-2 | David | 🟡 |
-| 3 | 05/10 | El listado de Luis usa datos de ejemplo; falta conectarlo a la búsqueda real (T3.1). | HU-3 | Luis | 🟡 |
+| 3 | 06/10 | T3.1 y la conexión de T3.2 ya están implementadas localmente; faltan comprobaciones visuales de T3.2 y revisión/integración por PR. La pantalla ya consulta datos de la API. | HU-3 | Luis | 🟡 |
 | 4 | 05/10 | T4.1 queda para los últimos 3 días del sprint y depende de HU-3. | HU-4 | Renzo | ⚪ |
 | 5 | 05/10 | App móvil "por definir" en el stack: el formulario es web responsive, no una app nativa. | HU-1 | Equipo | ⚪ |
 
@@ -108,6 +124,8 @@ Una línea por entrega, la más reciente arriba.
 
 | Fecha | Decisión | Motivo |
 |:---:|---|---|
+| 06/10 | Resultados usa el proxy `/api` existente y Leaflet; cancela búsquedas al cambiar filtros, repetir consulta o salir de la pantalla y conserva el orden recibido. | Evita datos desactualizados sin asumir el ordenamiento T3.3 de David; no altera el registro ni los datos locales. |
+| 06/10 | Búsqueda en `servicios` con Haversine reutilizable y radio inclusivo; respuesta pública sin calificaciones ni orden por distancia. | Respeta T3.1 y la organización del backend; T3.3 y T3.4 quedan a cargo de David. Sin migraciones ni cambios a registros locales. |
 | 05/10 | Mapa con Leaflet + OpenStreetMap; en desarrollo el frontend usa un proxy `/api` hacia Django (puerto 8000). | Sin claves ni costo; evita configurar CORS. |
 | 05/10 | Rubros iniciales cargados con una migración de datos. | Todos los entornos arrancan con los mismos rubros. |
 | 01/10 | Backend en Django + Django REST Framework. | Definido en el plan del equipo. |

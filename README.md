@@ -106,6 +106,7 @@ Capacidad: 30 h por sprint (3 integrantes × 10 h) · 114 h planificadas. Detall
 Chamba-PE/
 ├── core/               Configuración de Django (settings, urls)
 ├── prestadores/        App Django: prestador, rubros, cobertura y API de registro (HU-1)
+├── servicios/          Búsqueda por rubro, disponibilidad y cobertura; distancia y pruebas (T3.1)
 ├── certificaciones/    App Django: carga de certificaciones PDF/JPG ≤ 5 MB (HU-2)
 ├── frontend/           Frontend React + Vite: listado de prestadores (HU-3) y formulario de registro (HU-1)
 ├── src/                Componente React de carga de certificaciones (HU-2)
@@ -145,6 +146,7 @@ La API queda en `http://127.0.0.1:8000/` y el panel de Django en `/admin/`.
 |---|---|
 | `POST /api/prestadores/registro/` | Registro del prestador (HU-1) |
 | `GET /api/prestadores/rubros/` | Lista de rubros |
+| `GET /api/prestadores/buscar/` | Búsqueda por rubro, disponibilidad y cobertura (T3.1); [parámetros y ejemplos](docs/API_BUSQUEDA.md) |
 | `/api/certificaciones/` | Carga de certificaciones (HU-2) |
 
 Pruebas del backend:
@@ -162,6 +164,28 @@ npm install
 ```bash
 npm run dev
 ```
+
+### Avance HU-3: T3.1 y T3.2
+
+La búsqueda Django filtra por rubro, disponibilidad y cobertura y devuelve
+datos públicos con distancia geográfica. En **Resultados**, React carga los
+rubros, permite elegir la ubicación en Leaflet o confirmar coordenadas y
+muestra las tarjetas de la API con estados de carga, error y sin resultados.
+Se conservan el registro y la navegación, se eliminan las calificaciones
+ficticias y se respeta el orden recibido del backend.
+
+Para probar la coincidencia local, selecciona Gasfitería, introduce latitud
+`-12.046374` y longitud `-77.042793`, pulsa **Usar coordenadas** y **Buscar**.
+El prestador ficticio se prepara solo mediante el comando opcional documentado;
+la pantalla no modifica datos. Consulta los [parámetros y ejemplos de API](docs/API_BUSQUEDA.md)
+y la [guía del frontend](frontend/README.md).
+
+Verificado el 06/10/2026: 18 pruebas backend aprobadas, lint y build correctos.
+Luis confirmó manualmente respuestas HTTP 200 vacía y positiva y la tarjeta
+Demo Gasfitero ficticio a 0 km. Quedan pendientes pruebas visuales móviles,
+errores y concurrencia en navegador, revisión del PR e integración en `main`.
+HU-3 sigue parcial: David debe integrar T3.3 con esta búsqueda y verificar
+datos/rendimiento en T3.4; su avance separado en `certificaciones` se conserva.
 
 ## Flujo de trabajo
 

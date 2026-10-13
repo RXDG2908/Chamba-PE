@@ -23,6 +23,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/certificaciones/', include('certificaciones.urls')),
     path('api/prestadores/', include('prestadores.urls')),
+    path('api/servicios/', include('servicios.urls')),
 ]
 
 if settings.DEBUG:

@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'certificaciones',
     'rest_framework',
     'prestadores',
+    'servicios',
 ]
 
 MIDDLEWARE = [

@@ -106,7 +106,7 @@ Capacidad: 30 h por sprint (3 integrantes × 10 h) · 114 h planificadas. Detall
 Chamba-PE/
 ├── core/               Configuración de Django (settings, urls)
 ├── prestadores/        App Django: prestador, rubros, cobertura y API de registro (HU-1)
-├── servicios/          Búsqueda por rubro, disponibilidad y cobertura; distancia y pruebas (T3.1)
+├── servicios/          Búsqueda por rubro, disponibilidad y cobertura (HU-3) y solicitudes de servicio (HU-4)
 ├── certificaciones/    App Django: carga de certificaciones PDF/JPG ≤ 5 MB (HU-2)
 ├── frontend/           Frontend React + Vite: listado de prestadores (HU-3) y formulario de registro (HU-1)
 ├── src/                Componente React de carga de certificaciones (HU-2)
@@ -147,6 +147,10 @@ La API queda en `http://127.0.0.1:8000/` y el panel de Django en `/admin/`.
 | `POST /api/prestadores/registro/` | Registro del prestador (HU-1) |
 | `GET /api/prestadores/rubros/` | Lista de rubros |
 | `GET /api/prestadores/buscar/` | Búsqueda por rubro, disponibilidad y cobertura (T3.1); [parámetros y ejemplos](docs/API_BUSQUEDA.md) |
+| `POST /api/servicios/solicitudes/` | El cliente envía una solicitud al prestador; queda Pendiente (HU-4) |
+| `GET /api/servicios/solicitudes/<id>/` | El cliente consulta el estado de su solicitud (HU-4) |
+| `GET /api/servicios/solicitudes/recibidas/` | Bandeja del prestador; requiere su sesión (HU-4) |
+| `POST /api/servicios/solicitudes/<id>/aceptar/` · `.../rechazar/` | El prestador responde, una sola vez (HU-4) |
 | `/api/certificaciones/` | Carga de certificaciones (HU-2) |
 
 Pruebas del backend:
@@ -186,6 +190,14 @@ Demo Gasfitero ficticio a 0 km. Quedan pendientes pruebas visuales móviles,
 errores y concurrencia en navegador, revisión del PR e integración en `main`.
 HU-3 sigue parcial: David debe integrar T3.3 con esta búsqueda y verificar
 datos/rendimiento en T3.4; su avance separado en `certificaciones` se conserva.
+
+### Avance HU-4: T4.1
+
+La API de solicitudes (rama `hu-4-solicitud`) ya permite el flujo solicitar → aceptar o rechazar. Al enviar, se valida que el prestador esté disponible, ofrezca el rubro y cubra la ubicación del cliente. Solo el prestador dueño de la solicitud puede responderla, y solo mientras siga Pendiente. Mientras no exista el inicio de sesión (HU-5), la bandeja y las respuestas se prueban con autenticación básica (usuario y contraseña del registro), por ejemplo desde Postman.
+
+Verificado el 12/10/2026: 30 pruebas de `prestadores` y `servicios` aprobadas. Pendiente: unir el PR después del de HU-3, la pantalla de T4.2 conectada a esta API y las pruebas T4.3 de Luis.
+
+> `python manage.py test` marca 1 error en `certificaciones/test_reporte.py`: es un script de medición que necesita `requests` y el servidor encendido. Para correr solo las pruebas del backend: `python manage.py test prestadores servicios`.
 
 ## Flujo de trabajo
 

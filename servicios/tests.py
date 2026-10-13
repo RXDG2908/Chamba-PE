@@ -8,6 +8,7 @@ from django.urls import reverse
 from prestadores.models import Prestador, Rubro
 
 from .distancias import RADIO_TIERRA_KM, distancia_km
+from .models import Solicitud
 
 
 class DistanciaTests(SimpleTestCase):
@@ -110,3 +111,114 @@ class BusquedaPrestadoresTests(TestCase):
         respuesta = self.buscar()
         self.assertEqual(respuesta.status_code, 200)
         self.assertEqual(respuesta.json(), [])
+
+
+class SolicitudTests(TestCase):
+    def setUp(self):
+        self.rubro = Rubro.objects.create(nombre='Rubro de prueba')
+        self.otro_rubro = Rubro.objects.create(nombre='Otro rubro de prueba')
+        self.prestador = self.crear_prestador('ana')
+        self.datos = {
+            'prestador': self.prestador.id, 'rubro': self.rubro.id,
+            'cliente_nombre': 'Carlos', 'cliente_telefono': '999888777',
+            'descripcion': 'Se rompió la tubería del baño.',
+            'latitud': '0.010000', 'longitud': '0.000000',
+        }
+
+    def crear_prestador(self, username, **cambios):
+        usuario = get_user_model().objects.create_user(username=username)
+        datos = {
+            'usuario': usuario, 'dni': f'{Prestador.objects.count() + 1:08d}', 'nombres': 'Ana',
+            'apellidos': 'Pérez', 'latitud': 0, 'longitud': 0,
+            'radio_cobertura_km': 5, 'disponible': True,
+        }
+        prestador = Prestador.objects.create(**{**datos, **cambios})
+        prestador.rubros.set([self.rubro])
+        return prestador
+
+    def enviar(self, **cambios):
+        return self.client.post(
+            reverse('crear_solicitud'), {**self.datos, **cambios}, content_type='application/json',
+        )
+
+    def responder(self, accion, solicitud_id, usuario=None):
+        self.client.force_login(usuario or self.prestador.usuario)
+        return self.client.post(reverse(f'{accion}_solicitud', args=[solicitud_id]))
+
+    def test_envio_valido_queda_pendiente(self):
+        r = self.enviar()
+        self.assertEqual(r.status_code, 201)
+        self.assertEqual(r.json()['estado'], 'pendiente')
+        self.assertEqual(self.prestador.solicitudes.count(), 1)
+
+    def test_campos_obligatorios(self):
+        r = self.client.post(reverse('crear_solicitud'), {}, content_type='application/json')
+        self.assertEqual(r.status_code, 400)
+        for campo in ['prestador', 'rubro', 'cliente_nombre', 'cliente_telefono', 'descripcion']:
+            self.assertIn(campo, r.json())
+
+    def test_prestador_no_disponible(self):
+        self.prestador.disponible = False
+        self.prestador.save()
+        r = self.enviar()
+        self.assertEqual(r.status_code, 400)
+        self.assertIn('prestador', r.json())
+
+    def test_rubro_que_no_ofrece(self):
+        r = self.enviar(rubro=self.otro_rubro.id)
+        self.assertEqual(r.status_code, 400)
+        self.assertIn('rubro', r.json())
+
+    def test_cliente_fuera_de_cobertura(self):
+        r = self.enviar(latitud='1.000000')  # unos 111 km, fuera del radio de 5 km
+        self.assertEqual(r.status_code, 400)
+        self.assertIn('prestador', r.json())
+
+    def test_prestador_ve_sus_solicitudes(self):
+        self.enviar()
+        otro = self.crear_prestador('beto')
+        self.enviar(prestador=otro.id)
+        self.client.force_login(self.prestador.usuario)
+        r = self.client.get(reverse('solicitudes_recibidas'))
+        self.assertEqual(r.status_code, 200)
+        self.assertEqual(len(r.json()), 1)
+        self.assertEqual(r.json()[0]['cliente_telefono'], '999888777')
+
+    def test_bandeja_requiere_sesion_de_prestador(self):
+        self.assertEqual(self.client.get(reverse('solicitudes_recibidas')).status_code, 403)
+        self.client.force_login(get_user_model().objects.create_user(username='cliente'))
+        self.assertEqual(self.client.get(reverse('solicitudes_recibidas')).status_code, 403)
+
+    def test_aceptar_y_el_cliente_ve_el_cambio(self):
+        solicitud_id = self.enviar().json()['id']
+        r = self.responder('aceptar', solicitud_id)
+        self.assertEqual(r.status_code, 200)
+        self.client.logout()
+        r = self.client.get(reverse('detalle_solicitud', args=[solicitud_id]))
+        self.assertEqual(r.json()['estado'], 'aceptada')
+        self.assertIsNotNone(r.json()['respondida'])
+        self.assertNotIn('cliente_telefono', r.json())
+
+    def test_rechazar(self):
+        solicitud_id = self.enviar().json()['id']
+        self.assertEqual(self.responder('rechazar', solicitud_id).status_code, 200)
+        r = self.client.get(reverse('detalle_solicitud', args=[solicitud_id]))
+        self.assertEqual(r.json()['estado'], 'rechazada')
+
+    def test_no_se_responde_dos_veces(self):
+        solicitud_id = self.enviar().json()['id']
+        self.responder('aceptar', solicitud_id)
+        r = self.responder('rechazar', solicitud_id)
+        self.assertEqual(r.status_code, 409)
+        self.assertEqual(Solicitud.objects.get().estado, 'aceptada')
+
+    def test_otro_prestador_no_puede_responder(self):
+        solicitud_id = self.enviar().json()['id']
+        otro = self.crear_prestador('beto')
+        self.assertEqual(self.responder('aceptar', solicitud_id, otro.usuario).status_code, 404)
+        self.assertEqual(Solicitud.objects.get().estado, 'pendiente')
+
+    def test_responder_sin_sesion(self):
+        solicitud_id = self.enviar().json()['id']
+        r = self.client.post(reverse('aceptar_solicitud', args=[solicitud_id]))
+        self.assertEqual(r.status_code, 403)

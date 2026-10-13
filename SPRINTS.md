@@ -51,17 +51,17 @@ Reglas de reparto y flujo de trabajo en [PLAN_EQUIPO.md](PLAN_EQUIPO.md). Detall
 | T1.1 | Diseñar el modelo de datos del prestador (datos, rubros y cobertura) | Backend | 2 | ✅ |
 | T1.2 | Implementar la API de registro de prestadores (Django) | Backend | 3 | ✅ |
 | T1.3 | Maquetar el formulario de registro (web y móvil) con rubros y mapa de cobertura | Frontend | 2 | ✅ |
-| T4.1 | Implementar el flujo de solicitud: envío y aceptación o rechazo | Backend | 3 | 🟡 |
+| T4.1 | Implementar el flujo de solicitud: envío y aceptación o rechazo | Backend | 3 | ✅ |
 | | **Subtotal** | | **10** | |
 
 ### Luis Abad — 10 h
 
 | Tarea | Descripción | Tipo | Horas | ✔ |
 |:---:|---|:---:|:---:|:---:|
-| T3.1 | Implementar la búsqueda por rubro, radio de cobertura y disponibilidad | Backend | 3 | 🟡 |
-| T3.2 | Pantalla de resultados con lista de prestadores | Frontend | 4 | 🟡 |
-| T2.3 | Pruebas funcionales del registro y la carga (campos obligatorios y límites) | Pruebas | 1 | ☐ |
-| T4.3 | Pruebas del flujo buscar → solicitar → aceptar | Pruebas | 2 | ☐ |
+| T3.1 | Implementar la búsqueda por rubro, radio de cobertura y disponibilidad | Backend | 3 | ✅ |
+| T3.2 | Pantalla de resultados con lista de prestadores | Frontend | 4 | ✅ |
+| T2.3 | Pruebas funcionales del registro y la carga (campos obligatorios y límites) | Pruebas | 1 | 🟡 |
+| T4.3 | Pruebas del flujo buscar → solicitar → aceptar | Pruebas | 2 | 🟡 |
 | | **Subtotal** | | **10** | |
 
 ### David Valcarcel — 10 h
@@ -119,7 +119,7 @@ Horas pendientes al final de cada día. La línea ideal baja 3 h por día.
 | 5 | 07/10 (mié) | 15 | 23 |
 | 6 | 08/10 (jue) | 12 | 23 |
 | 7 | 09/10 (vie) | 9 | 23 |
-| 8 | 12/10 (lun) | 6 | 23 |
+| 8 | 12/10 (lun) | 6 | 13 |
 | 9 | 13/10 (mar) | 3 | |
 | 10 | 14/10 (mié) | 0 | |
 

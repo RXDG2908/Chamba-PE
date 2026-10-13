@@ -14,13 +14,13 @@ Estados: ✅ terminada · 🟡 en curso / parcial · ⚪ sin iniciar · 🔴 blo
 | Indicador | Valor |
 |---|---|
 | Horas comprometidas | 30 h |
-| Horas terminadas (tareas ✅) | 7 h |
-| Horas pendientes | 23 h |
+| Horas terminadas (tareas ✅) | 17 h |
+| Horas pendientes | 13 h |
 | Ideal de horas pendientes al 12/10 (día 8) | 6 h |
-| Tareas terminadas | 3 de 13 |
-| Tareas en curso | 10 (T2.1, T2.2, T2.3, T3.1, T3.2, T3.3, T3.4, T4.1, T4.2, T4.3) |
+| Tareas terminadas | 6 de 13 |
+| Tareas en curso | 7 (T2.1, T2.2, T2.3, T3.3, T3.4, T4.2, T4.3) |
 | Historias terminadas | 1 de 4 (HU-1; falta la prueba de Luis, T2.3) |
-| Estado general | 🔴 Atrasado: casi todo está avanzado, pero solo HU-1 entró a `main` por PR revisado |
+| Estado general | 🔴 Atrasado: búsqueda (T3.1, T3.2) y API de solicitudes (T4.1) ya están en `main`; faltan las tareas de David y las pruebas de Luis que dependen de ellas |
 
 > Las horas solo cuentan como terminadas cuando la tarea cumple la [definición de terminado](PLAN_EQUIPO.md#8-definición-de-terminado).
 
@@ -37,9 +37,9 @@ HU-3 y T2.3 siguen parciales. [Resultados y pendientes](docs/pruebas-T2.3.md).
 | T1.1 | HU-1 | Modelo de datos del prestador | Renzo León | 2 | ✅ | PR 1 unido a `main` | 05/10 | App `prestadores`: `Rubro` y `Prestador` (DNI, rubros, cobertura centro + radio km, estado "Pendiente de verificación"). Migración 0001. |
 | T1.2 | HU-1 | API de registro de prestadores | Renzo León | 3 | ✅ | `main` | 05/10 | `POST /api/prestadores/registro/` crea usuario y prestador; exige DNI (8 dígitos, único), ≥ 1 rubro y cobertura; queda "Pendiente de verificación". `GET /api/prestadores/rubros/`. 7 pruebas pasan. Se agregó Django REST Framework (`requirements.txt`). |
 | T1.3 | HU-1 | Formulario de registro (web y móvil) | Renzo León | 2 | ✅ | `main` | 05/10 | Formulario React (`frontend/src/RegistroPrestador.jsx`): datos, cuenta, rubros desde la API y mapa Leaflet con círculo de cobertura y radio. Valida en el cliente y muestra los errores del servidor. Diseño responsive (sirve en navegador móvil); la app móvil nativa sigue por definir. Probado de punta a punta contra la API. |
-| T4.1 | HU-4 | Flujo de solicitud: envío y aceptación/rechazo | Renzo León | 3 | 🟡 | `hu-4-solicitud`; pendiente de PR (se une después del PR 3 de HU-3) | 12/10 | Implementada en `servicios`: modelo `Solicitud` (Pendiente → Aceptada / Rechazada) y migración 0001. `POST /api/servicios/solicitudes/` valida que el prestador esté disponible, ofrezca el rubro y cubra la ubicación del cliente. El prestador ve su bandeja (`GET .../recibidas/`) y acepta o rechaza (`POST .../<id>/aceptar/` y `.../rechazar/`), solo si es el dueño y si sigue Pendiente. El cliente ve el cambio en `GET .../<id>/`. 12 pruebas nuevas; `prestadores` y `servicios`: 30 OK. |
-| T3.1 | HU-3 | Búsqueda por rubro, radio y disponibilidad | Luis Abad | 3 | 🟡 | `hu-3-busqueda`; pendiente de revisión e integración por PR | 06/10 | Implementada y verificada: `GET /api/prestadores/buscar/`, parámetros validados en español, Haversine reutilizable, cobertura inclusiva y datos públicos. 11 pruebas nuevas; suite completa: 18 OK, repetida tras incorporar `ae51360` del equipo. Luis confirmó HTTP 200 vacío y positivo. Sin ordenar por distancia (T3.3). [Documentación](docs/API_BUSQUEDA.md). Pendiente de revisión e integración por PR para cumplir la definición de terminado. |
-| T3.2 | HU-3 | Pantalla de resultados con lista de prestadores | Luis Abad | 4 | 🟡 | `hu-3-busqueda`; base previa `50a030c`, `3eceea7`; pendiente de revisión e integración por PR | 06/10 | Implementada: rubros desde API, ubicación Leaflet/coordenadas, Buscar por proxy Vite, tarjetas con datos reales sin calificaciones y estados en español. Cancela peticiones anteriores y conserva el orden de la API. Lint y build código 0, repetidos tras incorporar cambios del equipo. Proxy HTTP 200; Luis confirmó la tarjeta Demo Gasfitero ficticio, Gasfitería, 0 km. Pendientes revisión visual móvil/errores/concurrencia y PR; [pasos y comprobaciones pendientes](frontend/README.md). |
+| T4.1 | HU-4 | Flujo de solicitud: envío y aceptación/rechazo | Renzo León | 3 | ✅ | PR 4 unido a `main` | 12/10 | Implementada en `servicios`: modelo `Solicitud` (Pendiente → Aceptada / Rechazada) y migración 0001. `POST /api/servicios/solicitudes/` valida que el prestador esté disponible, ofrezca el rubro y cubra la ubicación del cliente. El prestador ve su bandeja (`GET .../recibidas/`) y acepta o rechaza (`POST .../<id>/aceptar/` y `.../rechazar/`), solo si es el dueño y si sigue Pendiente. El cliente ve el cambio en `GET .../<id>/`. 12 pruebas nuevas; `prestadores` y `servicios`: 30 OK. |
+| T3.1 | HU-3 | Búsqueda por rubro, radio y disponibilidad | Luis Abad | 3 | ✅ | PR 3 unido a `main` | 12/10 | Implementada y verificada: `GET /api/prestadores/buscar/`, parámetros validados en español, Haversine reutilizable, cobertura inclusiva y datos públicos. 11 pruebas nuevas; suite completa: 18 OK, repetida tras incorporar `ae51360` del equipo. Luis confirmó HTTP 200 vacío y positivo. Sin ordenar por distancia (T3.3). [Documentación](docs/API_BUSQUEDA.md). Pendiente de revisión e integración por PR para cumplir la definición de terminado. |
+| T3.2 | HU-3 | Pantalla de resultados con lista de prestadores | Luis Abad | 4 | ✅ | PR 3 unido a `main` | 12/10 | Implementada: rubros desde API, ubicación Leaflet/coordenadas, Buscar por proxy Vite, tarjetas con datos reales sin calificaciones y estados en español. Cancela peticiones anteriores y conserva el orden de la API. Lint y build código 0, repetidos tras incorporar cambios del equipo. Proxy HTTP 200; Luis confirmó la tarjeta Demo Gasfitero ficticio, Gasfitería, 0 km. Pendientes revisión visual móvil/errores/concurrencia y PR; [pasos y comprobaciones pendientes](frontend/README.md). |
 | T2.3 | HU-1/2 | Pruebas de registro y carga | Luis Abad | 1 | 🟡 | `hu-3-busqueda`, entrega de pruebas T2.3 | 12/10 | Casos automatizados ampliados: registro/campos/cobertura y PDF/JPG/límites. Suite: 28 pruebas, 27 OK y 1 FAIL por asociación de certificación al prestador (David, T2.1). BD de pruebas y media temporal. Manuales previas de Luis separadas; UI de carga pendiente. [Evidencia y reproducción](docs/pruebas-T2.3.md). No terminada. |
 | T4.3 | HU-4 | Pruebas buscar → solicitar → aceptar | Luis Abad | 2 | 🟡 | Copia temporal de HEAD `5d2e1db` + T4.1 de `origin/hu-4-solicitud` (`eb39859`), sin integrar la rama | 12/10 | 32 pruebas API OK: 30 existentes y 2 nuevas buscar → solicitar → aceptar/rechazar → consulta cliente. Basic Auth real, bandeja, persistencia y segunda respuesta 409; BD en memoria. Copia eliminada, T2.3/BD/media preservados. React sigue pendiente por T4.2 y T4.1 sin integrar aquí. [Resultados y reproducción](docs/pruebas-T4.3.md). No terminada. |
 | T2.1 | HU-2 | API de carga de certificaciones (PDF/JPG ≤ 5 MB) | David Valcarcel | 2 | 🟡 | `main` (`7533a5e`) | 03/10 | Valida tamaño y formato y devuelve estado "Pendiente de verificación". **Falta asociar la certificación al `Prestador`** (criterio de HU-2); se podrá con el modelo de T1.1. |
@@ -54,17 +54,17 @@ HU-3 y T2.3 siguen parciales. [Resultados y pendientes](docs/pruebas-T2.3.md).
 |:---:|---|:---:|:---:|---|:---:|---|
 | HU-1 | Registro del prestador | 3 | 7 h | T1.1 ✅ · T1.2 ✅ · T1.3 ✅ | ✅ 7 de 7 h | Luis (T2.3) |
 | HU-2 | Carga de certificaciones | 2 | 5 h | T2.1 🟡 · T2.2 🟡 · T2.3 🟡 (asociación falla) | 🟡 | Luis (T2.3) |
-| HU-3 | Búsqueda de prestadores | 5 | 11 h | T3.1 🟡 (PR 3) · T3.2 🟡 (PR 3) · T3.3 🟡 · T3.4 🟡 | 🟡 | David (T3.4) |
-| HU-4 | Solicitud y aceptación | 3 | 7 h | T4.1 🟡 (PR 4) · T4.2 🟡 (conexión pendiente) · T4.3 🟡 (API verificada; React pendiente) | 🟡 | Luis (T4.3) |
+| HU-3 | Búsqueda de prestadores | 5 | 11 h | T3.1 ✅ · T3.2 ✅ · T3.3 🟡 · T3.4 🟡 | 🟡 | David (T3.4) |
+| HU-4 | Solicitud y aceptación | 3 | 7 h | T4.1 ✅ · T4.2 🟡 (conexión pendiente) · T4.3 🟡 (API verificada; React pendiente) | 🟡 | Luis (T4.3) |
 
 ## 4. Avance por integrante
 
 | Integrante | Rol | Horas plan | Horas terminadas | Tareas terminadas | Tareas en curso |
 |---|---|:---:|:---:|:---:|---|
-| Renzo León | Scrum Master / Desarrollador | 10 h | 7 h | T1.1, T1.2, T1.3 | T4.1 (pendiente de PR) |
-| Luis Abad | Development Team | 10 h | 0 h | — | T3.1 (pendiente de PR), T3.2 (pendientes revisión visual y PR), T2.3 (asociación pendiente), T4.3 (API verificada; React/integración pendientes) |
+| Renzo León | Scrum Master / Desarrollador | 10 h | 10 h | T1.1, T1.2, T1.3, T4.1 | — |
+| Luis Abad | Development Team | 10 h | 7 h | T3.1, T3.2 | T2.3 (falla la asociación de HU-2), T4.3 (API verificada; falta React por T4.2) |
 | David Valcarcel | Product Owner / Desarrollador | 10 h | 0 h | — | T2.1, T2.2, T3.3, T3.4, T4.2 (subidas a `main` sin PR; falta integrarlas) |
-| **Equipo** | | **30 h** | **7 h** | **3** | **10** |
+| **Equipo** | | **30 h** | **17 h** | **6** | **7** |
 
 ## 5. Burndown (horas pendientes)
 
@@ -78,7 +78,7 @@ HU-3 y T2.3 siguen parciales. [Resultados y pendientes](docs/pruebas-T2.3.md).
 | 5 | 07/10 | 15 | 23 |
 | 6 | 08/10 | 12 | 23 |
 | 7 | 09/10 | 9 | 23 |
-| 8 | 12/10 | 6 | 23 |
+| 8 | 12/10 | 6 | 13 |
 | 9 | 13/10 | 3 | |
 | 10 | 14/10 | 0 | |
 
@@ -88,6 +88,7 @@ Una línea por entrega, la más reciente arriba.
 
 | Fecha | Quién | Qué se hizo | Tarea |
 |:---:|---|---|:---:|
+| 12/10 | Renzo León | Revisó y probó la búsqueda de Luis combinada con la T4.1: 40 pruebas (39 OK y la falla intencional de T2.3), ejecutor T4.3 con 32 OK, build OK y prueba en navegador de registro, búsqueda, flujo de solicitud por el proxy y vista móvil. Unió el PR 3 y el PR 4 a `main`. | T3.1/T3.2/T4.1 |
 | 12/10 | Renzo León | T4.1 en la rama `hu-4-solicitud` (creada desde `hu-3-busqueda` con `main` incorporado): modelo `Solicitud` y migración, envío con validación de disponibilidad, rubro y cobertura, bandeja del prestador, aceptar/rechazar solo por el dueño y solo una vez (409 si ya se respondió) y consulta del estado para el cliente. 12 pruebas nuevas; `prestadores` y `servicios`: 30 OK. AVANCES actualizado con lo subido por David entre el 05/10 y el 10/10. | T4.1 |
 | 12/10 | Luis Abad | Ejecutó T4.3 en copia temporal de HEAD con API de Renzo `eb39859`: 32 pruebas OK (30 existentes + 2 nuevas encadenando búsqueda/envío/aceptación o rechazo/consulta cliente), Basic Auth real y BD en memoria. Bandeja y cambios persistidos correctos; segunda respuesta 409. Copia eliminada; rama, HEAD, T2.3, BD y media conservados. Añadido ejecutor reproducible y [evidencia](docs/pruebas-T4.3.md). React pendiente por T4.2 e integración T4.1; sin commits, push, fusiones ni horas nuevas. | T4.3 |
 | 12/10 | Luis Abad | Revisión tras merge existente 5d2e1db: búsqueda 11 tests OK; suite ampliada 28, 27 OK/1 FAIL por asociación HU-2. Build OK; lint falla en UploadCertificado de David. Añadidos casos T2.3 con BD/media temporales y documentación de manuales previas, incidencias y pendientes. Sin horas nuevas ni tareas completas. [Informe](docs/pruebas-T2.3.md). | T3.1/T3.2/T2.3 |
@@ -115,18 +116,16 @@ Una línea por entrega, la más reciente arriba.
 
 | # | Fecha | Impedimento / riesgo | Afecta a | Responsable | Estado |
 |:---:|:---:|---|---|---|:---:|
-| 6 | 12/10 | T2.3 reproduce carga 201 sin registro ni asociación al perfil; prueba permanece fallando. | HU-2, T2.3 | David (T2.1) | 🔴 |
-| 7 | 12/10 | Lint falla por err sin usar en UploadCertificado; CSS importado ausente y componente sin navegación. T4.2 no conecta solicitudes de servicio. | HU-2, HU-4, T4.3 | David (T2.2/T4.2) | 🟡 |
-| 8 | 12/10 | T3.3/T3.4 existentes usan endpoint/modelo de certificaciones; faltan integración y verificación sobre búsqueda real. | HU-3 | David | 🟡 |
-| 9 | 12/10 | API T4.1 probada en copia aislada: 32 OK; aún sin integración en la rama de trabajo. Flujo completo React bloqueado por conexión T4.2. Navegador/PR pendientes. [Evidencia](docs/pruebas-T4.3.md). | T3.2, T4.3 | Luis / Renzo (T4.1) / David (T4.2) | 🟡 |
 | 1 | 05/10 | T1.1 llegaba con 3 días de retraso y bloqueaba la búsqueda y las certificaciones. Resuelto: PR 1 unido a `main` el 05/10. | HU-2, HU-3 | Renzo | ✅ |
-| 2 | 05/10 | La carga de certificaciones no está asociada a un prestador (criterio de HU-2). | HU-2 | David | 🟡 |
-| 3 | 06/10 | T3.1 y la conexión de T3.2 ya están implementadas localmente; faltan comprobaciones visuales de T3.2 y revisión/integración por PR. La pantalla ya consulta datos de la API. | HU-3 | Luis | 🟡 |
-| 4 | 05/10 | T4.1 dependía de HU-3. Implementada el 12/10 sobre `hu-3-busqueda`; su PR debe unirse después del PR 3. | HU-4 | Renzo | 🟡 |
+| 2 | 05/10 | La carga de certificaciones no se asocia al prestador (criterio de HU-2). La prueba de T2.3 lo demuestra: la carga responde 201 pero no guarda la certificación del perfil, y la prueba queda fallando a propósito hasta que se corrija. | HU-2, T2.3 | David (T2.1) | 🔴 |
+| 3 | 06/10 | T3.1 y T3.2 esperaban revisión. Resuelto: PR 3 revisado, probado y unido a `main` el 12/10. | HU-3 | Luis | ✅ |
+| 4 | 05/10 | T4.1 dependía de HU-3. Resuelto: PR 4 unido a `main` el 12/10, después del PR 3. | HU-4 | Renzo | ✅ |
 | 5 | 05/10 | App móvil "por definir" en el stack: el formulario es web responsive, no una app nativa. | HU-1 | Equipo | ⚪ |
-| 6 | 12/10 | T2.2, T3.3, T3.4 y T4.2 se subieron directo a `main`, sin PR ni revisión, y T3.3/T3.4 usan un modelo aparte (`CertificacionPrestador`) en vez de `Prestador`. Hay que integrarlas a la búsqueda real antes de la Review. | HU-2, HU-3, HU-4 | David | 🔴 |
+| 6 | 12/10 | T2.2, T3.3, T3.4 y T4.2 se subieron directo a `main`, sin PR ni revisión. T3.3 y T3.4 usan un endpoint y un modelo aparte (`CertificacionPrestador`); falta aplicar el orden por distancia en `/api/prestadores/buscar/` y medir esa búsqueda. | HU-2, HU-3, HU-4 | David | 🔴 |
 | 7 | 12/10 | `certificaciones/test_reporte.py` no es una prueba de Django: al correr `manage.py test` da error (falta `requests`) y reescribe `evidencia_rendimiento.txt`. Conviene moverlo fuera de la app o convertirlo en prueba. | Todas | David | 🟡 |
-| 8 | 12/10 | Quedan 2 días: HU-2, HU-3 y HU-4 no cumplen todavía la definición de terminado. Prioridad: revisar y unir el PR 3, luego T4.1, y que David conecte T3.3 y T4.2 a las APIs reales. | Sprint 1 | Equipo | 🔴 |
+| 8 | 12/10 | El lint falla por `err` sin usar en `UploadCertificado.jsx`; su CSS importado no existe y el componente no está en la navegación. | HU-2 | David (T2.2) | 🟡 |
+| 9 | 12/10 | La API de T4.1 ya está en `main` y Luis la verificó (32 pruebas OK, [evidencia](docs/pruebas-T4.3.md)). El flujo completo desde React sigue bloqueado hasta que la pantalla de T4.2 use `/api/servicios/solicitudes/`. | HU-4, T4.3 | David (T4.2) | 🟡 |
+| 10 | 12/10 | Quedan 2 días: HU-2, HU-3 y HU-4 solo pueden cerrarse si David termina T2.1, T3.3, T3.4 y T4.2 por PR. | Sprint 1 | Equipo | 🔴 |
 
 ## 8. Decisiones técnicas
 

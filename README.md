@@ -194,11 +194,11 @@ datos/rendimiento en T3.4; su avance separado en `certificaciones` se conserva.
 
 ### Avance HU-4: T4.1
 
-La API de solicitudes (rama `hu-4-solicitud`) ya permite el flujo solicitar → aceptar o rechazar. Al enviar, se valida que el prestador esté disponible, ofrezca el rubro y cubra la ubicación del cliente. Solo el prestador dueño de la solicitud puede responderla, y solo mientras siga Pendiente. Mientras no exista el inicio de sesión (HU-5), la bandeja y las respuestas se prueban con autenticación básica (usuario y contraseña del registro), por ejemplo desde Postman.
+La API de solicitudes ya está en `main` y permite el flujo solicitar → aceptar o rechazar. Al enviar, se valida que el prestador esté disponible, ofrezca el rubro y cubra la ubicación del cliente. Solo el prestador dueño de la solicitud puede responderla, y solo mientras siga Pendiente. Mientras no exista el inicio de sesión (HU-5), la bandeja y las respuestas se prueban con autenticación básica (usuario y contraseña del registro), por ejemplo desde Postman.
 
-Verificado el 12/10/2026: 30 pruebas de `prestadores` y `servicios` aprobadas. Pendiente: unir el PR después del de HU-3, la pantalla de T4.2 conectada a esta API y las pruebas T4.3 de Luis.
+Verificado el 12/10/2026 con la búsqueda de HU-3 ya integrada: 40 pruebas, 39 aprobadas; la que falla es la prueba de T2.3 que demuestra que el certificado aún no se asocia al prestador (T2.1). Luis verificó el flujo buscar → solicitar → aceptar o rechazar ([evidencia](docs/pruebas-T4.3.md)). Pendiente: la pantalla de T4.2 conectada a esta API.
 
-> `python manage.py test` marca 1 error en `certificaciones/test_reporte.py`: es un script de medición que necesita `requests` y el servidor encendido. Para correr solo las pruebas del backend: `python manage.py test prestadores servicios`.
+> `python manage.py test` marca 1 error en `certificaciones/test_reporte.py`: es un script de medición que necesita `requests` y el servidor encendido. Para correr solo las pruebas del backend: `python manage.py test prestadores servicios certificaciones.tests`.
 
 ## Flujo de trabajo
 

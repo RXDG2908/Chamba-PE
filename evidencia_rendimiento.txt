@@ -1,0 +1,7 @@
+=== REPORTE DE VERIFICACIÓN DE RENDIMIENTO (T3.3) ===
+- Endpoint consultado: http://127.0.0.1:8000/api/certificaciones/prestadores/cercanos/?lat=-12.0464&lon=-77.0428
+- Código de Estado HTTP: 200
+- Total de registros devueltos: 32
+- Tiempo de respuesta: 41.52 ms (0.0415 segundos)
+- Resultado: APROBADO (< 3 segundos)
+===================================================

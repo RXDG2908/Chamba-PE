@@ -5,6 +5,9 @@ from rest_framework import serializers
 from prestadores.models import Prestador, Rubro
 from prestadores.serializers import RubroSerializer
 
+from .distancias import distancia_km
+from .models import Solicitud
+
 
 class CoordenadaField(serializers.FloatField):
     def __init__(self, limite, **kwargs):
@@ -51,3 +54,58 @@ class PrestadorBusquedaSerializer(serializers.ModelSerializer):
     class Meta:
         model = Prestador
         fields = ['id', 'nombres', 'apellidos', 'rubros', 'distancia_km']
+
+
+class SolicitudSerializer(serializers.ModelSerializer):
+    """Envío de una solicitud por el cliente (HU-4)."""
+
+    class Meta:
+        model = Solicitud
+        fields = [
+            'id', 'prestador', 'rubro', 'cliente_nombre', 'cliente_telefono',
+            'descripcion', 'latitud', 'longitud', 'estado', 'creada',
+        ]
+        read_only_fields = ['id', 'estado', 'creada']
+
+    def validate(self, datos):
+        prestador = datos['prestador']
+        if not prestador.disponible:
+            raise serializers.ValidationError({'prestador': 'El prestador no está disponible.'})
+        if not prestador.rubros.filter(pk=datos['rubro'].pk).exists():
+            raise serializers.ValidationError({'rubro': 'El prestador no ofrece ese rubro.'})
+        distancia = distancia_km(
+            prestador.latitud, prestador.longitud, datos['latitud'], datos['longitud'],
+        )
+        # Mismo límite inclusivo que la búsqueda (HU-3).
+        if distancia > prestador.radio_cobertura_km + 1e-9:
+            raise serializers.ValidationError(
+                {'prestador': 'Tu ubicación está fuera del área de cobertura del prestador.'}
+            )
+        return datos
+
+
+class EstadoSolicitudSerializer(serializers.ModelSerializer):
+    """Lo que ve el cliente al consultar su solicitud; sin datos de contacto."""
+    prestador_nombres = serializers.CharField(source='prestador.nombres', read_only=True)
+    prestador_apellidos = serializers.CharField(source='prestador.apellidos', read_only=True)
+    rubro = serializers.StringRelatedField()
+    estado_display = serializers.CharField(source='get_estado_display', read_only=True)
+
+    class Meta:
+        model = Solicitud
+        fields = [
+            'id', 'prestador', 'prestador_nombres', 'prestador_apellidos', 'rubro',
+            'estado', 'estado_display', 'creada', 'respondida',
+        ]
+
+
+class SolicitudRecibidaSerializer(serializers.ModelSerializer):
+    """Lo que ve el prestador: incluye el contacto del cliente para atenderlo."""
+    rubro = serializers.StringRelatedField()
+
+    class Meta:
+        model = Solicitud
+        fields = [
+            'id', 'rubro', 'cliente_nombre', 'cliente_telefono', 'descripcion',
+            'latitud', 'longitud', 'estado', 'creada', 'respondida',
+        ]

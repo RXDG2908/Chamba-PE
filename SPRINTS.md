@@ -42,6 +42,8 @@ Reglas de reparto y flujo de trabajo en [PLAN_EQUIPO.md](PLAN_EQUIPO.md). Detall
 
 ## Reparto de tareas
 
+✅ terminada (en `main` por PR revisado) · 🟡 en curso o pendiente de PR · ☐ sin iniciar. Detalle en [AVANCES.md](AVANCES.md).
+
 ### Renzo León — 10 h
 
 | Tarea | Descripción | Tipo | Horas | ✔ |
@@ -49,28 +51,28 @@ Reglas de reparto y flujo de trabajo en [PLAN_EQUIPO.md](PLAN_EQUIPO.md). Detall
 | T1.1 | Diseñar el modelo de datos del prestador (datos, rubros y cobertura) | Backend | 2 | ✅ |
 | T1.2 | Implementar la API de registro de prestadores (Django) | Backend | 3 | ✅ |
 | T1.3 | Maquetar el formulario de registro (web y móvil) con rubros y mapa de cobertura | Frontend | 2 | ✅ |
-| T4.1 | Implementar el flujo de solicitud: envío y aceptación o rechazo | Backend | 3 | ☐ |
+| T4.1 | Implementar el flujo de solicitud: envío y aceptación o rechazo | Backend | 3 | ✅ |
 | | **Subtotal** | | **10** | |
 
 ### Luis Abad — 10 h
 
 | Tarea | Descripción | Tipo | Horas | ✔ |
 |:---:|---|:---:|:---:|:---:|
-| T3.1 | Implementar la búsqueda por rubro, radio de cobertura y disponibilidad | Backend | 3 | ☐ |
-| T3.2 | Pantalla de resultados con lista de prestadores | Frontend | 4 | ☐ |
-| T2.3 | Pruebas funcionales del registro y la carga (campos obligatorios y límites) | Pruebas | 1 | ☐ |
-| T4.3 | Pruebas del flujo buscar → solicitar → aceptar | Pruebas | 2 | ☐ |
+| T3.1 | Implementar la búsqueda por rubro, radio de cobertura y disponibilidad | Backend | 3 | ✅ |
+| T3.2 | Pantalla de resultados con lista de prestadores | Frontend | 4 | ✅ |
+| T2.3 | Pruebas funcionales del registro y la carga (campos obligatorios y límites) | Pruebas | 1 | 🟡 |
+| T4.3 | Pruebas del flujo buscar → solicitar → aceptar | Pruebas | 2 | 🟡 |
 | | **Subtotal** | | **10** | |
 
 ### David Valcarcel — 10 h
 
 | Tarea | Descripción | Tipo | Horas | ✔ |
 |:---:|---|:---:|:---:|:---:|
-| T2.1 | Implementar la API de carga de certificaciones (PDF/JPG hasta 5 MB) | Backend | 2 | ☐ |
-| T2.2 | Componente de carga de archivos y estado "Pendiente de verificación" | Frontend | 2 | ☐ |
-| T3.3 | Ordenar los resultados por distancia | Backend | 2 | ☐ |
-| T3.4 | Datos de prueba de prestadores y verificación del tiempo de respuesta (< 3 s) | Pruebas | 2 | ☐ |
-| T4.2 | Pantallas de envío de solicitud y cambio de estado | Frontend | 2 | ☐ |
+| T2.1 | Implementar la API de carga de certificaciones (PDF/JPG hasta 5 MB) | Backend | 2 | 🟡 |
+| T2.2 | Componente de carga de archivos y estado "Pendiente de verificación" | Frontend | 2 | 🟡 |
+| T3.3 | Ordenar los resultados por distancia | Backend | 2 | 🟡 |
+| T3.4 | Datos de prueba de prestadores y verificación del tiempo de respuesta (< 3 s) | Pruebas | 2 | 🟡 |
+| T4.2 | Pantallas de envío de solicitud y cambio de estado | Frontend | 2 | 🟡 |
 | | **Subtotal** | | **10** | |
 
 ### Resumen de carga
@@ -110,14 +112,14 @@ Horas pendientes al final de cada día. La línea ideal baja 3 h por día.
 | Día | Fecha | Ideal (h) | Real (h) |
 |:---:|:---:|:---:|:---:|
 | Inicio | 01/10 | 30 | 30 |
-| 1 | 01/10 (jue) | 27 | |
-| 2 | 02/10 (vie) | 24 | |
-| 3 | 05/10 (lun) | 21 | |
-| 4 | 06/10 (mar) | 18 | |
-| 5 | 07/10 (mié) | 15 | |
-| 6 | 08/10 (jue) | 12 | |
-| 7 | 09/10 (vie) | 9 | |
-| 8 | 12/10 (lun) | 6 | |
+| 1 | 01/10 (jue) | 27 | 30 |
+| 2 | 02/10 (vie) | 24 | 30 |
+| 3 | 05/10 (lun) | 21 | 23 |
+| 4 | 06/10 (mar) | 18 | 23 |
+| 5 | 07/10 (mié) | 15 | 23 |
+| 6 | 08/10 (jue) | 12 | 23 |
+| 7 | 09/10 (vie) | 9 | 23 |
+| 8 | 12/10 (lun) | 6 | 13 |
 | 9 | 13/10 (mar) | 3 | |
 | 10 | 14/10 (mié) | 0 | |
 

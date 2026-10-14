@@ -30,6 +30,24 @@ El lint global falla en el componente de carga de David. El resumen de horas y
 burndown conserva los valores previamente registrados; no se estimaron horas nuevas.
 HU-3 y T2.3 siguen parciales. [Resultados y pendientes](docs/pruebas-T2.3.md).
 
+Actualización de Luis del 14/10: en la base `7e671cd`, el asistente ejecutó
+11 pruebas de búsqueda OK, lint/build de `frontend/` OK y consultas por proxy
+200 positivo/vacío, 400 por latitud inválida y 502→200 al detener/reiniciar Django.
+Por separado, Luis probó en navegador móvil simulado/escritorio sin cortes,
+Demo Gasfitero ficticio a 0 km, vacío al cambiar a Electricidad, error con
+Django detenido y recuperación al pulsar Buscar sin recargar. En búsquedas
+Gasfitería→Electricidad, Network mostró solicitudes anteriores de rubro 1
+canceladas y la última de rubro 2 con 200; quedó vacío sin reaparecer Demo.
+[Evidencia, autoría y pendientes](frontend/README.md#comprobaciones-de-cierre-t32--14102026).
+
+Después se incorporó origin/main (`e20c533`, PR #4) por fast-forward en
+`pruebas-cierre-sprint1`, con los cambios originales resguardados en stash
+`cc6a40f64f6245b604f5560623e9503f4f76f1c9`. Se conserva la dependencia de Renzo
+`django-cors-headers>=4.4`; el pin local redundante se retiró. No se repitieron
+las pruebas anteriores sobre el nuevo main. Se conservan los estados, las
+horas y el burndown incorporados por Renzo, sin sumar horas por esta revisión.
+T2.3/T4.3 y HU-2/HU-3/HU-4 siguen parciales; no se cierra el sprint.
+
 ## 2. Cuadro de avance por tarea
 
 | Tarea | HU | Descripción | Responsable | Horas | Estado | Rama / PR | Fecha | Notas |
@@ -39,7 +57,7 @@ HU-3 y T2.3 siguen parciales. [Resultados y pendientes](docs/pruebas-T2.3.md).
 | T1.3 | HU-1 | Formulario de registro (web y móvil) | Renzo León | 2 | ✅ | `main` | 05/10 | Formulario React (`frontend/src/RegistroPrestador.jsx`): datos, cuenta, rubros desde la API y mapa Leaflet con círculo de cobertura y radio. Valida en el cliente y muestra los errores del servidor. Diseño responsive (sirve en navegador móvil); la app móvil nativa sigue por definir. Probado de punta a punta contra la API. |
 | T4.1 | HU-4 | Flujo de solicitud: envío y aceptación/rechazo | Renzo León | 3 | ✅ | PR 4 unido a `main` | 12/10 | Implementada en `servicios`: modelo `Solicitud` (Pendiente → Aceptada / Rechazada) y migración 0001. `POST /api/servicios/solicitudes/` valida que el prestador esté disponible, ofrezca el rubro y cubra la ubicación del cliente. El prestador ve su bandeja (`GET .../recibidas/`) y acepta o rechaza (`POST .../<id>/aceptar/` y `.../rechazar/`), solo si es el dueño y si sigue Pendiente. El cliente ve el cambio en `GET .../<id>/`. 12 pruebas nuevas; `prestadores` y `servicios`: 30 OK. |
 | T3.1 | HU-3 | Búsqueda por rubro, radio y disponibilidad | Luis Abad | 3 | ✅ | PR 3 unido a `main` | 12/10 | Implementada y verificada: `GET /api/prestadores/buscar/`, parámetros validados en español, Haversine reutilizable, cobertura inclusiva y datos públicos. 11 pruebas nuevas; suite completa: 18 OK, repetida tras incorporar `ae51360` del equipo. Luis confirmó HTTP 200 vacío y positivo. Sin ordenar por distancia (T3.3). [Documentación](docs/API_BUSQUEDA.md). Pendiente de revisión e integración por PR para cumplir la definición de terminado. |
-| T3.2 | HU-3 | Pantalla de resultados con lista de prestadores | Luis Abad | 4 | ✅ | PR 3 unido a `main` | 12/10 | Implementada: rubros desde API, ubicación Leaflet/coordenadas, Buscar por proxy Vite, tarjetas con datos reales sin calificaciones y estados en español. Cancela peticiones anteriores y conserva el orden de la API. Lint y build código 0, repetidos tras incorporar cambios del equipo. Proxy HTTP 200; Luis confirmó la tarjeta Demo Gasfitero ficticio, Gasfitería, 0 km. Pendientes revisión visual móvil/errores/concurrencia y PR; [pasos y comprobaciones pendientes](frontend/README.md). |
+| T3.2 | HU-3 | Pantalla de resultados con lista de prestadores | Luis Abad | 4 | ✅ | PR 3 unido a `main`; comprobaciones en `pruebas-cierre-sprint1` | 14/10 | Implementada con rubros API, mapa/coordenadas, tarjetas y cancelación; conserva orden recibido. Sobre `7e671cd`: asistente ejecutó lint/build OK, 11 tests búsqueda OK y HTTP positivo/vacío/error/recuperación. Luis comprobó móvil simulado/escritorio sin cortes, Demo a 0 km, vacío al cambiar a Electricidad, error con Django detenido y recuperación sin recargar. Network: rubro 1 anterior cancelado, rubro 2 final 200, sin resultados antiguos. Incorporado después `e20c533`, sin repetir pruebas. Pendientes cambios rápidos de ubicación y otros casos específicos; [evidencia y pasos](frontend/README.md). Estado ✅ conservado del cuadro de Renzo; no se suman horas. |
 | T2.3 | HU-1/2 | Pruebas de registro y carga | Luis Abad | 1 | 🟡 | `hu-3-busqueda`, entrega de pruebas T2.3 | 12/10 | Casos automatizados ampliados: registro/campos/cobertura y PDF/JPG/límites. Suite: 28 pruebas, 27 OK y 1 FAIL por asociación de certificación al prestador (David, T2.1). BD de pruebas y media temporal. Manuales previas de Luis separadas; UI de carga pendiente. [Evidencia y reproducción](docs/pruebas-T2.3.md). No terminada. |
 | T4.3 | HU-4 | Pruebas buscar → solicitar → aceptar | Luis Abad | 2 | 🟡 | Copia temporal de HEAD `5d2e1db` + T4.1 de `origin/hu-4-solicitud` (`eb39859`), sin integrar la rama | 12/10 | 32 pruebas API OK: 30 existentes y 2 nuevas buscar → solicitar → aceptar/rechazar → consulta cliente. Basic Auth real, bandeja, persistencia y segunda respuesta 409; BD en memoria. Copia eliminada, T2.3/BD/media preservados. React sigue pendiente por T4.2 y T4.1 sin integrar aquí. [Resultados y reproducción](docs/pruebas-T4.3.md). No terminada. |
 | T2.1 | HU-2 | API de carga de certificaciones (PDF/JPG ≤ 5 MB) | David Valcarcel | 2 | 🟡 | `main` (`7533a5e`) | 03/10 | Valida tamaño y formato y devuelve estado "Pendiente de verificación". **Falta asociar la certificación al `Prestador`** (criterio de HU-2); se podrá con el modelo de T1.1. |
@@ -88,6 +106,8 @@ Una línea por entrega, la más reciente arriba.
 
 | Fecha | Quién | Qué se hizo | Tarea |
 |:---:|---|---|:---:|
+| 14/10 | Luis Abad | Registró sus pruebas manuales sobre `7e671cd`: móvil simulado/escritorio sin cortes, Demo Gasfitero ficticio a 0 km en Gasfitería/Lima, cambio a Electricidad con tarjeta anterior retirada y mensaje vacío; Django detenido con error de comunicación y reiniciado con recuperación al pulsar Buscar sin recargar. Búsquedas Gasfitería→Electricidad: Network con solicitudes rubro 1 canceladas y rubro 2 final 200, estado vacío sin reaparecer Demo. Evidencia manual separada de las pruebas del asistente y de Renzo; no repetida en `e20c533`. | T3.2 |
+| 14/10 | Luis Abad / asistente | Conservó la comprobación automatizada previa en `7e671cd`: 11 pruebas búsqueda OK, lint/build frontend OK; proxy 200 positivo/vacío, 400 latitud inválida, 502→200 al detener/reiniciar Django. Instalación local de django-cors-headers 4.9.0 en venv existente; ficticio id 2 reutilizado dos veces, SHA-256 BD sin cambios. Resguardó los tres cambios en stash e incorporó origin/main `e20c533` por fast-forward; combinó documentación sin perder avances de Renzo y mantuvo su `django-cors-headers>=4.4`, retirando el pin redundante. Sin nuevas pruebas sobre main, migraciones, cambios a BD, horas nuevas, commits de trabajo, push ni PR. | T3.2 |
 | 14/10 | Renzo León | Incorporó a `hu-4-solicitud` el commit de David del 13/10 y agregó `django-cors-headers` a `requirements.txt`, que faltaba y hacía fallar `manage.py` en `main`. Pruebas: 40 (39 OK y la falla intencional de T2.3), ejecutor T4.3 con 32 OK, lint y build OK. | T4.1 |
 | 13/10 | David Valcarcel | Subió a `main` (sin PR) la configuración CORS y del proxy para la carga de certificaciones; corrigió el `err` sin usar del lint. | T4.2 |
 | 12/10 | Renzo León | Revisó y probó la búsqueda de Luis combinada con la T4.1: 40 pruebas (39 OK y la falla intencional de T2.3), ejecutor T4.3 con 32 OK, build OK y prueba en navegador de registro, búsqueda, flujo de solicitud por el proxy y vista móvil. Unió el PR 3 y el PR 4 a `main`. | T3.1/T3.2/T4.1 |
@@ -118,6 +138,7 @@ Una línea por entrega, la más reciente arriba.
 
 | # | Fecha | Impedimento / riesgo | Afecta a | Responsable | Estado |
 |:---:|:---:|---|---|---|:---:|
+| 12 | 14/10 | Luis cubrió visuales móvil simulado/escritorio, error/recuperación de búsqueda y concurrencia por rubro sobre `7e671cd`. Quedan cambios rápidos de ubicación, salida/retorno durante espera, reintento de rubros, validaciones visibles, regresión de registro y teléfono físico. No hay repetición sobre `e20c533`; el asistente no dispone de navegador. [Detalle](frontend/README.md). | T3.2, seguimiento de comprobaciones | Luis | 🟡 |
 | 1 | 05/10 | T1.1 llegaba con 3 días de retraso y bloqueaba la búsqueda y las certificaciones. Resuelto: PR 1 unido a `main` el 05/10. | HU-2, HU-3 | Renzo | ✅ |
 | 2 | 05/10 | La carga de certificaciones no se asocia al prestador (criterio de HU-2). La prueba de T2.3 lo demuestra: la carga responde 201 pero no guarda la certificación del perfil, y la prueba queda fallando a propósito hasta que se corrija. | HU-2, T2.3 | David (T2.1) | 🔴 |
 | 3 | 06/10 | T3.1 y T3.2 esperaban revisión. Resuelto: PR 3 revisado, probado y unido a `main` el 12/10. | HU-3 | Luis | ✅ |

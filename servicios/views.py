@@ -39,7 +39,10 @@ class BuscarPrestadoresView(APIView):
             if distancia <= radio or isclose(distancia, radio, rel_tol=0, abs_tol=1e-9):
                 prestador.distancia_km = distancia
                 resultados.append(prestador)
-        # T3.3 incorporará el ordenamiento; aquí solo se filtra y calcula distancia.
+        
+        # --- TAREA T3.3: ORDENAR POR DISTANCIA (del más cercano al más lejano) ---
+        resultados.sort(key=lambda x: x.distancia_km)
+
         return Response(PrestadorBusquedaSerializer(resultados, many=True).data)
 
 

@@ -25,6 +25,7 @@ class BusquedaPrestadoresTests(TestCase):
         self.rubro = Rubro.objects.create(nombre='Rubro de prueba')
         self.otro_rubro = Rubro.objects.create(nombre='Otro rubro de prueba')
         self.url = reverse('buscar_prestadores')
+        self.assertEqual(self.url, '/api/servicios/prestadores/buscar/')
         self.parametros = {'rubro': self.rubro.id, 'latitud': 0, 'longitud': 0}
 
     def crear_prestador(self, rubros=None, **cambios):
@@ -41,6 +42,10 @@ class BusquedaPrestadoresTests(TestCase):
 
     def buscar(self, **cambios):
         return self.client.get(self.url, {**self.parametros, **cambios})
+
+    def test_ruta_anterior_sigue_disponible(self):
+        respuesta = self.client.get('/api/prestadores/buscar/')
+        self.assertEqual(respuesta.status_code, 400)
 
     def test_filtra_rubro_disponibilidad_y_cobertura(self):
         incluido = self.crear_prestador(rubros=[self.rubro, self.otro_rubro])
@@ -64,6 +69,15 @@ class BusquedaPrestadoresTests(TestCase):
         respuesta = self.buscar(longitud=degrees(3 / RADIO_TIERRA_KM))
         self.assertEqual([p['id'] for p in respuesta.json()], [incluido.id])
         self.assertAlmostEqual(respuesta.json()[0]['distancia_km'], 3)
+
+    def test_ordenados_por_distancia_de_menor_a_mayor(self):
+        lejano = self.crear_prestador(longitud=degrees(3 / RADIO_TIERRA_KM))
+        cercano = self.crear_prestador(longitud=degrees(1 / RADIO_TIERRA_KM))
+
+        respuesta = self.buscar()
+
+        self.assertEqual(respuesta.status_code, 200)
+        self.assertEqual([p['id'] for p in respuesta.json()], [cercano.id, lejano.id])
 
     def test_limite_inclusivo_y_puntos_a_ambos_lados(self):
         prestador = self.crear_prestador()

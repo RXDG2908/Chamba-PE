@@ -2,7 +2,7 @@ from django.urls import path
 
 from .views import (
     AceptarSolicitudView, CrearSolicitudView, DetalleSolicitudView,
-    RechazarSolicitudView, SolicitudesRecibidasView,
+    RechazarSolicitudView, SolicitudesRecibidasView, BuscarPrestadoresView,
 )
 
 urlpatterns = [
@@ -11,4 +11,5 @@ urlpatterns = [
     path('solicitudes/<int:pk>/', DetalleSolicitudView.as_view(), name='detalle_solicitud'),
     path('solicitudes/<int:pk>/aceptar/', AceptarSolicitudView.as_view(), name='aceptar_solicitud'),
     path('solicitudes/<int:pk>/rechazar/', RechazarSolicitudView.as_view(), name='rechazar_solicitud'),
+    path('prestadores/buscar/', BuscarPrestadoresView.as_view(), name='buscar_prestadores'),
 ]

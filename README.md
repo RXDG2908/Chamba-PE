@@ -198,7 +198,7 @@ La API de solicitudes ya está en `main` y permite el flujo solicitar → acepta
 
 Verificado el 12/10/2026 con la búsqueda de HU-3 ya integrada: 40 pruebas, 39 aprobadas; la que falla es la prueba de T2.3 que demuestra que el certificado aún no se asocia al prestador (T2.1). Luis verificó el flujo buscar → solicitar → aceptar o rechazar ([evidencia](docs/pruebas-T4.3.md)). Pendiente: la pantalla de T4.2 conectada a esta API.
 
-> `python manage.py test` marca 1 error en `certificaciones/test_reporte.py`: es un script de medición que necesita `requests` y el servidor encendido. Para correr solo las pruebas del backend: `python manage.py test prestadores servicios certificaciones.tests`.
+> `python manage.py test` marca 1 error en `certificaciones/test_reporte.py`: es un script de medición que necesita `requests` y el servidor encendido. `requirements.txt` incluye `django-cors-headers`, que usa la configuración de CORS; si ya tenías el entorno creado, vuelve a correr `pip install -r requirements.txt`. Para correr solo las pruebas del backend: `python manage.py test prestadores servicios certificaciones.tests`.
 
 ## Flujo de trabajo
 

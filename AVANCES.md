@@ -3,7 +3,7 @@
 > **Regla del equipo:** este archivo se actualiza **siempre**, al terminar cada tarea o al cierre del día de trabajo, antes de dar la tarea por terminada. Ver [PLAN_EQUIPO.md](PLAN_EQUIPO.md#3-reglas-de-reparto).
 > Sirve de base para el cuadro de avances y el informe del Sprint Review.
 
-**Última actualización:** 12/10/2026 · **Sprint actual:** 1 (01/10 – 14/10/2026) · **Meta:** el prestador se registra y el cliente lo encuentra y le envía una solicitud.
+**Última actualización:** 14/10/2026 · **Sprint actual:** 1 (01/10 – 14/10/2026) · **Meta:** el prestador se registra y el cliente lo encuentra y le envía una solicitud.
 
 Estados: ✅ terminada · 🟡 en curso / parcial · ⚪ sin iniciar · 🔴 bloqueada
 
@@ -79,8 +79,8 @@ HU-3 y T2.3 siguen parciales. [Resultados y pendientes](docs/pruebas-T2.3.md).
 | 6 | 08/10 | 12 | 23 |
 | 7 | 09/10 | 9 | 23 |
 | 8 | 12/10 | 6 | 13 |
-| 9 | 13/10 | 3 | |
-| 10 | 14/10 | 0 | |
+| 9 | 13/10 | 3 | 13 |
+| 10 | 14/10 | 0 | 13 |
 
 ## 6. Bitácora de avances
 
@@ -88,6 +88,8 @@ Una línea por entrega, la más reciente arriba.
 
 | Fecha | Quién | Qué se hizo | Tarea |
 |:---:|---|---|:---:|
+| 14/10 | Renzo León | Incorporó a `hu-4-solicitud` el commit de David del 13/10 y agregó `django-cors-headers` a `requirements.txt`, que faltaba y hacía fallar `manage.py` en `main`. Pruebas: 40 (39 OK y la falla intencional de T2.3), ejecutor T4.3 con 32 OK, lint y build OK. | T4.1 |
+| 13/10 | David Valcarcel | Subió a `main` (sin PR) la configuración CORS y del proxy para la carga de certificaciones; corrigió el `err` sin usar del lint. | T4.2 |
 | 12/10 | Renzo León | Revisó y probó la búsqueda de Luis combinada con la T4.1: 40 pruebas (39 OK y la falla intencional de T2.3), ejecutor T4.3 con 32 OK, build OK y prueba en navegador de registro, búsqueda, flujo de solicitud por el proxy y vista móvil. Unió el PR 3 y el PR 4 a `main`. | T3.1/T3.2/T4.1 |
 | 12/10 | Renzo León | T4.1 en la rama `hu-4-solicitud` (creada desde `hu-3-busqueda` con `main` incorporado): modelo `Solicitud` y migración, envío con validación de disponibilidad, rubro y cobertura, bandeja del prestador, aceptar/rechazar solo por el dueño y solo una vez (409 si ya se respondió) y consulta del estado para el cliente. 12 pruebas nuevas; `prestadores` y `servicios`: 30 OK. AVANCES actualizado con lo subido por David entre el 05/10 y el 10/10. | T4.1 |
 | 12/10 | Luis Abad | Ejecutó T4.3 en copia temporal de HEAD con API de Renzo `eb39859`: 32 pruebas OK (30 existentes + 2 nuevas encadenando búsqueda/envío/aceptación o rechazo/consulta cliente), Basic Auth real y BD en memoria. Bandeja y cambios persistidos correctos; segunda respuesta 409. Copia eliminada; rama, HEAD, T2.3, BD y media conservados. Añadido ejecutor reproducible y [evidencia](docs/pruebas-T4.3.md). React pendiente por T4.2 e integración T4.1; sin commits, push, fusiones ni horas nuevas. | T4.3 |
@@ -123,9 +125,10 @@ Una línea por entrega, la más reciente arriba.
 | 5 | 05/10 | App móvil "por definir" en el stack: el formulario es web responsive, no una app nativa. | HU-1 | Equipo | ⚪ |
 | 6 | 12/10 | T2.2, T3.3, T3.4 y T4.2 se subieron directo a `main`, sin PR ni revisión. T3.3 y T3.4 usan un endpoint y un modelo aparte (`CertificacionPrestador`); falta aplicar el orden por distancia en `/api/prestadores/buscar/` y medir esa búsqueda. | HU-2, HU-3, HU-4 | David | 🔴 |
 | 7 | 12/10 | `certificaciones/test_reporte.py` no es una prueba de Django: al correr `manage.py test` da error (falta `requests`) y reescribe `evidencia_rendimiento.txt`. Conviene moverlo fuera de la app o convertirlo en prueba. | Todas | David | 🟡 |
-| 8 | 12/10 | El lint falla por `err` sin usar en `UploadCertificado.jsx`; su CSS importado no existe y el componente no está en la navegación. | HU-2 | David (T2.2) | 🟡 |
+| 8 | 12/10 | El lint fallaba por `err` sin usar en `UploadCertificado.jsx`. Resuelto por David el 13/10. Sigue pendiente: su CSS importado no existe y el componente no está en la navegación. | HU-2 | David (T2.2) | 🟡 |
 | 9 | 12/10 | La API de T4.1 ya está en `main` y Luis la verificó (32 pruebas OK, [evidencia](docs/pruebas-T4.3.md)). El flujo completo desde React sigue bloqueado hasta que la pantalla de T4.2 use `/api/servicios/solicitudes/`. | HU-4, T4.3 | David (T4.2) | 🟡 |
 | 10 | 12/10 | Quedan 2 días: HU-2, HU-3 y HU-4 solo pueden cerrarse si David termina T2.1, T3.3, T3.4 y T4.2 por PR. | Sprint 1 | Equipo | 🔴 |
+| 11 | 14/10 | El commit de CORS del 13/10 agregó `corsheaders` a la configuración sin sumarlo a `requirements.txt`: con una instalación nueva, `main` no arranca. Corregido en el PR 4. Además, la vista de carga pone cabeceras CORS a mano aunque ya se usa `django-cors-headers`, y el proxy de Vite ya evita CORS en desarrollo. | Todas | David / Renzo | 🟡 |
 
 ## 8. Decisiones técnicas
 

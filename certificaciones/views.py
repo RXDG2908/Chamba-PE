@@ -13,36 +13,62 @@ ALLOWED_MIME_TYPES = ['application/pdf', 'image/jpeg']
 
 @csrf_exempt
 def upload_certification(request):
-    # 1. Validar que sea método POST
+    # 1. Responder a la petición previa del navegador (Preflight OPTIONS)
+    if request.method == 'OPTIONS':
+        res = JsonResponse({})
+        res["Access-Control-Allow-Origin"] = "*"
+        res["Access-Control-Allow-Methods"] = "POST, OPTIONS"
+        res["Access-Control-Allow-Headers"] = "*"
+        return res
+
+    # 2. Validar que sea método POST
     if request.method != 'POST':
-        return JsonResponse({'error': 'Método no permitido. Usa POST.'}, status=405)
+        res = JsonResponse({'error': 'Método no permitido. Usa POST.'}, status=405)
+        res["Access-Control-Allow-Origin"] = "*"
+        res["Access-Control-Allow-Headers"] = "*"
+        return res
 
     # Capturar el archivo de la petición
     uploaded_file = request.FILES.get('file') or request.FILES.get('certificacion')
     
     if not uploaded_file:
-        return JsonResponse({'error': 'No se adjuntó ningún archivo.'}, status=400)
+        res = JsonResponse({'error': 'No se adjuntó ningún archivo.'}, status=400)
+        res["Access-Control-Allow-Origin"] = "*"
+        res["Access-Control-Allow-Headers"] = "*"
+        return res
 
-    # 2. Validar que el archivo pese menos de 5 MB
+    # 3. Validar que el archivo pese menos de 5 MB
     if uploaded_file.size > MAX_FILE_SIZE:
-        return JsonResponse({'error': 'El archivo excede el límite permitido de 5 MB.'}, status=400)
+        res = JsonResponse({'error': 'El archivo excede el límite permitido de 5 MB.'}, status=400)
+        res["Access-Control-Allow-Origin"] = "*"
+        res["Access-Control-Allow-Headers"] = "*"
+        return res
 
-    # 3. Validar que la extensión y tipo sean estrictamente PDF o JPG
+    # 4. Validar que la extensión y tipo sean estrictamente PDF o JPG
     ext = os.path.splitext(uploaded_file.name)[1].lower()
     if ext not in ALLOWED_EXTENSIONS or uploaded_file.content_type not in ALLOWED_MIME_TYPES:
-        return JsonResponse({'error': 'Formato no válido. Solo se permiten archivos PDF o JPG.'}, status=400)
+        res = JsonResponse({'error': 'Formato no válido. Solo se permiten archivos PDF o JPG.'}, status=400)
+        res["Access-Control-Allow-Origin"] = "*"
+        res["Access-Control-Allow-Headers"] = "*"
+        return res
 
-    # 4. Guardar el archivo y devolver respuesta de éxito en JSON
+    # 5. Guardar el archivo y devolver respuesta de éxito en JSON
     fs = FileSystemStorage()
     filename = fs.save(uploaded_file.name, uploaded_file)
     file_url = fs.url(filename)
 
-    return JsonResponse({
+    res = JsonResponse({
         'message': 'Certificación cargada exitosamente',
         'file_name': filename,
         'file_url': file_url,
         'status': 'Pendiente de verificación'
     }, status=201)
+
+    # Inyectar las cabeceras CORS obligatorias en la respuesta de éxito
+    res["Access-Control-Allow-Origin"] = "*"
+    res["Access-Control-Allow-Methods"] = "POST, OPTIONS"
+    res["Access-Control-Allow-Headers"] = "*"
+    return res
 
 
 # --- FÓRMULA DE HAVERSINE PARA LA TAREA T3.3 ---

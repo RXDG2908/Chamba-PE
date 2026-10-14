@@ -35,14 +35,14 @@ export default function UploadCertificado() {
     setResponseMsg(null);
 
     try {
-      const res = await fetch('http://127.0.0.1:8000/api/certificaciones/upload/', {
+      const respuesta = await fetch('/api/certificaciones/upload/', {
         method: 'POST',
         body: formData,
       });
 
-      const data = await res.json();
+      const data = await respuesta.json();
 
-      if (res.ok) {
+      if (respuesta.ok) {
         setResponseMsg(data);
         setFile(null);
       } else {

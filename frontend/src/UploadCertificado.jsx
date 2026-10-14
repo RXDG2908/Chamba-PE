@@ -46,7 +46,7 @@ export default function UploadCertificado() {
     formData.append('file', archivo);
 
     try {
-      const respuesta = await fetch('/api/certificaciones/upload/', {
+      const respuesta = await fetch('/api/certificaciones/upload/'  , {
         method: 'POST',
         body: formData,
       });
@@ -60,7 +60,7 @@ export default function UploadCertificado() {
         setMensajeError(resultado.error || 'Ocurrió un error al procesar la solicitud.');
         setEstadoCarga('error');
       }
-    } catch (err) {
+    } catch {
       setMensajeError('No se pudo establecer conexión con el servidor.');
       setEstadoCarga('error');
     }
@@ -88,14 +88,12 @@ export default function UploadCertificado() {
         </button>
       </form>
 
-      {/* Mensaje de Error en Cliente o Servidor */}
       {mensajeError && (
         <div style={{ marginTop: '20px', padding: '12px', backgroundColor: '#f8d7da', color: '#721c24', borderRadius: '4px' }}>
           <strong>Error: </strong> {mensajeError}
         </div>
       )}
 
-      {/* Pantalla de Visualización y Cambio de Estado (Éxito) */}
       {estadoCarga === 'exito' && datosRespuesta && (
         <div style={{ marginTop: '25px', padding: '20px', backgroundColor: '#d4edda', color: '#155724', borderRadius: '6px', border: '1px solid #c3e6cb' }}>
           <h3>¡Solicitud Enviada con Éxito!</h3>
@@ -117,7 +115,7 @@ export default function UploadCertificado() {
           </div>
           <p>
             <a 
-              href={datosRespuesta.file_url} 
+              href={`http://127.0.0.1:8000${datosRespuesta.file_url}`} 
               target="_blank" 
               rel="noopener noreferrer" 
               style={{ color: '#0056b3', textDecoration: 'underline' }}

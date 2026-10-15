@@ -8,8 +8,8 @@ Reglas de reparto y flujo de trabajo en [PLAN_EQUIPO.md](PLAN_EQUIPO.md). Detall
 
 | Sprint | Fechas | Historias | SP | Horas | Estado |
 |:---:|:---:|:---:|:---:|:---:|:---:|
-| [1](#sprint-1--0110--14102026) | 01/10 – 14/10/2026 | HU-1 a HU-4 | 13 | 30 h | 🟢 En curso |
-| [2](#sprint-2--1510--28102026) | 15/10 – 28/10/2026 | HU-5 a HU-9 | 13 | 30 h | ⚪ Por planificar |
+| [1](#sprint-1--0110--14102026) | 01/10 – 14/10/2026 | HU-1 a HU-4 | 13 | 30 h | ✅ Cerrado (23 de 30 h) |
+| [2](#sprint-2--1510--28102026) | 15/10 – 28/10/2026 | HU-5 a HU-9 | 13 | 30 h | 🟢 Planning el 15/10 |
 | [3](#sprint-3--2910--11112026) | 29/10 – 11/11/2026 | HU-19, HU-20, HU-21, HU-13 | 13 | 28 h | ⚪ Por planificar |
 | [4](#sprint-4--1211--25112026) | 12/11 – 25/11/2026 | HU-10, HU-11, HU-12 | 12 | 26 h | ⚪ Por planificar |
 | [—](#backlog-futuro) | — | HU-14 a HU-18 | 11 | 30 h | 📦 Backlog futuro |
@@ -68,11 +68,11 @@ Reglas de reparto y flujo de trabajo en [PLAN_EQUIPO.md](PLAN_EQUIPO.md). Detall
 
 | Tarea | Descripción | Tipo | Horas | ✔ |
 |:---:|---|:---:|:---:|:---:|
-| T2.1 | Implementar la API de carga de certificaciones (PDF/JPG hasta 5 MB) | Backend | 2 | 🟡 |
+| T2.1 | Implementar la API de carga de certificaciones (PDF/JPG hasta 5 MB) | Backend | 2 | ✅ |
 | T2.2 | Componente de carga de archivos y estado "Pendiente de verificación" | Frontend | 2 | 🟡 |
-| T3.3 | Ordenar los resultados por distancia | Backend | 2 | 🟡 |
+| T3.3 | Ordenar los resultados por distancia | Backend | 2 | ✅ |
 | T3.4 | Datos de prueba de prestadores y verificación del tiempo de respuesta (< 3 s) | Pruebas | 2 | 🟡 |
-| T4.2 | Pantallas de envío de solicitud y cambio de estado | Frontend | 2 | 🟡 |
+| T4.2 | Pantallas de envío de solicitud y cambio de estado | Frontend | 2 | ✅ |
 | | **Subtotal** | | **10** | |
 
 ### Resumen de carga
@@ -120,14 +120,21 @@ Horas pendientes al final de cada día. La línea ideal baja 3 h por día.
 | 6 | 08/10 (jue) | 12 | 23 |
 | 7 | 09/10 (vie) | 9 | 23 |
 | 8 | 12/10 (lun) | 6 | 13 |
-| 9 | 13/10 (mar) | 3 | |
-| 10 | 14/10 (mié) | 0 | |
+| 9 | 13/10 (mar) | 3 | 13 |
+| 10 | 14/10 (mié) | 0 | 7 |
 
 ## Retrospectiva
 
+> Borrador del Scrum Master con los datos del sprint; se confirma o ajusta con el equipo.
+
 | ¿Qué salió bien? | ¿Qué mejorar? | Acciones para el Sprint 2 |
 |---|---|---|
-| | | |
+| HU-1 completa en `main` con PR revisado y pruebas. | Arranque lento: 0 h terminadas los dos primeros días y T1.1, que bloqueaba al resto, llegó con 3 días de retraso. | Las tareas que bloquean a otros (modelos y APIs) se hacen en los primeros 2 días. |
+| Búsqueda, API de solicitudes y pantalla de solicitud funcionan de punta a punta y se probaron en el navegador. | Commits directo a `main` sin PR: rompieron `main` (faltaba `django-cors-headers`) y duplicaron lógica. | Activar la protección de `main` en GitHub: solo se une por PR con 1 aprobación. |
+| Las pruebas cruzadas funcionaron: Luis probó la API de T4.1 y su prueba de T2.3 detectó el certificado sin vincular. | T4.2 se hizo primero como pantalla de certificados por no leer los criterios de aceptación. | Antes de empezar, leer los criterios en SPRINTS.md y consultar dudas en el Daily. |
+| Al cierre, `main` quedó con 49 de 49 pruebas OK, lint y build sin errores. | Integración tardía: casi todo se unió entre el 12/10 y el 14/10, por eso el burndown no bajó una semana. | PR pequeños: abrirlos apenas la tarea funcione y revisarlos en máximo 1 día. |
+| | PR 4 y PR 7 se unieron sin revisión de otro integrante. | Si un PR agrega una librería, también actualiza `requirements.txt`; quien revisa instala desde cero. |
+| | AVANCES.md no se actualizó a diario y los informes de pruebas salieron muy largos. | AVANCES.md al cierre de cada día, en pocas líneas; el detalle va en `docs/`. |
 
 ---
 
@@ -140,6 +147,17 @@ Horas pendientes al final de cada día. La línea ideal baja 3 h por día.
 | Story points | Horas | Capacidad |
 |:---:|:---:|:---:|
 | 13 SP | 30 h | 3 × 10 h |
+
+## Pendientes que pasan del Sprint 1
+
+Van primero en el sprint. Las horas restantes se vuelven a estimar en el Planning.
+
+| Tarea | Descripción | Responsable | Horas plan | Qué falta |
+|:---:|---|---|:---:|---|
+| T2.2 | Componente de carga de certificados | David Valcarcel | 2 | Agregarlo a la navegación, enviar el prestador y corregir el CSS importado |
+| T3.4 | Tiempo de respuesta < 3 s | David Valcarcel | 2 | Medir la búsqueda real `/api/prestadores/buscar/` |
+| T2.3 | Pruebas de registro y carga | Luis Abad | 1 | Confirmar el cierre sobre `main` |
+| T4.3 | Pruebas buscar → solicitar → aceptar | Luis Abad | 2 | Confirmar el cierre sobre `main` |
 
 ## Historias y tareas
 

@@ -3,85 +3,27 @@
 > **Regla del equipo:** este archivo se actualiza **siempre**, al terminar cada tarea o al cierre del día de trabajo, antes de dar la tarea por terminada. Ver [PLAN_EQUIPO.md](PLAN_EQUIPO.md#3-reglas-de-reparto).
 > Sirve de base para el cuadro de avances y el informe del Sprint Review.
 
-**Última actualización:** 14/10/2026 · **Sprint actual:** 1 (01/10 – 14/10/2026) · **Meta:** el prestador se registra y el cliente lo encuentra y le envía una solicitud.
+**Última actualización:** 15/10/2026 · **Sprint 1:** ✅ cerrado el 14/10/2026 (01/10 – 14/10) · **Meta:** el prestador se registra y el cliente lo encuentra y le envía una solicitud.
 
 Estados: ✅ terminada · 🟡 en curso / parcial · ⚪ sin iniciar · 🔴 bloqueada
 
 ---
 
-## 1. Resumen del Sprint 1
+## 1. Resumen del Sprint 1 (cerrado)
 
 | Indicador | Valor |
 |---|---|
 | Horas comprometidas | 30 h |
-| Horas terminadas (tareas ✅) | 17 h |
-| Horas pendientes | 13 h |
-| Ideal de horas pendientes al 12/10 (día 8) | 6 h |
-| Tareas terminadas | 6 de 13 |
-| Tareas en curso | 7 (T2.1, T2.2, T2.3, T3.3, T3.4, T4.2, T4.3) |
-| Historias terminadas | 1 de 4 (HU-1; falta la prueba de Luis, T2.3) |
-| Estado general | 🔴 Atrasado: búsqueda (T3.1, T3.2) y API de solicitudes (T4.1) ya están en `main`; faltan las tareas de David y las pruebas de Luis que dependen de ellas |
+| Horas terminadas (tareas ✅) | 23 h (77 %) |
+| Horas pendientes al cierre | 7 h |
+| Tareas terminadas | 9 de 13 |
+| Tareas que pasan al Sprint 2 | 4 (T2.2, T2.3, T3.4, T4.3) |
+| Historias terminadas | 1 de 4 (HU-1). HU-2, HU-3 y HU-4 funcionan, pero les queda una tarea de pruebas o integración |
+| Estado de `main` al 15/10 | 49 de 49 pruebas OK, sin migraciones pendientes, lint y build OK; flujo registrar → buscar → solicitar → aceptar o rechazar probado en el navegador |
 
-> Las horas solo cuentan como terminadas cuando la tarea cumple la [definición de terminado](PLAN_EQUIPO.md#8-definición-de-terminado).
+> Las horas solo cuentan como terminadas cuando la tarea cumple la [definición de terminado](PLAN_EQUIPO.md#8-definición-de-terminado). T2.3 y T4.3 pasan a ✅ cuando Luis confirme el cierre de sus pruebas sobre `main`.
 
-Revisión del 12/10: T3.1 mantiene sus 11 pruebas aprobadas tras el merge ya
-incorporado; T3.2 compila, con comprobaciones de navegador pendientes.
-El lint global falla en el componente de carga de David. El resumen de horas y
-burndown conserva los valores previamente registrados; no se estimaron horas nuevas.
-HU-3 y T2.3 siguen parciales. [Resultados y pendientes](docs/pruebas-T2.3.md).
-
-Verificación del 14/10: se confirmó que `core/urls.py` incluye `servicios.urls`
-bajo `/api/servicios/`, que la URL inversa resuelve a
-`/api/servicios/prestadores/buscar/` y que Django la despacha a
-`BuscarPrestadoresView`. Las pruebas de búsqueda verifican esa ruta, su alias
-anterior y el orden ascendente por distancia: 11 OK. Sin horas nuevas ni cambios de burndown;
-T3.3 sigue en curso hasta su revisión e integración.
-
-Revisión adicional del 14/10: el proceso de `manage.py` confirma que carga
-`core/urls.py` desde este directorio de trabajo. No había proceso Python ni
-listener en el puerto 8000; se eliminaron los `__pycache__` concretos de
-`core` y `servicios`, y se repitió la resolución con bytecode desactivado.
-La ruta resuelve a `BuscarPrestadoresView`. No se alteran horas ni burndown.
-
-Actualización de Luis del 14/10: en la base `7e671cd`, el asistente ejecutó
-11 pruebas de búsqueda OK, lint/build de `frontend/` OK y consultas por proxy
-200 positivo/vacío, 400 por latitud inválida y 502→200 al detener/reiniciar Django.
-Por separado, Luis probó en navegador móvil simulado/escritorio sin cortes,
-Demo Gasfitero ficticio a 0 km, vacío al cambiar a Electricidad, error con
-Django detenido y recuperación al pulsar Buscar sin recargar. En búsquedas
-Gasfitería→Electricidad, Network mostró solicitudes anteriores de rubro 1
-canceladas y la última de rubro 2 con 200; quedó vacío sin reaparecer Demo.
-[Evidencia, autoría y pendientes](frontend/README.md#comprobaciones-de-cierre-t32--14102026).
-
-Después se incorporó origin/main (`e20c533`, PR #4) por fast-forward en
-`pruebas-cierre-sprint1`, con los cambios originales resguardados en stash
-`cc6a40f64f6245b604f5560623e9503f4f76f1c9`. Se conserva la dependencia de Renzo
-`django-cors-headers>=4.4`; el pin local redundante se retiró. No se repitieron
-las pruebas anteriores sobre el nuevo main. Se conservan los estados, las
-horas y el burndown incorporados por Renzo, sin sumar horas por esta revisión.
-T2.3/T4.3 y HU-2/HU-3/HU-4 siguen parciales; no se cierra el sprint.
-
-Actualización del 14/10 en `feature/sprint-1-correcciones`: T2.1 ahora exige
-el ID de prestador y devuelve HTTP 400 con “El prestador es obligatorio.”
-cuando falta; se añadió una prueba que verifica que no se persista nada. Se
-conectó T4.2 desde los resultados: el cliente envía la solicitud y consulta
-automáticamente el estado cada 5 segundos hasta que el prestador la acepte o
-rechace. `core/urls.py` incluye `servicios.urls` una sola vez y la ruta de
-búsqueda figura una vez en `servicios/urls.py`. Se mantienen T2.1 y T4.2 en
-🟡 hasta revisión e integración por PR. Para conservar las migraciones
-eliminadas por el usuario, se actualizó la dependencia de la migración de
-certificaciones a `prestadores.0002_rubros_iniciales`. La suite solicitada:
-43 pruebas OK; lint y build de `frontend/`: OK. No se registran horas nuevas ni
-se reestima el burndown. La desincronización del ID de certificación observada
-en la inspección adicional quedó corregida al regenerar la migración.
-
-Corrección adicional del 14/10: la vista de certificaciones guarda el archivo
-solo mediante `CertificacionPrestador.objects.create()` y responde con el nombre
-y URL del campo almacenado. Se regeneró la migración de certificaciones, se
-eliminó la ruta duplicada de búsqueda en `servicios` y se actualizó la
-documentación para usar `/api/prestadores/buscar/`. Pip confirmó las
-dependencias instaladas; `makemigrations --check` indicó “No changes detected”
-y las pruebas solicitadas terminaron OK (43). Sin cambio de horas o burndown.
+El detalle de cada verificación está en la bitácora (sección 6) y en los informes [docs/pruebas-T2.3.md](docs/pruebas-T2.3.md), [docs/pruebas-T4.3.md](docs/pruebas-T4.3.md) y [frontend/README.md](frontend/README.md).
 
 ## 2. Cuadro de avance por tarea
 
@@ -91,76 +33,33 @@ y las pruebas solicitadas terminaron OK (43). Sin cambio de horas o burndown.
 | T1.2 | HU-1 | API de registro de prestadores | Renzo León | 3 | ✅ | `main` | 05/10 | `POST /api/prestadores/registro/` crea usuario y prestador; exige DNI (8 dígitos, único), ≥ 1 rubro y cobertura; queda "Pendiente de verificación". `GET /api/prestadores/rubros/`. 7 pruebas pasan. Se agregó Django REST Framework (`requirements.txt`). |
 | T1.3 | HU-1 | Formulario de registro (web y móvil) | Renzo León | 2 | ✅ | `main` | 05/10 | Formulario React (`frontend/src/RegistroPrestador.jsx`): datos, cuenta, rubros desde la API y mapa Leaflet con círculo de cobertura y radio. Valida en el cliente y muestra los errores del servidor. Diseño responsive (sirve en navegador móvil); la app móvil nativa sigue por definir. Probado de punta a punta contra la API. |
 | T4.1 | HU-4 | Flujo de solicitud: envío y aceptación/rechazo | Renzo León | 3 | ✅ | PR 4 unido a `main` | 12/10 | Implementada en `servicios`: modelo `Solicitud` (Pendiente → Aceptada / Rechazada) y migración 0001. `POST /api/servicios/solicitudes/` valida que el prestador esté disponible, ofrezca el rubro y cubra la ubicación del cliente. El prestador ve su bandeja (`GET .../recibidas/`) y acepta o rechaza (`POST .../<id>/aceptar/` y `.../rechazar/`), solo si es el dueño y si sigue Pendiente. El cliente ve el cambio en `GET .../<id>/`. 12 pruebas nuevas; `prestadores` y `servicios`: 30 OK. |
-| T3.1 | HU-3 | Búsqueda por rubro, radio y disponibilidad | Luis Abad | 3 | ✅ | PR 3 unido a `main` | 12/10 | Implementada y verificada: `GET /api/prestadores/buscar/`, parámetros validados en español, Haversine reutilizable, cobertura inclusiva y datos públicos. 11 pruebas nuevas; suite completa: 18 OK, repetida tras incorporar `ae51360` del equipo. Luis confirmó HTTP 200 vacío y positivo. T3.3 agrega orden ascendente; se conserva una sola ruta en `prestadores/urls.py`. [Documentación](docs/API_BUSQUEDA.md). Pendiente de revisión e integración por PR para cumplir la definición de terminado. |
+| T3.1 | HU-3 | Búsqueda por rubro, radio y disponibilidad | Luis Abad | 3 | ✅ | PR 3 unido a `main` | 12/10 | Implementada y verificada: `GET /api/prestadores/buscar/`, parámetros validados en español, Haversine reutilizable, cobertura inclusiva y datos públicos. 11 pruebas nuevas; suite completa: 18 OK, repetida tras incorporar `ae51360` del equipo. Luis confirmó HTTP 200 vacío y positivo. T3.3 agregó el orden ascendente; hay una sola ruta, en `prestadores/urls.py`. [Documentación](docs/API_BUSQUEDA.md). |
 | T3.2 | HU-3 | Pantalla de resultados con lista de prestadores | Luis Abad | 4 | ✅ | PR 3 unido a `main`; comprobaciones en `pruebas-cierre-sprint1` | 14/10 | Implementada con rubros API, mapa/coordenadas, tarjetas y cancelación; conserva orden recibido. Sobre `7e671cd`: asistente ejecutó lint/build OK, 11 tests búsqueda OK y HTTP positivo/vacío/error/recuperación. Luis comprobó móvil simulado/escritorio sin cortes, Demo a 0 km, vacío al cambiar a Electricidad, error con Django detenido y recuperación sin recargar. Network: rubro 1 anterior cancelado, rubro 2 final 200, sin resultados antiguos. Incorporado después `e20c533`, sin repetir pruebas. Pendientes cambios rápidos de ubicación y otros casos específicos; [evidencia y pasos](frontend/README.md). Estado ✅ conservado del cuadro de Renzo; no se suman horas. |
-| T2.3 | HU-1/2 | Pruebas de registro y carga | Luis Abad | 1 | 🟡 | `pruebas-validacion-sprint1` | 15/10 | Base main f5565c0 (PR #6 integrado). Luis reporta 43 pruebas OK; asistente: 49 OK sobre baa41e5, incluyendo registro/carga. Pendientes UI y revisión. [Evidencia](docs/pruebas-T2.3.md). |
-| T4.3 | HU-4 | Pruebas buscar → solicitar → aceptar | Luis Abad | 2 | 🟡 | `pruebas-validacion-sprint1` | 15/10 | Luis verificó React Aceptada/Rechazada con respuesta API en f5565c0. Tras las correcciones confirmó tarjeta en escritorio/360/390 px, rechazo de nombre con números y teléfono con letras/8/10 dígitos sin crear solicitudes, y datos válidos con tilde y descripción numérica que crean pendiente. Asistente: 49 pruebas OK en baa41e5. Otros casos manuales y revisión pendientes. [Evidencia](docs/pruebas-T4.3.md). |
-| T2.1 | HU-2 | API de carga de certificaciones (PDF/JPG ≤ 5 MB) | David Valcarcel | 2 | 🟡 | `feature/sprint-1-correcciones` | 14/10 | Exige `prestador` o `prestador_id`, lo asocia al perfil y devuelve HTTP 400 con “El prestador es obligatorio.” si falta; ya no crea prestadores por defecto. El archivo se guarda una vez por el `FileField` del modelo y la respuesta utiliza el nombre/URL guardados. Pruebas OK; pendiente de revisión e integración por PR. |
-| T2.2 | HU-2 | Componente de carga de archivos | David Valcarcel | 2 | 🟡 | `main` (directo, sin PR) | 05/10 | Componente en `src/UploadCertificado.jsx` (carpeta `src/` de la raíz, no en `frontend/`). Falta integrarlo a la app de `frontend/` y pasar por PR. |
-| T3.3 | HU-3 | Ordenar resultados por distancia | David Valcarcel | 2 | 🟡 | cambios locales (pendiente PR) | 14/10 | `BuscarPrestadoresView` ordena por distancia ascendente y se expone solo en `GET /api/prestadores/buscar/`, mediante `prestadores/urls.py`. Se eliminó la ruta duplicada de `servicios`. Pendiente revisión e integración por PR. |
-| T3.4 | HU-3 | Datos de prueba y tiempo de respuesta (< 3 s) | David Valcarcel | 2 | 🟡 | `main` (`960c3f6`, directo, sin PR) | 07/10 | Script de medición y `evidencia_rendimiento.txt`, medido sobre el endpoint de T3.3, no sobre la búsqueda real. `certificaciones/test_reporte.py` necesita `requests` y el servidor encendido, por eso `manage.py test` marca 1 error. |
-| T4.2 | HU-4 | Pantallas de solicitud y cambio de estado | David Valcarcel | 2 | 🟡 | `feature/sprint-1-correcciones` | 14/10 | En `frontend/src/ResultadosPrestadores.jsx`, cada resultado permite enviar nombre, teléfono, descripción y ubicación a `POST /api/servicios/solicitudes/`; consulta `GET /api/servicios/solicitudes/<id>/` cada 5 s y muestra Pendiente/Aceptada/Rechazada. Pendiente de revisión e integración por PR. |
-
-## Validación adicional — 15/10/2026
-
-Este corte prevalece sobre las referencias históricas del 14/10 a correcciones
-pendientes de integración: PR #6 ya está en `main`, `f5565c0`, comprobado contra
-origin/main. Rama `pruebas-validacion-sprint1`; código probado `baa41e5`.
-
-| Caso | Resultado | Observación |
-|---|---|---|
-| T2.3, asistente | 49 pruebas OK en suite explícita | Registro/carga conservados; asociación HU-2 ya corregida. Parcial por UI y revisión pendientes |
-| T4.3, Luis | Aceptada (#1) y Rechazada (#2) en React | Sobre f5565c0; respuesta del prestador por API autenticada, no por pantalla del prestador |
-| T3.2, asistente | Cabecera separada del formulario | Corrige compresión del nombre/rubro; pendiente verificar escritorio y móvil |
-| T4.3, asistente | Validaciones React y Django + seis pruebas nuevas | Teléfono ASCII de 9 dígitos, nombre Unicode sin números, descripción no blanca hasta 500; rechazos sin persistencia |
-| Frontend, asistente | lint/build OK | No equivale a validación visual; pasos en docs/pruebas-T4.3.md |
-| T2.2 y T3.4, David | Pendientes | No se cierran integración de carga ni medición de búsqueda real <3 s |
-
-Verificación manual posterior reportada por Luis el 15/10/2026 sobre la página
-actualizada (código `baa41e5`, documentación `af62ac2`):
-
-| Caso | Resultado | Observación |
-|---|---|---|
-| Tarjeta en escritorio y a 360/390 px | Se ve bien | Reportado por Luis; no ejecutado por el asistente |
-| Nombre con números | No creó solicitudes | Reportado por Luis |
-| Teléfono con letras, 8 o 10 dígitos | No creó solicitudes | Reportado por Luis para los tres casos |
-| Datos válidos con nombre con tilde y números en descripción | Solicitud pendiente creada | Reportado por Luis; sin ID ni código HTTP informado |
-
-No se atribuyen comprobaciones de Network, mediciones de desbordamiento ni
-una repetición de aceptación/rechazo a esta confirmación. T2.2 y T3.4 siguen
-pendientes; tampoco se cierra T4.3 ni todo el Sprint 1.
-
-Horas: sin nuevas horas declaradas o terminadas; se conservan los totales.
-Burndown: último valor declarado 13 h pendientes al 14/10; sin nueva medición
-al 15/10, no se recalcula. No se cambia ningún estado de tarea ni se cierra
-Sprint 1. README y SPRINTS sin cambios.
-
-Impedimentos actuales: quedan los casos manuales no confirmados por Luis
-y revisión por PR. Luis ya confirmó distribución y los casos de validación
-indicados arriba tras estos cambios. El asistente no dispone de navegador.
-El bloqueo histórico de asociación HU-2 está resuelto por PR #6; la prueba manual
-de solicitud del cliente fue reportada por Luis, pero quedan los casos posteriores
-a las correcciones que no fueron confirmados arriba. El ejecutor histórico T4.3 se revisó y no se ejecutó porque
-usa commits fijos antiguos. Sin recuperación de stashes, borrado de BD, cambios
-de contraseña, push ni PR. [T2.3](docs/pruebas-T2.3.md) · [T4.3](docs/pruebas-T4.3.md).
+| T2.3 | HU-1/2 | Pruebas de registro y carga | Luis Abad | 1 | 🟡 | PR 7 unido a `main` | 15/10 | Pruebas de registro y carga en `main` (incluye asociación y rechazo sin prestador). Pasa al Sprint 2 hasta que Luis confirme el cierre. [Evidencia](docs/pruebas-T2.3.md). |
+| T4.3 | HU-4 | Pruebas buscar → solicitar → aceptar | Luis Abad | 2 | 🟡 | PR 7 unido a `main` | 15/10 | Flujo probado desde React: Aceptada y Rechazada, y validaciones sin crear solicitudes. Pasa al Sprint 2 hasta que Luis confirme el cierre. [Evidencia](docs/pruebas-T4.3.md). |
+| T2.1 | HU-2 | API de carga de certificaciones (PDF/JPG ≤ 5 MB) | David Valcarcel | 2 | ✅ | PR 6 unido a `main` | 14/10 | Exige `prestador` (400 si falta), guarda la certificación vinculada al prestador una sola vez mediante el `FileField` y responde con su nombre y URL. Revisado por Luis. |
+| T2.2 | HU-2 | Componente de carga de archivos | David Valcarcel | 2 | 🟡 | `main` (directo, sin PR) | 05/10 | Pasa al Sprint 2. `UploadCertificado` existe pero no está en la navegación de la app y su CSS importado no existe; falta enviar el prestador al subir. |
+| T3.3 | HU-3 | Ordenar resultados por distancia | David Valcarcel | 2 | ✅ | PR 6 unido a `main` | 14/10 | `GET /api/prestadores/buscar/` ordena por distancia ascendente, con prueba. Se quitó la ruta duplicada en `servicios`. El endpoint aparte `certificaciones/prestadores/cercanos/` sigue existiendo y ya no se usa. |
+| T3.4 | HU-3 | Datos de prueba y tiempo de respuesta (< 3 s) | David Valcarcel | 2 | 🟡 | `main` (`960c3f6`, directo, sin PR) | 07/10 | Pasa al Sprint 2. La medición se hizo sobre el endpoint aparte; falta medir `/api/prestadores/buscar/`. `certificaciones/test_reporte.py` necesita `requests` y el servidor encendido, por eso `manage.py test` completo marca 1 error. |
+| T4.2 | HU-4 | Pantallas de solicitud y cambio de estado | David Valcarcel | 2 | ✅ | PR 6 unido a `main` | 14/10 | Cada tarjeta de resultados permite solicitar el servicio (`POST /api/servicios/solicitudes/`) y consulta el estado cada 5 s hasta Aceptada o Rechazada. PR 7 agregó validaciones de nombre, teléfono de 9 dígitos y descripción. Probado en el navegador el 15/10. |
 
 ## 3. Avance por historia de usuario
 
 | HU | Historia | SP | Horas | Tareas | Estado | Pruebas a cargo |
 |:---:|---|:---:|:---:|---|:---:|---|
 | HU-1 | Registro del prestador | 3 | 7 h | T1.1 ✅ · T1.2 ✅ · T1.3 ✅ | ✅ 7 de 7 h | Luis (T2.3) |
-| HU-2 | Carga de certificaciones | 2 | 5 h | T2.1 🟡 · T2.2 🟡 · T2.3 🟡 (43 pruebas OK; pendiente PR) | 🟡 | Luis (T2.3) |
-| HU-3 | Búsqueda de prestadores | 5 | 11 h | T3.1 ✅ · T3.2 ✅ · T3.3 🟡 · T3.4 🟡 | 🟡 | David (T3.4) |
-| HU-4 | Solicitud y aceptación | 3 | 7 h | T4.1 ✅ · T4.2 🟡 (conectada; pendiente PR) · T4.3 🟡 (API verificada; prueba manual UI pendiente) | 🟡 | Luis (T4.3) |
+| HU-2 | Carga de certificaciones | 2 | 5 h | T2.1 ✅ · T2.2 🟡 · T2.3 🟡 | 🟡 2 de 5 h | Luis (T2.3) |
+| HU-3 | Búsqueda de prestadores | 5 | 11 h | T3.1 ✅ · T3.2 ✅ · T3.3 ✅ · T3.4 🟡 | 🟡 9 de 11 h | David (T3.4) |
+| HU-4 | Solicitud y aceptación | 3 | 7 h | T4.1 ✅ · T4.2 ✅ · T4.3 🟡 | 🟡 5 de 7 h | Luis (T4.3) |
 
 ## 4. Avance por integrante
 
 | Integrante | Rol | Horas plan | Horas terminadas | Tareas terminadas | Tareas en curso |
 |---|---|:---:|:---:|:---:|---|
 | Renzo León | Scrum Master / Desarrollador | 10 h | 10 h | T1.1, T1.2, T1.3, T4.1 | — |
-| Luis Abad | Development Team | 10 h | 7 h | T3.1, T3.2 | T2.3 (falla la asociación de HU-2), T4.3 (API verificada; falta React por T4.2) |
-| David Valcarcel | Product Owner / Desarrollador | 10 h | 0 h | — | T2.1, T2.2, T3.3, T3.4, T4.2 (subidas a `main` sin PR; falta integrarlas) |
-| **Equipo** | | **30 h** | **17 h** | **6** | **7** |
+| Luis Abad | Development Team | 10 h | 7 h | T3.1, T3.2 | T2.3 y T4.3 (falta confirmar cierre) |
+| David Valcarcel | Product Owner / Desarrollador | 10 h | 6 h | T2.1, T3.3, T4.2 | T2.2, T3.4 |
+| **Equipo** | | **30 h** | **23 h** | **9** | **4** |
 
 ## 5. Burndown (horas pendientes)
 
@@ -176,7 +75,7 @@ de contraseña, push ni PR. [T2.3](docs/pruebas-T2.3.md) · [T4.3](docs/pruebas-
 | 7 | 09/10 | 9 | 23 |
 | 8 | 12/10 | 6 | 13 |
 | 9 | 13/10 | 3 | 13 |
-| 10 | 14/10 | 0 | 13 |
+| 10 | 14/10 | 0 | 7 |
 
 ## 6. Bitácora de avances
 
@@ -184,6 +83,9 @@ Una línea por entrega, la más reciente arriba.
 
 | Fecha | Quién | Qué se hizo | Tarea |
 |:---:|---|---|:---:|
+| 15/10 | Renzo León | Cierre del Sprint 1: verificó `main` con una instalación limpia (49 de 49 pruebas, ejecutor T4.3 con 32 OK, migraciones al día, lint y build OK) y en el navegador (solicitud con teléfono inválido rechazada, solicitud válida creada y Rechazada mostrada sola; móvil sin scroll horizontal). Actualizó AVANCES, SPRINTS, TABLERO y README con 23 de 30 h y el borrador de la retrospectiva. | Cierre |
+| 15/10 | Luis Abad | PR 7 unido a `main`: validaciones de nombre, teléfono de 9 dígitos y descripción en React y Django (6 pruebas nuevas) y tarjeta de prestador corregida. Probó en escritorio y a 360/390 px. | T3.2/T4.3 |
+| 14/10 | David Valcarcel | PR 6 revisado por Luis y unido a `main`: certificado vinculado al prestador, orden por distancia en la búsqueda, pantalla de solicitud, guardado único del archivo, migración regenerada con Django 6.1 y ruta duplicada eliminada. | T2.1/T3.3/T4.2 |
 | 15/10 | Luis / asistente | Luis reportó tarjeta correcta en escritorio y 360/390 px, nombre con números y teléfono con letras/8/10 dígitos sin crear solicitudes, y datos válidos con tilde y números en descripción que crean pendiente. Asistente documentó únicamente esos resultados en un commit nuevo; sin repetir tests, sumar horas o cerrar Sprint 1, T2.2 ni T3.4. | T3.2/T4.3 |
 | 15/10 | Luis / asistente | Luis reportó 43 pruebas OK y aceptación/rechazo desde React con respuesta por API sobre f5565c0. Asistente corrigió tarjeta y validaciones, ejecutó 49 pruebas OK y lint/build OK; documentó evidencia y pendientes sin nuevas horas ni cierre. Commits de código fc756df y baa41e5; revisión visual posterior pendiente. | T3.2/T2.3/T4.3 |
 | 14/10 | Asistente | Inspeccionó procesos Python y el puerto 8000 (sin servidor activo); identificó `core/urls.py` cargado desde la raíz actual, eliminó únicamente `core/__pycache__` y `servicios/__pycache__` y verificó sin generar bytecode que `/api/servicios/prestadores/buscar/` resuelve a `BuscarPrestadoresView`. Sin horas ni cambios de burndown, datos, commit o PR. | T3.3 |
@@ -223,16 +125,17 @@ Una línea por entrega, la más reciente arriba.
 | 13 | 14/10 | Se detectó que la migración anterior de certificaciones declaraba `id` como `AutoField`, mientras el modelo usaba `BigAutoField`. Resuelto al regenerar la migración limpia. | Migraciones de certificaciones | Equipo | ✅ |
 | 12 | 14/10 | Luis cubrió visuales móvil simulado/escritorio, error/recuperación de búsqueda y concurrencia por rubro sobre `7e671cd`. Quedan cambios rápidos de ubicación, salida/retorno durante espera, reintento de rubros, validaciones visibles, regresión de registro y teléfono físico. No hay repetición sobre `e20c533`; el asistente no dispone de navegador. [Detalle](frontend/README.md). | T3.2, seguimiento de comprobaciones | Luis | 🟡 |
 | 1 | 05/10 | T1.1 llegaba con 3 días de retraso y bloqueaba la búsqueda y las certificaciones. Resuelto: PR 1 unido a `main` el 05/10. | HU-2, HU-3 | Renzo | ✅ |
-| 2 | 05/10 | T2.1 quedó corregida en `feature/sprint-1-correcciones`: la carga requiere prestador y se persiste asociada; la prueba cubre asociación y rechazo si falta. Pendiente validar en CI/revisión e integrar por PR. | HU-2, T2.3 | David (T2.1) | 🟡 |
+| 2 | 05/10 | La carga de certificaciones no se asociaba al prestador. Resuelto: PR 6 unido a `main` el 14/10. | HU-2, T2.3 | David (T2.1) | ✅ |
 | 3 | 06/10 | T3.1 y T3.2 esperaban revisión. Resuelto: PR 3 revisado, probado y unido a `main` el 12/10. | HU-3 | Luis | ✅ |
 | 4 | 05/10 | T4.1 dependía de HU-3. Resuelto: PR 4 unido a `main` el 12/10, después del PR 3. | HU-4 | Renzo | ✅ |
 | 5 | 05/10 | App móvil "por definir" en el stack: el formulario es web responsive, no una app nativa. | HU-1 | Equipo | ⚪ |
-| 6 | 12/10 | T2.2, T3.3, T3.4 y T4.2 se subieron directo a `main`, sin PR ni revisión. T2.1 y T4.2 ya tienen correcciones en `feature/sprint-1-correcciones`, pendientes de PR; T3.3 ordena la búsqueda, publicada una sola vez en `/api/prestadores/buscar/`, pendiente revisión. T3.4 aún debe medir esta búsqueda. | HU-2, HU-3, HU-4 | David | 🟡 |
+| 6 | 12/10 | T2.2, T3.3, T3.4 y T4.2 se subieron directo a `main`, sin PR. T3.3 y T4.2 se rehicieron y entraron por el PR 6; T2.2 y T3.4 pasan al Sprint 2. | HU-2, HU-3 | David | 🟡 |
 | 7 | 12/10 | `certificaciones/test_reporte.py` no es una prueba de Django: al correr `manage.py test` da error (falta `requests`) y reescribe `evidencia_rendimiento.txt`. Conviene moverlo fuera de la app o convertirlo en prueba. | Todas | David | 🟡 |
 | 8 | 12/10 | El lint fallaba por `err` sin usar en `UploadCertificado.jsx`. Resuelto por David el 13/10. Sigue pendiente: su CSS importado no existe y el componente no está en la navegación. | HU-2 | David (T2.2) | 🟡 |
-| 9 | 12/10 | La API de T4.1 está en `main` y Luis la verificó (32 pruebas OK, [evidencia](docs/pruebas-T4.3.md)). La interfaz T4.2 de la rama actual ya envía y consulta solicitudes; backend (43 pruebas), lint y build pasan. Falta comprobación manual de UI y revisión/integración por PR. | HU-4, T4.3 | David (T4.2) | 🟡 |
-| 10 | 12/10 | Quedan 2 días: HU-2, HU-3 y HU-4 solo pueden cerrarse si David termina T2.1, T3.3, T3.4 y T4.2 por PR. | Sprint 1 | Equipo | 🔴 |
+| 9 | 12/10 | El flujo desde React dependía de la pantalla de T4.2. Resuelto: PR 6 la unió a `main` y se probó en el navegador. | HU-4, T4.3 | David (T4.2) | ✅ |
+| 10 | 12/10 | Riesgo de cerrar el sprint sin HU-2, HU-3 ni HU-4. Se cerró con 23 de 30 h; pasan 7 h al Sprint 2. | Sprint 1 | Equipo | ✅ |
 | 11 | 14/10 | El commit de CORS del 13/10 agregó `corsheaders` a la configuración sin sumarlo a `requirements.txt`: con una instalación nueva, `main` no arranca. Corregido en el PR 4. Además, la vista de carga pone cabeceras CORS a mano aunque ya se usa `django-cors-headers`, y el proxy de Vite ya evita CORS en desarrollo. | Todas | David / Renzo | 🟡 |
+| 14 | 15/10 | El PR 4 y el PR 7 se unieron sin revisión de otro integrante. Acción: activar la protección de `main` en GitHub para exigir 1 aprobación. | Proceso | Renzo | 🟡 |
 
 ## 8. Decisiones técnicas
 
@@ -250,8 +153,15 @@ Una línea por entrega, la más reciente arriba.
 | 05/10 | Se agrega Django REST Framework; el registro crea el usuario y el prestador en una sola operación. | La API necesita un usuario (relación 1:1); el login con roles llega en HU-5. |
 | 05/10 | Cobertura del prestador como centro (latitud, longitud) + radio en km, sin PostGIS. | Más simple; basta para la búsqueda por radio y por distancia. |
 
-## 9. Retrospectiva del Sprint 1 (se llena el 14/10)
+## 9. Retrospectiva del Sprint 1
+
+> Borrador del Scrum Master con los datos del sprint; se confirma o ajusta con el equipo.
 
 | ¿Qué salió bien? | ¿Qué mejorar? | Acciones para el Sprint 2 |
 |---|---|---|
-| | | |
+| HU-1 completa en `main` con PR revisado y pruebas. | Arranque lento: 0 h terminadas los dos primeros días y T1.1, que bloqueaba al resto, llegó con 3 días de retraso. | Las tareas que bloquean a otros (modelos y APIs) se hacen en los primeros 2 días. |
+| Búsqueda, API de solicitudes y pantalla de solicitud funcionan de punta a punta y se probaron en el navegador. | Commits directo a `main` sin PR: rompieron `main` (faltaba `django-cors-headers`) y duplicaron lógica. | Activar la protección de `main` en GitHub: solo se une por PR con 1 aprobación. |
+| Las pruebas cruzadas funcionaron: Luis probó la API de T4.1 y su prueba de T2.3 detectó el certificado sin vincular. | T4.2 se hizo primero como pantalla de certificados por no leer los criterios de aceptación. | Antes de empezar, leer los criterios en SPRINTS.md y consultar dudas en el Daily. |
+| Al cierre, `main` quedó con 49 de 49 pruebas OK, lint y build sin errores. | Integración tardía: casi todo se unió entre el 12/10 y el 14/10, por eso el burndown no bajó una semana. | PR pequeños: abrirlos apenas la tarea funcione y revisarlos en máximo 1 día. |
+| | PR 4 y PR 7 se unieron sin revisión de otro integrante. | Si un PR agrega una librería, también actualiza `requirements.txt`; quien revisa instala desde cero. |
+| | AVANCES.md no se actualizó a diario y los informes de pruebas salieron muy largos. | AVANCES.md al cierre de cada día, en pocas líneas; el detalle va en `docs/`. |

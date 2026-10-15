@@ -28,7 +28,27 @@ Se revisó `docs/pruebas_T4_3.py`: usa `SEARCH_REF=5d2e1db` y
 No se ejecutó: reconstruye una combinación antigua y no verifica main actual.
 Las 32 pruebas de la sección histórica no son una ejecución de esta sesión.
 
-Comprobación manual pendiente con Django y Vite iniciados:
+## Verificación manual reportada por Luis — 15/10/2026
+
+Luis confirmó estos resultados en la página actualizada de
+`pruebas-validacion-sprint1`, con el código de `baa41e5` y documentación
+en `af62ac2`. Son pruebas manuales reportadas por Luis, no ejecutadas por el
+asistente. No se reportaron IDs nuevos, respuestas HTTP ni inspección de Network.
+
+| Caso | Resultado | Observación |
+|---|---|---|
+| Tarjeta en escritorio | Se ve bien | Confirmación manual de Luis después de la corrección |
+| Tarjeta a 360 y 390 px | Se ve bien | Anchos móviles confirmados por Luis |
+| Nombre con números | No creó solicitudes | Caso inválido confirmado por Luis |
+| Teléfono con letras, 8 o 10 dígitos | No creó solicitudes | Los tres casos fueron confirmados por Luis |
+| Datos válidos, nombre con tilde y números en descripción | Creó una solicitud pendiente | No implica nueva comprobación de aceptación/rechazo tras las correcciones |
+
+Quedan sin confirmar manualmente los otros casos de validación y regresión.
+La aceptación/rechazo reportada anteriormente corresponde a `f5565c0`;
+no se registra como repetida sobre la página corregida.
+
+Guía de comprobación adicional con Django y Vite iniciados (los casos ya
+confirmados arriba no se consideran pendientes):
 
 1. Abrir Resultados a 1366 px y repetir a 360 y 390 px en DevTools; buscar
    Gasfitería con las coordenadas anteriores. Verificar nombre y rubro legibles,
@@ -47,7 +67,7 @@ Comprobación manual pendiente con Django y Vite iniciados:
    y recuperación. La inspección de código conserva estos mecanismos; falta
    repetirlos en navegador después de las correcciones.
 
-T4.3 sigue parcial hasta comprobación manual posterior y revisión por PR.
+T4.3 sigue parcial por los casos manuales restantes y revisión por PR.
 No hay pantalla del prestador verificada. T2.2 y T3.4 de David permanecen
 pendientes; no se cierra Sprint 1 ni se añaden horas terminadas.
 

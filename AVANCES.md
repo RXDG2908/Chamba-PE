@@ -94,7 +94,7 @@ y las pruebas solicitadas terminaron OK (43). Sin cambio de horas o burndown.
 | T3.1 | HU-3 | Búsqueda por rubro, radio y disponibilidad | Luis Abad | 3 | ✅ | PR 3 unido a `main` | 12/10 | Implementada y verificada: `GET /api/prestadores/buscar/`, parámetros validados en español, Haversine reutilizable, cobertura inclusiva y datos públicos. 11 pruebas nuevas; suite completa: 18 OK, repetida tras incorporar `ae51360` del equipo. Luis confirmó HTTP 200 vacío y positivo. T3.3 agrega orden ascendente; se conserva una sola ruta en `prestadores/urls.py`. [Documentación](docs/API_BUSQUEDA.md). Pendiente de revisión e integración por PR para cumplir la definición de terminado. |
 | T3.2 | HU-3 | Pantalla de resultados con lista de prestadores | Luis Abad | 4 | ✅ | PR 3 unido a `main`; comprobaciones en `pruebas-cierre-sprint1` | 14/10 | Implementada con rubros API, mapa/coordenadas, tarjetas y cancelación; conserva orden recibido. Sobre `7e671cd`: asistente ejecutó lint/build OK, 11 tests búsqueda OK y HTTP positivo/vacío/error/recuperación. Luis comprobó móvil simulado/escritorio sin cortes, Demo a 0 km, vacío al cambiar a Electricidad, error con Django detenido y recuperación sin recargar. Network: rubro 1 anterior cancelado, rubro 2 final 200, sin resultados antiguos. Incorporado después `e20c533`, sin repetir pruebas. Pendientes cambios rápidos de ubicación y otros casos específicos; [evidencia y pasos](frontend/README.md). Estado ✅ conservado del cuadro de Renzo; no se suman horas. |
 | T2.3 | HU-1/2 | Pruebas de registro y carga | Luis Abad | 1 | 🟡 | `pruebas-validacion-sprint1` | 15/10 | Base main f5565c0 (PR #6 integrado). Luis reporta 43 pruebas OK; asistente: 49 OK sobre baa41e5, incluyendo registro/carga. Pendientes UI y revisión. [Evidencia](docs/pruebas-T2.3.md). |
-| T4.3 | HU-4 | Pruebas buscar → solicitar → aceptar | Luis Abad | 2 | 🟡 | `pruebas-validacion-sprint1` | 15/10 | Luis verificó React Aceptada/Rechazada con respuesta API en f5565c0, sin pantalla del prestador. Asistente: 49 pruebas OK en baa41e5, validaciones y rechazos sin guardar. Pendiente navegador posterior y revisión. [Evidencia](docs/pruebas-T4.3.md). |
+| T4.3 | HU-4 | Pruebas buscar → solicitar → aceptar | Luis Abad | 2 | 🟡 | `pruebas-validacion-sprint1` | 15/10 | Luis verificó React Aceptada/Rechazada con respuesta API en f5565c0. Tras las correcciones confirmó tarjeta en escritorio/360/390 px, rechazo de nombre con números y teléfono con letras/8/10 dígitos sin crear solicitudes, y datos válidos con tilde y descripción numérica que crean pendiente. Asistente: 49 pruebas OK en baa41e5. Otros casos manuales y revisión pendientes. [Evidencia](docs/pruebas-T4.3.md). |
 | T2.1 | HU-2 | API de carga de certificaciones (PDF/JPG ≤ 5 MB) | David Valcarcel | 2 | 🟡 | `feature/sprint-1-correcciones` | 14/10 | Exige `prestador` o `prestador_id`, lo asocia al perfil y devuelve HTTP 400 con “El prestador es obligatorio.” si falta; ya no crea prestadores por defecto. El archivo se guarda una vez por el `FileField` del modelo y la respuesta utiliza el nombre/URL guardados. Pruebas OK; pendiente de revisión e integración por PR. |
 | T2.2 | HU-2 | Componente de carga de archivos | David Valcarcel | 2 | 🟡 | `main` (directo, sin PR) | 05/10 | Componente en `src/UploadCertificado.jsx` (carpeta `src/` de la raíz, no en `frontend/`). Falta integrarlo a la app de `frontend/` y pasar por PR. |
 | T3.3 | HU-3 | Ordenar resultados por distancia | David Valcarcel | 2 | 🟡 | cambios locales (pendiente PR) | 14/10 | `BuscarPrestadoresView` ordena por distancia ascendente y se expone solo en `GET /api/prestadores/buscar/`, mediante `prestadores/urls.py`. Se eliminó la ruta duplicada de `servicios`. Pendiente revisión e integración por PR. |
@@ -116,16 +116,31 @@ origin/main. Rama `pruebas-validacion-sprint1`; código probado `baa41e5`.
 | Frontend, asistente | lint/build OK | No equivale a validación visual; pasos en docs/pruebas-T4.3.md |
 | T2.2 y T3.4, David | Pendientes | No se cierran integración de carga ni medición de búsqueda real <3 s |
 
+Verificación manual posterior reportada por Luis el 15/10/2026 sobre la página
+actualizada (código `baa41e5`, documentación `af62ac2`):
+
+| Caso | Resultado | Observación |
+|---|---|---|
+| Tarjeta en escritorio y a 360/390 px | Se ve bien | Reportado por Luis; no ejecutado por el asistente |
+| Nombre con números | No creó solicitudes | Reportado por Luis |
+| Teléfono con letras, 8 o 10 dígitos | No creó solicitudes | Reportado por Luis para los tres casos |
+| Datos válidos con nombre con tilde y números en descripción | Solicitud pendiente creada | Reportado por Luis; sin ID ni código HTTP informado |
+
+No se atribuyen comprobaciones de Network, mediciones de desbordamiento ni
+una repetición de aceptación/rechazo a esta confirmación. T2.2 y T3.4 siguen
+pendientes; tampoco se cierra T4.3 ni todo el Sprint 1.
+
 Horas: sin nuevas horas declaradas o terminadas; se conservan los totales.
 Burndown: último valor declarado 13 h pendientes al 14/10; sin nueva medición
 al 15/10, no se recalcula. No se cambia ningún estado de tarea ni se cierra
 Sprint 1. README y SPRINTS sin cambios.
 
-Impedimentos actuales: falta comprobar distribución y validaciones en navegador
-tras estos cambios y revisión por PR. El asistente no dispone de navegador.
+Impedimentos actuales: quedan los casos manuales no confirmados por Luis
+y revisión por PR. Luis ya confirmó distribución y los casos de validación
+indicados arriba tras estos cambios. El asistente no dispone de navegador.
 El bloqueo histórico de asociación HU-2 está resuelto por PR #6; la prueba manual
 de solicitud del cliente fue reportada por Luis, pero quedan los casos posteriores
-a las correcciones. El ejecutor histórico T4.3 se revisó y no se ejecutó porque
+a las correcciones que no fueron confirmados arriba. El ejecutor histórico T4.3 se revisó y no se ejecutó porque
 usa commits fijos antiguos. Sin recuperación de stashes, borrado de BD, cambios
 de contraseña, push ni PR. [T2.3](docs/pruebas-T2.3.md) · [T4.3](docs/pruebas-T4.3.md).
 
@@ -169,6 +184,7 @@ Una línea por entrega, la más reciente arriba.
 
 | Fecha | Quién | Qué se hizo | Tarea |
 |:---:|---|---|:---:|
+| 15/10 | Luis / asistente | Luis reportó tarjeta correcta en escritorio y 360/390 px, nombre con números y teléfono con letras/8/10 dígitos sin crear solicitudes, y datos válidos con tilde y números en descripción que crean pendiente. Asistente documentó únicamente esos resultados en un commit nuevo; sin repetir tests, sumar horas o cerrar Sprint 1, T2.2 ni T3.4. | T3.2/T4.3 |
 | 15/10 | Luis / asistente | Luis reportó 43 pruebas OK y aceptación/rechazo desde React con respuesta por API sobre f5565c0. Asistente corrigió tarjeta y validaciones, ejecutó 49 pruebas OK y lint/build OK; documentó evidencia y pendientes sin nuevas horas ni cierre. Commits de código fc756df y baa41e5; revisión visual posterior pendiente. | T3.2/T2.3/T4.3 |
 | 14/10 | Asistente | Inspeccionó procesos Python y el puerto 8000 (sin servidor activo); identificó `core/urls.py` cargado desde la raíz actual, eliminó únicamente `core/__pycache__` y `servicios/__pycache__` y verificó sin generar bytecode que `/api/servicios/prestadores/buscar/` resuelve a `BuscarPrestadoresView`. Sin horas ni cambios de burndown, datos, commit o PR. | T3.3 |
 | 14/10 | Asistente | Verificó el include principal y la resolución de `/api/servicios/prestadores/buscar/` a `BuscarPrestadoresView`; agregó regresiones para la URL exacta, alias anterior y orden ascendente por distancia (11 pruebas de búsqueda OK) y actualizó la documentación. Sin cambios de datos, horas, commit ni PR; T3.3 continúa parcial hasta revisión e integración. | T3.3 |

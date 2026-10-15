@@ -1,4 +1,6 @@
 from math import isfinite
+import re
+import unicodedata
 
 from rest_framework import serializers
 
@@ -66,6 +68,36 @@ class SolicitudSerializer(serializers.ModelSerializer):
             'descripcion', 'latitud', 'longitud', 'estado', 'creada',
         ]
         read_only_fields = ['id', 'estado', 'creada']
+
+    cliente_nombre = serializers.CharField(max_length=100, trim_whitespace=False, error_messages={
+        'blank': 'Ingresa un nombre con al menos una letra.',
+    })
+    cliente_telefono = serializers.CharField(trim_whitespace=False, error_messages={
+        'blank': 'Ingresa exactamente 9 d\u00edgitos del 0 al 9, sin +51 ni espacios.',
+    })
+    descripcion = serializers.CharField(max_length=500, trim_whitespace=False, error_messages={
+        'blank': 'Describe el trabajo; no lo dejes en blanco.',
+    })
+
+    def validate_cliente_telefono(self, valor):
+        if not re.fullmatch(r'[0-9]{9}', valor):
+            raise serializers.ValidationError('Ingresa exactamente 9 dígitos del 0 al 9, sin +51 ni espacios.')
+        return valor
+
+    def validate_cliente_nombre(self, valor):
+        nombre = unicodedata.normalize('NFC', valor)
+        if not any(c.isalpha() for c in nombre) or not all(
+            c.isalpha() or c in " -'’" for c in nombre
+        ):
+            raise serializers.ValidationError(
+                'Ingresa un nombre con al menos una letra; solo letras, espacios, guiones y apóstrofes.'
+            )
+        return nombre
+
+    def validate_descripcion(self, valor):
+        if not valor.strip():
+            raise serializers.ValidationError('Describe el trabajo; no uses solo espacios.')
+        return valor
 
     def validate(self, datos):
         prestador = datos['prestador']

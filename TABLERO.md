@@ -2,7 +2,7 @@
 
 Tablero estilo Trello del Sprint 1. Cada tarjeta es una tarea; al avanzar, se mueve a la columna siguiente. El detalle de cada tarea está en [AVANCES.md](AVANCES.md) y la planificación en [SPRINTS.md](SPRINTS.md).
 
-**Actualizado:** 12/10/2026 · **Sprint 1:** 01/10 – 14/10/2026 · **Meta:** el prestador se registra y el cliente lo encuentra y le envía una solicitud.
+**Actualizado:** 15/10/2026 · **Sprint 1:** ✅ cerrado el 14/10/2026 · **Meta:** el prestador se registra y el cliente lo encuentra y le envía una solicitud.
 
 | Columna | Cuándo pasa una tarjeta ahí |
 |---|---|
@@ -11,31 +11,26 @@ Tablero estilo Trello del Sprint 1. Cada tarjeta es una tarea; al avanzar, se mu
 | 👀 En revisión | Está completa y espera la revisión del PR |
 | ✅ Terminado | Está en `main` por un PR revisado y cumple los criterios de aceptación |
 
-Resumen: **6 terminadas · 0 en revisión · 7 en curso · 0 por hacer** · 17 de 30 h terminadas.
+Resumen: **11 terminadas · 0 en revisión · 2 en curso · 0 por hacer** · 26 de 30 h terminadas. Las 2 tarjetas en curso pasan al Sprint 2.
 
 ---
 
 ## 📋 Por hacer (0)
 
-Sin tarjetas: todas las tareas del sprint ya empezaron.
+Sin tarjetas.
 
-## 🔨 En curso (7)
+## 🔨 En curso (2) — pasan al Sprint 2
 
 | Tarjeta | HU | Responsable | Horas | Nota |
 |---|:---:|---|:---:|---|
-| **T2.1** API de carga de certificaciones | HU-2 | David Valcarcel | 2 | Valida PDF/JPG y 5 MB; falta vincular el certificado al prestador |
-| **T2.2** Componente de carga de archivos | HU-2 | David Valcarcel | 2 | Está en `src/` de la raíz; falta llevarlo a `frontend/` y corregir el lint (`err` sin usar) |
-| **T3.3** Ordenar resultados por distancia | HU-3 | David Valcarcel | 2 | Hecho en un endpoint aparte; falta aplicarlo en `/api/prestadores/buscar/` |
-| **T3.4** Datos de prueba y respuesta < 3 s | HU-3 | David Valcarcel | 2 | Medido sobre el endpoint aparte; falta medir la búsqueda real |
-| **T4.2** Pantallas de solicitud y cambio de estado | HU-4 | David Valcarcel | 2 | Falta la pantalla de solicitud conectada a `/api/servicios/solicitudes/` (ya en `main`) |
-| **T2.3** Pruebas de registro y carga | HU-1/2 | Luis Abad | 1 | Pruebas en `main`; una falla a propósito hasta que T2.1 vincule el certificado. [Informe](docs/pruebas-T2.3.md) |
-| **T4.3** Pruebas buscar → solicitar → aceptar | HU-4 | Luis Abad | 2 | API verificada (32 OK); falta probar desde React cuando esté T4.2. [Informe](docs/pruebas-T4.3.md) |
+| **T2.2** Componente de carga de archivos | HU-2 | David Valcarcel | 2 | Falta agregarlo a la navegación, enviar el prestador y corregir el CSS importado |
+| **T3.4** Datos de prueba y respuesta < 3 s | HU-3 | David Valcarcel | 2 | Falta medir la búsqueda real `/api/prestadores/buscar/` |
 
 ## 👀 En revisión (0)
 
-Sin PR abiertos: el #3 y el #4 se unieron a `main` el 12/10.
+Sin PR abiertos: del #1 al #7 están unidos a `main`.
 
-## ✅ Terminado (6)
+## ✅ Terminado (11)
 
 | Tarjeta | HU | Responsable | Horas | PR | Nota |
 |---|:---:|---|:---:|:---:|---|
@@ -45,6 +40,11 @@ Sin PR abiertos: el #3 y el #4 se unieron a `main` el 12/10.
 | **T3.1** Búsqueda por rubro, radio y disponibilidad | HU-3 | Luis Abad | 3 | [#3](https://github.com/RXDG2908/Chamba-PE/pull/3) | `GET /api/prestadores/buscar/`; 11 pruebas |
 | **T3.2** Pantalla de resultados | HU-3 | Luis Abad | 4 | [#3](https://github.com/RXDG2908/Chamba-PE/pull/3) | Rubros, mapa Leaflet y tarjetas con datos reales |
 | **T4.1** Flujo de solicitud: envío y aceptación o rechazo | HU-4 | Renzo León | 3 | [#4](https://github.com/RXDG2908/Chamba-PE/pull/4) | API de solicitudes; 12 pruebas |
+| **T2.1** API de carga de certificaciones | HU-2 | David Valcarcel | 2 | [#6](https://github.com/RXDG2908/Chamba-PE/pull/6) | Certificado vinculado al prestador; 400 si falta |
+| **T3.3** Ordenar resultados por distancia | HU-3 | David Valcarcel | 2 | [#6](https://github.com/RXDG2908/Chamba-PE/pull/6) | Orden ascendente en la búsqueda real |
+| **T4.2** Pantallas de solicitud y cambio de estado | HU-4 | David Valcarcel | 2 | [#6](https://github.com/RXDG2908/Chamba-PE/pull/6) | Solicitar desde la tarjeta y ver Aceptada o Rechazada; validaciones en [#7](https://github.com/RXDG2908/Chamba-PE/pull/7) |
+| **T2.3** Pruebas de registro y carga | HU-1/2 | Luis Abad | 1 | [#7](https://github.com/RXDG2908/Chamba-PE/pull/7) | Registro y carga, incluida la asociación del certificado. [Informe](docs/pruebas-T2.3.md) |
+| **T4.3** Pruebas buscar → solicitar → aceptar | HU-4 | Luis Abad | 2 | [#7](https://github.com/RXDG2908/Chamba-PE/pull/7) | Envío, Aceptada, Rechazada y validaciones desde React. [Informe](docs/pruebas-T4.3.md) |
 
 ### Otros entregables hechos (sin horas del sprint)
 
@@ -58,6 +58,9 @@ Sin PR abiertos: el #3 y el #4 se unieron a `main` el 12/10.
 | 12/10 | AVANCES actualizado con el estado real de todas las tareas | Renzo León |
 | 12/10 | Informes de pruebas T2.3 y T4.3 (`docs/pruebas-T2.3.md`, `docs/pruebas-T4.3.md`) | Luis Abad |
 | 12/10 | Revisión y prueba combinada de los PR 3 y 4 (backend, frontend y navegador) | Renzo León |
+| 14/10 | Pruebas manuales de búsqueda en móvil y escritorio (PR 5) | Luis Abad |
+| 15/10 | Validaciones de nombre, teléfono y descripción, y tarjeta corregida (PR 7) | Luis Abad |
+| 15/10 | Verificación final de `main` y cierre del Sprint 1 | Renzo León |
 
 ---
 
@@ -66,9 +69,9 @@ Sin PR abiertos: el #3 y el #4 se unieron a `main` el 12/10.
 | HU | Historia | Por hacer | En curso | En revisión | Terminado |
 |:---:|---|:---:|:---:|:---:|:---:|
 | HU-1 | Registro del prestador | — | — | — | T1.1 · T1.2 · T1.3 |
-| HU-2 | Carga de certificaciones | — | T2.1 · T2.2 · T2.3 | — | — |
-| HU-3 | Búsqueda de prestadores | — | T3.3 · T3.4 | — | T3.1 · T3.2 |
-| HU-4 | Solicitud y aceptación | — | T4.2 · T4.3 | — | T4.1 |
+| HU-2 | Carga de certificaciones | — | T2.2 | — | T2.1 · T2.3 |
+| HU-3 | Búsqueda de prestadores | — | T3.4 | — | T3.1 · T3.2 · T3.3 |
+| HU-4 | Solicitud y aceptación | — | — | — | T4.1 · T4.2 · T4.3 |
 
 ## Próximos sprints (backlog)
 

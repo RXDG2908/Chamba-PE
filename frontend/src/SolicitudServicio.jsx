@@ -65,6 +65,19 @@ function SolicitudServicio({ prestador, rubro, ubicacion }) {
 
   async function enviar(evento) {
     evento.preventDefault()
+    const nombre = datosCliente.cliente_nombre.normalize('NFC')
+    if (!/\p{L}/u.test(nombre) || /[^\p{L} '\u2019-]/u.test(nombre) || nombre.length > 100) {
+      setError('Ingresa un nombre con al menos una letra; solo letras, espacios, guiones y apóstrofes (máximo 100 caracteres).')
+      return
+    }
+    if (datosCliente.cliente_telefono.length !== 9 || !/^[0-9]{9}$/.test(datosCliente.cliente_telefono)) {
+      setError('Ingresa exactamente 9 dígitos del 0 al 9, sin +51 ni espacios.')
+      return
+    }
+    if (!datosCliente.descripcion.trim() || datosCliente.descripcion.length > 500) {
+      setError('Describe el trabajo, sin dejarlo en blanco (máximo 500 caracteres).')
+      return
+    }
     setEnviando(true)
     setError('')
     try {
@@ -99,7 +112,7 @@ function SolicitudServicio({ prestador, rubro, ubicacion }) {
   return (
     <div className="solicitud-servicio">
       {!solicitud ? (
-        <form onSubmit={enviar}>
+        <form onSubmit={enviar} noValidate>
           <h5>Solicitar este servicio</h5>
           <label>
             <span>Tu nombre</span>
@@ -115,7 +128,8 @@ function SolicitudServicio({ prestador, rubro, ubicacion }) {
             <input
               required
               type="tel"
-              maxLength="20"
+              inputMode="numeric"
+              aria-label="Teléfono: 9 dígitos sin +51"
               value={datosCliente.cliente_telefono}
               onChange={(evento) => setDatosCliente({ ...datosCliente, cliente_telefono: evento.target.value })}
             />

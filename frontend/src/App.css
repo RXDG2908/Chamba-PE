@@ -26,7 +26,8 @@
 .resumen h3 { margin: 0; font-size: 18px; }
 .resumen > span { color: #58675f; font-size: 14px; }
 .lista-prestadores { list-style: none; padding: 0; margin: 0; display: grid; gap: 16px; }
-.tarjeta { display: flex; align-items: center; gap: 20px; padding: 24px; background: #fff; border: 1px solid #e0e7e4; border-radius: 16px; box-shadow: 0 3px 12px #173b2610; }
+.tarjeta { display: grid; min-width: 0; gap: 20px; padding: 24px; background: #fff; border: 1px solid #e0e7e4; border-radius: 16px; box-shadow: 0 3px 12px #173b2610; }
+.cabecera-prestador { display: flex; align-items: center; gap: 20px; min-width: 0; }
 .avatar { display: grid; place-items: center; width: 60px; height: 60px; flex-shrink: 0; border-radius: 16px; font-size: 20px; font-weight: 700; }
 .verde { background: #e0f0e5; color: #226340; }
 .azul { background: #e3edf9; color: #2d5986; }
@@ -42,7 +43,8 @@
 @media (max-width: 600px) {
   .contenedor { width: calc(100% - 32px); }
   .resultados { padding-top: 28px; }
-  .tarjeta { flex-wrap: wrap; gap: 16px; padding: 20px; }
+  .tarjeta { gap: 16px; padding: 20px; }
+  .cabecera-prestador { flex-wrap: wrap; gap: 16px; }
   .avatar { width: 52px; height: 52px; }
   .detalles { width: 100%; gap: 24px; padding-top: 16px; border-top: 1px solid #edf0ee; }
   .detalles > div { flex: 1; }
@@ -69,12 +71,12 @@
 .resultado-anuncio { margin-bottom: 16px; color: #58675f; font-size: 14px; }
 .busqueda :focus-visible { outline: 3px solid #16734f; outline-offset: 3px; }
 
-.solicitud-servicio { flex-basis: 100%; padding-top: 16px; border-top: 1px solid #edf0ee; }
+.solicitud-servicio { min-width: 0; padding-top: 16px; border-top: 1px solid #edf0ee; }
 .solicitud-servicio form { display: grid; gap: 12px; }
 .solicitud-servicio h5 { margin: 0; font-size: 16px; }
-.solicitud-servicio label { display: grid; gap: 6px; font-size: 14px; }
-.solicitud-servicio input, .solicitud-servicio textarea { width: 100%; padding: 10px 12px; border: 1px solid #cbded3; border-radius: 10px; color: #20352a; font: inherit; }
-.solicitud-servicio button { justify-self: start; padding: 10px 16px; border: 1px solid #16734f; border-radius: 10px; background: #16734f; color: #fff; font: inherit; font-weight: 700; cursor: pointer; }
+.solicitud-servicio label { min-width: 0; display: grid; gap: 6px; font-size: 14px; }
+.solicitud-servicio input, .solicitud-servicio textarea { min-width: 0; width: 100%; padding: 10px 12px; border: 1px solid #cbded3; border-radius: 10px; color: #20352a; font: inherit; }
+.solicitud-servicio button { max-width: 100%; overflow-wrap: anywhere; justify-self: start; padding: 10px 16px; border: 1px solid #16734f; border-radius: 10px; background: #16734f; color: #fff; font: inherit; font-weight: 700; cursor: pointer; }
 .solicitud-servicio button:disabled { opacity: 0.6; cursor: not-allowed; }
 .estado-solicitud { font-weight: 700; }
 .estado-aceptada { color: #16734f; }

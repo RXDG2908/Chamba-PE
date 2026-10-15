@@ -238,3 +238,51 @@ class SolicitudTests(TestCase):
         solicitud_id = self.enviar().json()['id']
         r = self.client.post(reverse('aceptar_solicitud', args=[solicitud_id]))
         self.assertEqual(r.status_code, 403)
+
+
+class ValidacionSolicitudTests(TestCase):
+    setUp = SolicitudTests.setUp
+    crear_prestador = SolicitudTests.crear_prestador
+    enviar = SolicitudTests.enviar
+    """Regresiones del contrato de contacto; cada rechazo debe ser atómico."""
+
+    def test_telefonos_validos(self):
+        for telefono in ['987654321', '012345678']:
+            with self.subTest(telefono=telefono):
+                respuesta = self.enviar(cliente_telefono=telefono)
+                self.assertEqual(respuesta.status_code, 201)
+                self.assertEqual(Solicitud.objects.get(pk=respuesta.json()['id']).cliente_telefono, telefono)
+
+    def comprobar_rechazos(self, campo, valores):
+        for valor in valores:
+            with self.subTest(campo=campo, valor=valor):
+                antes = Solicitud.objects.count()
+                respuesta = self.enviar(**{campo: valor})
+                self.assertEqual(respuesta.status_code, 400)
+                self.assertIn(campo, respuesta.json())
+                self.assertEqual(Solicitud.objects.count(), antes)
+
+    def test_telefonos_invalidos_no_guardan(self):
+        self.comprobar_rechazos('cliente_telefono', [
+            '', '   ', '12345678', '1234567890', '9' * 21, 'abcdefghi',
+            '98765a321', '+51987654321', '987 65432', ' 987654321',
+            '987654321 ', '９８７６５４３２１', '٩٨٧٦٥٤٣٢١', '98765432\n',
+        ])
+
+    def test_nombres_unicode_validos(self):
+        for nombre in ["María-José O'Neill", 'Ángel Muñoz', '李 明', 'D’Arcy', 'Jose\u0301 Pérez']:
+            with self.subTest(nombre=nombre):
+                self.assertEqual(self.enviar(cliente_nombre=nombre).status_code, 201)
+
+    def test_nombres_invalidos_no_guardan(self):
+        self.comprobar_rechazos('cliente_nombre', [
+            '', '   ', '123', 'Luis2', " -'’ ", 'Ana@', 'Ana\tMaría', 'a' * 101,
+        ])
+
+    def test_descripcion_numeros_puntuacion_y_limite(self):
+        for descripcion in ['reparar 2 tuberías en el piso 3', 'Revisar: caño #2, ¿fuga?', 'a' * 500]:
+            with self.subTest(descripcion=descripcion):
+                self.assertEqual(self.enviar(descripcion=descripcion).status_code, 201)
+
+    def test_descripciones_invalidas_no_guardan(self):
+        self.comprobar_rechazos('descripcion', ['', '   ', '\t\n', 'a' * 501])

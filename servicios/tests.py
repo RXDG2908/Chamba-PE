@@ -25,7 +25,7 @@ class BusquedaPrestadoresTests(TestCase):
         self.rubro = Rubro.objects.create(nombre='Rubro de prueba')
         self.otro_rubro = Rubro.objects.create(nombre='Otro rubro de prueba')
         self.url = reverse('buscar_prestadores')
-        self.assertEqual(self.url, '/api/servicios/prestadores/buscar/')
+        self.assertEqual(self.url, '/api/prestadores/buscar/')
         self.parametros = {'rubro': self.rubro.id, 'latitud': 0, 'longitud': 0}
 
     def crear_prestador(self, rubros=None, **cambios):
@@ -43,9 +43,11 @@ class BusquedaPrestadoresTests(TestCase):
     def buscar(self, **cambios):
         return self.client.get(self.url, {**self.parametros, **cambios})
 
-    def test_ruta_anterior_sigue_disponible(self):
-        respuesta = self.client.get('/api/prestadores/buscar/')
+    def test_ruta_de_busqueda_unica(self):
+        respuesta = self.client.get(self.url)
         self.assertEqual(respuesta.status_code, 400)
+        respuesta_duplicada = self.client.get('/api/servicios/prestadores/buscar/')
+        self.assertEqual(respuesta_duplicada.status_code, 404)
 
     def test_filtra_rubro_disponibilidad_y_cobertura(self):
         incluido = self.crear_prestador(rubros=[self.rubro, self.otro_rubro])

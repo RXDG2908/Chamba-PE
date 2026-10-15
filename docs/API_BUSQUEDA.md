@@ -2,10 +2,9 @@
 
 ## Endpoint
 
-`GET /api/servicios/prestadores/buscar/`
+`GET /api/prestadores/buscar/`
 
 Consulta pública, sin autenticación. Requiere los tres parámetros:
-La ruta anterior `GET /api/prestadores/buscar/` se conserva como alias.
 
 | Parámetro | Valor |
 |---|---|
@@ -16,7 +15,7 @@ La ruta anterior `GET /api/prestadores/buscar/` se conserva como alias.
 Ejemplo (reemplazar `1` por el ID del rubro elegido):
 
 ```http
-GET /api/servicios/prestadores/buscar/?rubro=1&latitud=-12.046374&longitud=-77.042793
+GET /api/prestadores/buscar/?rubro=1&latitud=-12.046374&longitud=-77.042793
 ```
 
 Respuesta `200 OK`, ejemplo ilustrativo del formato, sin crear registros:
@@ -107,7 +106,7 @@ rubro 1 devolvió 200 y el prestador a 0.0 km.
 3. Elegir un ID y consultar la ubicación del cliente:
 
    ```powershell
-   Invoke-RestMethod 'http://127.0.0.1:8000/api/servicios/prestadores/buscar/?rubro=1&latitud=-12.046374&longitud=-77.042793' | ConvertTo-Json -Depth 5
+   Invoke-RestMethod 'http://127.0.0.1:8000/api/prestadores/buscar/?rubro=1&latitud=-12.046374&longitud=-77.042793' | ConvertTo-Json -Depth 5
    ```
 
    También se puede abrir esa URL en el navegador. Un registro nuevo tiene
@@ -115,7 +114,7 @@ rubro 1 devolvió 200 y el prestador a 0.0 km.
    coincidencia manual debe existir un prestador disponible del rubro y con
    cobertura en esa ubicación. Esta implementación no cambia registros locales.
 
-4. Comprobar errores abriendo `/api/servicios/prestadores/buscar/` sin parámetros y
+4. Comprobar errores abriendo `/api/prestadores/buscar/` sin parámetros y
    repitiendo la consulta con `latitud=91`: ambos devuelven 400.
 
 5. Ejecutar la suite automática, que crea sus datos exclusivamente en la

@@ -3,7 +3,6 @@ import os
 import math
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
-from django.core.files.storage import FileSystemStorage
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
@@ -65,13 +64,8 @@ def upload_certification(request):
         res["Access-Control-Allow-Headers"] = "*"
         return res
 
-    # 5. Guardar físicamente el archivo
-    fs = FileSystemStorage()
-    filename = fs.save(uploaded_file.name, uploaded_file)
-    file_url = fs.url(filename)
-
     # Tarea T2.1: Crear y persistir la certificación vinculada al prestador correcto
-    CertificacionPrestador.objects.create(
+    cert = CertificacionPrestador.objects.create(
         prestador=prestador_asociado,
         archivo=uploaded_file,
         estado='Pendiente'
@@ -79,8 +73,8 @@ def upload_certification(request):
 
     res = JsonResponse({
         'message': 'Certificación cargada y vinculada exitosamente',
-        'file_name': filename,
-        'file_url': file_url,
+        'file_name': cert.archivo.name,
+        'file_url': cert.archivo.url,
         'status': 'Pendiente de verificación'
     }, status=201)
 

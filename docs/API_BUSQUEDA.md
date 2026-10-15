@@ -1,4 +1,4 @@
-# Búsqueda de prestadores — T3.1 (Luis Abad)
+# Búsqueda de prestadores — T3.1 y T3.3
 
 ## Endpoint
 
@@ -61,8 +61,8 @@ de 0.000000001 km (un micrómetro) para el error numérico en el límite.
 `servicios.distancias.distancia_km` queda disponible para reutilizar en T3.3.
 Los rubros se precargan con `prefetch_related`.
 
-No hay ordenamiento por distancia ni garantía de orden; T3.3 corresponde a
-David. Tampoco se añade un filtro por estado de verificación: T3.1 aplica
+Los resultados se ordenan por distancia ascendente (el prestador más cercano
+primero), según T3.3. Tampoco se añade un filtro por estado de verificación: T3.1 aplica
 los filtros solicitados de rubro, disponibilidad y cobertura.
 T3.2 ya está conectada a esta API en Resultados, con selector de rubros y
 ubicación Leaflet; véase [cómo probar el frontend](../frontend/README.md).

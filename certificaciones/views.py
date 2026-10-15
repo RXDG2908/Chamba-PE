@@ -3,9 +3,12 @@ import os
 import math
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
-from django.core.files.storage import FileSystemStorage
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
+
+# Importar el modelo Prestador para asociar la certificación (T2.1)
+from prestadores.models import Prestador
+from .models import CertificacionPrestador
 
 MAX_FILE_SIZE = 5 * 1024 * 1024  # 5 MB en bytes
 ALLOWED_EXTENSIONS = ['.pdf', '.jpg', '.jpeg']
@@ -27,6 +30,15 @@ def upload_certification(request):
         res["Access-Control-Allow-Origin"] = "*"
         res["Access-Control-Allow-Headers"] = "*"
         return res
+
+    prestador_id = request.POST.get('prestador') or request.POST.get('prestador_id')
+    if not prestador_id:
+        return JsonResponse({'error': 'El prestador es obligatorio.'}, status=400)
+
+    try:
+        prestador_asociado = Prestador.objects.get(id=prestador_id)
+    except Prestador.DoesNotExist:
+        return JsonResponse({'error': 'El prestador especificado no existe.'}, status=404)
 
     # Capturar el archivo de la petición
     uploaded_file = request.FILES.get('file') or request.FILES.get('certificacion')
@@ -52,15 +64,17 @@ def upload_certification(request):
         res["Access-Control-Allow-Headers"] = "*"
         return res
 
-    # 5. Guardar el archivo y devolver respuesta de éxito en JSON
-    fs = FileSystemStorage()
-    filename = fs.save(uploaded_file.name, uploaded_file)
-    file_url = fs.url(filename)
+    # Tarea T2.1: Crear y persistir la certificación vinculada al prestador correcto
+    cert = CertificacionPrestador.objects.create(
+        prestador=prestador_asociado,
+        archivo=uploaded_file,
+        estado='Pendiente'
+    )
 
     res = JsonResponse({
-        'message': 'Certificación cargada exitosamente',
-        'file_name': filename,
-        'file_url': file_url,
+        'message': 'Certificación cargada y vinculada exitosamente',
+        'file_name': cert.archivo.name,
+        'file_url': cert.archivo.url,
         'status': 'Pendiente de verificación'
     }, status=201)
 
@@ -89,8 +103,7 @@ def listar_prestadores_por_distancia(request):
     except (TypeError, ValueError):
         return Response({"error": "Debe proporcionar una latitud y longitud válidas."}, status=400)
 
-    # Corrección aplicada: Importación desde la app actual
-    from .models import CertificacionPrestador as Prestador 
+    from prestadores.models import Prestador 
     from .serializers import CertificacionSerializer as PrestadorSerializer
 
     prestadores = Prestador.objects.all()
@@ -102,7 +115,7 @@ def listar_prestadores_por_distancia(request):
         prestador.distancia_km = round(dist, 2)
         prestadores_con_distancia.append(prestador)
 
-    # Ordenar los resultados de menor a mayor distancia (más cercano primero)
+    # Ordenar los resultados de menor a mayor distancia (más cercano primero) - Tarea T3.3
     prestadores_con_distancia.sort(key=lambda x: x.distancia_km)
 
     serializer = PrestadorSerializer(prestadores_con_distancia, many=True)

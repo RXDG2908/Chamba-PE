@@ -4,8 +4,11 @@ from pathlib import Path
 from tempfile import TemporaryDirectory
 
 from django.core.files.uploadedfile import SimpleUploadedFile
+from django.contrib.auth import get_user_model
 from django.test import TestCase
 from django.urls import reverse
+
+from prestadores.models import Prestador
 
 from .models import CertificacionPrestador
 
@@ -46,12 +49,17 @@ class CargaCertificacionTests(TestCase):
         configuracion.enable()
         self.addCleanup(configuracion.disable)
         self.url = reverse('upload_certification')
+        usuario = get_user_model().objects.create_user(username='certificacion_prueba')
+        self.prestador = Prestador.objects.create(
+            usuario=usuario, nombres='Ana', apellidos='Prueba', dni='11223344',
+            latitud=-12.046374, longitud=-77.042793, radio_cobertura_km=5,
+        )
 
     def cargar(self, nombre='certificado.pdf', contenido=None, mime='application/pdf', **datos):
         if contenido is None:
             contenido = pdf_valido()
         archivo = SimpleUploadedFile(nombre, contenido, content_type=mime)
-        return self.client.post(self.url, {'file': archivo, **datos})
+        return self.client.post(self.url, {'file': archivo, 'prestador': self.prestador.pk, **datos})
 
     def verificar_guardado(self, respuesta, contenido):
         self.assertEqual(respuesta.status_code, 201)
@@ -71,6 +79,14 @@ class CargaCertificacionTests(TestCase):
         respuesta = self.client.post(self.url, {})
         self.assertEqual(respuesta.status_code, 400)
         self.assertIn('error', respuesta.json())
+        self.assertEqual(list(self.directorio.iterdir()), [])
+
+    def test_prestador_obligatorio(self):
+        archivo = SimpleUploadedFile('certificado.pdf', pdf_valido(), content_type='application/pdf')
+        respuesta = self.client.post(self.url, {'file': archivo})
+        self.assertEqual(respuesta.status_code, 400)
+        self.assertEqual(respuesta.json(), {'error': 'El prestador es obligatorio.'})
+        self.assertEqual(CertificacionPrestador.objects.count(), 0)
         self.assertEqual(list(self.directorio.iterdir()), [])
 
     def test_formato_no_permitido(self):

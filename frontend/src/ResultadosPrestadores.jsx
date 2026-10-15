@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { CircleMarker, MapContainer, TileLayer, useMapEvents } from 'react-leaflet'
 import 'leaflet/dist/leaflet.css'
+import SolicitudServicio from './SolicitudServicio.jsx'
 
 const LIMA = [-12.046374, -77.042793]
 const formatoDistancia = new Intl.NumberFormat('es-PE', { maximumFractionDigits: 2 })
@@ -211,6 +212,11 @@ function ResultadosPrestadores() {
                 <dl className="detalles">
                   <div><dt>Distancia</dt><dd>{formatoDistancia.format(prestador.distancia_km)} km</dd></div>
                 </dl>
+                <SolicitudServicio
+                  prestador={prestador}
+                  rubro={rubro}
+                  ubicacion={ubicacion}
+                />
               </li>
             ))}
           </ul>

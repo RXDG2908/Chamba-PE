@@ -51,6 +51,12 @@ y MIME; estas pruebas no certifican validación del contenido por el servidor.
 
 ## Incumplimientos y reproducción
 
+> **Actualización 14/10/2026:** los resultados siguientes documentan una
+> ejecución anterior y están supersedidos por las correcciones de
+> `feature/sprint-1-correcciones`. La suite actualizada pasó 43 pruebas,
+> incluyendo asociación al prestador y HTTP 400 si falta; la carga guarda el
+> archivo mediante el modelo. Ver [AVANCES.md](../AVANCES.md) para el cierre.
+
 **David — T2.1, asociación HU-2 (bloquea cierre de T2.3).**
 Ejecutar de forma aislada, sin registros locales:
 

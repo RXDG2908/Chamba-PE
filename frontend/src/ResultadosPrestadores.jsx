@@ -202,6 +202,7 @@ function ResultadosPrestadores() {
           <ul className="lista-prestadores">
             {prestadores.map((prestador, indice) => (
               <li key={prestador.id} className="tarjeta">
+                <div className="cabecera-prestador">
                 <div className={`avatar ${['verde', 'azul', 'naranja'][indice % 3]}`} aria-hidden="true">
                   {prestador.nombres.charAt(0)}{prestador.apellidos.charAt(0)}
                 </div>
@@ -212,6 +213,7 @@ function ResultadosPrestadores() {
                 <dl className="detalles">
                   <div><dt>Distancia</dt><dd>{formatoDistancia.format(prestador.distancia_km)} km</dd></div>
                 </dl>
+                </div>
                 <SolicitudServicio
                   prestador={prestador}
                   rubro={rubro}

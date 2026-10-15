@@ -69,6 +69,18 @@
 .resultado-anuncio { margin-bottom: 16px; color: #58675f; font-size: 14px; }
 .busqueda :focus-visible { outline: 3px solid #16734f; outline-offset: 3px; }
 
+.solicitud-servicio { flex-basis: 100%; padding-top: 16px; border-top: 1px solid #edf0ee; }
+.solicitud-servicio form { display: grid; gap: 12px; }
+.solicitud-servicio h5 { margin: 0; font-size: 16px; }
+.solicitud-servicio label { display: grid; gap: 6px; font-size: 14px; }
+.solicitud-servicio input, .solicitud-servicio textarea { width: 100%; padding: 10px 12px; border: 1px solid #cbded3; border-radius: 10px; color: #20352a; font: inherit; }
+.solicitud-servicio button { justify-self: start; padding: 10px 16px; border: 1px solid #16734f; border-radius: 10px; background: #16734f; color: #fff; font: inherit; font-weight: 700; cursor: pointer; }
+.solicitud-servicio button:disabled { opacity: 0.6; cursor: not-allowed; }
+.estado-solicitud { font-weight: 700; }
+.estado-aceptada { color: #16734f; }
+.estado-rechazada, .error-solicitud { color: #b3261e; }
+.error-solicitud { overflow-wrap: anywhere; }
+
 @media (max-width: 600px) {
   .busqueda { padding: 16px; }
   .coordenadas-busqueda { grid-template-columns: 1fr; }

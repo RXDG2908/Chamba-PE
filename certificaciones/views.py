@@ -32,6 +32,15 @@ def upload_certification(request):
         res["Access-Control-Allow-Headers"] = "*"
         return res
 
+    prestador_id = request.POST.get('prestador') or request.POST.get('prestador_id')
+    if not prestador_id:
+        return JsonResponse({'error': 'El prestador es obligatorio.'}, status=400)
+
+    try:
+        prestador_asociado = Prestador.objects.get(id=prestador_id)
+    except Prestador.DoesNotExist:
+        return JsonResponse({'error': 'El prestador especificado no existe.'}, status=404)
+
     # Capturar el archivo de la petición
     uploaded_file = request.FILES.get('file') or request.FILES.get('certificacion')
     
@@ -55,35 +64,6 @@ def upload_certification(request):
         res["Access-Control-Allow-Origin"] = "*"
         res["Access-Control-Allow-Headers"] = "*"
         return res
-
-    # Tarea T2.1: Obtener o asociar el prestador desde la petición
-    prestador_id = request.POST.get('prestador') or request.POST.get('prestador_id')
-    
-    if prestador_id:
-        try:
-            prestador_asociado = Prestador.objects.get(id=prestador_id)
-        except Prestador.DoesNotExist:
-            return JsonResponse({'error': 'El prestador especificado no existe.'}, status=404)
-    else:
-        # Si no se envía prestador, tomamos el primero o creamos uno por defecto con un usuario válido para las pruebas
-        prestador_asociado = Prestador.objects.first()
-        if not prestador_asociado:
-            from django.contrib.auth.models import User
-            usuario_default, _ = User.objects.get_or_create(
-                username="test_prestador_default",
-                defaults={"email": "test@example.com"}
-            )
-            prestador_asociado = Prestador.objects.create(
-                usuario=usuario_default,
-                nombres="Prestador",
-                apellidos="Prueba",
-                dni="00000000",
-                telefono="999999999",
-                latitud=-12.046374,
-                longitud=-77.042793,
-                radio_cobertura_km=5.0,
-                disponible=True
-            )
 
     # 5. Guardar físicamente el archivo
     fs = FileSystemStorage()

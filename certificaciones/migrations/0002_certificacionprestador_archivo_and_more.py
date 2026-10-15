@@ -8,7 +8,7 @@ class Migration(migrations.Migration):
 
     dependencies = [
         ('certificaciones', '0001_initial'),
-        ('prestadores', '0003_alter_prestador_id_alter_rubro_id'),
+        ('prestadores', '0002_rubros_iniciales'),
     ]
 
     operations = [

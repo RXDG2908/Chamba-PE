@@ -8,7 +8,7 @@ Reglas de reparto y flujo de trabajo en [PLAN_EQUIPO.md](PLAN_EQUIPO.md). Detall
 
 | Sprint | Fechas | Historias | SP | Horas | Estado |
 |:---:|:---:|:---:|:---:|:---:|:---:|
-| [1](#sprint-1--0110--14102026) | 01/10 – 14/10/2026 | HU-1 a HU-4 | 13 | 30 h | ✅ Cerrado (23 de 30 h) |
+| [1](#sprint-1--0110--14102026) | 01/10 – 14/10/2026 | HU-1 a HU-4 | 13 | 30 h | ✅ Cerrado (26 de 30 h) |
 | [2](#sprint-2--1510--28102026) | 15/10 – 28/10/2026 | HU-5 a HU-9 | 13 | 30 h | 🟢 Planning el 15/10 |
 | [3](#sprint-3--2910--11112026) | 29/10 – 11/11/2026 | HU-19, HU-20, HU-21, HU-13 | 13 | 28 h | ⚪ Por planificar |
 | [4](#sprint-4--1211--25112026) | 12/11 – 25/11/2026 | HU-10, HU-11, HU-12 | 12 | 26 h | ⚪ Por planificar |
@@ -60,8 +60,8 @@ Reglas de reparto y flujo de trabajo en [PLAN_EQUIPO.md](PLAN_EQUIPO.md). Detall
 |:---:|---|:---:|:---:|:---:|
 | T3.1 | Implementar la búsqueda por rubro, radio de cobertura y disponibilidad | Backend | 3 | ✅ |
 | T3.2 | Pantalla de resultados con lista de prestadores | Frontend | 4 | ✅ |
-| T2.3 | Pruebas funcionales del registro y la carga (campos obligatorios y límites) | Pruebas | 1 | 🟡 |
-| T4.3 | Pruebas del flujo buscar → solicitar → aceptar | Pruebas | 2 | 🟡 |
+| T2.3 | Pruebas funcionales del registro y la carga (campos obligatorios y límites) | Pruebas | 1 | ✅ |
+| T4.3 | Pruebas del flujo buscar → solicitar → aceptar | Pruebas | 2 | ✅ |
 | | **Subtotal** | | **10** | |
 
 ### David Valcarcel — 10 h
@@ -121,7 +121,7 @@ Horas pendientes al final de cada día. La línea ideal baja 3 h por día.
 | 7 | 09/10 (vie) | 9 | 23 |
 | 8 | 12/10 (lun) | 6 | 13 |
 | 9 | 13/10 (mar) | 3 | 13 |
-| 10 | 14/10 (mié) | 0 | 7 |
+| 10 | 14/10 (mié) | 0 | 4 |
 
 ## Retrospectiva
 
@@ -156,8 +156,6 @@ Van primero en el sprint. Las horas restantes se vuelven a estimar en el Plannin
 |:---:|---|---|:---:|---|
 | T2.2 | Componente de carga de certificados | David Valcarcel | 2 | Agregarlo a la navegación, enviar el prestador y corregir el CSS importado |
 | T3.4 | Tiempo de respuesta < 3 s | David Valcarcel | 2 | Medir la búsqueda real `/api/prestadores/buscar/` |
-| T2.3 | Pruebas de registro y carga | Luis Abad | 1 | Confirmar el cierre sobre `main` |
-| T4.3 | Pruebas buscar → solicitar → aceptar | Luis Abad | 2 | Confirmar el cierre sobre `main` |
 
 ## Historias y tareas
 

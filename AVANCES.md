@@ -14,14 +14,14 @@ Estados: ✅ terminada · 🟡 en curso / parcial · ⚪ sin iniciar · 🔴 blo
 | Indicador | Valor |
 |---|---|
 | Horas comprometidas | 30 h |
-| Horas terminadas (tareas ✅) | 23 h (77 %) |
-| Horas pendientes al cierre | 7 h |
-| Tareas terminadas | 9 de 13 |
-| Tareas que pasan al Sprint 2 | 4 (T2.2, T2.3, T3.4, T4.3) |
-| Historias terminadas | 1 de 4 (HU-1). HU-2, HU-3 y HU-4 funcionan, pero les queda una tarea de pruebas o integración |
+| Horas terminadas (tareas ✅) | 26 h (87 %) |
+| Horas pendientes al cierre | 4 h |
+| Tareas terminadas | 11 de 13 |
+| Tareas que pasan al Sprint 2 | 2 (T2.2 y T3.4, de David) |
+| Historias terminadas | 2 de 4 (HU-1 y HU-4). A HU-2 le falta T2.2 y a HU-3, T3.4 |
 | Estado de `main` al 15/10 | 49 de 49 pruebas OK, sin migraciones pendientes, lint y build OK; flujo registrar → buscar → solicitar → aceptar o rechazar probado en el navegador |
 
-> Las horas solo cuentan como terminadas cuando la tarea cumple la [definición de terminado](PLAN_EQUIPO.md#8-definición-de-terminado). T2.3 y T4.3 pasan a ✅ cuando Luis confirme el cierre de sus pruebas sobre `main`.
+> Las horas solo cuentan como terminadas cuando la tarea cumple la [definición de terminado](PLAN_EQUIPO.md#8-definición-de-terminado). T2.3 y T4.3 las confirmó Luis el 15/10; el PR 7 se unió el 15/10 a las 00:43 y se cuenta en el cierre.
 
 El detalle de cada verificación está en la bitácora (sección 6) y en los informes [docs/pruebas-T2.3.md](docs/pruebas-T2.3.md), [docs/pruebas-T4.3.md](docs/pruebas-T4.3.md) y [frontend/README.md](frontend/README.md).
 
@@ -35,8 +35,8 @@ El detalle de cada verificación está en la bitácora (sección 6) y en los inf
 | T4.1 | HU-4 | Flujo de solicitud: envío y aceptación/rechazo | Renzo León | 3 | ✅ | PR 4 unido a `main` | 12/10 | Implementada en `servicios`: modelo `Solicitud` (Pendiente → Aceptada / Rechazada) y migración 0001. `POST /api/servicios/solicitudes/` valida que el prestador esté disponible, ofrezca el rubro y cubra la ubicación del cliente. El prestador ve su bandeja (`GET .../recibidas/`) y acepta o rechaza (`POST .../<id>/aceptar/` y `.../rechazar/`), solo si es el dueño y si sigue Pendiente. El cliente ve el cambio en `GET .../<id>/`. 12 pruebas nuevas; `prestadores` y `servicios`: 30 OK. |
 | T3.1 | HU-3 | Búsqueda por rubro, radio y disponibilidad | Luis Abad | 3 | ✅ | PR 3 unido a `main` | 12/10 | Implementada y verificada: `GET /api/prestadores/buscar/`, parámetros validados en español, Haversine reutilizable, cobertura inclusiva y datos públicos. 11 pruebas nuevas; suite completa: 18 OK, repetida tras incorporar `ae51360` del equipo. Luis confirmó HTTP 200 vacío y positivo. T3.3 agregó el orden ascendente; hay una sola ruta, en `prestadores/urls.py`. [Documentación](docs/API_BUSQUEDA.md). |
 | T3.2 | HU-3 | Pantalla de resultados con lista de prestadores | Luis Abad | 4 | ✅ | PR 3 unido a `main`; comprobaciones en `pruebas-cierre-sprint1` | 14/10 | Implementada con rubros API, mapa/coordenadas, tarjetas y cancelación; conserva orden recibido. Sobre `7e671cd`: asistente ejecutó lint/build OK, 11 tests búsqueda OK y HTTP positivo/vacío/error/recuperación. Luis comprobó móvil simulado/escritorio sin cortes, Demo a 0 km, vacío al cambiar a Electricidad, error con Django detenido y recuperación sin recargar. Network: rubro 1 anterior cancelado, rubro 2 final 200, sin resultados antiguos. Incorporado después `e20c533`, sin repetir pruebas. Pendientes cambios rápidos de ubicación y otros casos específicos; [evidencia y pasos](frontend/README.md). Estado ✅ conservado del cuadro de Renzo; no se suman horas. |
-| T2.3 | HU-1/2 | Pruebas de registro y carga | Luis Abad | 1 | 🟡 | PR 7 unido a `main` | 15/10 | Pruebas de registro y carga en `main` (incluye asociación y rechazo sin prestador). Pasa al Sprint 2 hasta que Luis confirme el cierre. [Evidencia](docs/pruebas-T2.3.md). |
-| T4.3 | HU-4 | Pruebas buscar → solicitar → aceptar | Luis Abad | 2 | 🟡 | PR 7 unido a `main` | 15/10 | Flujo probado desde React: Aceptada y Rechazada, y validaciones sin crear solicitudes. Pasa al Sprint 2 hasta que Luis confirme el cierre. [Evidencia](docs/pruebas-T4.3.md). |
+| T2.3 | HU-1/2 | Pruebas de registro y carga | Luis Abad | 1 | ✅ | PR 7 unido a `main` | 15/10 | Pruebas de registro y carga en `main`, incluida la asociación del certificado y el rechazo sin prestador. Luis confirmó el cierre el 15/10. [Evidencia](docs/pruebas-T2.3.md). |
+| T4.3 | HU-4 | Pruebas buscar → solicitar → aceptar | Luis Abad | 2 | ✅ | PR 7 unido a `main` | 15/10 | Flujo probado desde React: envío, Aceptada, Rechazada, validaciones sin crear solicitudes y vista en escritorio y móvil. Luis confirmó el cierre el 15/10. [Evidencia](docs/pruebas-T4.3.md). |
 | T2.1 | HU-2 | API de carga de certificaciones (PDF/JPG ≤ 5 MB) | David Valcarcel | 2 | ✅ | PR 6 unido a `main` | 14/10 | Exige `prestador` (400 si falta), guarda la certificación vinculada al prestador una sola vez mediante el `FileField` y responde con su nombre y URL. Revisado por Luis. |
 | T2.2 | HU-2 | Componente de carga de archivos | David Valcarcel | 2 | 🟡 | `main` (directo, sin PR) | 05/10 | Pasa al Sprint 2. `UploadCertificado` existe pero no está en la navegación de la app y su CSS importado no existe; falta enviar el prestador al subir. |
 | T3.3 | HU-3 | Ordenar resultados por distancia | David Valcarcel | 2 | ✅ | PR 6 unido a `main` | 14/10 | `GET /api/prestadores/buscar/` ordena por distancia ascendente, con prueba. Se quitó la ruta duplicada en `servicios`. El endpoint aparte `certificaciones/prestadores/cercanos/` sigue existiendo y ya no se usa. |
@@ -48,18 +48,18 @@ El detalle de cada verificación está en la bitácora (sección 6) y en los inf
 | HU | Historia | SP | Horas | Tareas | Estado | Pruebas a cargo |
 |:---:|---|:---:|:---:|---|:---:|---|
 | HU-1 | Registro del prestador | 3 | 7 h | T1.1 ✅ · T1.2 ✅ · T1.3 ✅ | ✅ 7 de 7 h | Luis (T2.3) |
-| HU-2 | Carga de certificaciones | 2 | 5 h | T2.1 ✅ · T2.2 🟡 · T2.3 🟡 | 🟡 2 de 5 h | Luis (T2.3) |
+| HU-2 | Carga de certificaciones | 2 | 5 h | T2.1 ✅ · T2.2 🟡 · T2.3 ✅ | 🟡 3 de 5 h | Luis (T2.3) |
 | HU-3 | Búsqueda de prestadores | 5 | 11 h | T3.1 ✅ · T3.2 ✅ · T3.3 ✅ · T3.4 🟡 | 🟡 9 de 11 h | David (T3.4) |
-| HU-4 | Solicitud y aceptación | 3 | 7 h | T4.1 ✅ · T4.2 ✅ · T4.3 🟡 | 🟡 5 de 7 h | Luis (T4.3) |
+| HU-4 | Solicitud y aceptación | 3 | 7 h | T4.1 ✅ · T4.2 ✅ · T4.3 ✅ | ✅ 7 de 7 h | Luis (T4.3) |
 
 ## 4. Avance por integrante
 
 | Integrante | Rol | Horas plan | Horas terminadas | Tareas terminadas | Tareas en curso |
 |---|---|:---:|:---:|:---:|---|
 | Renzo León | Scrum Master / Desarrollador | 10 h | 10 h | T1.1, T1.2, T1.3, T4.1 | — |
-| Luis Abad | Development Team | 10 h | 7 h | T3.1, T3.2 | T2.3 y T4.3 (falta confirmar cierre) |
+| Luis Abad | Development Team | 10 h | 10 h | T3.1, T3.2, T2.3, T4.3 | — |
 | David Valcarcel | Product Owner / Desarrollador | 10 h | 6 h | T2.1, T3.3, T4.2 | T2.2, T3.4 |
-| **Equipo** | | **30 h** | **23 h** | **9** | **4** |
+| **Equipo** | | **30 h** | **26 h** | **11** | **2** |
 
 ## 5. Burndown (horas pendientes)
 
@@ -75,7 +75,7 @@ El detalle de cada verificación está en la bitácora (sección 6) y en los inf
 | 7 | 09/10 | 9 | 23 |
 | 8 | 12/10 | 6 | 13 |
 | 9 | 13/10 | 3 | 13 |
-| 10 | 14/10 | 0 | 7 |
+| 10 | 14/10 | 0 | 4 |
 
 ## 6. Bitácora de avances
 
@@ -83,6 +83,7 @@ Una línea por entrega, la más reciente arriba.
 
 | Fecha | Quién | Qué se hizo | Tarea |
 |:---:|---|---|:---:|
+| 15/10 | Luis Abad | Confirmó el cierre de T2.3 y T4.3: probó envío, aceptación y rechazo, validaciones y la vista en escritorio y móvil. Sprint 1 queda en 26 de 30 h. | T2.3/T4.3 |
 | 15/10 | Renzo León | Cierre del Sprint 1: verificó `main` con una instalación limpia (49 de 49 pruebas, ejecutor T4.3 con 32 OK, migraciones al día, lint y build OK) y en el navegador (solicitud con teléfono inválido rechazada, solicitud válida creada y Rechazada mostrada sola; móvil sin scroll horizontal). Actualizó AVANCES, SPRINTS, TABLERO y README con 23 de 30 h y el borrador de la retrospectiva. | Cierre |
 | 15/10 | Luis Abad | PR 7 unido a `main`: validaciones de nombre, teléfono de 9 dígitos y descripción en React y Django (6 pruebas nuevas) y tarjeta de prestador corregida. Probó en escritorio y a 360/390 px. | T3.2/T4.3 |
 | 14/10 | David Valcarcel | PR 6 revisado por Luis y unido a `main`: certificado vinculado al prestador, orden por distancia en la búsqueda, pantalla de solicitud, guardado único del archivo, migración regenerada con Django 6.1 y ruta duplicada eliminada. | T2.1/T3.3/T4.2 |
@@ -133,7 +134,7 @@ Una línea por entrega, la más reciente arriba.
 | 7 | 12/10 | `certificaciones/test_reporte.py` no es una prueba de Django: al correr `manage.py test` da error (falta `requests`) y reescribe `evidencia_rendimiento.txt`. Conviene moverlo fuera de la app o convertirlo en prueba. | Todas | David | 🟡 |
 | 8 | 12/10 | El lint fallaba por `err` sin usar en `UploadCertificado.jsx`. Resuelto por David el 13/10. Sigue pendiente: su CSS importado no existe y el componente no está en la navegación. | HU-2 | David (T2.2) | 🟡 |
 | 9 | 12/10 | El flujo desde React dependía de la pantalla de T4.2. Resuelto: PR 6 la unió a `main` y se probó en el navegador. | HU-4, T4.3 | David (T4.2) | ✅ |
-| 10 | 12/10 | Riesgo de cerrar el sprint sin HU-2, HU-3 ni HU-4. Se cerró con 23 de 30 h; pasan 7 h al Sprint 2. | Sprint 1 | Equipo | ✅ |
+| 10 | 12/10 | Riesgo de cerrar el sprint sin HU-2, HU-3 ni HU-4. Se cerró con 26 de 30 h; pasan 4 h al Sprint 2 (T2.2 y T3.4). | Sprint 1 | Equipo | ✅ |
 | 11 | 14/10 | El commit de CORS del 13/10 agregó `corsheaders` a la configuración sin sumarlo a `requirements.txt`: con una instalación nueva, `main` no arranca. Corregido en el PR 4. Además, la vista de carga pone cabeceras CORS a mano aunque ya se usa `django-cors-headers`, y el proxy de Vite ya evita CORS en desarrollo. | Todas | David / Renzo | 🟡 |
 | 14 | 15/10 | El PR 4 y el PR 7 se unieron sin revisión de otro integrante. Acción: activar la protección de `main` en GitHub para exigir 1 aprobación. | Proceso | Renzo | 🟡 |
 

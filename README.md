@@ -196,7 +196,7 @@ datos/rendimiento en T3.4; su avance separado en `certificaciones` se conserva.
 
 La API de solicitudes ya está en `main` y permite el flujo solicitar → aceptar o rechazar. Al enviar, se valida que el prestador esté disponible, ofrezca el rubro y cubra la ubicación del cliente. Solo el prestador dueño de la solicitud puede responderla, y solo mientras siga Pendiente. Mientras no exista el inicio de sesión (HU-5), la bandeja y las respuestas se prueban con autenticación básica (usuario y contraseña del registro), por ejemplo desde Postman.
 
-Verificado el 15/10/2026 en `main`, con una instalación limpia: 49 de 49 pruebas aprobadas, y en el navegador el cliente solicita el servicio desde la tarjeta del prestador y ve el cambio a Aceptada o Rechazada sin recargar. Sprint 1 cerrado con 23 de 30 h; pasan al Sprint 2 T2.2, T2.3, T3.4 y T4.3 (ver [TABLERO.md](TABLERO.md)).
+Verificado el 15/10/2026 en `main`, con una instalación limpia: 49 de 49 pruebas aprobadas, y en el navegador el cliente solicita el servicio desde la tarjeta del prestador y ve el cambio a Aceptada o Rechazada sin recargar. Sprint 1 cerrado con 26 de 30 h (HU-1 y HU-4 completas); pasan al Sprint 2 T2.2 y T3.4 (ver [TABLERO.md](TABLERO.md)).
 
 > `python manage.py test` marca 1 error en `certificaciones/test_reporte.py`: es un script de medición que necesita `requests` y el servidor encendido. `requirements.txt` incluye `django-cors-headers`, que usa la configuración de CORS; si ya tenías el entorno creado, vuelve a correr `pip install -r requirements.txt`. Para correr solo las pruebas del backend: `python manage.py test prestadores servicios certificaciones.tests`.
 

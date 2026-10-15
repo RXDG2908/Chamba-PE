@@ -1,4 +1,27 @@
-# Pruebas T2.3 y revisión de integración — 12/10/2026
+# Actualización T2.3 — 15/10/2026
+
+Esta actualización prevalece sobre los bloqueos históricos descritos debajo.
+Base `main`: `f5565c0` (PR #6 integrado, remoto comprobado). Rama de trabajo:
+`pruebas-validacion-sprint1`. Código probado: `baa41e5`, con distribución de
+tarjetas en `fc756df`. README sin cambios: las instrucciones de uso se conservan.
+
+| Caso | Resultado | Observación |
+|---|---|---|
+| Suite de Luis sobre f5565c0 | 43 OK, reportado por Luis | Instaló requirements y ejecutó migrate; no repetido por el asistente sobre esa base sin cambios |
+| Suite del asistente sobre el código de baa41e5 | 49 OK | `python manage.py test prestadores.tests servicios.tests certificaciones.tests --noinput`; última ejecución aproximadamente 2,3 s, salida 0 |
+| Registro y carga API | OK dentro de la suite | Incluye asociación de certificación y rechazo sin prestador; la falla histórica quedó corregida en main |
+| Frontend, asistente | lint y build OK | En `frontend/`: `npm.cmd run lint` y `npm.cmd run build`; 63 módulos. No demuestra presentación visual ni carga desde UI |
+| Incidencias de solicitud y tarjeta | Correcciones implementadas | Detalle y comprobaciones pendientes en [T4.3](pruebas-T4.3.md) |
+
+Se usaron BD de pruebas de Django y media temporal de los tests de carga.
+El asistente no ejecutó migrate en la BD local, no recuperó stashes, no cambió
+la contraseña del usuario demo y no ejecutó scripts de rendimiento.
+T2.3 continúa parcial por comprobaciones UI y revisión pendientes. T2.2 y T3.4
+de David siguen pendientes; Sprint 1 no se declara terminado.
+
+---
+
+# Evidencia histórica T2.3 y revisión de integración — 12/10/2026
 
 Responsable de pruebas: Luis Abad. Rama `hu-3-busqueda`, HEAD `5d2e1db`.
 Se leyeron PLAN_EQUIPO.md, SPRINTS.md y AVANCES.md; no se encontró AGENTS.md

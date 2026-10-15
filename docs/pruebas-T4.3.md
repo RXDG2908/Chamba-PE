@@ -1,4 +1,59 @@
-# Pruebas T4.3 — API buscar → solicitar → aceptar/rechazar
+# Actualización T4.3 — 15/10/2026
+
+Esta actualización prevalece sobre los bloqueos históricos descritos debajo.
+Base `main` verificada contra el remoto: `f5565c0` (PR #6 integrado).
+Rama `pruebas-validacion-sprint1`; código probado `baa41e5`, que incluye
+la corrección visual `fc756df`. Pruebas ejecutadas sobre esos cambios antes
+de crear el commit, sin modificaciones de código posteriores.
+
+| Caso | Resultado | Observación |
+|---|---|---|
+| Luis: buscar Gasfitería, -12.046374/-77.042793 | Prestador encontrado | Manual reportado sobre f5565c0; no repetido por el asistente |
+| Luis: solicitud #1 y aceptación autenticada por API | API 200, React Aceptada | Verifica formulario del cliente y respuesta API, no pantalla del prestador |
+| Luis: solicitud #2 y rechazo por API | React Rechazada | Manual reportado; no se proporcionó código HTTP del rechazo |
+| Nombre y rubro comprimidos letra por letra | Corrección implementada | Formulario competía en la fila flexible; ahora hay cabecera separada y formulario/estado debajo. Revisión visual pendiente |
+| Teléfono con letras o más de 9 dígitos | Corrección React/API | Exactamente `[0-9]{9}`, sin +51, espacios ni truncamiento. API: válidos 201, inválidos 400 sin guardar |
+| Nombre | API OK | Tildes, ñ, letras Unicode, guiones y apóstrofes; normalización NFC. Blancos, números y signos no admitidos: 400 sin guardar |
+| Descripción | API OK | “reparar 2 tuberías en el piso 3” y puntuación válidos; blanco y >500 caracteres: 400 sin guardar; 500 válidos |
+| Suite del asistente | 49 OK, salida 0 | `python manage.py test prestadores.tests servicios.tests certificaciones.tests --noinput`, aproximadamente 2,3 s en última ejecución; seis métodos nuevos con subcasos |
+| Frontend del asistente | lint y build OK | `npm.cmd run lint`, `npm.cmd run build` en frontend; no acreditan diseño visual |
+| Escritorio y móvil del asistente | No ejecutado | No hay herramienta de navegador disponible |
+
+La suite conserva pruebas de aceptación/rechazo, permisos y consulta de estado.
+Las nuevas pruebas comparan el número de solicitudes antes y después de cada
+POST inválido. Se utilizó la BD de pruebas, sin alterar la contraseña demo.
+
+Se revisó `docs/pruebas_T4_3.py`: usa `SEARCH_REF=5d2e1db` y
+`REQUEST_REF=eb39859`, además de un nombre histórico con números (`Cliente T43`).
+No se ejecutó: reconstruye una combinación antigua y no verifica main actual.
+Las 32 pruebas de la sección histórica no son una ejecución de esta sesión.
+
+Comprobación manual pendiente con Django y Vite iniciados:
+
+1. Abrir Resultados a 1366 px y repetir a 360 y 390 px en DevTools; buscar
+   Gasfitería con las coordenadas anteriores. Verificar nombre y rubro legibles,
+   distancia en la cabecera, formulario debajo y ausencia de desplazamiento
+   horizontal (también con `document.documentElement.scrollWidth <= innerWidth`).
+2. Probar teléfono `987654321` y rechazos con letras, 8/10 dígitos, +51 y espacios.
+   Pegar un teléfono largo: debe conservarse y mostrar error, sin POST en Network.
+3. Probar `María-José O'Neill`, `Ángel Muñoz`, nombre vacío, espacios y `Luis2`.
+   Los inválidos deben mostrar mensaje sin POST. Descripción con números válida;
+   solo espacios inválida; mantener límite de 500.
+4. Enviar una solicitud válida, aceptar por API con la sesión del prestador
+   ficticio y comprobar actualización automática en unos 5 s; repetir con otra
+   solicitud rechazada. Comprobar cabecera y estado sin desbordamiento en ambos
+   tamaños. Usar las credenciales locales existentes, sin publicarlas.
+5. Repetir búsqueda por mapa y coordenadas, cambio de rubro, vacío, error de red
+   y recuperación. La inspección de código conserva estos mecanismos; falta
+   repetirlos en navegador después de las correcciones.
+
+T4.3 sigue parcial hasta comprobación manual posterior y revisión por PR.
+No hay pantalla del prestador verificada. T2.2 y T3.4 de David permanecen
+pendientes; no se cierra Sprint 1 ni se añaden horas terminadas.
+
+---
+
+# Evidencia histórica T4.3 — API buscar → solicitar → aceptar/rechazar
 
 Fecha: 12/10/2026 (America/Lima). Responsable de pruebas: Luis Abad.
 Estado: **API verificada en copia aislada; T4.3 y HU-4 siguen parciales**.

@@ -1,11 +1,10 @@
-﻿import { useState } from 'react'
+import { Navigate, NavLink, Route, Routes } from 'react-router-dom'
 import './App.css'
 import RegistroPrestador from './RegistroPrestador.jsx'
 import ResultadosPrestadores from './ResultadosPrestadores.jsx'
+import UploadCertificado from './UploadCertificado.jsx'
 
 function App() {
-  const [vista, setVista] = useState('registro')
-
   return (
     <>
       <header className="cabecera">
@@ -13,13 +12,19 @@ function App() {
           <h1>Chamba<span>PE</span></h1>
           <p>Talento local, cerca de ti.</p>
           <nav className="menu">
-            <button type="button" aria-current={vista === 'registro'} onClick={() => setVista('registro')}>Registro de prestador</button>
-            <button type="button" aria-current={vista === 'resultados'} onClick={() => setVista('resultados')}>Resultados</button>
+            <NavLink to="/" end>Registro de prestador</NavLink>
+            <NavLink to="/resultados">Resultados</NavLink>
+            <NavLink to="/certificaciones">Cargar certificado</NavLink>
           </nav>
         </div>
       </header>
 
-      {vista === 'registro' ? <RegistroPrestador /> : <ResultadosPrestadores />}
+      <Routes>
+        <Route path="/" element={<RegistroPrestador />} />
+        <Route path="/resultados" element={<ResultadosPrestadores />} />
+        <Route path="/certificaciones" element={<UploadCertificado />} />
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
     </>
   )
 }

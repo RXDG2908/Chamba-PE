@@ -128,6 +128,12 @@ class BusquedaPrestadoresTests(TestCase):
         self.assertEqual(respuesta.status_code, 200)
         self.assertEqual(respuesta.json(), [])
 
+    def test_busqueda_expone_tiempo_sin_cambiar_el_json(self):
+        respuesta = self.buscar()
+        self.assertEqual(respuesta.status_code, 200)
+        self.assertEqual(respuesta.json(), [])
+        self.assertGreaterEqual(float(respuesta['X-Execution-Time-Ms']), 0)
+
 
 class SolicitudTests(TestCase):
     def setUp(self):

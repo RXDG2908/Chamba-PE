@@ -3,7 +3,7 @@
 > **Regla del equipo:** este archivo se actualiza **siempre**, al terminar cada tarea o al cierre del día de trabajo, antes de dar la tarea por terminada. Ver [PLAN_EQUIPO.md](PLAN_EQUIPO.md#3-reglas-de-reparto).
 > Sirve de base para el cuadro de avances y el informe del Sprint Review.
 
-**Última actualización:** 14/10/2026 · **Sprint actual:** 1 (01/10 – 14/10/2026) · **Meta:** el prestador se registra y el cliente lo encuentra y le envía una solicitud.
+**Última actualización:** 16/10/2026 · **Sprint actual:** 1 (01/10 – 14/10/2026) · **Meta:** el prestador se registra y el cliente lo encuentra y le envía una solicitud.
 
 Estados: ✅ terminada · 🟡 en curso / parcial · ⚪ sin iniciar · 🔴 bloqueada
 
@@ -96,9 +96,9 @@ y las pruebas solicitadas terminaron OK (43). Sin cambio de horas o burndown.
 | T2.3 | HU-1/2 | Pruebas de registro y carga | Luis Abad | 1 | 🟡 | `pruebas-validacion-sprint1` | 15/10 | Base main f5565c0 (PR #6 integrado). Luis reporta 43 pruebas OK; asistente: 49 OK sobre baa41e5, incluyendo registro/carga. Pendientes UI y revisión. [Evidencia](docs/pruebas-T2.3.md). |
 | T4.3 | HU-4 | Pruebas buscar → solicitar → aceptar | Luis Abad | 2 | 🟡 | `pruebas-validacion-sprint1` | 15/10 | Luis verificó React Aceptada/Rechazada con respuesta API en f5565c0. Tras las correcciones confirmó tarjeta en escritorio/360/390 px, rechazo de nombre con números y teléfono con letras/8/10 dígitos sin crear solicitudes, y datos válidos con tilde y descripción numérica que crean pendiente. Asistente: 49 pruebas OK en baa41e5. Otros casos manuales y revisión pendientes. [Evidencia](docs/pruebas-T4.3.md). |
 | T2.1 | HU-2 | API de carga de certificaciones (PDF/JPG ≤ 5 MB) | David Valcarcel | 2 | 🟡 | `feature/sprint-1-correcciones` | 14/10 | Exige `prestador` o `prestador_id`, lo asocia al perfil y devuelve HTTP 400 con “El prestador es obligatorio.” si falta; ya no crea prestadores por defecto. El archivo se guarda una vez por el `FileField` del modelo y la respuesta utiliza el nombre/URL guardados. Pruebas OK; pendiente de revisión e integración por PR. |
-| T2.2 | HU-2 | Componente de carga de archivos | David Valcarcel | 2 | 🟡 | `main` (directo, sin PR) | 05/10 | Componente en `src/UploadCertificado.jsx` (carpeta `src/` de la raíz, no en `frontend/`). Falta integrarlo a la app de `frontend/` y pasar por PR. |
+| T2.2 | HU-2 | Componente de carga de archivos | David Valcarcel | 2 | 🟡 | `main` (directo, sin PR) | 16/10 | Auditoría: la app raíz renderiza `src/UploadCertificado.jsx` de forma directa, sin ruta ni enlace de navegación. La app `frontend/` no lo integra; su copia importa `UploadCertificado.css` inexistente y no envía el `prestador` obligatorio. Pendiente integración funcional y accesible desde el menú. |
 | T3.3 | HU-3 | Ordenar resultados por distancia | David Valcarcel | 2 | 🟡 | cambios locales (pendiente PR) | 14/10 | `BuscarPrestadoresView` ordena por distancia ascendente y se expone solo en `GET /api/prestadores/buscar/`, mediante `prestadores/urls.py`. Se eliminó la ruta duplicada de `servicios`. Pendiente revisión e integración por PR. |
-| T3.4 | HU-3 | Datos de prueba y tiempo de respuesta (< 3 s) | David Valcarcel | 2 | 🟡 | `main` (`960c3f6`, directo, sin PR) | 07/10 | Script de medición y `evidencia_rendimiento.txt`, medido sobre el endpoint de T3.3, no sobre la búsqueda real. `certificaciones/test_reporte.py` necesita `requests` y el servidor encendido, por eso `manage.py test` marca 1 error. |
+| T3.4 | HU-3 | Datos de prueba y tiempo de respuesta (< 3 s) | David Valcarcel | 2 | 🟡 | `main` (`960c3f6`, directo, sin PR) | 16/10 | Auditoría: `BuscarPrestadoresView` no mide ni devuelve latencia en JSON/cabecera. Los scripts usan `time.time()` del cliente y consultan `/api/certificaciones/prestadores/cercanos/`, no `/api/prestadores/buscar/`; falta instrumentar/verificar el endpoint real. |
 | T4.2 | HU-4 | Pantallas de solicitud y cambio de estado | David Valcarcel | 2 | 🟡 | `feature/sprint-1-correcciones` | 14/10 | En `frontend/src/ResultadosPrestadores.jsx`, cada resultado permite enviar nombre, teléfono, descripción y ubicación a `POST /api/servicios/solicitudes/`; consulta `GET /api/servicios/solicitudes/<id>/` cada 5 s y muestra Pendiente/Aceptada/Rechazada. Pendiente de revisión e integración por PR. |
 
 ## Validación adicional — 15/10/2026
@@ -132,8 +132,19 @@ pendientes; tampoco se cierra T4.3 ni todo el Sprint 1.
 
 Horas: sin nuevas horas declaradas o terminadas; se conservan los totales.
 Burndown: último valor declarado 13 h pendientes al 14/10; sin nueva medición
-al 15/10, no se recalcula. No se cambia ningún estado de tarea ni se cierra
+al 16/10, no se recalcula. No se cambia ningún estado de tarea ni se cierra
 Sprint 1. README y SPRINTS sin cambios.
+
+Auditoría de T2.2/T3.4 (16/10): T2.2 no está completa. El `src/App.jsx` de la
+raíz muestra `UploadCertificado` directamente, sin React Router ni enlace de
+navegación; la app independiente `frontend/` tiene menú, pero no importa ni
+enlaza ese componente. El duplicado de carga en `frontend/src/` importa un CSS
+inexistente y solo envía el archivo, sin el `prestador` requerido por la API.
+T3.4 tampoco está completa: `BuscarPrestadoresView` no mide ni devuelve el
+tiempo de ejecución en JSON o cabecera; los scripts de benchmark usan
+`time.time()` del lado cliente y consultan `/api/certificaciones/prestadores/
+cercanos/`, no la búsqueda real `/api/prestadores/buscar/`. Se registran ambos
+hallazgos como pendientes, sin modificar código, horas ni burndown.
 
 Impedimentos actuales: quedan los casos manuales no confirmados por Luis
 y revisión por PR. Luis ya confirmó distribución y los casos de validación
@@ -184,6 +195,7 @@ Una línea por entrega, la más reciente arriba.
 
 | Fecha | Quién | Qué se hizo | Tarea |
 |:---:|---|---|:---:|
+| 16/10 | Asistente | Auditoría directa: T2.2 no está integrada como ruta/enlace en el frontend `frontend/`; el componente raíz se renderiza directamente, y la copia del frontend tiene import CSS faltante y no envía el prestador requerido. T3.4 no mide ni expone latencia desde la vista real de búsqueda; los scripts existentes cronometan desde cliente otro endpoint. Se conservan estados 🟡, sin horas o burndown nuevos. | T2.2/T3.4 |
 | 15/10 | Luis / asistente | Luis reportó tarjeta correcta en escritorio y 360/390 px, nombre con números y teléfono con letras/8/10 dígitos sin crear solicitudes, y datos válidos con tilde y números en descripción que crean pendiente. Asistente documentó únicamente esos resultados en un commit nuevo; sin repetir tests, sumar horas o cerrar Sprint 1, T2.2 ni T3.4. | T3.2/T4.3 |
 | 15/10 | Luis / asistente | Luis reportó 43 pruebas OK y aceptación/rechazo desde React con respuesta por API sobre f5565c0. Asistente corrigió tarjeta y validaciones, ejecutó 49 pruebas OK y lint/build OK; documentó evidencia y pendientes sin nuevas horas ni cierre. Commits de código fc756df y baa41e5; revisión visual posterior pendiente. | T3.2/T2.3/T4.3 |
 | 14/10 | Asistente | Inspeccionó procesos Python y el puerto 8000 (sin servidor activo); identificó `core/urls.py` cargado desde la raíz actual, eliminó únicamente `core/__pycache__` y `servicios/__pycache__` y verificó sin generar bytecode que `/api/servicios/prestadores/buscar/` resuelve a `BuscarPrestadoresView`. Sin horas ni cambios de burndown, datos, commit o PR. | T3.3 |
@@ -220,6 +232,7 @@ Una línea por entrega, la más reciente arriba.
 
 | # | Fecha | Impedimento / riesgo | Afecta a | Responsable | Estado |
 |:---:|:---:|---|---|---|:---:|
+| 14 | 16/10 | Auditoría confirma que T2.2 no tiene ruta/enlace de carga en el frontend `frontend/`; componente independiente en la raíz y copia incompleta. T3.4 no instrumenta el endpoint real `/api/prestadores/buscar/`; benchmarks existentes llaman otro endpoint. No se modifica estado de sprint hasta implementar y validar ambas integraciones. | T2.2, T3.4 | David | 🟡 |
 | 13 | 14/10 | Se detectó que la migración anterior de certificaciones declaraba `id` como `AutoField`, mientras el modelo usaba `BigAutoField`. Resuelto al regenerar la migración limpia. | Migraciones de certificaciones | Equipo | ✅ |
 | 12 | 14/10 | Luis cubrió visuales móvil simulado/escritorio, error/recuperación de búsqueda y concurrencia por rubro sobre `7e671cd`. Quedan cambios rápidos de ubicación, salida/retorno durante espera, reintento de rubros, validaciones visibles, regresión de registro y teléfono físico. No hay repetición sobre `e20c533`; el asistente no dispone de navegador. [Detalle](frontend/README.md). | T3.2, seguimiento de comprobaciones | Luis | 🟡 |
 | 1 | 05/10 | T1.1 llegaba con 3 días de retraso y bloqueaba la búsqueda y las certificaciones. Resuelto: PR 1 unido a `main` el 05/10. | HU-2, HU-3 | Renzo | ✅ |

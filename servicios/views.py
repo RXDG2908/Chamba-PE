@@ -1,3 +1,4 @@
+import time
 from math import isclose
 
 from django.shortcuts import get_object_or_404
@@ -23,6 +24,7 @@ class BuscarPrestadoresView(APIView):
     authentication_classes = []
 
     def get(self, request):
+        inicio = time.perf_counter()
         parametros = BusquedaPrestadorSerializer(data=request.query_params)
         parametros.is_valid(raise_exception=True)
         datos = parametros.validated_data
@@ -43,7 +45,9 @@ class BuscarPrestadoresView(APIView):
         # --- TAREA T3.3: ORDENAR POR DISTANCIA (del más cercano al más lejano) ---
         resultados.sort(key=lambda x: x.distancia_km)
 
-        return Response(PrestadorBusquedaSerializer(resultados, many=True).data)
+        respuesta = Response(PrestadorBusquedaSerializer(resultados, many=True).data)
+        respuesta['X-Execution-Time-Ms'] = f'{(time.perf_counter() - inicio) * 1000:.3f}'
+        return respuesta
 
 
 class CrearSolicitudView(generics.CreateAPIView):

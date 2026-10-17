@@ -1,0 +1,87 @@
+.container-certificacion {
+  width: min(600px, calc(100% - 32px));
+  margin: 40px auto;
+  padding: 24px;
+  border: 1px solid #e0e7e4;
+  border-radius: 16px;
+  background: #fff;
+  box-shadow: 0 3px 12px #173b2610;
+}
+
+.container-certificacion h2 {
+  margin: 0 0 8px;
+}
+
+.container-certificacion .descripcion,
+.container-certificacion small {
+  color: #58675f;
+}
+
+.form-certificacion {
+  display: grid;
+  gap: 12px;
+  margin-top: 20px;
+}
+
+.form-certificacion label {
+  font-weight: 600;
+}
+
+.form-certificacion input {
+  width: 100%;
+  min-width: 0;
+  padding: 10px 12px;
+  border: 1px solid #cbded3;
+  border-radius: 10px;
+  color: #20352a;
+  font: inherit;
+}
+
+.form-certificacion button {
+  justify-self: start;
+  padding: 12px 16px;
+  border: 1px solid #16734f;
+  border-radius: 10px;
+  background: #16734f;
+  color: #fff;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.form-certificacion button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.certificacion-error,
+.certificacion-exito {
+  margin-top: 20px;
+  padding: 16px;
+  border-radius: 10px;
+  overflow-wrap: anywhere;
+}
+
+.certificacion-error {
+  background: #fdecea;
+  color: #b3261e;
+}
+
+.certificacion-exito {
+  border: 1px solid #cbded3;
+  background: #eaf4ee;
+  color: #20352a;
+}
+
+.certificacion-exito h3 {
+  margin-top: 0;
+}
+
+.certificacion-exito a {
+  color: #16734f;
+}
+
+.container-certificacion :focus-visible {
+  outline: 3px solid #16734f;
+  outline-offset: 3px;
+}

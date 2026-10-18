@@ -1,10 +1,15 @@
+from io import StringIO
 from math import degrees, pi
+from pathlib import Path
+from tempfile import TemporaryDirectory
 from unittest.mock import patch
 
 from django.contrib.auth import get_user_model
+from django.core.management import CommandError, call_command
 from django.test import SimpleTestCase, TestCase
 from django.urls import reverse
 
+from prestadores.management.commands import medir_busqueda
 from prestadores.models import Prestador, Rubro
 
 from .distancias import RADIO_TIERRA_KM, distancia_km
@@ -133,6 +138,41 @@ class BusquedaPrestadoresTests(TestCase):
         self.assertEqual(respuesta.status_code, 200)
         self.assertEqual(respuesta.json(), [])
         self.assertGreaterEqual(float(respuesta['X-Execution-Time-Ms']), 0)
+
+
+class RendimientoBusquedaTests(TestCase):
+    """T3.4: la búsqueda real responde en menos de 3 s según X-Execution-Time-Ms."""
+
+    def test_busqueda_con_datos_de_prueba_menor_a_3_s(self):
+        rubro = medir_busqueda.Command().crear_datos(300)
+        respuesta = self.client.get('/api/prestadores/buscar/', {
+            'rubro': rubro.id, 'latitud': medir_busqueda.CENTRO[0], 'longitud': medir_busqueda.CENTRO[1],
+        })
+        self.assertEqual(respuesta.status_code, 200)
+        distancias = [p['distancia_km'] for p in respuesta.json()]
+        self.assertTrue(0 < len(distancias) < 300)
+        self.assertEqual(distancias, sorted(distancias))
+        self.assertLess(float(respuesta['X-Execution-Time-Ms']), medir_busqueda.LIMITE_MS)
+
+    def test_comando_registra_evidencia_y_descarta_datos(self):
+        rubros = Rubro.objects.count()
+        with TemporaryDirectory() as carpeta:
+            salida = Path(carpeta) / 'evidencia.txt'
+            call_command('medir_busqueda', prestadores=50, repeticiones=2, salida=salida, stdout=StringIO())
+            reporte = salida.read_text(encoding='utf-8')
+        self.assertIn('GET /api/prestadores/buscar/?rubro=', reporte)
+        self.assertIn('X-Execution-Time-Ms: mín', reporte)
+        self.assertIn('Resultado: APROBADO', reporte)
+        self.assertFalse(Prestador.objects.exists())
+        self.assertEqual(Rubro.objects.count(), rubros)
+        self.assertFalse(get_user_model().objects.exists())
+
+    def test_comando_falla_si_supera_el_limite(self):
+        with TemporaryDirectory() as carpeta, patch.object(medir_busqueda, 'LIMITE_MS', 0):
+            salida = Path(carpeta) / 'evidencia.txt'
+            with self.assertRaisesMessage(CommandError, 'el límite es 0 ms'):
+                call_command('medir_busqueda', prestadores=5, repeticiones=1, salida=salida, stdout=StringIO())
+            self.assertIn('Resultado: REPROBADO', salida.read_text(encoding='utf-8'))
 
 
 class SolicitudTests(TestCase):

@@ -41,6 +41,7 @@ El detalle de cada verificación está en la bitácora (sección 6) y en los inf
 | T2.2 | HU-2 | Componente de carga de archivos | David Valcarcel | 2 | ✅ | PR 9 unido a `main` | 18/10 | Pasó del Sprint 1. Ruta `/certificaciones` con enlace «Cargar certificado» en el menú (React Router); el registro exitoso muestra el ID y enlaza a la carga. Envía el `prestador`, usa su `UploadCertificado.css` y Vite redirige `/media/` a Django para abrir el archivo subido. |
 | T3.3 | HU-3 | Ordenar resultados por distancia | David Valcarcel | 2 | ✅ | PR 6 unido a `main` | 14/10 | `GET /api/prestadores/buscar/` ordena por distancia ascendente, con prueba. Se quitó la ruta duplicada en `servicios`. El endpoint aparte `certificaciones/prestadores/cercanos/` sigue existiendo y ya no se usa. |
 | T3.4 | HU-3 | Datos de prueba y tiempo de respuesta (< 3 s) | David Valcarcel | 2 | ✅ | PR 9 unido a `main` | 18/10 | Pasó del Sprint 1. `python manage.py medir_busqueda` crea 500 prestadores ficticios (se descartan al terminar), mide la búsqueda real `GET /api/prestadores/buscar/` con la cabecera `X-Execution-Time-Ms` y escribe `evidencia_rendimiento.txt` (máx. 32,5 ms). 3 pruebas nuevas. Se retiraron los `test_reporte.py` que hacían fallar `manage.py test`. |
+| T9.1 | HU-9 | Modelo y API en Django para revisar documentos | David Valcarcel | 2 | 🟡 | `feature/t9.1-revision-documentos`, PR pendiente | 18/10 | Sprint 2. App `administracion`: modelo `RevisionDocumento` (pendiente / aprobado / rechazado, comentario, revisor y fecha), migraciones 0001 y 0002 (crea revisiones para las certificaciones ya subidas). Cada certificación nueva entra sola como pendiente. `/api/administracion/revisiones/`: listar (`?estado=`), consultar, crear y `PATCH` para aprobar o rechazar; solo administradores (`is_staff`). Rechazar exige comentario (400). 16 pruebas nuevas; suite completa: 74 OK. |
 | T4.2 | HU-4 | Pantallas de solicitud y cambio de estado | David Valcarcel | 2 | ✅ | PR 6 unido a `main` | 14/10 | Cada tarjeta de resultados permite solicitar el servicio (`POST /api/servicios/solicitudes/`) y consulta el estado cada 5 s hasta Aceptada o Rechazada. PR 7 agregó validaciones de nombre, teléfono de 9 dígitos y descripción. Probado en el navegador el 15/10. |
 
 ## 3. Avance por historia de usuario
@@ -83,6 +84,7 @@ Una línea por entrega, la más reciente arriba.
 
 | Fecha | Quién | Qué se hizo | Tarea |
 |:---:|---|---|:---:|
+| 18/10 | David Valcarcel | T9.1 en `feature/t9.1-revision-documentos`: app `administracion` con el modelo `RevisionDocumento`, sus migraciones y la API `/api/administracion/revisiones/` (listar, consultar, crear, aprobar o rechazar; solo administradores). 16 pruebas nuevas, 74 de 74 OK y sin migraciones pendientes. Falta abrir el PR. | T9.1 |
 | 18/10 | Renzo León | Revisó y unió el PR 9 de David a `main`: 58 de 58 pruebas OK, sin migraciones pendientes, lint y build OK. Cierra T2.2 y T3.4, que pasaron del Sprint 1. | T2.1/T2.2/T3.4 |
 | 17/10 | David Valcarcel | PR 9: carga de certificados en la navegación (`/certificaciones`) con el prestador y proxy `/media/`; validación de `prestador` y de la firma real del archivo; `manage.py medir_busqueda` mide la búsqueda real (< 3000 ms). 8 pruebas nuevas. | T2.1/T2.2/T3.4 |
 | 15/10 | Luis Abad | Confirmó el cierre de T2.3 y T4.3: probó envío, aceptación y rechazo, validaciones y la vista en escritorio y móvil. Sprint 1 queda en 26 de 30 h. | T2.3/T4.3 |
@@ -140,12 +142,14 @@ Una línea por entrega, la más reciente arriba.
 | 11 | 14/10 | El commit de CORS del 13/10 agregó `corsheaders` a la configuración sin sumarlo a `requirements.txt`: con una instalación nueva, `main` no arranca. Corregido en el PR 4. Además, la vista de carga pone cabeceras CORS a mano aunque ya se usa `django-cors-headers`, y el proxy de Vite ya evita CORS en desarrollo. | Todas | David / Renzo | 🟡 |
 | 15 | 17/10 | Cambiar el estado de una solicitud desde el admin de Django deja `respondida` vacía y permite saltarse la regla de una sola respuesta. | T4.1/T4.2 | David | 🟡 |
 | 16 | 18/10 | La carga de certificados no pide sesión: cualquiera puede subir un archivo con el ID de otro prestador. Se corrige con la autenticación de HU-5. | HU-2, HU-5 | Equipo | 🟡 |
+| 17 | 18/10 | La API de revisión (T9.1) exige un usuario `is_staff`, pero aún no hay inicio de sesión (HU-5). Mientras tanto, la pantalla de T9.2 solo funciona con la sesión del admin de Django (`/admin/`). | T9.2, HU-5 | David / Equipo | 🟡 |
 | 14 | 15/10 | El PR 4 y el PR 7 se unieron sin revisión de otro integrante. Acción: activar la protección de `main` en GitHub para exigir 1 aprobación. | Proceso | Renzo | 🟡 |
 
 ## 8. Decisiones técnicas
 
 | Fecha | Decisión | Motivo |
 |:---:|---|---|
+| 18/10 | La revisión de documentos vive en una tabla aparte (`administracion.RevisionDocumento`, 1:1 con la certificación), no en campos nuevos de `CertificacionPrestador`. Al decidir, se copia el estado a la certificación. | La app `administracion` es de David (HU-9, HU-13) y guarda quién revisó y cuándo sin tocar el modelo de HU-2. |
 | 12/10 | La `Solicitud` guarda nombre y teléfono del cliente en vez de enlazar a una cuenta. | Todavía no hay inicio de sesión de clientes (HU-5, Sprint 2); entonces se agrega la relación con el usuario. |
 | 12/10 | Aceptar, rechazar y la bandeja exigen sesión del prestador dueño; enviar y consultar el estado no piden sesión. | Solo el prestador puede responder sus solicitudes; el cliente aún no tiene cuenta. La consulta del cliente no muestra su teléfono. |
 | 12/10 | La solicitud solo se responde una vez; responder de nuevo devuelve 409. | Evita que un prestador cambie de Aceptada a Rechazada después de confirmar. |

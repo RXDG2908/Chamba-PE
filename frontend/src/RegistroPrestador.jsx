@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { Link } from 'react-router-dom'
 import { Circle, MapContainer, TileLayer, useMapEvents } from 'react-leaflet'
 import 'leaflet/dist/leaflet.css'
 import './RegistroPrestador.css'
@@ -21,6 +22,7 @@ function RegistroPrestador() {
   const [centro, setCentro] = useState(null)
   const [errores, setErrores] = useState({})
   const [estado, setEstado] = useState('inicial') // inicial | enviando | listo | fallo
+  const [prestadorId, setPrestadorId] = useState(null)
 
   useEffect(() => {
     fetch('/api/prestadores/rubros/')
@@ -69,6 +71,8 @@ function RegistroPrestador() {
         }),
       })
       if (respuesta.ok) {
+        const resultado = await respuesta.json()
+        setPrestadorId(resultado.id)
         setEstado('listo')
         return
       }
@@ -90,6 +94,12 @@ function RegistroPrestador() {
       <section className="registro exito" role="status">
         <h2>¡Registro enviado!</h2>
         <p>Tu perfil quedó <strong>Pendiente de verificación</strong>. Te avisaremos cuando sea revisado.</p>
+        {prestadorId && (
+          <>
+            <p>Tu ID de prestador es <strong>{prestadorId}</strong>.</p>
+            <Link to="/certificaciones" state={{ prestadorId }}>Cargar un certificado</Link>
+          </>
+        )}
       </section>
     )
   }

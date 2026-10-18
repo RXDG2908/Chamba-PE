@@ -1,6 +1,7 @@
 from django.shortcuts import render
 import os
 import math
+import re
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework.decorators import api_view
@@ -11,8 +12,21 @@ from prestadores.models import Prestador
 from .models import CertificacionPrestador
 
 MAX_FILE_SIZE = 5 * 1024 * 1024  # 5 MB en bytes
-ALLOWED_EXTENSIONS = ['.pdf', '.jpg', '.jpeg']
-ALLOWED_MIME_TYPES = ['application/pdf', 'image/jpeg']
+# Extensión permitida → (tipo MIME esperado, firma de los primeros bytes).
+FORMATOS_PERMITIDOS = {
+    '.pdf': ('application/pdf', b'%PDF-'),
+    '.jpg': ('image/jpeg', b'\xff\xd8\xff'),
+    '.jpeg': ('image/jpeg', b'\xff\xd8\xff'),
+}
+PRESTADOR_ID = re.compile(r'[1-9]\d*')
+
+
+def contenido_coincide(archivo, firma):
+    """Compara la firma real del archivo sin depender de lo que declara el cliente."""
+    archivo.seek(0)
+    cabecera = archivo.read(len(firma))
+    archivo.seek(0)
+    return cabecera == firma
 
 @csrf_exempt
 def upload_certification(request):
@@ -34,6 +48,8 @@ def upload_certification(request):
     prestador_id = request.POST.get('prestador') or request.POST.get('prestador_id')
     if not prestador_id:
         return JsonResponse({'error': 'El prestador es obligatorio.'}, status=400)
+    if not PRESTADOR_ID.fullmatch(prestador_id):
+        return JsonResponse({'error': 'El prestador debe ser un número entero positivo.'}, status=400)
 
     try:
         prestador_asociado = Prestador.objects.get(id=prestador_id)
@@ -56,10 +72,18 @@ def upload_certification(request):
         res["Access-Control-Allow-Headers"] = "*"
         return res
 
-    # 4. Validar que la extensión y tipo sean estrictamente PDF o JPG
+    # 4. Validar que extensión y tipo MIME correspondan al mismo formato (PDF o JPG)
     ext = os.path.splitext(uploaded_file.name)[1].lower()
-    if ext not in ALLOWED_EXTENSIONS or uploaded_file.content_type not in ALLOWED_MIME_TYPES:
+    mime_esperado, firma = FORMATOS_PERMITIDOS.get(ext, (None, None))
+    if uploaded_file.content_type != mime_esperado:
         res = JsonResponse({'error': 'Formato no válido. Solo se permiten archivos PDF o JPG.'}, status=400)
+        res["Access-Control-Allow-Origin"] = "*"
+        res["Access-Control-Allow-Headers"] = "*"
+        return res
+
+    # 5. Validar el contenido real (magic bytes): un .txt renombrado a .pdf no pasa
+    if not contenido_coincide(uploaded_file, firma):
+        res = JsonResponse({'error': 'El contenido del archivo no corresponde a un PDF o JPG válido.'}, status=400)
         res["Access-Control-Allow-Origin"] = "*"
         res["Access-Control-Allow-Headers"] = "*"
         return res

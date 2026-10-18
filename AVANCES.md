@@ -3,7 +3,7 @@
 > **Regla del equipo:** este archivo se actualiza **siempre**, al terminar cada tarea o al cierre del día de trabajo, antes de dar la tarea por terminada. Ver [PLAN_EQUIPO.md](PLAN_EQUIPO.md#3-reglas-de-reparto).
 > Sirve de base para el cuadro de avances y el informe del Sprint Review.
 
-**Última actualización:** 15/10/2026 · **Sprint 1:** ✅ cerrado el 14/10/2026 (01/10 – 14/10) · **Meta:** el prestador se registra y el cliente lo encuentra y le envía una solicitud.
+**Última actualización:** 18/10/2026 · **Sprint 1:** ✅ cerrado el 14/10/2026 (01/10 – 14/10) · **Sprint 2:** 🟢 en curso (15/10 – 28/10) · **Meta:** el prestador se registra y el cliente lo encuentra y le envía una solicitud.
 
 Estados: ✅ terminada · 🟡 en curso / parcial · ⚪ sin iniciar · 🔴 bloqueada
 
@@ -17,8 +17,8 @@ Estados: ✅ terminada · 🟡 en curso / parcial · ⚪ sin iniciar · 🔴 blo
 | Horas terminadas (tareas ✅) | 26 h (87 %) |
 | Horas pendientes al cierre | 4 h |
 | Tareas terminadas | 11 de 13 |
-| Tareas que pasan al Sprint 2 | 2 (T2.2 y T3.4, de David) |
-| Historias terminadas | 2 de 4 (HU-1 y HU-4). A HU-2 le falta T2.2 y a HU-3, T3.4 |
+| Tareas que pasan al Sprint 2 | 2 (T2.2 y T3.4, de David). Terminadas el 18/10 con el PR 9 |
+| Historias terminadas | 2 de 4 (HU-1 y HU-4). A HU-2 le faltaba T2.2 y a HU-3, T3.4; ambas se completaron el 18/10 (Sprint 2) |
 | Estado de `main` al 15/10 | 49 de 49 pruebas OK, sin migraciones pendientes, lint y build OK; flujo registrar → buscar → solicitar → aceptar o rechazar probado en el navegador |
 
 > Las horas solo cuentan como terminadas cuando la tarea cumple la [definición de terminado](PLAN_EQUIPO.md#8-definición-de-terminado). T2.3 y T4.3 las confirmó Luis el 15/10; el PR 7 se unió el 15/10 a las 00:43 y se cuenta en el cierre.
@@ -37,10 +37,10 @@ El detalle de cada verificación está en la bitácora (sección 6) y en los inf
 | T3.2 | HU-3 | Pantalla de resultados con lista de prestadores | Luis Abad | 4 | ✅ | PR 3 unido a `main`; comprobaciones en `pruebas-cierre-sprint1` | 14/10 | Implementada con rubros API, mapa/coordenadas, tarjetas y cancelación; conserva orden recibido. Sobre `7e671cd`: asistente ejecutó lint/build OK, 11 tests búsqueda OK y HTTP positivo/vacío/error/recuperación. Luis comprobó móvil simulado/escritorio sin cortes, Demo a 0 km, vacío al cambiar a Electricidad, error con Django detenido y recuperación sin recargar. Network: rubro 1 anterior cancelado, rubro 2 final 200, sin resultados antiguos. Incorporado después `e20c533`, sin repetir pruebas. Pendientes cambios rápidos de ubicación y otros casos específicos; [evidencia y pasos](frontend/README.md). Estado ✅ conservado del cuadro de Renzo; no se suman horas. |
 | T2.3 | HU-1/2 | Pruebas de registro y carga | Luis Abad | 1 | ✅ | PR 7 unido a `main` | 15/10 | Pruebas de registro y carga en `main`, incluida la asociación del certificado y el rechazo sin prestador. Luis confirmó el cierre el 15/10. [Evidencia](docs/pruebas-T2.3.md). |
 | T4.3 | HU-4 | Pruebas buscar → solicitar → aceptar | Luis Abad | 2 | ✅ | PR 7 unido a `main` | 15/10 | Flujo probado desde React: envío, Aceptada, Rechazada, validaciones sin crear solicitudes y vista en escritorio y móvil. Luis confirmó el cierre el 15/10. [Evidencia](docs/pruebas-T4.3.md). |
-| T2.1 | HU-2 | API de carga de certificaciones (PDF/JPG ≤ 5 MB) | David Valcarcel | 2 | ✅ | PR 6 unido a `main` | 14/10 | Exige `prestador` (400 si falta), guarda la certificación vinculada al prestador una sola vez mediante el `FileField` y responde con su nombre y URL. Revisado por Luis. |
-| T2.2 | HU-2 | Componente de carga de archivos | David Valcarcel | 2 | 🟡 | `main` (directo, sin PR) | 05/10 | Pasa al Sprint 2. `UploadCertificado` existe pero no está en la navegación de la app y su CSS importado no existe; falta enviar el prestador al subir. |
+| T2.1 | HU-2 | API de carga de certificaciones (PDF/JPG ≤ 5 MB) | David Valcarcel | 2 | ✅ | PR 6 unido a `main`; reforzada en PR 9 | 14/10 | Exige `prestador` (400 si falta), guarda la certificación vinculada al prestador una sola vez mediante el `FileField` y responde con su nombre y URL. Revisado por Luis. PR 9 (18/10): `prestador` no numérico da 400 en vez de 500; extensión, MIME y primeros bytes (`%PDF-` / `FF D8 FF`) deben coincidir, así un TXT renombrado a `.pdf` se rechaza. |
+| T2.2 | HU-2 | Componente de carga de archivos | David Valcarcel | 2 | ✅ | PR 9 unido a `main` | 18/10 | Pasó del Sprint 1. Ruta `/certificaciones` con enlace «Cargar certificado» en el menú (React Router); el registro exitoso muestra el ID y enlaza a la carga. Envía el `prestador`, usa su `UploadCertificado.css` y Vite redirige `/media/` a Django para abrir el archivo subido. |
 | T3.3 | HU-3 | Ordenar resultados por distancia | David Valcarcel | 2 | ✅ | PR 6 unido a `main` | 14/10 | `GET /api/prestadores/buscar/` ordena por distancia ascendente, con prueba. Se quitó la ruta duplicada en `servicios`. El endpoint aparte `certificaciones/prestadores/cercanos/` sigue existiendo y ya no se usa. |
-| T3.4 | HU-3 | Datos de prueba y tiempo de respuesta (< 3 s) | David Valcarcel | 2 | 🟡 | `main` (`960c3f6`, directo, sin PR) | 07/10 | Pasa al Sprint 2. La medición se hizo sobre el endpoint aparte; falta medir `/api/prestadores/buscar/`. `certificaciones/test_reporte.py` necesita `requests` y el servidor encendido, por eso `manage.py test` completo marca 1 error. |
+| T3.4 | HU-3 | Datos de prueba y tiempo de respuesta (< 3 s) | David Valcarcel | 2 | ✅ | PR 9 unido a `main` | 18/10 | Pasó del Sprint 1. `python manage.py medir_busqueda` crea 500 prestadores ficticios (se descartan al terminar), mide la búsqueda real `GET /api/prestadores/buscar/` con la cabecera `X-Execution-Time-Ms` y escribe `evidencia_rendimiento.txt` (máx. 32,5 ms). 3 pruebas nuevas. Se retiraron los `test_reporte.py` que hacían fallar `manage.py test`. |
 | T4.2 | HU-4 | Pantallas de solicitud y cambio de estado | David Valcarcel | 2 | ✅ | PR 6 unido a `main` | 14/10 | Cada tarjeta de resultados permite solicitar el servicio (`POST /api/servicios/solicitudes/`) y consulta el estado cada 5 s hasta Aceptada o Rechazada. PR 7 agregó validaciones de nombre, teléfono de 9 dígitos y descripción. Probado en el navegador el 15/10. |
 
 ## 3. Avance por historia de usuario
@@ -48,8 +48,8 @@ El detalle de cada verificación está en la bitácora (sección 6) y en los inf
 | HU | Historia | SP | Horas | Tareas | Estado | Pruebas a cargo |
 |:---:|---|:---:|:---:|---|:---:|---|
 | HU-1 | Registro del prestador | 3 | 7 h | T1.1 ✅ · T1.2 ✅ · T1.3 ✅ | ✅ 7 de 7 h | Luis (T2.3) |
-| HU-2 | Carga de certificaciones | 2 | 5 h | T2.1 ✅ · T2.2 🟡 · T2.3 ✅ | 🟡 3 de 5 h | Luis (T2.3) |
-| HU-3 | Búsqueda de prestadores | 5 | 11 h | T3.1 ✅ · T3.2 ✅ · T3.3 ✅ · T3.4 🟡 | 🟡 9 de 11 h | David (T3.4) |
+| HU-2 | Carga de certificaciones | 2 | 5 h | T2.1 ✅ · T2.2 ✅ · T2.3 ✅ | ✅ 5 de 5 h (T2.2 el 18/10) | Luis (T2.3) |
+| HU-3 | Búsqueda de prestadores | 5 | 11 h | T3.1 ✅ · T3.2 ✅ · T3.3 ✅ · T3.4 ✅ | ✅ 11 de 11 h (T3.4 el 18/10) | David (T3.4) |
 | HU-4 | Solicitud y aceptación | 3 | 7 h | T4.1 ✅ · T4.2 ✅ · T4.3 ✅ | ✅ 7 de 7 h | Luis (T4.3) |
 
 ## 4. Avance por integrante
@@ -58,8 +58,8 @@ El detalle de cada verificación está en la bitácora (sección 6) y en los inf
 |---|---|:---:|:---:|:---:|---|
 | Renzo León | Scrum Master / Desarrollador | 10 h | 10 h | T1.1, T1.2, T1.3, T4.1 | — |
 | Luis Abad | Development Team | 10 h | 10 h | T3.1, T3.2, T2.3, T4.3 | — |
-| David Valcarcel | Product Owner / Desarrollador | 10 h | 6 h | T2.1, T3.3, T4.2 | T2.2, T3.4 |
-| **Equipo** | | **30 h** | **26 h** | **11** | **2** |
+| David Valcarcel | Product Owner / Desarrollador | 10 h | 6 h | T2.1, T3.3, T4.2 | — (T2.2 y T3.4 terminadas el 18/10, en el Sprint 2) |
+| **Equipo** | | **30 h** | **26 h** | **11** | **0** |
 
 ## 5. Burndown (horas pendientes)
 
@@ -83,6 +83,8 @@ Una línea por entrega, la más reciente arriba.
 
 | Fecha | Quién | Qué se hizo | Tarea |
 |:---:|---|---|:---:|
+| 18/10 | Renzo León | Revisó y unió el PR 9 de David a `main`: 58 de 58 pruebas OK, sin migraciones pendientes, lint y build OK. Cierra T2.2 y T3.4, que pasaron del Sprint 1. | T2.1/T2.2/T3.4 |
+| 17/10 | David Valcarcel | PR 9: carga de certificados en la navegación (`/certificaciones`) con el prestador y proxy `/media/`; validación de `prestador` y de la firma real del archivo; `manage.py medir_busqueda` mide la búsqueda real (< 3000 ms). 8 pruebas nuevas. | T2.1/T2.2/T3.4 |
 | 15/10 | Luis Abad | Confirmó el cierre de T2.3 y T4.3: probó envío, aceptación y rechazo, validaciones y la vista en escritorio y móvil. Sprint 1 queda en 26 de 30 h. | T2.3/T4.3 |
 | 15/10 | Renzo León | Cierre del Sprint 1: verificó `main` con una instalación limpia (49 de 49 pruebas, ejecutor T4.3 con 32 OK, migraciones al día, lint y build OK) y en el navegador (solicitud con teléfono inválido rechazada, solicitud válida creada y Rechazada mostrada sola; móvil sin scroll horizontal). Actualizó AVANCES, SPRINTS, TABLERO y README con 23 de 30 h y el borrador de la retrospectiva. | Cierre |
 | 15/10 | Luis Abad | PR 7 unido a `main`: validaciones de nombre, teléfono de 9 dígitos y descripción en React y Django (6 pruebas nuevas) y tarjeta de prestador corregida. Probó en escritorio y a 360/390 px. | T3.2/T4.3 |
@@ -130,12 +132,14 @@ Una línea por entrega, la más reciente arriba.
 | 3 | 06/10 | T3.1 y T3.2 esperaban revisión. Resuelto: PR 3 revisado, probado y unido a `main` el 12/10. | HU-3 | Luis | ✅ |
 | 4 | 05/10 | T4.1 dependía de HU-3. Resuelto: PR 4 unido a `main` el 12/10, después del PR 3. | HU-4 | Renzo | ✅ |
 | 5 | 05/10 | App móvil "por definir" en el stack: el formulario es web responsive, no una app nativa. | HU-1 | Equipo | ⚪ |
-| 6 | 12/10 | T2.2, T3.3, T3.4 y T4.2 se subieron directo a `main`, sin PR. T3.3 y T4.2 se rehicieron y entraron por el PR 6; T2.2 y T3.4 pasan al Sprint 2. | HU-2, HU-3 | David | 🟡 |
-| 7 | 12/10 | `certificaciones/test_reporte.py` no es una prueba de Django: al correr `manage.py test` da error (falta `requests`) y reescribe `evidencia_rendimiento.txt`. Conviene moverlo fuera de la app o convertirlo en prueba. | Todas | David | 🟡 |
-| 8 | 12/10 | El lint fallaba por `err` sin usar en `UploadCertificado.jsx`. Resuelto por David el 13/10. Sigue pendiente: su CSS importado no existe y el componente no está en la navegación. | HU-2 | David (T2.2) | 🟡 |
+| 6 | 12/10 | T2.2, T3.3, T3.4 y T4.2 se subieron directo a `main`, sin PR. T3.3 y T4.2 se rehicieron y entraron por el PR 6; T2.2 y T3.4, por el PR 9 el 18/10. | HU-2, HU-3 | David | ✅ |
+| 7 | 12/10 | `certificaciones/test_reporte.py` no es una prueba de Django: al correr `manage.py test` da error (falta `requests`) y reescribe `evidencia_rendimiento.txt`. Resuelto en el PR 9: se retiró y la medición pasó a `manage.py medir_busqueda` con pruebas. | Todas | David | ✅ |
+| 8 | 12/10 | El lint fallaba por `err` sin usar en `UploadCertificado.jsx`. Resuelto por David el 13/10. El CSS ya existe y el componente está en la navegación (`/certificaciones`) desde el PR 9. | HU-2 | David (T2.2) | ✅ |
 | 9 | 12/10 | El flujo desde React dependía de la pantalla de T4.2. Resuelto: PR 6 la unió a `main` y se probó en el navegador. | HU-4, T4.3 | David (T4.2) | ✅ |
 | 10 | 12/10 | Riesgo de cerrar el sprint sin HU-2, HU-3 ni HU-4. Se cerró con 26 de 30 h; pasan 4 h al Sprint 2 (T2.2 y T3.4). | Sprint 1 | Equipo | ✅ |
 | 11 | 14/10 | El commit de CORS del 13/10 agregó `corsheaders` a la configuración sin sumarlo a `requirements.txt`: con una instalación nueva, `main` no arranca. Corregido en el PR 4. Además, la vista de carga pone cabeceras CORS a mano aunque ya se usa `django-cors-headers`, y el proxy de Vite ya evita CORS en desarrollo. | Todas | David / Renzo | 🟡 |
+| 15 | 17/10 | Cambiar el estado de una solicitud desde el admin de Django deja `respondida` vacía y permite saltarse la regla de una sola respuesta. | T4.1/T4.2 | David | 🟡 |
+| 16 | 18/10 | La carga de certificados no pide sesión: cualquiera puede subir un archivo con el ID de otro prestador. Se corrige con la autenticación de HU-5. | HU-2, HU-5 | Equipo | 🟡 |
 | 14 | 15/10 | El PR 4 y el PR 7 se unieron sin revisión de otro integrante. Acción: activar la protección de `main` en GitHub para exigir 1 aprobación. | Proceso | Renzo | 🟡 |
 
 ## 8. Decisiones técnicas

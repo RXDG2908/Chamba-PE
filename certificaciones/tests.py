@@ -98,6 +98,50 @@ class CargaCertificacionTests(TestCase):
                 self.assertIn('error', respuesta.json())
                 self.assertEqual(list(self.directorio.iterdir()), [])
 
+    def test_prestador_no_numerico(self):
+        for valor in ['abc', '1.5', '-1', '0', '01', ' 2', '2a']:
+            with self.subTest(prestador=valor):
+                respuesta = self.cargar(prestador=valor)
+                self.assertEqual(respuesta.status_code, 400)
+                self.assertEqual(respuesta.json(), {'error': 'El prestador debe ser un número entero positivo.'})
+        self.assertEqual(CertificacionPrestador.objects.count(), 0)
+        self.assertEqual(list(self.directorio.iterdir()), [])
+
+    def test_prestador_inexistente(self):
+        respuesta = self.cargar(prestador='999999')
+        self.assertEqual(respuesta.status_code, 404)
+        self.assertEqual(CertificacionPrestador.objects.count(), 0)
+
+    def test_contenido_falsificado(self):
+        casos = [
+            ('falso.pdf', b'hola, soy texto plano', 'application/pdf'),
+            ('falso.pdf', JPG_VALIDO, 'application/pdf'),
+            ('falso.jpg', b'texto plano', 'image/jpeg'),
+            ('falso.jpeg', pdf_valido(), 'image/jpeg'),
+            ('vacio.pdf', b'', 'application/pdf'),
+            ('corto.pdf', b'%PD', 'application/pdf'),
+        ]
+        for nombre, contenido, mime in casos:
+            with self.subTest(nombre=nombre, contenido=contenido[:8]):
+                respuesta = self.cargar(nombre, contenido, mime)
+                self.assertEqual(respuesta.status_code, 400)
+                self.assertEqual(respuesta.json()['error'],
+                                 'El contenido del archivo no corresponde a un PDF o JPG válido.')
+        self.assertEqual(CertificacionPrestador.objects.count(), 0)
+        self.assertEqual(list(self.directorio.iterdir()), [])
+
+    def test_extension_y_mime_deben_coincidir(self):
+        for nombre, contenido, mime in [('certificado.jpg', JPG_VALIDO, 'application/pdf'),
+                                        ('certificado.pdf', pdf_valido(), 'image/jpeg')]:
+            with self.subTest(nombre=nombre, mime=mime):
+                respuesta = self.cargar(nombre, contenido, mime)
+                self.assertEqual(respuesta.status_code, 400)
+                self.assertIn('Formato no válido', respuesta.json()['error'])
+        self.assertEqual(list(self.directorio.iterdir()), [])
+
+    def test_jpeg_con_extension_larga_aceptado(self):
+        self.verificar_guardado(self.cargar('certificado.JPEG', JPG_VALIDO, 'image/jpeg'), JPG_VALIDO)
+
     def test_exactamente_5_mb(self):
         contenido = pdf_valido(5 * 1024 * 1024)
         self.assertEqual(len(contenido), 5242880)

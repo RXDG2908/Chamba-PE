@@ -69,9 +69,9 @@ Reglas de reparto y flujo de trabajo en [PLAN_EQUIPO.md](PLAN_EQUIPO.md). Detall
 | Tarea | Descripción | Tipo | Horas | ✔ |
 |:---:|---|:---:|:---:|:---:|
 | T2.1 | Implementar la API de carga de certificaciones (PDF/JPG hasta 5 MB) | Backend | 2 | ✅ |
-| T2.2 | Componente de carga de archivos y estado "Pendiente de verificación" | Frontend | 2 | 🟡 |
+| T2.2 | Componente de carga de archivos y estado "Pendiente de verificación" | Frontend | 2 | ✅ 18/10 |
 | T3.3 | Ordenar los resultados por distancia | Backend | 2 | ✅ |
-| T3.4 | Datos de prueba de prestadores y verificación del tiempo de respuesta (< 3 s) | Pruebas | 2 | 🟡 |
+| T3.4 | Datos de prueba de prestadores y verificación del tiempo de respuesta (< 3 s) | Pruebas | 2 | ✅ 18/10 |
 | T4.2 | Pantallas de envío de solicitud y cambio de estado | Frontend | 2 | ✅ |
 | | **Subtotal** | | **10** | |
 
@@ -152,10 +152,10 @@ Horas pendientes al final de cada día. La línea ideal baja 3 h por día.
 
 Van primero en el sprint. Las horas restantes se vuelven a estimar en el Planning.
 
-| Tarea | Descripción | Responsable | Horas plan | Qué falta |
-|:---:|---|---|:---:|---|
-| T2.2 | Componente de carga de certificados | David Valcarcel | 2 | Agregarlo a la navegación, enviar el prestador y corregir el CSS importado |
-| T3.4 | Tiempo de respuesta < 3 s | David Valcarcel | 2 | Medir la búsqueda real `/api/prestadores/buscar/` |
+| Tarea | Descripción | Responsable | Horas plan | Estado | Resultado |
+|:---:|---|---|:---:|:---:|---|
+| T2.2 | Componente de carga de certificados | David Valcarcel | 2 | ✅ | PR 9 unido el 18/10: ruta `/certificaciones` en el menú, envía el prestador y usa su CSS |
+| T3.4 | Tiempo de respuesta < 3 s | David Valcarcel | 2 | ✅ | PR 9 unido el 18/10: `manage.py medir_busqueda` mide `/api/prestadores/buscar/` (máx. 32,5 ms) |
 
 ## Historias y tareas
 

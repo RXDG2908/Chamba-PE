@@ -2,7 +2,7 @@
 
 Tablero estilo Trello del Sprint 1. Cada tarjeta es una tarea; al avanzar, se mueve a la columna siguiente. El detalle de cada tarea está en [AVANCES.md](AVANCES.md) y la planificación en [SPRINTS.md](SPRINTS.md).
 
-**Actualizado:** 15/10/2026 · **Sprint 1:** ✅ cerrado el 14/10/2026 · **Meta:** el prestador se registra y el cliente lo encuentra y le envía una solicitud.
+**Actualizado:** 18/10/2026 · **Sprint 1:** ✅ cerrado el 14/10/2026 · **Meta:** el prestador se registra y el cliente lo encuentra y le envía una solicitud.
 
 | Columna | Cuándo pasa una tarjeta ahí |
 |---|---|
@@ -11,7 +11,7 @@ Tablero estilo Trello del Sprint 1. Cada tarjeta es una tarea; al avanzar, se mu
 | 👀 En revisión | Está completa y espera la revisión del PR |
 | ✅ Terminado | Está en `main` por un PR revisado y cumple los criterios de aceptación |
 
-Resumen: **11 terminadas · 0 en revisión · 2 en curso · 0 por hacer** · 26 de 30 h terminadas. Las 2 tarjetas en curso pasan al Sprint 2.
+Resumen: **13 terminadas · 0 en revisión · 0 en curso · 0 por hacer** · 26 de 30 h terminadas dentro del sprint. T2.2 y T3.4 pasaron al Sprint 2 y se terminaron el 18/10 con el PR 9.
 
 ---
 
@@ -19,18 +19,15 @@ Resumen: **11 terminadas · 0 en revisión · 2 en curso · 0 por hacer** · 26 
 
 Sin tarjetas.
 
-## 🔨 En curso (2) — pasan al Sprint 2
+## 🔨 En curso (0)
 
-| Tarjeta | HU | Responsable | Horas | Nota |
-|---|:---:|---|:---:|---|
-| **T2.2** Componente de carga de archivos | HU-2 | David Valcarcel | 2 | Falta agregarlo a la navegación, enviar el prestador y corregir el CSS importado |
-| **T3.4** Datos de prueba y respuesta < 3 s | HU-3 | David Valcarcel | 2 | Falta medir la búsqueda real `/api/prestadores/buscar/` |
+Sin tarjetas.
 
 ## 👀 En revisión (0)
 
-Sin PR abiertos: del #1 al #7 están unidos a `main`.
+Sin PR abiertos: del #1 al #9 están unidos a `main`.
 
-## ✅ Terminado (11)
+## ✅ Terminado (13)
 
 | Tarjeta | HU | Responsable | Horas | PR | Nota |
 |---|:---:|---|:---:|:---:|---|
@@ -45,6 +42,8 @@ Sin PR abiertos: del #1 al #7 están unidos a `main`.
 | **T4.2** Pantallas de solicitud y cambio de estado | HU-4 | David Valcarcel | 2 | [#6](https://github.com/RXDG2908/Chamba-PE/pull/6) | Solicitar desde la tarjeta y ver Aceptada o Rechazada; validaciones en [#7](https://github.com/RXDG2908/Chamba-PE/pull/7) |
 | **T2.3** Pruebas de registro y carga | HU-1/2 | Luis Abad | 1 | [#7](https://github.com/RXDG2908/Chamba-PE/pull/7) | Registro y carga, incluida la asociación del certificado. [Informe](docs/pruebas-T2.3.md) |
 | **T4.3** Pruebas buscar → solicitar → aceptar | HU-4 | Luis Abad | 2 | [#7](https://github.com/RXDG2908/Chamba-PE/pull/7) | Envío, Aceptada, Rechazada y validaciones desde React. [Informe](docs/pruebas-T4.3.md) |
+| **T2.2** Componente de carga de archivos | HU-2 | David Valcarcel | 2 | [#9](https://github.com/RXDG2908/Chamba-PE/pull/9) | Pasó del Sprint 1; ruta `/certificaciones` en el menú y envío del prestador (18/10) |
+| **T3.4** Datos de prueba y respuesta < 3 s | HU-3 | David Valcarcel | 2 | [#9](https://github.com/RXDG2908/Chamba-PE/pull/9) | Pasó del Sprint 1; `manage.py medir_busqueda` sobre la búsqueda real, máx. 32,5 ms (18/10) |
 
 ### Otros entregables hechos (sin horas del sprint)
 
@@ -69,8 +68,8 @@ Sin PR abiertos: del #1 al #7 están unidos a `main`.
 | HU | Historia | Por hacer | En curso | En revisión | Terminado |
 |:---:|---|:---:|:---:|:---:|:---:|
 | HU-1 | Registro del prestador | — | — | — | T1.1 · T1.2 · T1.3 |
-| HU-2 | Carga de certificaciones | — | T2.2 | — | T2.1 · T2.3 |
-| HU-3 | Búsqueda de prestadores | — | T3.4 | — | T3.1 · T3.2 · T3.3 |
+| HU-2 | Carga de certificaciones | — | — | — | T2.1 · T2.2 · T2.3 |
+| HU-3 | Búsqueda de prestadores | — | — | — | T3.1 · T3.2 · T3.3 · T3.4 |
 | HU-4 | Solicitud y aceptación | — | — | — | T4.1 · T4.2 · T4.3 |
 
 ## Próximos sprints (backlog)

@@ -36,6 +36,11 @@ class RegistroPrestadorSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError('Ese nombre de usuario ya existe.')
         return value
 
+    def validate_email(self, value):
+        if User.objects.filter(email__iexact=value).exists():
+            raise serializers.ValidationError('Ya existe una cuenta con ese correo.')
+        return value
+
     def validate_password(self, value):
         validate_password(value)
         return value
@@ -48,7 +53,8 @@ class RegistroPrestadorSerializer(serializers.ModelSerializer):
             email=validated_data.pop('email'),
             password=validated_data.pop('password'),
         )
-        # El estado queda "Pendiente de verificación" por defecto.
+        # El estado queda "Pendiente de verificación" por defecto; el rol prestador
+        # lo asigna la señal de usuarios al crear el Prestador.
         prestador = Prestador.objects.create(usuario=usuario, **validated_data)
         prestador.rubros.set(rubros)
         return prestador

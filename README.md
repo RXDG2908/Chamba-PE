@@ -16,6 +16,7 @@ Proyecto Integrador — Diseño y Desarrollo de Software · IV ciclo · Tecsup 2
 | [AVANCES.md](AVANCES.md) | Estado de cada tarea, bitácora, impedimentos y burndown |
 | [TABLERO.md](TABLERO.md) | Tablero estilo Trello del sprint: Por hacer, En curso, En revisión y Terminado |
 | [docs/](docs/) | Documentos fuente: visión del producto y Lab 07 (historias, criterios y estimaciones) |
+| [docs/API_AUTENTICACION.md](docs/API_AUTENTICACION.md) | Contrato de la autenticación con roles (T5.1, Sprint 2): rutas, sesión y CSRF, roles y permisos. Pendiente de implementar |
 
 ---
 

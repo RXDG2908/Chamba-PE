@@ -167,7 +167,7 @@ Van primero en el sprint. Las horas restantes se vuelven a estimar en el Plannin
 | HU-6 · Disponibilidad activo/inactivo | T6.1 | Endpoint para activar y desactivar la disponibilidad | Backend | 2 | |
 | | T6.2 | Interruptor de disponibilidad en la app móvil | Frontend | 2 | |
 | | T6.3 | Pruebas: solo los prestadores activos aparecen en la búsqueda | Pruebas | 1 | |
-| HU-7 · Mapa de prestadores | T7.1 | Consulta de prestadores por coordenadas dentro del radio | Backend | 2 | |
+| HU-7 · Mapa de prestadores | T7.1 | Consulta de prestadores por coordenadas dentro del radio — 🟡 implementada localmente, pendiente de revisión/PR | Backend | 2 | Luis Abad |
 | | T7.2 | Integrar el mapa con marcadores (móvil y web) | Frontend | 3 | |
 | | T7.3 | Pruebas de precisión del radio de cobertura | Pruebas | 2 | |
 | HU-8 · Notificaciones instantáneas | T8.1 | Integrar notificaciones push (Firebase Cloud Messaging) | Backend | 3 | |

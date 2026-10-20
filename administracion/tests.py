@@ -5,7 +5,7 @@ from django.urls import reverse
 from rest_framework.test import APIClient
 
 from certificaciones.models import CertificacionPrestador
-from prestadores.models import Prestador
+from prestadores.models import Prestador, Rubro
 
 from .models import RevisionDocumento
 
@@ -132,6 +132,60 @@ class RevisionDocumentoTests(TestCase):
         for estado in ['pendiente', 'borrado', '']:
             respuesta = self.client.patch(self.url_detalle, {'estado': estado}, format='json')
             self.assertEqual(respuesta.status_code, 400, estado)
+
+    # --- T9.2: datos para la pantalla y estado Verificado ---
+
+    def test_detalle_incluye_tipo_formato_y_ruta_media(self):
+        self.certificacion.archivo.name = 'certificaciones/titulo.PDF'
+        self.certificacion.save()
+        datos = self.client.get(self.url_detalle).data
+        self.assertEqual(datos['tipo_documento'], 'Certificación')
+        self.assertEqual(datos['formato'], 'PDF')
+        self.assertEqual(datos['archivo_url'], '/media/certificaciones/titulo.PDF')
+        self.assertEqual(datos['prestador']['estado'], 'pendiente')
+
+    def test_aprobar_deja_al_prestador_verificado(self):
+        respuesta = self.client.patch(self.url_detalle, {'estado': 'aprobado'}, format='json')
+        self.assertEqual(respuesta.data['prestador']['estado'], 'verificado')
+        self.prestador.refresh_from_db()
+        self.assertEqual(self.prestador.estado, Prestador.Estado.VERIFICADO)
+
+    def test_rechazar_todo_deja_al_prestador_rechazado(self):
+        self.client.patch(self.url_detalle, {'estado': 'rechazado', 'comentario': 'Vencido'}, format='json')
+        self.prestador.refresh_from_db()
+        self.assertEqual(self.prestador.estado, Prestador.Estado.RECHAZADO)
+
+    def test_rechazo_con_otro_documento_por_revisar_sigue_pendiente(self):
+        CertificacionPrestador.objects.create(prestador=self.prestador)
+        self.client.patch(self.url_detalle, {'estado': 'rechazado', 'comentario': 'Vencido'}, format='json')
+        self.prestador.refresh_from_db()
+        self.assertEqual(self.prestador.estado, Prestador.Estado.PENDIENTE)
+
+    def test_un_documento_aprobado_basta_para_seguir_verificado(self):
+        otra = CertificacionPrestador.objects.create(prestador=self.prestador)
+        self.client.patch(self.url_detalle, {'estado': 'aprobado'}, format='json')
+        url_otra = reverse('revision-documento-detail', args=[otra.revision.id])
+        self.client.patch(url_otra, {'estado': 'rechazado', 'comentario': 'Borroso'}, format='json')
+        self.prestador.refresh_from_db()
+        self.assertEqual(self.prestador.estado, Prestador.Estado.VERIFICADO)
+
+    def test_documento_nuevo_de_prestador_rechazado_vuelve_a_pendiente(self):
+        self.client.patch(self.url_detalle, {'estado': 'rechazado', 'comentario': 'Vencido'}, format='json')
+        CertificacionPrestador.objects.create(prestador=self.prestador)
+        self.prestador.refresh_from_db()
+        self.assertEqual(self.prestador.estado, Prestador.Estado.PENDIENTE)
+
+    def test_aprobar_hace_visible_al_prestador_en_la_busqueda(self):
+        rubro = Rubro.objects.create(nombre='Rubro T9.2')
+        self.prestador.rubros.set([rubro])
+        self.prestador.disponible = True
+        self.prestador.save()
+        parametros = {'rubro': rubro.id, 'latitud': '-12.046374', 'longitud': '-77.042793'}
+        url_busqueda = reverse('buscar_prestadores')
+        self.assertEqual(self.client.get(url_busqueda, parametros).json(), [])
+        self.client.patch(self.url_detalle, {'estado': 'aprobado'}, format='json')
+        resultados = self.client.get(url_busqueda, parametros).json()
+        self.assertEqual([p['id'] for p in resultados], [self.prestador.id])
 
     def test_put_y_delete_no_estan_permitidos(self):
         self.assertEqual(self.client.put(self.url_detalle, {}, format='json').status_code, 405)

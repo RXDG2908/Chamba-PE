@@ -174,7 +174,7 @@ Van primero en el sprint. Las horas restantes se vuelven a estimar en el Plannin
 | | T8.2 | Recepción de la notificación y pantalla aceptar/rechazar | Frontend | 2 | |
 | | T8.3 | Pruebas de entrega de notificaciones | Pruebas | 2 | |
 | HU-9 · Validación de prestadores | T9.1 | Modelo y API en Django para revisar documentos | Backend | 2 | David Valcarcel 🟡 |
-| | T9.2 | Pantalla web (React) para aprobar o rechazar | Frontend | 2 | |
+| | T9.2 | Pantalla web (React) para aprobar o rechazar | Frontend | 2 | David Valcarcel 🟡 |
 | | | **Total** | | **30** | |
 
 ## Carga por integrante

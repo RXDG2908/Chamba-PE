@@ -1,0 +1,57 @@
+.revision { padding-block: 44px 32px; }
+
+.revision-titulo { display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; margin-bottom: 24px; }
+.revision-titulo h2 { margin: 10px 0; font-size: clamp(26px, 5vw, 36px); line-height: 1.2; letter-spacing: -0.8px; }
+.revision-titulo p { color: #58675f; max-width: 60ch; }
+
+.revision-resumen { margin-bottom: 16px; color: #58675f; font-size: 14px; }
+.revision-aviso { padding: 16px 20px; border: 1px solid #cbded3; border-radius: 12px; background: #eaf4ee; color: #355342; }
+.revision-aviso-error { display: grid; gap: 10px; justify-items: start; border-color: #f3c7c2; background: #fdecea; color: #b3261e; }
+.revision-aviso-error a { color: #b3261e; font-weight: 700; }
+
+.revision-lista { list-style: none; margin: 0; padding: 0; display: grid; gap: 16px; }
+
+.revision-tarjeta { display: grid; gap: 18px; min-width: 0; padding: 22px 24px; border: 1px solid #e0e7e4; border-left: 4px solid #d9a441; border-radius: 16px; background: #fff; box-shadow: 0 3px 12px #173b2610; }
+.revision-aprobado { border-left-color: #16734f; }
+.revision-rechazado { border-left-color: #b3261e; }
+
+.revision-cabecera { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; min-width: 0; }
+.revision-datos { min-width: 0; }
+.revision-datos h3 { margin: 0 0 12px; font-size: 18px; overflow-wrap: anywhere; }
+.revision-datos dl { display: flex; flex-wrap: wrap; gap: 12px 32px; margin: 0; }
+.revision-datos dt { margin-bottom: 4px; color: #58675f; font-size: 13px; }
+.revision-datos dd { margin: 0; font-weight: 600; }
+
+.revision-ver { flex-shrink: 0; padding: 9px 14px; border: 1px solid #cbded3; border-radius: 10px; background: #eaf4ee; color: #16734f; font-size: 14px; font-weight: 700; text-decoration: none; }
+.revision-ver:hover { border-color: #16734f; }
+.revision-sin-archivo { color: #58675f; font-size: 14px; }
+
+.revision-acciones { padding-top: 16px; border-top: 1px solid #edf0ee; }
+.revision-botones { display: flex; flex-wrap: wrap; gap: 10px; }
+.revision-rechazo { display: grid; gap: 8px; }
+.revision-rechazo label { font-size: 14px; font-weight: 600; }
+.revision-rechazo textarea { width: 100%; min-width: 0; padding: 10px 12px; border: 1px solid #cbded3; border-radius: 10px; color: #20352a; font: inherit; resize: vertical; }
+.revision-rechazo .revision-botones { margin-top: 4px; }
+
+.revision button { padding: 10px 16px; border: 1px solid transparent; border-radius: 10px; font: inherit; font-weight: 700; cursor: pointer; }
+.revision button:disabled { opacity: 0.6; cursor: not-allowed; }
+.revision .boton-aprobar { border-color: #16734f; background: #16734f; color: #fff; }
+.revision .boton-rechazar { border-color: #b3261e; background: #fff; color: #b3261e; }
+.revision .revision-rechazo .boton-rechazar { background: #b3261e; color: #fff; }
+.revision .boton-secundario { border-color: #cbded3; background: #fff; color: #20352a; font-weight: 400; }
+
+.revision-resultado { display: grid; gap: 4px; padding-top: 16px; border-top: 1px solid #edf0ee; color: #355342; }
+.revision-rechazado .revision-resultado { color: #8c1d18; }
+.revision-motivo { color: #58675f; font-size: 14px; overflow-wrap: anywhere; }
+.revision-error { margin: 0; padding: 10px 14px; border-radius: 10px; background: #fdecea; color: #b3261e; font-size: 14px; overflow-wrap: anywhere; }
+
+.revision :focus-visible { outline: 3px solid #16734f; outline-offset: 3px; }
+
+@media (max-width: 600px) {
+  .revision { padding-top: 28px; }
+  .revision-titulo { flex-direction: column; align-items: stretch; }
+  .revision-titulo .boton-secundario { justify-self: start; align-self: flex-start; }
+  .revision-tarjeta { padding: 20px; }
+  .revision-cabecera { flex-direction: column; }
+  .revision-botones button { flex: 1; }
+}

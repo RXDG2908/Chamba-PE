@@ -253,7 +253,7 @@ Horas pendientes al final de cada día. La línea ideal baja 3 h por día.
 | 1 | 15/10 (jue) | 27 | 30 |
 | 2 | 16/10 (vie) | 24 | 30 |
 | 3 | 19/10 (lun) | 21 | 30 |
-| 4 | 20/10 (mar) | 18 | |
+| 4 | 20/10 (mar) | 18 | 30 |
 | 5 | 21/10 (mié) | 15 | |
 | 6 | 22/10 (jue) | 12 | |
 | 7 | 23/10 (vie) | 9 | |

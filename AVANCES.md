@@ -83,6 +83,7 @@ Una línea por entrega, la más reciente arriba.
 
 | Fecha | Quién | Qué se hizo | Tarea |
 |:---:|---|---|:---:|
+| 21/10 | Renzo León | Burndown del 20/10: 30 h pendientes (ideal 18). Ninguna tarea entró a `main`: T5.1 (PR 13) espera la revisión de David, y T9.1 (PR 11) y T7.1 (PR 14) siguen abiertos. Revisó el PR 11 y le dejó observaciones (choques con `main` y con T5.1, cambiar a `EsAdministrador`). | Burndown |
 | 20/10 | Renzo León | Unió el PR 10 (planificación del Sprint 2) a `main` e integró `main` en la rama de T5.1. Burndown del 19/10: 30 h pendientes (ideal 21), porque T5.1 sigue en revisión y ninguna tarea entró a `main`. | Planning/T5.1 |
 | 19/10 | Renzo León | T5.1 implementada en la rama `feature/t5.1-autenticacion`: app `usuarios` con `Perfil` (rol), rutas `csrf`, `registro`, `login` (usuario o correo), `logout` y `yo`, permisos `EsCliente`, `EsPrestador` y `EsAdministrador`, migración que da perfil a las cuentas existentes, correo único también en el registro del prestador y bandeja de solicitudes con `EsPrestador`. 23 pruebas nuevas; 81 de 81 OK. PR 13 abierto, revisa David. | T5.1 |
 | 19/10 | Renzo León | Contrato de T5.1 en `docs/API_AUTENTICACION.md`: rutas `/api/usuarios/` (csrf, registro, login, logout, yo), sesión de Django con `X-CSRFToken` por el proxy de Vite, rol en `usuarios.Perfil` y permisos `EsCliente`, `EsPrestador` y `EsAdministrador`. Falta implementar la API (PR el 20/10). | T5.1 |

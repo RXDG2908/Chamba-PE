@@ -6,7 +6,10 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from .serializers import LoginSerializer, RegistroClienteSerializer, UsuarioActualSerializer
+from .permisos import EsPrestador
+from .serializers import (
+    DisponibilidadSerializer, LoginSerializer, RegistroClienteSerializer, UsuarioActualSerializer,
+)
 
 User = get_user_model()
 
@@ -77,3 +80,19 @@ class UsuarioActualView(APIView):
 
     def get(self, request):
         return Response(UsuarioActualSerializer(request.user).data)
+
+
+class DisponibilidadView(APIView):
+    """T6.1: el prestador consulta y cambia su disponibilidad (Activo o Inactivo)."""
+    permission_classes = [EsPrestador]
+
+    def get(self, request):
+        return Response(DisponibilidadSerializer(request.user.prestador).data)
+
+    def patch(self, request):
+        prestador = request.user.prestador
+        serializer = DisponibilidadSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        prestador.disponible = serializer.validated_data['disponible']
+        prestador.save(update_fields=['disponible'])
+        return Response(DisponibilidadSerializer(prestador).data)

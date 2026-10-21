@@ -226,3 +226,67 @@ class PermisosTests(TestCase):
         self.assertEqual(self.estado(EsAdministrador, self.cliente), 403)
         self.assertEqual(self.estado(EsAdministrador, self.prestador), 403)
         self.assertEqual(self.estado(EsAdministrador, None), 403)
+
+
+class DisponibilidadTests(TestCase):
+    """T6.1: el prestador activa o desactiva su disponibilidad."""
+
+    def setUp(self):
+        self.url = reverse('disponibilidad')
+        self.usuario = crear_prestador()
+        self.prestador = self.usuario.prestador
+        # Verificado para que la búsqueda dependa solo de la disponibilidad.
+        self.prestador.estado = Prestador.Estado.VERIFICADO
+        self.prestador.save()
+        self.client.force_login(self.usuario)
+
+    def cambiar(self, valor):
+        return self.client.patch(self.url, {'disponible': valor}, content_type='application/json')
+
+    def buscar(self):
+        rubro = self.prestador.rubros.get()
+        return self.client.get(reverse('buscar_prestadores'), {
+            'rubro': rubro.id, 'latitud': '-12.046374', 'longitud': '-77.042793',
+        }).json()
+
+    def test_consultar_disponibilidad(self):
+        r = self.client.get(self.url)
+        self.assertEqual(r.status_code, 200)
+        self.assertEqual(r.json(), {'disponible': False, 'estado': 'verificado'})
+
+    def test_activar_y_desactivar(self):
+        r = self.cambiar(True)
+        self.assertEqual(r.status_code, 200)
+        self.assertTrue(r.json()['disponible'])
+        self.prestador.refresh_from_db()
+        self.assertTrue(self.prestador.disponible)
+
+        self.assertFalse(self.cambiar(False).json()['disponible'])
+        self.prestador.refresh_from_db()
+        self.assertFalse(self.prestador.disponible)
+
+    def test_inactivo_no_aparece_en_la_busqueda(self):
+        self.cambiar(True)
+        self.assertEqual([p['id'] for p in self.buscar()], [self.prestador.id])
+        self.cambiar(False)
+        self.assertEqual(self.buscar(), [])
+
+    def test_valor_obligatorio_y_booleano(self):
+        r = self.client.patch(self.url, {}, content_type='application/json')
+        self.assertEqual(r.status_code, 400)
+        self.assertIn('disponible', r.json())
+        self.assertEqual(self.cambiar('quizas').status_code, 400)
+
+    def test_solo_el_prestador_puede_cambiarla(self):
+        self.client.logout()
+        self.assertEqual(self.cambiar(True).status_code, 403)
+        self.client.force_login(User.objects.create_user(username='cliente'))
+        self.assertEqual(self.cambiar(True).status_code, 403)
+        self.prestador.refresh_from_db()
+        self.assertFalse(self.prestador.disponible)
+
+    def test_exige_csrf(self):
+        cliente = Client(enforce_csrf_checks=True)
+        cliente.force_login(self.usuario)
+        r = cliente.patch(self.url, {'disponible': True}, content_type='application/json')
+        self.assertEqual(r.status_code, 403)

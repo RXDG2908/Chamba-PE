@@ -158,6 +158,7 @@ La API queda en `http://127.0.0.1:8000/` y el panel de Django en `/admin/`.
 | `GET /api/usuarios/csrf/` | Deja la cookie `csrftoken` para los `POST` desde React (HU-5) |
 | `POST /api/usuarios/registro/` | Registro del cliente; queda con la sesión iniciada (HU-5) |
 | `POST /api/usuarios/login/` · `.../logout/` | Inicio de sesión con usuario o correo, y cierre de sesión (HU-5) |
+| `GET` · `PATCH /api/usuarios/disponibilidad/` | El prestador consulta o cambia su disponibilidad, Activo o Inactivo (HU-6) |
 | `GET /api/usuarios/yo/` | Quién tiene la sesión y con qué rol; 403 sin sesión (HU-5); [contrato completo](docs/API_AUTENTICACION.md) |
 
 Pruebas del backend:

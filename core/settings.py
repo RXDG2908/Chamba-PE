@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'prestadores',
     'servicios',
+    'usuarios',
 ]
 
 MIDDLEWARE = [
@@ -74,6 +75,13 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'core.wsgi.application'
+
+# Solo sesión de Django: sin sesión las rutas privadas responden 403.
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.SessionAuthentication',
+    ],
+}
 
 
 # Database

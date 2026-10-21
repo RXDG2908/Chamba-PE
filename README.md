@@ -16,6 +16,7 @@ Proyecto Integrador — Diseño y Desarrollo de Software · IV ciclo · Tecsup 2
 | [AVANCES.md](AVANCES.md) | Estado de cada tarea, bitácora, impedimentos y burndown |
 | [TABLERO.md](TABLERO.md) | Tablero estilo Trello del sprint: Por hacer, En curso, En revisión y Terminado |
 | [docs/](docs/) | Documentos fuente: visión del producto y Lab 07 (historias, criterios y estimaciones) |
+| [docs/API_AUTENTICACION.md](docs/API_AUTENTICACION.md) | Autenticación con roles (T5.1, Sprint 2): rutas, sesión y CSRF, roles y permisos para las demás apps |
 
 ---
 
@@ -108,6 +109,7 @@ Chamba-PE/
 ├── core/               Configuración de Django (settings, urls)
 ├── prestadores/        App Django: prestador, rubros, cobertura y API de registro (HU-1)
 ├── servicios/          Búsqueda por rubro, disponibilidad y cobertura (HU-3) y solicitudes de servicio (HU-4)
+├── usuarios/           App Django: cuentas, inicio de sesión y roles cliente, prestador y administrador (HU-5)
 ├── certificaciones/    App Django: carga de certificaciones PDF/JPG ≤ 5 MB (HU-2)
 ├── frontend/           Frontend React + Vite: listado de prestadores (HU-3) y formulario de registro (HU-1)
 ├── src/                Componente React de carga de certificaciones (HU-2)
@@ -150,9 +152,13 @@ La API queda en `http://127.0.0.1:8000/` y el panel de Django en `/admin/`.
 | `GET /api/prestadores/buscar/` | Búsqueda por rubro, disponibilidad y cobertura (T3.1); [parámetros y ejemplos](docs/API_BUSQUEDA.md) |
 | `POST /api/servicios/solicitudes/` | El cliente envía una solicitud al prestador; queda Pendiente (HU-4) |
 | `GET /api/servicios/solicitudes/<id>/` | El cliente consulta el estado de su solicitud (HU-4) |
-| `GET /api/servicios/solicitudes/recibidas/` | Bandeja del prestador; requiere su sesión (HU-4) |
+| `GET /api/servicios/solicitudes/recibidas/` | Bandeja del prestador; requiere sesión con rol prestador (HU-4) |
 | `POST /api/servicios/solicitudes/<id>/aceptar/` · `.../rechazar/` | El prestador responde, una sola vez (HU-4) |
 | `/api/certificaciones/` | Carga de certificaciones (HU-2) |
+| `GET /api/usuarios/csrf/` | Deja la cookie `csrftoken` para los `POST` desde React (HU-5) |
+| `POST /api/usuarios/registro/` | Registro del cliente; queda con la sesión iniciada (HU-5) |
+| `POST /api/usuarios/login/` · `.../logout/` | Inicio de sesión con usuario o correo, y cierre de sesión (HU-5) |
+| `GET /api/usuarios/yo/` | Quién tiene la sesión y con qué rol; 403 sin sesión (HU-5); [contrato completo](docs/API_AUTENTICACION.md) |
 
 Pruebas del backend:
 

@@ -9,7 +9,7 @@ Reglas de reparto y flujo de trabajo en [PLAN_EQUIPO.md](PLAN_EQUIPO.md). Detall
 | Sprint | Fechas | Historias | SP | Horas | Estado |
 |:---:|:---:|:---:|:---:|:---:|:---:|
 | [1](#sprint-1--0110--14102026) | 01/10 – 14/10/2026 | HU-1 a HU-4 | 13 | 30 h | ✅ Cerrado (26 de 30 h) |
-| [2](#sprint-2--1510--28102026) | 15/10 – 28/10/2026 | HU-5 a HU-9 | 13 | 30 h | 🟢 Planning el 15/10 |
+| [2](#sprint-2--1510--28102026) | 15/10 – 28/10/2026 | HU-5 a HU-9 | 13 | 30 h | 🟢 En curso |
 | [3](#sprint-3--2910--11112026) | 29/10 – 11/11/2026 | HU-19, HU-20, HU-21, HU-13 | 13 | 28 h | ⚪ Por planificar |
 | [4](#sprint-4--1211--25112026) | 12/11 – 25/11/2026 | HU-10, HU-11, HU-12 | 12 | 26 h | ⚪ Por planificar |
 | [—](#backlog-futuro) | — | HU-14 a HU-18 | 11 | 30 h | 📦 Backlog futuro |
@@ -140,57 +140,126 @@ Horas pendientes al final de cada día. La línea ideal baja 3 h por día.
 
 # Sprint 2 · 15/10 – 28/10/2026
 
-> ⚪ **Plantilla — por planificar en el Sprint Planning.** Las tareas y horas vienen del Lab 07; los responsables se asignan en la reunión.
-
 **Meta:** Cuentas, disponibilidad, mapa y notificaciones; prestadores verificados por administración.
 
 | Story points | Horas | Capacidad |
 |:---:|:---:|:---:|
 | 13 SP | 30 h | 3 × 10 h |
 
-## Pendientes que pasan del Sprint 1
+> ⚠️ **Arranque tardío:** el reparto se armó el 18/10 y el 15/10 y el 16/10 pasaron sin horas. Quedan 8 días hábiles (19/10 – 28/10) para 30 h, unas **1,25 h diarias por integrante**. Si en el Daily del 23/10 quedan más de 15 h, el Product Owner decide qué tarea pasa al Sprint 3 (candidatas: T8.2 y T8.3, notificaciones).
 
-Van primero en el sprint. Las horas restantes se vuelven a estimar en el Planning.
+## Pendientes que pasan del Sprint 1
 
 | Tarea | Descripción | Responsable | Horas plan | Estado | Resultado |
 |:---:|---|---|:---:|:---:|---|
 | T2.2 | Componente de carga de certificados | David Valcarcel | 2 | ✅ | PR 9 unido el 18/10: ruta `/certificaciones` en el menú, envía el prestador y usa su CSS |
 | T3.4 | Tiempo de respuesta < 3 s | David Valcarcel | 2 | ✅ | PR 9 unido el 18/10: `manage.py medir_busqueda` mide `/api/prestadores/buscar/` (máx. 32,5 ms) |
 
-## Historias y tareas
+## Historias comprometidas
 
-| HU | Tarea | Descripción | Tipo | Horas | Responsable |
-|:---:|:---:|---|:---:|:---:|:---:|
-| HU-5 · Registro e inicio de sesión | T5.1 | API de autenticación con roles (cliente, prestador, administrador) | Backend | 3 | |
-| | T5.2 | Pantallas de registro e inicio de sesión (móvil y web) | Frontend | 3 | |
-| | T5.3 | Pruebas de autenticación y acceso por rol | Pruebas | 1 | |
-| HU-6 · Disponibilidad activo/inactivo | T6.1 | Endpoint para activar y desactivar la disponibilidad | Backend | 2 | |
-| | T6.2 | Interruptor de disponibilidad en la app móvil | Frontend | 2 | |
-| | T6.3 | Pruebas: solo los prestadores activos aparecen en la búsqueda | Pruebas | 1 | |
-| HU-7 · Mapa de prestadores | T7.1 | Consulta de prestadores por coordenadas dentro del radio | Backend | 2 | |
-| | T7.2 | Integrar el mapa con marcadores (móvil y web) | Frontend | 3 | |
-| | T7.3 | Pruebas de precisión del radio de cobertura | Pruebas | 2 | |
-| HU-8 · Notificaciones instantáneas | T8.1 | Integrar notificaciones push (Firebase Cloud Messaging) | Backend | 3 | |
-| | T8.2 | Recepción de la notificación y pantalla aceptar/rechazar | Frontend | 2 | |
-| | T8.3 | Pruebas de entrega de notificaciones | Pruebas | 2 | |
-| HU-9 · Validación de prestadores | T9.1 | Modelo y API en Django para revisar documentos | Backend | 2 | |
-| | T9.2 | Pantalla web (React) para aprobar o rechazar | Frontend | 2 | |
-| | | **Total** | | **30** | |
+| HU | Historia | SP | Horas | Criterios de aceptación |
+|:---:|---|:---:|:---:|---|
+| HU-5 | Como **cliente o prestador**, quiero registrarme e iniciar sesión de forma segura, a fin de acceder a las funciones de mi perfil. | 3 | 7 h | • El registro valida correo y contraseña y asigna el rol (cliente o prestador).<br>• Sin sesión iniciada no se accede a las funciones privadas. |
+| HU-6 | Como **prestador**, quiero activar o desactivar mi disponibilidad en tiempo real, a fin de recibir solicitudes solo cuando esté listo para trabajar. | 2 | 5 h | • El prestador cambia su estado entre Activo e Inactivo desde la app.<br>• Un prestador inactivo no aparece en las búsquedas ni recibe solicitudes. |
+| HU-7 | Como **cliente**, quiero ver en un mapa a los prestadores dentro del radio de cobertura, a fin de saber qué tan cerca están de mi ubicación. | 3 | 7 h | • El mapa muestra solo prestadores dentro del radio de cobertura de la ubicación del cliente.<br>• Al tocar un marcador se ve nombre, rubro, calificación y distancia. |
+| HU-8 | Como **prestador**, quiero recibir una notificación inmediata en mi móvil cuando me llegue una solicitud, a fin de aceptarla o rechazarla en pocos segundos. | 3 | 7 h | • La notificación llega en menos de 5 s tras enviarse la solicitud.<br>• Desde la notificación el prestador puede aceptar o rechazar. |
+| HU-9 | Como **administrador**, quiero validar la identidad y las certificaciones de los prestadores antes de activarlos, a fin de garantizar la seguridad de los usuarios. | 2 | 4 h | • El administrador ve el DNI y las certificaciones, y puede aprobarlas o rechazarlas indicando un motivo.<br>• Al aprobar, el estado cambia a "Verificado" y el prestador ya puede recibir solicitudes. |
 
-## Carga por integrante
+## Reparto de tareas
+
+Cada uno construye las historias de la app de Django de la que es dueño ([PLAN_EQUIPO.md §5](PLAN_EQUIPO.md#5-organización-del-backend)). David, que tiene la historia más chica, hace las pruebas cruzadas de las demás.
+
+✅ terminada (en `main` por PR revisado) · 🟡 en curso o pendiente de PR · ☐ sin iniciar. Detalle en [AVANCES.md](AVANCES.md).
+
+### Renzo León — 10 h · app `usuarios`
+
+| Tarea | Descripción | Tipo | Horas | ✔ |
+|:---:|---|:---:|:---:|:---:|
+| T5.1 | API de autenticación con roles (cliente, prestador, administrador) | Backend | 3 | 🟡 |
+| T6.1 | Endpoint para activar y desactivar la disponibilidad | Backend | 2 | ☐ |
+| T5.2 | Pantallas de registro e inicio de sesión (móvil y web) | Frontend | 3 | ☐ |
+| T6.2 | Interruptor de disponibilidad en la app móvil | Frontend | 2 | ☐ |
+| | **Subtotal** | | **10** | |
+
+### Luis Abad — 10 h · app `servicios`
+
+| Tarea | Descripción | Tipo | Horas | ✔ |
+|:---:|---|:---:|:---:|:---:|
+| T7.1 | Consulta de prestadores por coordenadas dentro del radio | Backend | 2 | ☐ |
+| T8.1 | Integrar notificaciones push (Firebase Cloud Messaging) | Backend | 3 | ☐ |
+| T7.2 | Integrar el mapa con marcadores (móvil y web) | Frontend | 3 | ☐ |
+| T8.2 | Recepción de la notificación y pantalla aceptar/rechazar | Frontend | 2 | ☐ |
+| | **Subtotal** | | **10** | |
+
+### David Valcarcel — 10 h · app `administracion`
+
+| Tarea | Descripción | Tipo | Horas | ✔ |
+|:---:|---|:---:|:---:|:---:|
+| T9.1 | Modelo y API en Django para revisar documentos | Backend | 2 | ☐ |
+| T9.2 | Pantalla web (React) para aprobar o rechazar | Frontend | 2 | ☐ |
+| T5.3 | Pruebas de autenticación y acceso por rol | Pruebas | 1 | ☐ |
+| T7.3 | Pruebas de precisión del radio de cobertura | Pruebas | 2 | ☐ |
+| T6.3 | Pruebas: solo los prestadores activos aparecen en la búsqueda | Pruebas | 1 | ☐ |
+| T8.3 | Pruebas de entrega de notificaciones | Pruebas | 2 | ☐ |
+| | **Subtotal** | | **10** | |
+
+### Resumen de carga
 
 | Integrante | Backend | Frontend | Pruebas | Total |
 |---|:---:|:---:|:---:|:---:|
-| | | | | |
-| | | | | |
-| | | | | |
+| Renzo León | 5 h | 5 h | — | **10 h** |
+| Luis Abad | 5 h | 5 h | — | **10 h** |
+| David Valcarcel | 2 h | 2 h | 6 h | **10 h** |
+| **Equipo** | **12 h** | **12 h** | **6 h** | **30 h** |
+
+### Pruebas cruzadas y revisión de PR
+
+| Historia | Construye | Prueba | Revisa el PR |
+|:---:|---|---|---|
+| HU-5 | Renzo | David (T5.3) | David |
+| HU-6 | Renzo | David (T6.3) | David |
+| HU-7 | Luis | David (T7.3) | David |
+| HU-8 | Luis | David (T8.3) | David |
+| HU-9 | David | Luis (prueba manual antes de la Review, sin horas) | Renzo (dueño de `prestadores`, donde vive el estado del prestador) |
+
+## Orden de trabajo
+
+Dependencias: **T5.1 → T6.1, T5.2, T9.1 (permisos por rol) y T8.1 (token del dispositivo por usuario)** · **T6.1 → T6.2** · **T7.1 → T7.2** · **T8.1 → T8.2** · cada prueba va después del PR de su historia.
+
+Lo que bloquea va en los primeros dos días. **T5.1** es la única tarea de la que dependen los otros dos, así que su PR se abre a más tardar el 20/10; mientras tanto, Luis y David avanzan en lo que no depende de ella.
+
+| Momento | Renzo | Luis | David |
+|---|---|---|---|
+| **19/10 – 20/10** · bloqueantes | **T5.1 API de autenticación con roles** (PR el 20/10) | **T7.1 consulta por coordenadas** · crear el proyecto de Firebase y hacer un envío de prueba (inicio de T8.1) | **T9.1 modelo y API de revisión**, con `IsAdminUser` hasta que entre el rol de T5.1 |
+| **21/10 – 23/10** | T6.1 disponibilidad · T5.2 pantallas de registro e inicio de sesión | T8.1 notificación al crear la solicitud · T7.2 mapa con marcadores | T9.2 pantalla de aprobar o rechazar · T5.3 pruebas de autenticación · T7.3 pruebas del radio |
+| **26/10 – 28/10** | T6.2 interruptor de disponibilidad | T8.2 recepción y aceptar/rechazar desde la notificación | T6.3 pruebas de disponibilidad · T8.3 pruebas de entrega (< 5 s) |
+
+**Acuerdos para el Daily del 19/10, antes de escribir código**, para que nadie se bloquee:
+
+1. **Contrato de T5.1:** rutas de registro, inicio y cierre de sesión y "quién soy"; cómo viaja la sesión desde React (sesión de Django + CSRF por el proxy de Vite, como hoy); dónde se guarda el rol. Renzo lo deja escrito en `docs/` el 19/10.
+2. **"Móvil" = web responsive:** la app nativa sigue por definir ([impedimento 5](AVANCES.md#7-impedimentos-y-riesgos)), así que T5.2, T6.2 y T7.2 se hacen en React responsive y T8.2 usa notificaciones web de FCM (service worker).
+3. **HU-9 cambia la búsqueda y las solicitudes:** solo un prestador "Verificado" aparece y recibe solicitudes. David agrega ese filtro en T9.1 y Luis revisa el cambio en `servicios`.
+4. **Credenciales de Firebase fuera del repositorio** (variables de entorno); en `main` solo va un archivo de ejemplo.
+
+**Cierre (28/10):** Sprint Review con demo de iniciar sesión → activar disponibilidad → ver prestadores en el mapa → enviar solicitud → notificación al prestador → aceptar, y del administrador aprobando a un prestador. Luego, Retrospectiva.
 
 ## Burndown
 
-| Día | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 |
-|---|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
-| **Ideal (h)** | 27 | 24 | 21 | 18 | 15 | 12 | 9 | 6 | 3 | 0 |
-| **Real (h)** | | | | | | | | | | |
+Horas pendientes al final de cada día. La línea ideal baja 3 h por día.
+
+| Día | Fecha | Ideal (h) | Real (h) |
+|:---:|:---:|:---:|:---:|
+| Inicio | 15/10 | 30 | 30 |
+| 1 | 15/10 (jue) | 27 | 30 |
+| 2 | 16/10 (vie) | 24 | 30 |
+| 3 | 19/10 (lun) | 21 | 30 |
+| 4 | 20/10 (mar) | 18 | |
+| 5 | 21/10 (mié) | 15 | |
+| 6 | 22/10 (jue) | 12 | |
+| 7 | 23/10 (vie) | 9 | |
+| 8 | 26/10 (lun) | 6 | |
+| 9 | 27/10 (mar) | 3 | |
+| 10 | 28/10 (mié) | 0 | |
 
 ## Retrospectiva
 

@@ -163,7 +163,7 @@ Van primero en el sprint. Las horas restantes se vuelven a estimar en el Plannin
 |:---:|:---:|---|:---:|:---:|:---:|
 | HU-5 · Registro e inicio de sesión | T5.1 | API de autenticación con roles (cliente, prestador, administrador) | Backend | 3 | |
 | | T5.2 | Pantallas de registro e inicio de sesión (móvil y web) | Frontend | 3 | |
-| | T5.3 | Pruebas de autenticación y acceso por rol | Pruebas | 1 | |
+| | T5.3 | Pruebas de autenticación y acceso por rol | Pruebas | 1 | David Valcarcel 🟡 |
 | HU-6 · Disponibilidad activo/inactivo | T6.1 | Endpoint para activar y desactivar la disponibilidad | Backend | 2 | |
 | | T6.2 | Interruptor de disponibilidad en la app móvil | Frontend | 2 | |
 | | T6.3 | Pruebas: solo los prestadores activos aparecen en la búsqueda | Pruebas | 1 | |

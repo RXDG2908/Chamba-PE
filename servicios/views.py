@@ -4,12 +4,12 @@ from math import isclose
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
 from rest_framework import generics, status
-from rest_framework.exceptions import PermissionDenied
-from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from prestadores.models import Prestador
+from usuarios.permisos import EsPrestador
 
 from .distancias import distancia_km
 from .models import Solicitud
@@ -65,31 +65,23 @@ class DetalleSolicitudView(generics.RetrieveAPIView):
     authentication_classes = []
 
 
-def prestador_del_usuario(usuario):
-    if not hasattr(usuario, 'prestador'):
-        raise PermissionDenied('Solo un prestador puede ver y responder solicitudes.')
-    return usuario.prestador
-
-
 class SolicitudesRecibidasView(generics.ListAPIView):
     """Bandeja del prestador con las solicitudes que le enviaron."""
     serializer_class = SolicitudRecibidaSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [EsPrestador]
     pagination_class = None
 
     def get_queryset(self):
-        prestador = prestador_del_usuario(self.request.user)
-        return prestador.solicitudes.select_related('rubro')
+        return self.request.user.prestador.solicitudes.select_related('rubro')
 
 
 class ResponderSolicitudView(APIView):
     """Base para aceptar o rechazar; solo el prestador dueño y solo si sigue Pendiente."""
-    permission_classes = [IsAuthenticated]
+    permission_classes = [EsPrestador]
     nuevo_estado = None
 
     def post(self, request, pk):
-        prestador = prestador_del_usuario(request.user)
-        solicitud = get_object_or_404(Solicitud, pk=pk, prestador=prestador)
+        solicitud = get_object_or_404(Solicitud, pk=pk, prestador=request.user.prestador)
         if solicitud.estado != Solicitud.Estado.PENDIENTE:
             return Response(
                 {'estado': f'La solicitud ya fue {solicitud.get_estado_display().lower()}.'},

@@ -7,6 +7,8 @@ from rest_framework.test import APIClient
 from certificaciones.models import CertificacionPrestador
 from prestadores.models import Prestador, Rubro
 
+from usuarios.models import Perfil
+
 from .models import RevisionDocumento
 
 
@@ -51,6 +53,22 @@ class RevisionDocumentoTests(TestCase):
         self.assertEqual(cliente.get(self.url_lista).status_code, 403)
         respuesta = cliente.patch(self.url_detalle, {'estado': 'aprobado'}, format='json')
         self.assertEqual(respuesta.status_code, 403)
+
+    def test_prestador_devuelve_403(self):
+        cliente = APIClient()
+        cliente.force_authenticate(self.prestador.usuario)
+        self.assertEqual(cliente.get(self.url_lista).status_code, 403)
+
+    def test_rol_administrador_sin_is_staff_tiene_acceso(self):
+        # EsAdministrador (T5.1) acepta el rol del perfil, no solo is_staff.
+        Perfil.objects.filter(usuario=self.no_admin).update(rol=Perfil.Rol.ADMINISTRADOR)
+        self.no_admin.refresh_from_db()
+        cliente = APIClient()
+        cliente.force_authenticate(self.no_admin)
+        self.assertEqual(cliente.get(self.url_lista).status_code, 200)
+        respuesta = cliente.patch(self.url_detalle, {'estado': 'aprobado'}, format='json')
+        self.assertEqual(respuesta.status_code, 200)
+        self.assertEqual(respuesta.data['revisor'], 'usuario_comun')
 
     # --- Listar y consultar ---
 

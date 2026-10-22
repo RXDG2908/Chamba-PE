@@ -23,6 +23,8 @@ from certificaciones.tests import pdf_valido
 from prestadores.models import Prestador, Rubro
 from servicios.models import Solicitud
 
+from .models import Perfil
+
 User = get_user_model()
 CLAVE = 'Clave-segura-2026'
 
@@ -128,7 +130,7 @@ class AutenticacionYRolTests(AccesoPorRolBase):
 
 
 class RutasDeAdministracionTests(AccesoPorRolBase):
-    """/api/administracion/revisiones/: solo administradores (is_staff o superusuario)."""
+    """/api/administracion/revisiones/: solo administradores (EsAdministrador: rol o is_staff)."""
 
     def setUp(self):
         self.revision = self.certificacion.revision
@@ -141,6 +143,15 @@ class RutasDeAdministracionTests(AccesoPorRolBase):
                 cliente = self.sesion(self.cuentas()[nombre])
                 self.assertEqual(cliente.get(self.url_lista).status_code, 200)
                 self.assertEqual(cliente.get(self.url_detalle).status_code, 200)
+
+    def test_rol_administrador_sin_is_staff_entra_por_el_login(self):
+        admin_por_rol = User.objects.create_user(username='admin_rol_t53', password=CLAVE)
+        Perfil.objects.filter(usuario=admin_por_rol).update(rol=Perfil.Rol.ADMINISTRADOR)
+        cliente = self.sesion(admin_por_rol)
+        self.assertEqual(cliente.get(reverse('usuario_actual')).json()['rol'], 'administrador')
+        self.assertEqual(cliente.get(self.url_lista).status_code, 200)
+        r = cliente.patch(self.url_detalle, {'estado': 'aprobado'}, format='json')
+        self.assertEqual(r.status_code, 200)
 
     def test_administrador_crea_revision(self):
         RevisionDocumento.objects.all().delete()
@@ -354,10 +365,14 @@ class SinCredencialesValidasTests(AccesoPorRolBase):
         User.objects.filter(pk=self.admin.pk).update(is_active=False)
         self.assertEqual(cliente.get(reverse('revision-documento-list')).status_code, 403)
 
-    def test_quitar_is_staff_quita_el_acceso_de_administrador(self):
+    def test_quitar_el_rol_y_is_staff_quita_el_acceso_de_administrador(self):
         cliente = self.sesion(self.admin)
+        url = reverse('revision-documento-list')
+        # Con EsAdministrador, quitar solo is_staff no basta: el perfil sigue siendo administrador.
         User.objects.filter(pk=self.admin.pk).update(is_staff=False)
-        self.assertEqual(cliente.get(reverse('revision-documento-list')).status_code, 403)
+        self.assertEqual(cliente.get(url).status_code, 200)
+        Perfil.objects.filter(usuario=self.admin).update(rol=Perfil.Rol.CLIENTE)
+        self.assertEqual(cliente.get(url).status_code, 403)
 
     def test_sesion_valida_sin_token_csrf_no_modifica_datos(self):
         cliente = APIClient(enforce_csrf_checks=True)

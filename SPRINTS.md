@@ -175,7 +175,7 @@ Cada uno construye las historias de la app de Django de la que es dueño ([PLAN_
 
 | Tarea | Descripción | Tipo | Horas | ✔ |
 |:---:|---|:---:|:---:|:---:|
-| T5.1 | API de autenticación con roles (cliente, prestador, administrador) | Backend | 3 | ☐ |
+| T5.1 | API de autenticación con roles (cliente, prestador, administrador) | Backend | 3 | 🟡 |
 | T6.1 | Endpoint para activar y desactivar la disponibilidad | Backend | 2 | ☐ |
 | T5.2 | Pantallas de registro e inicio de sesión (móvil y web) | Frontend | 3 | ☐ |
 | T6.2 | Interruptor de disponibilidad en la app móvil | Frontend | 2 | ☐ |
@@ -195,8 +195,8 @@ Cada uno construye las historias de la app de Django de la que es dueño ([PLAN_
 
 | Tarea | Descripción | Tipo | Horas | ✔ |
 |:---:|---|:---:|:---:|:---:|
-| T9.1 | Modelo y API en Django para revisar documentos | Backend | 2 | ☐ |
-| T9.2 | Pantalla web (React) para aprobar o rechazar | Frontend | 2 | ☐ |
+| T9.1 | Modelo y API en Django para revisar documentos | Backend | 2 | 🟡 |
+| T9.2 | Pantalla web (React) para aprobar o rechazar | Frontend | 2 | 🟡 |
 | T5.3 | Pruebas de autenticación y acceso por rol | Pruebas | 1 | ☐ |
 | T7.3 | Pruebas de precisión del radio de cobertura | Pruebas | 2 | ☐ |
 | T6.3 | Pruebas: solo los prestadores activos aparecen en la búsqueda | Pruebas | 1 | ☐ |
@@ -252,8 +252,8 @@ Horas pendientes al final de cada día. La línea ideal baja 3 h por día.
 | Inicio | 15/10 | 30 | 30 |
 | 1 | 15/10 (jue) | 27 | 30 |
 | 2 | 16/10 (vie) | 24 | 30 |
-| 3 | 19/10 (lun) | 21 | |
-| 4 | 20/10 (mar) | 18 | |
+| 3 | 19/10 (lun) | 21 | 30 |
+| 4 | 20/10 (mar) | 18 | 30 |
 | 5 | 21/10 (mié) | 15 | |
 | 6 | 22/10 (jue) | 12 | |
 | 7 | 23/10 (vie) | 9 | |

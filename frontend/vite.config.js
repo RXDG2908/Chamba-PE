@@ -16,6 +16,19 @@ export default defineConfig({
         changeOrigin: true,
         secure: false,
       },
+      // T9.2: el inicio de sesión del admin (y sus estilos) pasa por el mismo origen
+      // que React, así la cookie de sesión sirve para /api/administracion/.
+      // Con la barra final para no capturar la ruta /administracion de React.
+      '/admin/': {
+        target: 'http://127.0.0.1:8000',
+        changeOrigin: true,
+        secure: false,
+      },
+      '/static/': {
+        target: 'http://127.0.0.1:8000',
+        changeOrigin: true,
+        secure: false,
+      },
     },
   },
 })

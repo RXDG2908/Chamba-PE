@@ -3,6 +3,7 @@ import './App.css'
 import RegistroPrestador from './RegistroPrestador.jsx'
 import ResultadosPrestadores from './ResultadosPrestadores.jsx'
 import UploadCertificado from './UploadCertificado.jsx'
+import RevisionDocumentos from './RevisionDocumentos.jsx'
 
 function App() {
   return (
@@ -15,6 +16,7 @@ function App() {
             <NavLink to="/" end>Registro de prestador</NavLink>
             <NavLink to="/resultados">Resultados</NavLink>
             <NavLink to="/certificaciones">Cargar certificado</NavLink>
+            <NavLink to="/administracion/revisiones">Revisión de documentos</NavLink>
           </nav>
         </div>
       </header>
@@ -23,6 +25,7 @@ function App() {
         <Route path="/" element={<RegistroPrestador />} />
         <Route path="/resultados" element={<ResultadosPrestadores />} />
         <Route path="/certificaciones" element={<UploadCertificado />} />
+        <Route path="/administracion/revisiones" element={<RevisionDocumentos />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </>

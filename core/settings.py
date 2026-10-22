@@ -43,6 +43,8 @@ INSTALLED_APPS = [
     'rest_framework',
     'prestadores',
     'servicios',
+    'administracion',
+    'usuarios',
 ]
 
 MIDDLEWARE = [
@@ -74,6 +76,13 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'core.wsgi.application'
+
+# Solo sesión de Django: sin sesión las rutas privadas responden 403.
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.SessionAuthentication',
+    ],
+}
 
 
 # Database
@@ -146,6 +155,13 @@ CORS_ALLOWED_ORIGINS = [
     "http://127.0.0.1:5173",
 ]
 CORS_ALLOW_ALL_ORIGINS = True  # Permite peticiones locales de cualquier puerto de Vite
+
+# T9.2: el panel de revisión usa la sesión del admin a través del proxy de Vite,
+# que reescribe el Host; Django debe aceptar el Origin de Vite en las peticiones con CSRF.
+CSRF_TRUSTED_ORIGINS = [
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",
+]
 
 CORS_ALLOW_METHODS = [
     "DELETE",

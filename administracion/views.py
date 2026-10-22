@@ -1,6 +1,7 @@
 from rest_framework import mixins, viewsets
-from rest_framework.permissions import IsAdminUser
 from rest_framework.response import Response
+
+from usuarios.permisos import EsAdministrador
 
 from .models import RevisionDocumento
 from .serializers import DecisionRevisionSerializer, RevisionDocumentoSerializer
@@ -11,7 +12,7 @@ class RevisionDocumentoViewSet(
     viewsets.GenericViewSet,
 ):
     """
-    T9.1: cola de revisión de documentos, solo para administradores (is_staff).
+    T9.1: cola de revisión de documentos, solo para administradores (rol `administrador` o is_staff).
 
     GET    /api/administracion/revisiones/?estado=pendiente
     GET    /api/administracion/revisiones/<id>/
@@ -19,7 +20,7 @@ class RevisionDocumentoViewSet(
     PATCH  /api/administracion/revisiones/<id>/     {"estado": "aprobado|rechazado", "comentario": "..."}
     """
 
-    permission_classes = [IsAdminUser]
+    permission_classes = [EsAdministrador]
     serializer_class = RevisionDocumentoSerializer
 
     def get_queryset(self):

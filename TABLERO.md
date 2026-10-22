@@ -2,15 +2,14 @@
 
 ## Sprint 2 · 15/10 – 28/10/2026
 
-**Actualizado:** 18/10/2026 · **Meta:** cuentas, disponibilidad, mapa y notificaciones; prestadores verificados por administración. Reparto y orden en [SPRINTS.md](SPRINTS.md#sprint-2--1510--28102026).
+**Actualizado:** 20/10/2026 · **Meta:** cuentas, disponibilidad, mapa y notificaciones; prestadores verificados por administración. Reparto y orden en [SPRINTS.md](SPRINTS.md#sprint-2--1510--28102026).
 
-Resumen: **0 terminadas · 0 en revisión · 0 en curso · 14 por hacer** · 0 de 30 h terminadas.
+Resumen: **0 terminadas · 1 en revisión · 0 en curso · 13 por hacer** · 0 de 30 h terminadas.
 
-### 📋 Por hacer (14)
+### 📋 Por hacer (13)
 
 | Tarjeta | HU | Responsable | Horas | Cuándo |
 |---|:---:|---|:---:|---|
-| **T5.1** API de autenticación con roles | HU-5 | Renzo León | 3 | 19–20/10 · **bloquea T6.1, T5.2, T9.1 y T8.1** |
 | **T7.1** Consulta por coordenadas dentro del radio | HU-7 | Luis Abad | 2 | 19–20/10 · bloquea T7.2 |
 | **T9.1** Modelo y API de revisión de documentos | HU-9 | David Valcarcel | 2 | 19–20/10 · bloquea T9.2 |
 | **T8.1** Notificaciones push (FCM) | HU-8 | Luis Abad | 3 | Firebase el 19–20/10; envío al crear la solicitud el 21–23/10 |
@@ -25,9 +24,19 @@ Resumen: **0 terminadas · 0 en revisión · 0 en curso · 14 por hacer** · 0 d
 | **T6.3** Pruebas: solo activos en la búsqueda | HU-6 | David Valcarcel | 1 | 26–28/10 |
 | **T8.3** Pruebas de entrega (< 5 s) | HU-8 | David Valcarcel | 2 | 26–28/10 |
 
-### 🔨 En curso (0) · 👀 En revisión (0) · ✅ Terminado (0)
+### 🔨 En curso (0)
 
-Sin tarjetas todavía.
+Sin tarjetas.
+
+### 👀 En revisión (1)
+
+| Tarjeta | HU | Responsable | Horas | PR | Nota |
+|---|:---:|---|:---:|:---:|---|
+| **T5.1** API de autenticación con roles | HU-5 | Renzo León | 3 | [#13](https://github.com/RXDG2908/Chamba-PE/pull/13) | Revisa David; desbloquea T6.1, T5.2, T9.1 y T8.1. [Contrato](docs/API_AUTENTICACION.md) |
+
+### ✅ Terminado (0)
+
+Sin tarjetas.
 
 ---
 

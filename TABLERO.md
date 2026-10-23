@@ -2,11 +2,11 @@
 
 ## Sprint 2 · 15/10 – 28/10/2026
 
-**Actualizado:** 18/10/2026 · **Meta:** cuentas, disponibilidad, mapa y notificaciones; prestadores verificados por administración. Reparto y orden en [SPRINTS.md](SPRINTS.md#sprint-2--1510--28102026).
+**Actualizado:** 22/10/2026 · **Meta:** cuentas, disponibilidad, mapa y notificaciones; prestadores verificados por administración. Reparto y orden en [SPRINTS.md](SPRINTS.md#sprint-2--1510--28102026).
 
-Resumen: **0 terminadas · 0 en revisión · 0 en curso · 14 por hacer** · 0 de 30 h terminadas.
+Resumen: **0 terminadas · 0 en revisión · 1 en curso · 13 por hacer** · 0 de 30 h terminadas.
 
-### 📋 Por hacer (14)
+### 📋 Por hacer (13)
 
 | Tarjeta | HU | Responsable | Horas | Cuándo |
 |---|:---:|---|:---:|---|
@@ -19,13 +19,18 @@ Resumen: **0 terminadas · 0 en revisión · 0 en curso · 14 por hacer** · 0 d
 | **T7.2** Mapa con marcadores | HU-7 | Luis Abad | 3 | 21–23/10 |
 | **T9.2** Pantalla de aprobar o rechazar | HU-9 | David Valcarcel | 2 | 21–23/10 |
 | **T5.3** Pruebas de autenticación y rol | HU-5 | David Valcarcel | 1 | 21–23/10 |
-| **T7.3** Pruebas del radio de cobertura | HU-7 | David Valcarcel | 2 | 21–23/10 |
 | **T6.2** Interruptor de disponibilidad | HU-6 | Renzo León | 2 | 26–28/10 |
 | **T8.2** Recepción y aceptar/rechazar desde la notificación | HU-8 | Luis Abad | 2 | 26–28/10 |
 | **T6.3** Pruebas: solo activos en la búsqueda | HU-6 | David Valcarcel | 1 | 26–28/10 |
 | **T8.3** Pruebas de entrega (< 5 s) | HU-8 | David Valcarcel | 2 | 26–28/10 |
 
-### 🔨 En curso (0) · 👀 En revisión (0) · ✅ Terminado (0)
+### 🔨 En curso (1)
+
+| Tarjeta | HU | Responsable | Horas | Nota |
+|---|:---:|---|:---:|---|
+| **T7.3** Pruebas del radio de cobertura | HU-7 | David Valcarcel | 2 | Rama `feature/t7.3-pruebas-radio`: 12 pruebas, 70 de 70 OK. [Guía de navegación](docs/GUIA_NAVEGACION.md). Falta abrir el PR |
+
+### 👀 En revisión (0) · ✅ Terminado (0)
 
 Sin tarjetas todavía.
 

@@ -199,7 +199,7 @@ Cada uno construye las historias de la app de Django de la que es dueño ([PLAN_
 | T9.2 | Pantalla web (React) para aprobar o rechazar | Frontend | 2 | 🟡 |
 | T5.3 | Pruebas de autenticación y acceso por rol | Pruebas | 1 | ☐ |
 | T7.3 | Pruebas de precisión del radio de cobertura | Pruebas | 2 | ☐ |
-| T6.3 | Pruebas: solo los prestadores activos aparecen en la búsqueda | Pruebas | 1 | ☐ |
+| T6.3 | Pruebas: solo los prestadores activos aparecen en la búsqueda | Pruebas | 1 | 🟡 |
 | T8.3 | Pruebas de entrega de notificaciones | Pruebas | 2 | ☐ |
 | | **Subtotal** | | **10** | |
 

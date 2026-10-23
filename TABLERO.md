@@ -2,11 +2,11 @@
 
 ## Sprint 2 · 15/10 – 28/10/2026
 
-**Actualizado:** 21/10/2026 · **Meta:** cuentas, disponibilidad, mapa y notificaciones; prestadores verificados por administración. Reparto y orden en [SPRINTS.md](SPRINTS.md#sprint-2--1510--28102026).
+**Actualizado:** 22/10/2026 · **Meta:** cuentas, disponibilidad, mapa y notificaciones; prestadores verificados por administración. Reparto y orden en [SPRINTS.md](SPRINTS.md#sprint-2--1510--28102026).
 
-Resumen: **0 terminadas · 4 en revisión · 0 en curso · 10 por hacer** · 0 de 30 h terminadas.
+Resumen: **0 terminadas · 4 en revisión · 1 en curso · 9 por hacer** · 0 de 30 h terminadas.
 
-### 📋 Por hacer (10)
+### 📋 Por hacer (9)
 
 | Tarjeta | HU | Responsable | Horas | Cuándo |
 |---|:---:|---|:---:|---|
@@ -18,12 +18,13 @@ Resumen: **0 terminadas · 4 en revisión · 0 en curso · 10 por hacer** · 0 d
 | **T7.3** Pruebas del radio de cobertura | HU-7 | David Valcarcel | 2 | 21–23/10 |
 | **T6.2** Interruptor de disponibilidad | HU-6 | Renzo León | 2 | 26–28/10 |
 | **T8.2** Recepción y aceptar/rechazar desde la notificación | HU-8 | Luis Abad | 2 | 26–28/10 |
-| **T6.3** Pruebas: solo activos en la búsqueda | HU-6 | David Valcarcel | 1 | 26–28/10 |
 | **T8.3** Pruebas de entrega (< 5 s) | HU-8 | David Valcarcel | 2 | 26–28/10 |
 
-### 🔨 En curso (0)
+### 🔨 En curso (1)
 
-Sin tarjetas.
+| Tarjeta | HU | Responsable | Horas | Nota |
+|---|:---:|---|:---:|---|
+| **T6.3** Pruebas: solo activos en la búsqueda | HU-6 | David Valcarcel | 1 | Rama `feature/t6.3-pruebas-disponibilidad` (sobre los PR 11 y 15): 9 pruebas OK. [Guía manual](docs/GUIA_T6.3.md). PR después de los #13, #11 y #15 |
 
 ### 👀 En revisión (4)
 

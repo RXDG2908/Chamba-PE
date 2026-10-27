@@ -83,6 +83,7 @@ Una línea por entrega, la más reciente arriba.
 
 | Fecha | Quién | Qué se hizo | Tarea |
 |:---:|---|---|:---:|
+| 18/10 | Renzo León | Sprint Planning del Sprint 2 en SPRINTS.md: Renzo HU-5 y HU-6 (`usuarios`), Luis HU-7 y HU-8 (`servicios`), David HU-9 (`administracion`) y las pruebas cruzadas; 10 h cada uno. T5.1 va primero (PR el 20/10) porque bloquea T6.1, T5.2, T9.1 y T8.1. | Planning |
 | 18/10 | Renzo León | Revisó y unió el PR 9 de David a `main`: 58 de 58 pruebas OK, sin migraciones pendientes, lint y build OK. Cierra T2.2 y T3.4, que pasaron del Sprint 1. | T2.1/T2.2/T3.4 |
 | 17/10 | David Valcarcel | PR 9: carga de certificados en la navegación (`/certificaciones`) con el prestador y proxy `/media/`; validación de `prestador` y de la firma real del archivo; `manage.py medir_busqueda` mide la búsqueda real (< 3000 ms). 8 pruebas nuevas. | T2.1/T2.2/T3.4 |
 | 15/10 | Luis Abad | Confirmó el cierre de T2.3 y T4.3: probó envío, aceptación y rechazo, validaciones y la vista en escritorio y móvil. Sprint 1 queda en 26 de 30 h. | T2.3/T4.3 |
@@ -140,6 +141,7 @@ Una línea por entrega, la más reciente arriba.
 | 11 | 14/10 | El commit de CORS del 13/10 agregó `corsheaders` a la configuración sin sumarlo a `requirements.txt`: con una instalación nueva, `main` no arranca. Corregido en el PR 4. Además, la vista de carga pone cabeceras CORS a mano aunque ya se usa `django-cors-headers`, y el proxy de Vite ya evita CORS en desarrollo. | Todas | David / Renzo | 🟡 |
 | 15 | 17/10 | Cambiar el estado de una solicitud desde el admin de Django deja `respondida` vacía y permite saltarse la regla de una sola respuesta. | T4.1/T4.2 | David | 🟡 |
 | 16 | 18/10 | La carga de certificados no pide sesión: cualquiera puede subir un archivo con el ID de otro prestador. Se corrige con la autenticación de HU-5. | HU-2, HU-5 | Equipo | 🟡 |
+| 17 | 18/10 | El Sprint 2 se planificó el 18/10: el 15/10 y el 16/10 pasaron sin horas. Quedan 8 días hábiles para 30 h (1,25 h diarias por integrante). Si en el Daily del 23/10 quedan más de 15 h, el Product Owner decide qué pasa al Sprint 3. | Sprint 2 | Equipo | 🟡 |
 | 14 | 15/10 | El PR 4 y el PR 7 se unieron sin revisión de otro integrante. Acción: activar la protección de `main` en GitHub para exigir 1 aprobación. | Proceso | Renzo | 🟡 |
 
 ## 8. Decisiones técnicas
@@ -171,16 +173,16 @@ Una línea por entrega, la más reciente arriba.
 | | PR 4 y PR 7 se unieron sin revisión de otro integrante. | Si un PR agrega una librería, también actualiza `requirements.txt`; quien revisa instala desde cero. |
 | | AVANCES.md no se actualizó a diario y los informes de pruebas salieron muy largos. | AVANCES.md al cierre de cada día, en pocas líneas; el detalle va en `docs/`. |
 
-## 10. Sprint 2 — avance local de T7.1 (19/10/2026)
+## 10. Sprint 2 — avance de T7.1 (implementación y pruebas del 19/10/2026)
 
 | Tarea | Responsable | Horas plan | Estado | Rama / PR |
 |---|---|---|---|---|
-| T7.1 — consulta por coordenadas | Luis Abad | 2 h | 🟡 Implementada localmente; pendiente de revisión/PR y de integrar el filtro Verificado | `feature/t7.1-mapa-prestadores`, commits locales sin push |
+| T7.1 — consulta por coordenadas | Luis Abad | 2 h | 🟡 Implementación y pruebas realizadas; PR #14 pendiente de revisión e integración del filtro Verificado | `feature/t7.1-mapa-prestadores`, PR [#14](https://github.com/RXDG2908/Chamba-PE/pull/14) |
 
 - **Implementado:** misma búsqueda pública, ahora con latitud/longitud numéricas del centro de cobertura; conserva tarjetas, Haversine, filtros, radios propios, orden y cabecera de tiempo. Contrato en [docs/API_BUSQUEDA.md](docs/API_BUSQUEDA.md).
 - **Probado:** Python de `venv`, `manage.py test --noinput`: 60 pruebas OK en 2.574 s, sin problemas en el system check; dos pruebas nuevas y contrato público actualizado. Datos exclusivamente en la base de pruebas; sin modificar registros locales. Sin prueba visual del frontend.
 - **Evidencia manual reportada por Luis (19/10):** búsqueda HTTP 200, prestador ficticio id `2`, latitud `-12.046374`, longitud `-77.042793`, `distancia_km: 0.0` y cabecera `X-Execution-Time-Ms: 16.782`. Confirma la respuesta para ese caso; no valida el filtro Verificado pendiente.
-- **Integración/revisión pendiente:** David revisa el PR y ejecuta T7.3; T9.1 todavía debe actualizar el estado del prestador e integrar el filtro de verificados en búsqueda/solicitudes. Renzo debe confirmar continuidad de consulta pública al integrar roles/disponibilidad. Sin soporte real de calificaciones: propuesta de promedio `null`, cantidad `0` y texto «Sin calificaciones», aún fuera de la respuesta.
+- **Integración/revisión pendiente:** David revisa el PR #14 y ejecuta T7.3; T9.1 todavía debe actualizar el estado del prestador e integrar el filtro de verificados en búsqueda/solicitudes. Renzo debe confirmar continuidad de consulta pública al integrar roles/disponibilidad. Sin soporte real de calificaciones: propuesta de promedio `null`, cantidad `0` y texto «Sin calificaciones», aún fuera de la respuesta.
 - **Bitácora:** 19/10, Luis/asistente: verificados rama limpia y HEAD `8198a83`; fetch remoto completado con certificados de Windows; revisadas planificación y ramas T5.1/T9.1 sin fusionar. Preparados código, pruebas y documentación para revisión local.
 - **Horas y burndown:** 2 h planificadas para T7.1; horas reales no informadas por Luis. Se suman **0 h terminadas** hasta revisión e integración; no se descuenta T7.1 del burndown ni se infiere el avance de otros integrantes.
 - **Alcance:** T7.2, T7.3, HU-7 y Sprint 2 siguen pendientes; sin notificaciones ni HU-12 implementadas.

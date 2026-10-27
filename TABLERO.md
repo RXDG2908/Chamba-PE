@@ -2,16 +2,15 @@
 
 ## Sprint 2 · 15/10 – 28/10/2026
 
-**Actualizado:** 18/10/2026 · **Meta:** cuentas, disponibilidad, mapa y notificaciones; prestadores verificados por administración. Reparto y orden en [SPRINTS.md](SPRINTS.md#sprint-2--1510--28102026).
+**Actualizado:** 27/10/2026 · **Meta:** cuentas, disponibilidad, mapa y notificaciones; prestadores verificados por administración. Reparto y orden en [SPRINTS.md](SPRINTS.md#sprint-2--1510--28102026).
 
-Resumen: **0 terminadas · 0 en revisión · 0 en curso · 14 por hacer** · 0 de 30 h terminadas.
+Resumen: **0 terminadas · 1 en revisión · 0 en curso · 13 por hacer** · 0 de 30 h terminadas.
 
-### 📋 Por hacer (14)
+### 📋 Por hacer (13)
 
 | Tarjeta | HU | Responsable | Horas | Cuándo |
 |---|:---:|---|:---:|---|
 | **T5.1** API de autenticación con roles | HU-5 | Renzo León | 3 | 19–20/10 · **bloquea T6.1, T5.2, T9.1 y T8.1** |
-| **T7.1** Consulta por coordenadas dentro del radio | HU-7 | Luis Abad | 2 | 19–20/10 · bloquea T7.2 |
 | **T9.1** Modelo y API de revisión de documentos | HU-9 | David Valcarcel | 2 | 19–20/10 · bloquea T9.2 |
 | **T8.1** Notificaciones push (FCM) | HU-8 | Luis Abad | 3 | Firebase el 19–20/10; envío al crear la solicitud el 21–23/10 |
 | **T6.1** Endpoint de disponibilidad | HU-6 | Renzo León | 2 | 21–23/10 |
@@ -25,9 +24,13 @@ Resumen: **0 terminadas · 0 en revisión · 0 en curso · 14 por hacer** · 0 d
 | **T6.3** Pruebas: solo activos en la búsqueda | HU-6 | David Valcarcel | 1 | 26–28/10 |
 | **T8.3** Pruebas de entrega (< 5 s) | HU-8 | David Valcarcel | 2 | 26–28/10 |
 
-### 🔨 En curso (0) · 👀 En revisión (0) · ✅ Terminado (0)
+### 🔨 En curso (0) · 👀 En revisión (1) · ✅ Terminado (0)
 
-Sin tarjetas todavía.
+| Tarjeta | HU | Responsable | Horas | PR / Pendientes |
+|---|:---:|---|:---:|---|
+| **T7.1** Consulta por coordenadas dentro del radio | HU-7 | Luis Abad | 2 | [#14](https://github.com/RXDG2908/Chamba-PE/pull/14) pendiente de revisión; implementación y pruebas realizadas (60 OK y evidencia manual). Falta integrar el filtro «Verificado» de T9.1 y ejecutar T7.3; detalle en [AVANCES.md](AVANCES.md). |
+
+HU-7 sigue pendiente: T7.2 y T7.3 no están terminadas. T7.1 no suma horas terminadas hasta revisión e integración.
 
 ---
 

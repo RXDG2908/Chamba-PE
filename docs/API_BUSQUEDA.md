@@ -1,24 +1,25 @@
-# Búsqueda de prestadores — T3.1 y T3.3
+# Búsqueda de prestadores — T3.1, T3.3 y T7.1
 
-## Endpoint
+## Endpoint y parámetros
 
-`GET /api/prestadores/buscar/`
+`GET /api/prestadores/buscar/` es una consulta pública, sin autenticación.
+Se reutiliza para tarjetas y para preparar los marcadores de T7.2; no hay un endpoint nuevo.
 
-Consulta pública, sin autenticación. Requiere los tres parámetros:
-
-| Parámetro | Valor |
+| Parámetro obligatorio | Contrato |
 |---|---|
-| `rubro` | ID entero positivo de un rubro existente; consultar `GET /api/prestadores/rubros/` |
-| `latitud` | Coordenada numérica finita del cliente, entre -90 y 90 grados inclusive |
-| `longitud` | Coordenada numérica finita del cliente, entre -180 y 180 grados inclusive |
+| `rubro` | ID entero positivo de un rubro existente en `GET /api/prestadores/rubros/` |
+| `latitud` | Coordenada numérica finita del cliente, entre -90 y 90 inclusive |
+| `longitud` | Coordenada numérica finita del cliente, entre -180 y 180 inclusive |
 
-Ejemplo (reemplazar `1` por el ID del rubro elegido):
+No se requiere un radio del cliente: se respeta el `radio_cobertura_km` de cada prestador.
+
+Ejemplo con Gasfitería (ID 1, confirmado mediante consulta de solo lectura a los rubros locales el 19/10/2026):
 
 ```http
-GET /api/prestadores/buscar/?rubro=1&latitud=-12.046374&longitud=-77.042793
+GET /api/prestadores/buscar/?rubro=1&latitud=-12.05&longitud=-77.04
 ```
 
-Respuesta `200 OK`, ejemplo ilustrativo del formato, sin crear registros:
+Respuesta `200 OK` ilustrativa (no crea registros):
 
 ```json
 [
@@ -27,105 +28,104 @@ Respuesta `200 OK`, ejemplo ilustrativo del formato, sin crear registros:
     "nombres": "Ana",
     "apellidos": "Pérez",
     "rubros": [{"id": 1, "nombre": "Gasfitería"}],
-    "distancia_km": 2.345678
+    "latitud": -12.046374,
+    "longitud": -77.042793,
+    "distancia_km": 0.504792
   }
 ]
 ```
 
-Devuelve todos los rubros de cada prestador. Los únicos campos de salida son
-`id`, `nombres`, `apellidos`, `rubros` y `distancia_km`; no incluye DNI,
-teléfono, datos de cuenta, contraseñas ni calificaciones.
-Sin coincidencias devuelve `200 OK` con `[]`, sin paginación.
+La distancia del ejemplo está aproximada para su lectura. La API devuelve el cálculo sin redondear.
+Los únicos campos de cada resultado son `id`, `nombres`, `apellidos`, `rubros`,
+`latitud`, `longitud` y `distancia_km`. Los rubros contienen únicamente `id` y `nombre`.
+Las coordenadas se devuelven como **números JSON**, aunque el modelo las almacena
+como Decimal con seis decimales. Representan el centro de cobertura registrado
+del prestador, no su ubicación en tiempo real ni las coordenadas del cliente.
 
-Los errores devuelven `400 Bad Request` por parámetro, en español. Ejemplo:
+Se conservan los campos y tipos consumidos por las tarjetas actuales; las dos
+coordenadas son campos adicionales. No se exponen DNI, teléfono, correo,
+cuentas, documentos ni estado administrativo. Sin coincidencias: `200 OK` con
+`[]`, sin paginación. Las respuestas 200 conservan `X-Execution-Time-Ms`
+(milisegundos de ejecución de la vista, incluida la serialización; no mide la red).
+
+Parámetros faltantes o inválidos, incluidos rubros inexistentes, devuelven
+`400 Bad Request` con mensajes por campo en español. Ejemplo:
 
 ```json
 {"latitud": ["La coordenada debe estar entre -90 y 90 grados."]}
 ```
 
-Un ID de rubro inexistente también devuelve 400; un rubro existente sin
-prestadores que cumplan los filtros devuelve una lista vacía.
+Un rubro existente sin coincidencias devuelve una lista vacía, no un error.
 
-## Cálculo y alcance
+## Distancia, filtros y dependencias
 
-La búsqueda reside en `servicios`, conforme a la organización del backend
-en `PLAN_EQUIPO.md`, y reutiliza los modelos de `prestadores` sin modificarlos.
-Primero filtra en la base de datos por rubro y `disponible=True`.
-Después calcula la distancia geográfica entre el centro de cobertura del
-prestador y el cliente mediante Haversine, usando un radio terrestre medio
-de 6371.0088 km. No es una distancia de ruta ni un tiempo de llegada.
+`servicios.views.BuscarPrestadoresView` filtra por `disponible=True` y rubro,
+precarga todos los rubros y reutiliza `servicios.distancias.distancia_km`.
+Calcula Haversine con radio terrestre medio de 6371.0088 km, no distancia de
+ruta ni tiempo de llegada. Incluye al prestador cuando la distancia al cliente
+es menor o igual a su propio radio; compara sin redondear, con tolerancia
+absoluta de 1e-9 km en el límite. Ordena por distancia ascendente.
 
-Solo incluye al prestador si la distancia es menor o igual a su propio
-`radio_cobertura_km`. Compara sin redondear y admite una tolerancia absoluta
-de 0.000000001 km (un micrómetro) para el error numérico en el límite.
-`servicios.distancias.distancia_km` queda disponible para reutilizar en T3.3.
-Los rubros se precargan con `prefetch_related`.
+**Verificación pendiente de integración (David, T9.1):** existe
+`Prestador.estado` con `pendiente`, `verificado` y `rechazado`, pero la búsqueda
+actual todavía no filtra por él. La planificación de `origin/planning-sprint-2`
+asigna ese filtro y el de solicitudes a David. Tras actualizar las referencias
+el 19/10, su rama `origin/feature/t9.1-revision-documentos` incorpora revisión de
+certificaciones, pero todavía no actualiza `Prestador.estado` al aprobar ni
+aplica los filtros en búsqueda/solicitudes. T7.1 no duplica ese trabajo.
+Por tanto, esta respuesta aún puede incluir prestadores pendientes o rechazados
+si cumplen disponibilidad, rubro y cobertura; **HU-7 no está completa**.
+Coordinar con David la transición de estado, el filtro y sus pruebas de integración.
 
-Los resultados se ordenan por distancia ascendente (el prestador más cercano
-primero), según T3.3. Tampoco se añade un filtro por estado de verificación: T3.1 aplica
-los filtros solicitados de rubro, disponibilidad y cobertura.
-T3.2 ya está conectada a esta API en Resultados, con selector de rubros y
-ubicación Leaflet; véase [cómo probar el frontend](../frontend/README.md).
-Luis confirmó manualmente la tarjeta ficticia a 0 km y respuestas HTTP 200
-vacía y positiva. Quedan pendientes la revisión visual completa y el PR.
-HU-3 continúa parcial y la verificación de rendimiento de T3.4 está pendiente.
-El avance de David `ae51360` usa un endpoint separado en `certificaciones`;
-se conserva en la base de la rama y aún debe integrarse con esta búsqueda.
+**Calificación pendiente (HU-12):** no hay modelo ni cálculo real de calificaciones.
+El contrato actual omite ese campo. Propuesta para acordar con T7.2/HU-12:
+`calificacion_promedio: null` y `cantidad_calificaciones: 0` cuando no haya
+reseñas; mostrar «Sin calificaciones». Estos campos son una propuesta, **no
+forman parte de la respuesta implementada**. Hasta acordar e integrar el soporte,
+T7.2 puede mostrar ese texto cuando el campo está ausente; nunca interpretar
+su ausencia como cero estrellas ni inventar puntuaciones.
 
-## Probar en Windows
+La rama `origin/feature/t5.1-autenticacion` de Renzo incorpora roles y sesiones,
+pero conserva la búsqueda pública. T7.1 no necesita fusionarla. Confirmar ese
+contrato al integrar T5.1/T6.1. Los marcadores (T7.2), las pruebas cruzadas de
+precisión (David, T7.3), las notificaciones y HU-12 quedan fuera de la entrega original T7.1.
 
-Preparación opcional de una coincidencia ficticia en la base **local**:
+## Probar en Windows sin modificar registros locales
 
 ```powershell
-.\venv\Scripts\python.exe manage.py preparar_busqueda_local
+.\venv\Scripts\python.exe manage.py runserver
 ```
 
-Crea un único prestador `Demo Gasfitero ficticio`, con Gasfitería,
-disponible, centro -12.046374/-77.042793 y radio 5 km. La cuenta tiene
-contraseña inutilizable y el DNI es ficticio. Repetir el comando reutiliza
-el mismo registro sin cambios; si sus identificadores están ocupados o el
-registro fue modificado, aborta sin actualizar ni borrar registros.
-Esto es una prueba positiva local de T3.1, no los datos ni las pruebas de
-rendimiento de T3.4. Verificado el 06/10: primera ejecución creó id 2,
-segunda ejecución lo reutilizó; consulta HTTP real al servidor local con
-rubro 1 devolvió 200 y el prestador a 0.0 km.
+En otra terminal, confirmar primero el rubro y luego consultar:
 
-1. Desde la raíz del repositorio, ejecutar el backend (si ya está corriendo,
-   usar ese servidor):
+```powershell
+Invoke-RestMethod 'http://127.0.0.1:8000/api/prestadores/rubros/'
+Invoke-WebRequest 'http://127.0.0.1:8000/api/prestadores/buscar/?rubro=1&latitud=-12.05&longitud=-77.04'
+```
 
-   ```powershell
-   .\venv\Scripts\python.exe manage.py runserver
-   ```
+Gasfitería tiene ID 1 en la base local consultada; en otro entorno usar el ID
+que devuelva el listado. `Invoke-WebRequest` permite revisar tanto JSON como
+cabecera de tiempo. Puede devolver `[]` si no hay prestadores elegibles; no se
+necesita alterar registros para validar esa respuesta. Sin parámetros o con
+`latitud=91`, debe devolver 400. Las tarjetas existentes siguen en Resultados;
+la entrega original T7.1 no dibuja marcadores. T7.2 los añade en la misma pantalla;
+ver [comprobaciones del mapa](pruebas-T7.2.md).
 
-2. En otra terminal, consultar los rubros:
+```powershell
+.\venv\Scripts\python.exe manage.py test --noinput
+```
 
-   ```powershell
-   Invoke-RestMethod 'http://127.0.0.1:8000/api/prestadores/rubros/'
-   ```
+Verificado el 19/10/2026: **60 pruebas OK**, en 2.574 s, comprobación de Django
+sin problemas. Base de pruebas separada, creada y destruida por Django; no se
+modificaron registros locales. Incluye dos pruebas nuevas de coordenadas reales
+del prestador, compatibilidad con tarjetas, cabecera de tiempo y combinación de
+filtros/orden/cobertura, más las regresiones existentes de validación, radios
+individuales, límite inclusivo, comparación sin redondeo, privacidad y rendimiento
+(< 3000 ms para el escenario de prueba). No se ejecutaron pruebas visuales del
+frontend ni se validó la integración de ramas todavía separadas.
 
-3. Elegir un ID y consultar la ubicación del cliente:
-
-   ```powershell
-   Invoke-RestMethod 'http://127.0.0.1:8000/api/prestadores/buscar/?rubro=1&latitud=-12.046374&longitud=-77.042793' | ConvertTo-Json -Depth 5
-   ```
-
-   También se puede abrir esa URL en el navegador. Un registro nuevo tiene
-   `disponible=False` por defecto, así que no aparece. Para obtener una
-   coincidencia manual debe existir un prestador disponible del rubro y con
-   cobertura en esa ubicación. Esta implementación no cambia registros locales.
-
-4. Comprobar errores abriendo `/api/prestadores/buscar/` sin parámetros y
-   repitiendo la consulta con `latitud=91`: ambos devuelven 400.
-
-5. Ejecutar la suite automática, que crea sus datos exclusivamente en la
-   base de pruebas y la destruye al terminar:
-
-   ```powershell
-   .\venv\Scripts\python.exe manage.py test --noinput
-   ```
-
-Verificado el 06/10/2026: **18 pruebas, OK**, comprobación de Django sin
-problemas. Incluye 7 pruebas existentes de registro y 11 nuevas de distancia
-y búsqueda: filtros combinados, distintos radios, límite y puntos a ambos
-lados, comparación sin redondear, campos públicos, parámetros faltantes e
-inválidos, extremos válidos y ausencia de resultados.
+Evidencia manual reportada por Luis el 19/10/2026: HTTP 200 con el prestador
+ficticio id `2`, latitud `-12.046374`, longitud `-77.042793`,
+`distancia_km: 0.0` y `X-Execution-Time-Ms: 16.782`. Es una comprobación
+puntual de la respuesta; el filtro Verificado sigue pendiente de integración
+y T7.1 sigue pendiente de revisión/PR. HU-7 no se declara completa.

@@ -185,11 +185,13 @@ Cada uno construye las historias de la app de Django de la que es dueño ([PLAN_
 
 | Tarea | Descripción | Tipo | Horas | ✔ |
 |:---:|---|:---:|:---:|:---:|
-| T7.1 | Consulta de prestadores por coordenadas dentro del radio | Backend | 2 | ☐ |
+| T7.1 | Consulta de prestadores por coordenadas dentro del radio | Backend | 2 | 🟡 |
 | T8.1 | Integrar notificaciones push (Firebase Cloud Messaging) | Backend | 3 | ☐ |
 | T7.2 | Integrar el mapa con marcadores (móvil y web) | Frontend | 3 | ☐ |
 | T8.2 | Recepción de la notificación y pantalla aceptar/rechazar | Frontend | 2 | ☐ |
 | | **Subtotal** | | **10** | |
+
+**Avance de T7.1:** implementación y pruebas realizadas (60 pruebas OK y evidencia manual HTTP 200; detalle en [AVANCES.md](AVANCES.md)). PR [#14](https://github.com/RXDG2908/Chamba-PE/pull/14) pendiente de revisión; falta integrar el filtro «Verificado» de T9.1 en búsqueda/solicitudes y ejecutar T7.3. T7.2 y HU-7 siguen pendientes; no se descuentan horas del burndown hasta revisión e integración.
 
 ### David Valcarcel — 10 h · app `administracion`
 

@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
-import { CircleMarker, MapContainer, TileLayer, useMapEvents } from 'react-leaflet'
+import { CircleMarker, MapContainer, Marker, Popup, TileLayer, useMap, useMapEvents } from 'react-leaflet'
+import { divIcon, DomEvent } from 'leaflet'
 import 'leaflet/dist/leaflet.css'
 import SolicitudServicio from './SolicitudServicio.jsx'
 
@@ -7,19 +8,77 @@ const LIMA = [-12.046374, -77.042793]
 const formatoDistancia = new Intl.NumberFormat('es-PE', { maximumFractionDigits: 2 })
 
 function UbicacionCliente({ ubicacion, onElegir }) {
-  const mapa = useMapEvents({
-    click: ({ latlng }) => {
+  useMapEvents({
+    click: ({ latlng, originalEvent }) => {
+      if (originalEvent?.target?.closest('.leaflet-popup, .leaflet-interactive, .leaflet-marker-icon')) return
       // Normaliza la longitud cuando Leaflet muestra otra copia del mundo.
       const punto = latlng.wrap()
       if (punto.lat >= -90 && punto.lat <= 90) onElegir([punto.lat, punto.lng])
     },
   })
 
-  useEffect(() => {
-    if (ubicacion) mapa.setView(ubicacion, mapa.getZoom())
-  }, [mapa, ubicacion])
+  return ubicacion ? (
+    <CircleMarker center={ubicacion} radius={9} bubblingMouseEvents={false}
+      pathOptions={{ color: '#fff', weight: 3, fillColor: '#2463a6', fillOpacity: 1 }}>
+      <Popup>Tu ubicación para el servicio</Popup>
+    </CircleMarker>
+  ) : null
+}
 
-  return ubicacion ? <CircleMarker center={ubicacion} radius={8} /> : null
+function VistaResultados({ ubicacion, prestadores }) {
+  const mapa = useMap()
+
+  useEffect(() => {
+    if (!ubicacion) return
+    const puntos = [ubicacion, ...prestadores.map((p) => [p.latitud, p.longitud])]
+    mapa.fitBounds(puntos, { padding: [32, 32], maxZoom: 15 })
+  }, [mapa, ubicacion, prestadores])
+
+  return ubicacion && (
+    <div className="volver-mapa" ref={(nodo) => {
+      if (nodo) DomEvent.disableClickPropagation(nodo)
+    }}>
+      <button type="button" onClick={() => mapa.fitBounds(
+        [ubicacion, ...prestadores.map((p) => [p.latitud, p.longitud])],
+        { padding: [32, 32], maxZoom: 15 },
+      )}>Ver ubicación y resultados</button>
+    </div>
+  )
+}
+
+function MarcadoresPrestadores({ prestadores }) {
+  return prestadores.map((prestador, indice) => {
+    // No desplazamos las coordenadas: la ventana permite consultar a todos
+    // los prestadores superpuestos, incluido un punto compartido con el cliente.
+    const coincidentes = prestadores.filter((otro) => otro.latitud === prestador.latitud
+      && otro.longitud === prestador.longitud)
+    const titulo = coincidentes.length > 1
+      ? `${coincidentes.length} prestadores en esta ubicación`
+      : `${prestador.nombres} ${prestador.apellidos}`
+    return (
+      <Marker key={prestador.id} position={[prestador.latitud, prestador.longitud]}
+        bubblingMouseEvents={false} title={titulo} alt={titulo}
+        icon={divIcon({
+          className: 'marcador-prestador',
+          html: `<span>${indice + 1}${coincidentes.length > 1 ? '+' : ''}</span>`,
+          iconSize: [36, 36], iconAnchor: [18, 36], popupAnchor: [0, -36],
+        })}>
+        <Popup maxWidth={240} maxHeight={200}>
+          <div className="contenido-marcador">
+            {coincidentes.length > 1 && <p><strong>{titulo}</strong></p>}
+            {coincidentes.map((persona) => (
+              <article key={persona.id}>
+                <strong>{persona.nombres} {persona.apellidos}</strong>
+                <p>{persona.rubros.map((r) => r.nombre).join(' · ')}</p>
+                <p>{formatoDistancia.format(persona.distancia_km)} km</p>
+                <p>Sin calificaciones</p>
+              </article>
+            ))}
+          </div>
+        </Popup>
+      </Marker>
+    )
+  })
 }
 
 function ResultadosPrestadores() {
@@ -111,6 +170,10 @@ function ResultadosPrestadores() {
         throw new Error(mensajes.join(' ') || 'No se pudo realizar la búsqueda. Inténtalo de nuevo.')
       }
       if (!Array.isArray(datos)) throw new Error('El servidor devolvió una respuesta inesperada. Inténtalo de nuevo.')
+      if (datos.some((p) => !Number.isFinite(p.latitud) || Math.abs(p.latitud) > 90
+        || !Number.isFinite(p.longitud) || Math.abs(p.longitud) > 180)) {
+        throw new Error('El servidor devolvió coordenadas inválidas. Inténtalo de nuevo.')
+      }
       // Una petición cancelada nunca puede reemplazar una búsqueda más reciente.
       if (!controlador.signal.aborted && peticion.current === controlador) {
         setPrestadores(datos)
@@ -165,7 +228,10 @@ function ResultadosPrestadores() {
               url="https://tile.openstreetmap.org/{z}/{x}/{y}.png"
             />
             <UbicacionCliente ubicacion={ubicacion} onElegir={elegirUbicacion} />
+            <MarcadoresPrestadores prestadores={prestadores} />
+            <VistaResultados ubicacion={ubicacion} prestadores={prestadores} />
           </MapContainer>
+          <p className="leyenda-mapa">● Azul: tu ubicación · Marcadores verdes numerados: prestadores (centro de cobertura). El signo + indica varios en el mismo punto; abre la ventana para verlos todos.</p>
           <div className="coordenadas-busqueda">
             <label className="campo-busqueda">
               <span>Latitud</span>
@@ -209,6 +275,7 @@ function ResultadosPrestadores() {
                 <div className="perfil">
                   <h4>{prestador.nombres} {prestador.apellidos}</h4>
                   <p className="rubros-tarjeta">{prestador.rubros.map((especialidad) => especialidad.nombre).join(' · ')}</p>
+                  <p className="rubros-tarjeta">Sin calificaciones</p>
                 </div>
                 <dl className="detalles">
                   <div><dt>Distancia</dt><dd>{formatoDistancia.format(prestador.distancia_km)} km</dd></div>

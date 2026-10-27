@@ -88,7 +88,7 @@ su ausencia como cero estrellas ni inventar puntuaciones.
 La rama `origin/feature/t5.1-autenticacion` de Renzo incorpora roles y sesiones,
 pero conserva la búsqueda pública. T7.1 no necesita fusionarla. Confirmar ese
 contrato al integrar T5.1/T6.1. Los marcadores (T7.2), las pruebas cruzadas de
-precisión (David, T7.3), las notificaciones y HU-12 quedan fuera de esta entrega.
+precisión (David, T7.3), las notificaciones y HU-12 quedan fuera de la entrega original T7.1.
 
 ## Probar en Windows sin modificar registros locales
 
@@ -108,7 +108,8 @@ que devuelva el listado. `Invoke-WebRequest` permite revisar tanto JSON como
 cabecera de tiempo. Puede devolver `[]` si no hay prestadores elegibles; no se
 necesita alterar registros para validar esa respuesta. Sin parámetros o con
 `latitud=91`, debe devolver 400. Las tarjetas existentes siguen en Resultados;
-esta entrega no dibuja marcadores.
+la entrega original T7.1 no dibuja marcadores. T7.2 los añade en la misma pantalla;
+ver [comprobaciones del mapa](pruebas-T7.2.md).
 
 ```powershell
 .\venv\Scripts\python.exe manage.py test --noinput

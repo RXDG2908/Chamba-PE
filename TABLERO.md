@@ -32,7 +32,7 @@ Sin tarjetas.
 |---|:---:|---|:---:|:---:|---|
 | **T5.1** API de autenticación con roles | HU-5 | Renzo León | 3 | [#13](https://github.com/RXDG2908/Chamba-PE/pull/13) | Revisa David; desbloquea T6.1, T5.2, T9.1 y T8.1. [Contrato](docs/API_AUTENTICACION.md) |
 | **T6.1** Endpoint de disponibilidad | HU-6 | Renzo León | 2 | [#15](https://github.com/RXDG2908/Chamba-PE/pull/15) | `GET`/`PATCH /api/usuarios/disponibilidad/`; sale de la rama de T5.1, se une después del #13 |
-| **T5.2** Pantallas de registro e inicio de sesión | HU-5 | Renzo León | 3 | PR T5.2 | Crear cuenta de cliente, iniciar con usuario o correo y cerrar sesión; React responsive. Se une después del #15 |
+| **T5.2** Pantallas de registro e inicio de sesión | HU-5 | Renzo León | 3 | [#17](https://github.com/RXDG2908/Chamba-PE/pull/17) | Crear cuenta de cliente, iniciar con usuario o correo y cerrar sesión; React responsive. Se une después del #15 |
 
 ### ✅ Terminado (0)
 

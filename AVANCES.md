@@ -3,7 +3,7 @@
 > **Regla del equipo:** este archivo se actualiza **siempre**, al terminar cada tarea o al cierre del día de trabajo, antes de dar la tarea por terminada. Ver [PLAN_EQUIPO.md](PLAN_EQUIPO.md#3-reglas-de-reparto).
 > Sirve de base para el cuadro de avances y el informe del Sprint Review.
 
-**Última actualización:** 18/10/2026 · **Sprint 1:** ✅ cerrado el 14/10/2026 (01/10 – 14/10) · **Sprint 2:** 🟢 en curso (15/10 – 28/10) · **Meta:** el prestador se registra y el cliente lo encuentra y le envía una solicitud.
+**Última actualización:** 27/10/2026 · **Sprint 1:** ✅ cerrado el 14/10/2026 (01/10 – 14/10) · **Sprint 2:** 🟢 en curso (15/10 – 28/10) · **Meta:** el prestador se registra y el cliente lo encuentra y le envía una solicitud.
 
 Estados: ✅ terminada · 🟡 en curso / parcial · ⚪ sin iniciar · 🔴 bloqueada
 
@@ -42,6 +42,7 @@ El detalle de cada verificación está en la bitácora (sección 6) y en los inf
 | T3.3 | HU-3 | Ordenar resultados por distancia | David Valcarcel | 2 | ✅ | PR 6 unido a `main` | 14/10 | `GET /api/prestadores/buscar/` ordena por distancia ascendente, con prueba. Se quitó la ruta duplicada en `servicios`. El endpoint aparte `certificaciones/prestadores/cercanos/` sigue existiendo y ya no se usa. |
 | T3.4 | HU-3 | Datos de prueba y tiempo de respuesta (< 3 s) | David Valcarcel | 2 | ✅ | PR 9 unido a `main` | 18/10 | Pasó del Sprint 1. `python manage.py medir_busqueda` crea 500 prestadores ficticios (se descartan al terminar), mide la búsqueda real `GET /api/prestadores/buscar/` con la cabecera `X-Execution-Time-Ms` y escribe `evidencia_rendimiento.txt` (máx. 32,5 ms). 3 pruebas nuevas. Se retiraron los `test_reporte.py` que hacían fallar `manage.py test`. |
 | T4.2 | HU-4 | Pantallas de solicitud y cambio de estado | David Valcarcel | 2 | ✅ | PR 6 unido a `main` | 14/10 | Cada tarjeta de resultados permite solicitar el servicio (`POST /api/servicios/solicitudes/`) y consulta el estado cada 5 s hasta Aceptada o Rechazada. PR 7 agregó validaciones de nombre, teléfono de 9 dígitos y descripción. Probado en el navegador el 15/10. |
+| T8.3 | HU-8 | Pruebas de entrega de notificaciones | David Valcarcel | 2 | 🟡 | `feature/t8.3-pruebas-notificaciones` (desde `main`), PR pendiente | 27/10 | `servicios/test_notificaciones.py`: 7 pruebas sobre el único aviso que existe hoy, la bandeja del prestador (`GET /api/servicios/solicitudes/recibidas/`). La solicitud llega en la consulta siguiente, sin esperas; de enviar a verla en la bandeja tarda < 5 s (medido: 5 ms de promedio, máx. 7,6 ms en 20 envíos), también con 600 solicitudes previas; `creada` es la hora del envío; trae nombre y teléfono del cliente, rubro, descripción y ubicación; solo la recibe el prestador elegido; una solicitud rechazada no genera aviso. Suite: 65 de 65 OK sobre `main` y 130 de 130 sobre la rama de T6.3 (con T5.1, T9.1 y T6.1). **Falta el envío push:** T8.1 no está iniciada ([impedimento 20](#7-impedimentos-y-riesgos)). |
 
 ## 3. Avance por historia de usuario
 
@@ -83,6 +84,7 @@ Una línea por entrega, la más reciente arriba.
 
 | Fecha | Quién | Qué se hizo | Tarea |
 |:---:|---|---|:---:|
+| 27/10 | David Valcarcel | T8.3 en `feature/t8.3-pruebas-notificaciones`: 7 pruebas de entrega del aviso de solicitud a la bandeja del prestador (< 5 s, datos del cliente, rubro y descripción, destinatario correcto). 65 de 65 OK. Queda parcial hasta que exista T8.1 (push). | T8.3 |
 | 18/10 | Renzo León | Sprint Planning del Sprint 2 en SPRINTS.md: Renzo HU-5 y HU-6 (`usuarios`), Luis HU-7 y HU-8 (`servicios`), David HU-9 (`administracion`) y las pruebas cruzadas; 10 h cada uno. T5.1 va primero (PR el 20/10) porque bloquea T6.1, T5.2, T9.1 y T8.1. | Planning |
 | 18/10 | Renzo León | Revisó y unió el PR 9 de David a `main`: 58 de 58 pruebas OK, sin migraciones pendientes, lint y build OK. Cierra T2.2 y T3.4, que pasaron del Sprint 1. | T2.1/T2.2/T3.4 |
 | 17/10 | David Valcarcel | PR 9: carga de certificados en la navegación (`/certificaciones`) con el prestador y proxy `/media/`; validación de `prestador` y de la firma real del archivo; `manage.py medir_busqueda` mide la búsqueda real (< 3000 ms). 8 pruebas nuevas. | T2.1/T2.2/T3.4 |
@@ -141,6 +143,7 @@ Una línea por entrega, la más reciente arriba.
 | 11 | 14/10 | El commit de CORS del 13/10 agregó `corsheaders` a la configuración sin sumarlo a `requirements.txt`: con una instalación nueva, `main` no arranca. Corregido en el PR 4. Además, la vista de carga pone cabeceras CORS a mano aunque ya se usa `django-cors-headers`, y el proxy de Vite ya evita CORS en desarrollo. | Todas | David / Renzo | 🟡 |
 | 15 | 17/10 | Cambiar el estado de una solicitud desde el admin de Django deja `respondida` vacía y permite saltarse la regla de una sola respuesta. | T4.1/T4.2 | David | 🟡 |
 | 16 | 18/10 | La carga de certificados no pide sesión: cualquiera puede subir un archivo con el ID de otro prestador. Se corrige con la autenticación de HU-5. | HU-2, HU-5 | Equipo | 🟡 |
+| 20 | 27/10 | T8.1 (notificaciones push con FCM) no está iniciada: no hay rama ni código, y el sprint cierra el 28/10. T8.3 solo puede probar la bandeja del prestador; el criterio de HU-8 «la notificación llega al móvil en < 5 s» queda sin probar. El Product Owner decide en el Daily si HU-8 pasa al Sprint 3. | HU-8, T8.2, T8.3 | Luis / David | 🔴 |
 | 17 | 18/10 | El Sprint 2 se planificó el 18/10: el 15/10 y el 16/10 pasaron sin horas. Quedan 8 días hábiles para 30 h (1,25 h diarias por integrante). Si en el Daily del 23/10 quedan más de 15 h, el Product Owner decide qué pasa al Sprint 3. | Sprint 2 | Equipo | 🟡 |
 | 14 | 15/10 | El PR 4 y el PR 7 se unieron sin revisión de otro integrante. Acción: activar la protección de `main` en GitHub para exigir 1 aprobación. | Proceso | Renzo | 🟡 |
 

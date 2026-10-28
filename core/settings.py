@@ -155,6 +155,13 @@ CORS_ALLOWED_ORIGINS = [
 ]
 CORS_ALLOW_ALL_ORIGINS = True  # Permite peticiones locales de cualquier puerto de Vite
 
+# T9.2: el panel de revisión usa la sesión del admin a través del proxy de Vite,
+# que reescribe el Host; Django debe aceptar el Origin de Vite en las peticiones con CSRF.
+CSRF_TRUSTED_ORIGINS = [
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",
+]
+
 CORS_ALLOW_METHODS = [
     "DELETE",
     "GET",

@@ -177,7 +177,7 @@ Cada uno construye las historias de la app de Django de la que es dueño ([PLAN_
 |:---:|---|:---:|:---:|:---:|
 | T5.1 | API de autenticación con roles (cliente, prestador, administrador) | Backend | 3 | 🟡 |
 | T6.1 | Endpoint para activar y desactivar la disponibilidad | Backend | 2 | 🟡 |
-| T5.2 | Pantallas de registro e inicio de sesión (móvil y web) | Frontend | 3 | ☐ |
+| T5.2 | Pantallas de registro e inicio de sesión (móvil y web) | Frontend | 3 | 🟡 |
 | T6.2 | Interruptor de disponibilidad en la app móvil | Frontend | 2 | ☐ |
 | | **Subtotal** | | **10** | |
 

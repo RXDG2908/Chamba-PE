@@ -1,14 +1,13 @@
 import { useState } from 'react'
-import { Link, useLocation, useNavigate } from 'react-router-dom'
+import { Link, Navigate, useLocation } from 'react-router-dom'
 import { enviarJson } from './api.js'
 import './RegistroPrestador.css'
 import './Cuenta.css'
 
 // Pantalla a la que va cada rol después de iniciar sesión.
-const INICIO_POR_ROL = { cliente: '/resultados', prestador: '/resultados', administrador: '/resultados' }
+const INICIO_POR_ROL = { cliente: '/resultados', prestador: '/disponibilidad', administrador: '/resultados' }
 
-function IniciarSesion({ alIniciar }) {
-  const navegar = useNavigate()
+function IniciarSesion({ usuario, alIniciar }) {
   const { state } = useLocation()
   const [datos, setDatos] = useState({ username: '', password: '' })
   const [errores, setErrores] = useState({})
@@ -30,7 +29,6 @@ function IniciarSesion({ alIniciar }) {
       const cuerpo = await respuesta.json()
       if (respuesta.ok) {
         alIniciar(cuerpo)
-        navegar(state?.desde || INICIO_POR_ROL[cuerpo.rol] || '/', { replace: true })
         return
       }
       setErrores({ general: cuerpo.detail || 'No se pudo iniciar sesión.' })
@@ -39,6 +37,9 @@ function IniciarSesion({ alIniciar }) {
       setEstado('fallo')
     }
   }
+
+  // Con la sesión iniciada vuelve a la página que pidió o a la de su rol.
+  if (usuario) return <Navigate to={state?.desde || INICIO_POR_ROL[usuario.rol] || '/'} replace />
 
   return (
     <form className="registro cuenta" onSubmit={enviar} noValidate>

@@ -111,7 +111,7 @@ Chamba-PE/
 ├── servicios/          Búsqueda por rubro, disponibilidad y cobertura (HU-3) y solicitudes de servicio (HU-4)
 ├── usuarios/           App Django: cuentas, inicio de sesión y roles cliente, prestador y administrador (HU-5)
 ├── certificaciones/    App Django: carga de certificaciones PDF/JPG ≤ 5 MB (HU-2)
-├── frontend/           Frontend React + Vite: listado de prestadores (HU-3), formulario de registro (HU-1) e inicio de sesión y cuenta de cliente (HU-5)
+├── frontend/           Frontend React + Vite: listado de prestadores (HU-3), formulario de registro (HU-1) e inicio de sesión y cuenta de cliente (HU-5) e interruptor de disponibilidad del prestador (HU-6)
 ├── src/                Componente React de carga de certificaciones (HU-2)
 ├── docs/               Visión del producto, Lab 07 y maquetas (docs/renders/)
 ├── manage.py

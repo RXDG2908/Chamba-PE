@@ -9,7 +9,7 @@ Reglas de reparto y flujo de trabajo en [PLAN_EQUIPO.md](PLAN_EQUIPO.md). Detall
 | Sprint | Fechas | Historias | SP | Horas | Estado |
 |:---:|:---:|:---:|:---:|:---:|:---:|
 | [1](#sprint-1--0110--14102026) | 01/10 – 14/10/2026 | HU-1 a HU-4 | 13 | 30 h | ✅ Cerrado (26 de 30 h) |
-| [2](#sprint-2--1510--28102026) | 15/10 – 28/10/2026 | HU-5 a HU-9 | 13 | 30 h | 🟠 Cierre el 28/10: 0 de 30 h en `main`, 21 h en PRs por revisar |
+| [2](#sprint-2--1510--28102026) | 15/10 – 28/10/2026 | HU-5 a HU-9 | 13 | 30 h | 🟠 Cierre el 28/10: 0 de 30 h en `main`, 19 h en PRs por revisar |
 | [3](#sprint-3--2910--11112026) | 29/10 – 11/11/2026 | HU-19, HU-20, HU-21, HU-13 | 13 | 28 h | ⚪ Por planificar |
 | [4](#sprint-4--1211--25112026) | 12/11 – 25/11/2026 | HU-10, HU-11, HU-12 | 12 | 26 h | ⚪ Por planificar |
 | [—](#backlog-futuro) | — | HU-14 a HU-18 | 11 | 30 h | 📦 Backlog futuro |
@@ -148,7 +148,7 @@ Horas pendientes al final de cada día. La línea ideal baja 3 h por día.
 
 > ⚠️ **Arranque tardío:** el reparto se armó el 18/10 y el 15/10 y el 16/10 pasaron sin horas. Quedan 8 días hábiles (19/10 – 28/10) para 30 h, unas **1,25 h diarias por integrante**. Si en el Daily del 23/10 quedan más de 15 h, el Product Owner decide qué tarea pasa al Sprint 3 (candidatas: T8.2 y T8.3, notificaciones).
 
-> 🟠 **Cierre (28/10):** ninguna tarea entró a `main`, así que quedan 0 de 30 h terminadas. Hay 21 h de código en PRs abiertos esperando revisión (#11, #13 a #18) y 4 h en ramas de pruebas sin PR. T8.1 y T8.2 (5 h, HU-8) no se empezaron. Con todos los PRs unidos pasan 116 de 116 pruebas. Estado por tarea, guion de la demo, decisiones para el PO y propuesta de retrospectiva en [docs/sprint2-review.md](docs/sprint2-review.md).
+> 🟠 **Cierre (28/10):** ninguna tarea entró a `main`, así que quedan 0 de 30 h terminadas. Hay 19 h de código en PRs abiertos esperando revisión (#11 y #13 a #18) y 6 h en ramas de pruebas sin PR. T8.1 y T8.2 (5 h, HU-8) no se empezaron. Con todos los PRs unidos pasan 116 de 116 pruebas. Estado por tarea, guion de la demo, decisiones para el PO y propuesta de retrospectiva en [docs/sprint2-review.md](docs/sprint2-review.md).
 
 ## Pendientes que pasan del Sprint 1
 

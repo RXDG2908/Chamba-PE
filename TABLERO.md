@@ -15,7 +15,7 @@ Resumen: **7 terminadas · 4 en revisión · 0 en curso · 0 por hacer · 3 pasa
 | **T7.1** Consulta por coordenadas dentro del radio | HU-7 | Luis Abad | 2 | [#14](https://github.com/RXDG2908/Chamba-PE/pull/14) | Falta asignar quién revisa |
 | **T7.2** Mapa con marcadores | HU-7 | Luis Abad | 3 | [#16](https://github.com/RXDG2908/Chamba-PE/pull/16) | Incluye T7.1; se une después del #14 |
 | **T6.3** Pruebas: solo activos en la búsqueda | HU-6 | David Valcarcel | 1 | [#20](https://github.com/RXDG2908/Chamba-PE/pull/20) | `main` integrado el 29/10 (154 pruebas OK); listo para revisión |
-| **T7.3** Pruebas del radio de cobertura | HU-7 | David Valcarcel | 2 | [#23](https://github.com/RXDG2908/Chamba-PE/pull/23) | Choca con `main`: hay que traer `main` |
+| **T7.3** Pruebas del radio de cobertura | HU-7 | David Valcarcel | 2 | [#23](https://github.com/RXDG2908/Chamba-PE/pull/23) | `main` integrado el 29/10 (157 pruebas OK); listo para revisión |
 
 ### ➡️ Pasan al Sprint 3 (3)
 

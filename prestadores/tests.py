@@ -1,4 +1,9 @@
-from django.test import TestCase
+from io import StringIO
+
+from django.contrib.auth import get_user_model
+from django.core.management import call_command
+from django.core.management.base import CommandError
+from django.test import TestCase, override_settings
 from django.urls import reverse
 
 from .models import Prestador, Rubro
@@ -57,7 +62,6 @@ class RegistroPrestadorTests(TestCase):
 
 
     def test_campos_obligatorios_ausentes_y_vacios(self):
-        from django.contrib.auth import get_user_model
         for campo in self.datos:
             for ausente in (True, False):
                 with self.subTest(campo=campo, ausente=ausente):
@@ -90,3 +94,35 @@ class RegistroPrestadorTests(TestCase):
         prestador = Prestador.objects.get()
         self.assertEqual(prestador.estado, Prestador.Estado.PENDIENTE)
         self.assertEqual(prestador.get_estado_display(), 'Pendiente de verificación')
+
+
+@override_settings(DEBUG=True)
+class PrepararDemoTests(TestCase):
+    def preparar(self):
+        call_command('preparar_demo', stdout=StringIO())
+
+    def test_crea_las_tres_cuentas_con_su_rol(self):
+        self.preparar()
+        roles = {u.username: u.perfil.rol for u in get_user_model().objects.all()}
+        self.assertEqual(roles, {'admin.demo': 'administrador', 'ana.cliente': 'cliente',
+                                 'jorge.respaldo': 'prestador'})
+        self.assertTrue(self.client.login(username='jorge.respaldo', password='PrestadorChamba2026'))
+
+    def test_el_prestador_de_respaldo_sale_en_la_busqueda(self):
+        self.preparar()
+        rubro = Rubro.objects.get(nombre='Gasfitería')
+        r = self.client.get(reverse('buscar_prestadores'),
+                            {'rubro': rubro.id, 'latitud': '-12.0464', 'longitud': '-77.0428'})
+        self.assertEqual([p['nombres'] for p in r.json()], ['Jorge'])
+
+    def test_se_puede_correr_dos_veces(self):
+        self.preparar()
+        self.preparar()
+        self.assertEqual(get_user_model().objects.count(), 3)
+        self.assertEqual(Prestador.objects.count(), 1)
+
+    @override_settings(DEBUG=False)
+    def test_no_corre_fuera_de_desarrollo(self):
+        with self.assertRaises(CommandError):
+            self.preparar()
+        self.assertFalse(get_user_model().objects.exists())

@@ -6,16 +6,16 @@
 
 Resumen: **7 terminadas · 4 en revisión · 0 en curso · 0 por hacer · 3 pasan al Sprint 3** · 15 de 23 h terminadas (HU-8, 7 h, salió del sprint por decisión del PO).
 
+> 29/10 (inicio del Sprint 3): T6.3 (#20) y T7.3 (#23) se unieron a `main` y pasan a Terminado; quedan en revisión T7.1 (#14) y T7.2 (#16).
+
 > 🟣 **Decisión del Product Owner (David, 28/10):** HU-8 (T8.1, T8.2 y T8.3, 7 h) pasa completa al Sprint 3, porque T8.1 no se empezó. La prueba de la bandeja de T8.3 queda como base parcial.
 
-### 👀 En revisión (4) · pasan al inicio del Sprint 3
+### 👀 En revisión (2) · pasan al inicio del Sprint 3
 
 | Tarjeta | HU | Responsable | Horas | PR | Nota |
 |---|:---:|---|:---:|:---:|---|
 | **T7.1** Consulta por coordenadas dentro del radio | HU-7 | Luis Abad | 2 | [#14](https://github.com/RXDG2908/Chamba-PE/pull/14) | Falta asignar quién revisa |
 | **T7.2** Mapa con marcadores | HU-7 | Luis Abad | 3 | [#16](https://github.com/RXDG2908/Chamba-PE/pull/16) | Incluye T7.1; se une después del #14 |
-| **T6.3** Pruebas: solo activos en la búsqueda | HU-6 | David Valcarcel | 1 | [#20](https://github.com/RXDG2908/Chamba-PE/pull/20) | `main` integrado el 29/10 (154 pruebas OK); listo para revisión |
-| **T7.3** Pruebas del radio de cobertura | HU-7 | David Valcarcel | 2 | [#23](https://github.com/RXDG2908/Chamba-PE/pull/23) | `main` integrado el 29/10 (157 pruebas OK); listo para revisión |
 
 ### ➡️ Pasan al Sprint 3 (3)
 
@@ -25,7 +25,7 @@ Resumen: **7 terminadas · 4 en revisión · 0 en curso · 0 por hacer · 3 pasa
 | **T8.2** Recepción y aceptar/rechazar desde la notificación | HU-8 | Luis Abad | 2 | Depende de T8.1 |
 | **T8.3** Pruebas de entrega (< 5 s) | HU-8 | David Valcarcel | 2 | Base parcial en [#22](https://github.com/RXDG2908/Chamba-PE/pull/22): 7 pruebas de la bandeja. Falta la prueba del push |
 
-### ✅ Terminado (7)
+### ✅ Terminado (9)
 
 | Tarjeta | HU | Responsable | Horas | PR | Nota |
 |---|:---:|---|:---:|:---:|---|
@@ -36,6 +36,8 @@ Resumen: **7 terminadas · 4 en revisión · 0 en curso · 0 por hacer · 3 pasa
 | **T9.1** Modelo y API de revisión de documentos | HU-9 | David Valcarcel | 2 | [#11](https://github.com/RXDG2908/Chamba-PE/pull/11) | Unido el 28/10; usa `EsAdministrador` |
 | **T9.2** Pantalla de aprobar o rechazar | HU-9 | David Valcarcel | 2 | [#11](https://github.com/RXDG2908/Chamba-PE/pull/11) | Unido el 28/10, junto con T9.1 |
 | **T5.3** Pruebas de autenticación y rol | HU-5 | David Valcarcel | 1 | [#21](https://github.com/RXDG2908/Chamba-PE/pull/21) | Unido el 28/10; 3 fallos esperados por el impedimento 16 |
+| **T6.3** Pruebas: solo activos en la búsqueda | HU-6 | David Valcarcel | 1 | [#20](https://github.com/RXDG2908/Chamba-PE/pull/20) | Unido el 29/10 (inicio del Sprint 3). [Guía manual](docs/GUIA_T6.3.md) |
+| **T7.3** Pruebas del radio de cobertura | HU-7 | David Valcarcel | 2 | [#23](https://github.com/RXDG2908/Chamba-PE/pull/23) | Unido el 29/10 (inicio del Sprint 3). [Guía de navegación](docs/GUIA_NAVEGACION.md) |
 
 ---
 

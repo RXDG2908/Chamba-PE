@@ -200,8 +200,8 @@ Cada uno construye las historias de la app de Django de la que es dueño ([PLAN_
 | T9.1 | Modelo y API en Django para revisar documentos | Backend | 2 | ✅ |
 | T9.2 | Pantalla web (React) para aprobar o rechazar | Frontend | 2 | ✅ |
 | T5.3 | Pruebas de autenticación y acceso por rol | Pruebas | 1 | ✅ |
-| T7.3 | Pruebas de precisión del radio de cobertura | Pruebas | 2 | 🟡 |
-| T6.3 | Pruebas: solo los prestadores activos aparecen en la búsqueda | Pruebas | 1 | 🟡 |
+| T7.3 | Pruebas de precisión del radio de cobertura | Pruebas | 2 | ✅ 29/10 |
+| T6.3 | Pruebas: solo los prestadores activos aparecen en la búsqueda | Pruebas | 1 | ✅ 29/10 |
 | T8.3 | Pruebas de entrega de notificaciones | Pruebas | 2 | ➡️ S3 |
 | | **Subtotal** | | **10** | |
 
@@ -264,6 +264,8 @@ Horas pendientes al final de cada día. La línea ideal baja 3 h por día.
 | 10 | 28/10 (mié) | 0 | 15 |
 
 > El 28/10 en la noche entraron a `main` 15 h (#13, #15, #17, #18, #11 y #21). De las 15 h que quedan, 7 son de HU-8, que el PO pasó al Sprint 3, y 8 están en PRs sin unir (#14, #16, #20 y #23).
+>
+> 29/10 (inicio del Sprint 3): se unieron #20 (T6.3) y #23 (T7.3), 3 h. El Sprint 2 queda cerrado en 15 h; siguen abiertos #14 y #16 (T7.1 y T7.2, 5 h).
 
 ## Retrospectiva
 

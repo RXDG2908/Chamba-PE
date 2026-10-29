@@ -16,6 +16,7 @@ Proyecto Integrador — Diseño y Desarrollo de Software · IV ciclo · Tecsup 2
 | [AVANCES.md](AVANCES.md) | Estado de cada tarea, bitácora, impedimentos y burndown |
 | [TABLERO.md](TABLERO.md) | Tablero estilo Trello del sprint: Por hacer, En curso, En revisión y Terminado |
 | [docs/](docs/) | Documentos fuente: visión del producto y Lab 07 (historias, criterios y estimaciones) |
+| [docs/sprint2-review.md](docs/sprint2-review.md) | Cierre del Sprint 2 (15 de 23 h; HU-5, HU-6 y HU-9 completas): estado por tarea, guion de la demo y propuesta de retrospectiva |
 | [docs/API_AUTENTICACION.md](docs/API_AUTENTICACION.md) | Autenticación con roles (T5.1, Sprint 2): rutas, sesión y CSRF, roles y permisos para las demás apps |
 
 ---
@@ -111,7 +112,7 @@ Chamba-PE/
 ├── servicios/          Búsqueda por rubro, disponibilidad y cobertura (HU-3) y solicitudes de servicio (HU-4)
 ├── usuarios/           App Django: cuentas, inicio de sesión y roles cliente, prestador y administrador (HU-5)
 ├── certificaciones/    App Django: carga de certificaciones PDF/JPG ≤ 5 MB (HU-2)
-├── frontend/           Frontend React + Vite: listado de prestadores (HU-3) y formulario de registro (HU-1)
+├── frontend/           Frontend React + Vite: listado de prestadores (HU-3), formulario de registro (HU-1) e inicio de sesión y cuenta de cliente (HU-5) e interruptor de disponibilidad del prestador (HU-6)
 ├── src/                Componente React de carga de certificaciones (HU-2)
 ├── docs/               Visión del producto, Lab 07 y maquetas (docs/renders/)
 ├── manage.py

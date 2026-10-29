@@ -78,7 +78,7 @@ class Command(BaseCommand):
                 usuario=usuario, dni=next(dnis), nombres='Prueba', apellidos=f'Rendimiento {i}',
                 latitud=CENTRO[0] + (i % 20 - 10) * PASO,
                 longitud=CENTRO[1] + (i // 20 % 20 - 10) * PASO,
-                radio_cobertura_km=5, disponible=True,
+                radio_cobertura_km=5, disponible=True, estado=Prestador.Estado.VERIFICADO,
             )
             for i, usuario in enumerate(usuarios)
         ])

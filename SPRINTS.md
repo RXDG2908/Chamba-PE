@@ -148,7 +148,7 @@ Horas pendientes al final de cada día. La línea ideal baja 3 h por día.
 
 > ⚠️ **Arranque tardío:** el reparto se armó el 18/10 y el 15/10 y el 16/10 pasaron sin horas. Quedan 8 días hábiles (19/10 – 28/10) para 30 h, unas **1,25 h diarias por integrante**. Si en el Daily del 23/10 quedan más de 15 h, el Product Owner decide qué tarea pasa al Sprint 3 (candidatas: T8.2 y T8.3, notificaciones).
 
-> 🟠 **Cierre (28/10):** ninguna tarea entró a `main`, así que quedan 0 de 30 h terminadas. Hay 19 h de código en PRs abiertos esperando revisión (#11 y #13 a #18) y 6 h en ramas de pruebas sin PR. T8.1 y T8.2 (5 h, HU-8) no se empezaron. Con todos los PRs unidos pasan 116 de 116 pruebas. Estado por tarea, guion de la demo, decisiones para el PO y propuesta de retrospectiva en [docs/sprint2-review.md](docs/sprint2-review.md).
+> 🟠 **Cierre (28/10):** ninguna tarea entró a `main`, así que quedan 0 de 30 h terminadas. Hay 19 h de código en PRs abiertos esperando revisión (#11 y #13 a #18) y 4 h en los PRs de pruebas de David (T5.3, T6.3 y T7.3), abiertos el 28/10. T8.1 y T8.2 (5 h, HU-8) no se empezaron. **Decisión del PO (28/10):** HU-8 (T8.1, T8.2 y T8.3, 7 h) pasa completa al Sprint 3; la prueba de la bandeja de T8.3 queda como base parcial. El compromiso del Sprint 2 baja a 23 h. Con todos los PRs unidos pasan 116 de 116 pruebas. Estado por tarea, guion de la demo, decisiones para el PO y propuesta de retrospectiva en [docs/sprint2-review.md](docs/sprint2-review.md).
 
 ## Pendientes que pasan del Sprint 1
 
@@ -187,22 +187,22 @@ Cada uno construye las historias de la app de Django de la que es dueño ([PLAN_
 
 | Tarea | Descripción | Tipo | Horas | ✔ |
 |:---:|---|:---:|:---:|:---:|
-| T7.1 | Consulta de prestadores por coordenadas dentro del radio | Backend | 2 | ☐ |
-| T8.1 | Integrar notificaciones push (Firebase Cloud Messaging) | Backend | 3 | ☐ |
-| T7.2 | Integrar el mapa con marcadores (móvil y web) | Frontend | 3 | ☐ |
-| T8.2 | Recepción de la notificación y pantalla aceptar/rechazar | Frontend | 2 | ☐ |
+| T7.1 | Consulta de prestadores por coordenadas dentro del radio | Backend | 2 | 🟡 |
+| T8.1 | Integrar notificaciones push (Firebase Cloud Messaging) | Backend | 3 | ➡️ S3 |
+| T7.2 | Integrar el mapa con marcadores (móvil y web) | Frontend | 3 | 🟡 |
+| T8.2 | Recepción de la notificación y pantalla aceptar/rechazar | Frontend | 2 | ➡️ S3 |
 | | **Subtotal** | | **10** | |
 
 ### David Valcarcel — 10 h · app `administracion`
 
 | Tarea | Descripción | Tipo | Horas | ✔ |
 |:---:|---|:---:|:---:|:---:|
-| T9.1 | Modelo y API en Django para revisar documentos | Backend | 2 | ☐ |
-| T9.2 | Pantalla web (React) para aprobar o rechazar | Frontend | 2 | ☐ |
-| T5.3 | Pruebas de autenticación y acceso por rol | Pruebas | 1 | ☐ |
-| T7.3 | Pruebas de precisión del radio de cobertura | Pruebas | 2 | ☐ |
-| T6.3 | Pruebas: solo los prestadores activos aparecen en la búsqueda | Pruebas | 1 | ☐ |
-| T8.3 | Pruebas de entrega de notificaciones | Pruebas | 2 | ☐ |
+| T9.1 | Modelo y API en Django para revisar documentos | Backend | 2 | 🟡 |
+| T9.2 | Pantalla web (React) para aprobar o rechazar | Frontend | 2 | 🟡 |
+| T5.3 | Pruebas de autenticación y acceso por rol | Pruebas | 1 | 🟡 |
+| T7.3 | Pruebas de precisión del radio de cobertura | Pruebas | 2 | 🟡 |
+| T6.3 | Pruebas: solo los prestadores activos aparecen en la búsqueda | Pruebas | 1 | 🟡 |
+| T8.3 | Pruebas de entrega de notificaciones | Pruebas | 2 | ➡️ S3 |
 | | **Subtotal** | | **10** | |
 
 ### Resumen de carga
@@ -277,6 +277,19 @@ Horas pendientes al final de cada día. La línea ideal baja 3 h por día.
 > ⚪ **Plantilla: por planificar en el Sprint Planning.** Los responsables se asignan en la reunión.
 
 **Meta:** Verificación de identidad del prestador (escaneo del DNI + reconocimiento facial) y moderación de cuentas.
+
+## Pendientes que pasan del Sprint 2
+
+Decisión del Product Owner del 28/10: HU-8 pasa completa porque T8.1 no se empezó en el Sprint 2.
+
+| HU | Tarea | Descripción | Tipo | Horas | Responsable | Punto de partida |
+|:---:|:---:|---|:---:|:---:|---|---|
+| HU-8 | T8.1 | Integrar notificaciones push (Firebase Cloud Messaging) | Backend | 3 | Luis Abad | Sin código |
+| | T8.2 | Recepción de la notificación y pantalla aceptar/rechazar | Frontend | 2 | Luis Abad | Sin código; depende de T8.1 |
+| | T8.3 | Pruebas de entrega de notificaciones (< 5 s) | Pruebas | 2 | David Valcarcel | Base parcial: 7 pruebas de la bandeja del prestador en `servicios/test_notificaciones.py`; falta la prueba del push |
+| | | **Total** | | **7** | | |
+
+> ⚠️ **Capacidad:** con HU-8 el Sprint 3 suma 35 h (28 + 7) para 30 h de capacidad. Se ajusta en el Sprint Planning del 29/10. Propuesta: HU-13 (suspensión y bloqueo, 4 h) pasa al Sprint 4, que tiene 4 h de holgura, y queda 1 h de sobrecarga a vigilar en el Daily.
 
 | Story points | Horas | Capacidad | Holgura |
 |:---:|:---:|:---:|:---:|

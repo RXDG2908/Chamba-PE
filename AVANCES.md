@@ -3,7 +3,7 @@
 > **Regla del equipo:** este archivo se actualiza **siempre**, al terminar cada tarea o al cierre del día de trabajo, antes de dar la tarea por terminada. Ver [PLAN_EQUIPO.md](PLAN_EQUIPO.md#3-reglas-de-reparto).
 > Sirve de base para el cuadro de avances y el informe del Sprint Review.
 
-**Última actualización:** 18/10/2026 · **Sprint 1:** ✅ cerrado el 14/10/2026 (01/10 – 14/10) · **Sprint 2:** 🟢 en curso (15/10 – 28/10) · **Meta:** el prestador se registra y el cliente lo encuentra y le envía una solicitud.
+**Última actualización:** 28/10/2026 · **Sprint 1:** ✅ cerrado el 14/10/2026 (01/10 – 14/10) · **Sprint 2:** 🟢 en curso (15/10 – 28/10) · **Meta:** el prestador se registra y el cliente lo encuentra y le envía una solicitud.
 
 Estados: ✅ terminada · 🟡 en curso / parcial · ⚪ sin iniciar · 🔴 bloqueada
 
@@ -83,6 +83,7 @@ Una línea por entrega, la más reciente arriba.
 
 | Fecha | Quién | Qué se hizo | Tarea |
 |:---:|---|---|:---:|
+| 28/10 | David Valcarcel | **Decisión del PO:** HU-8 (T8.1, T8.2 y T8.3, 7 h) pasa completa al Sprint 3 porque T8.1 no se empezó; la prueba de la bandeja de T8.3 queda como base parcial. El Sprint 2 queda en 23 h comprometidas. Abrió hacia `main` los PRs de pruebas de T5.3, T6.3 y T7.3 y el de la base parcial de T8.3; T5.3 y T6.3 se unen después de #11, #13 y #15. Actualizó TABLERO (11 en revisión, 3 al Sprint 3) y SPRINTS (pendientes y capacidad del Sprint 3). | Cierre |
 | 28/10 | Renzo León | Preparó el cierre del Sprint 2 en `docs/sprint2-review.md`: estado de las 14 tareas, guion de la demo, decisiones para el PO y propuesta de retrospectiva. Probó la demo en una rama local que une #18, #11 y #16: 116 de 116 pruebas OK, lint y build OK, y por API el flujo prestador verificado → búsqueda → solicitud → aceptada. Burndown del 28/10: 30 h. | Cierre |
 | 28/10 | Renzo León | T6.2 en la rama `feature/t6.2-interruptor-disponibilidad` (sale de T5.2): pantalla `/disponibilidad` con interruptor Activo/Inactivo, solo para el prestador; sin sesión manda a iniciar sesión y vuelve después, con otro rol regresa al inicio. Avisa si el perfil aún no está verificado. Al iniciar sesión, el prestador entra directo a su disponibilidad. Probado en el navegador (escritorio y 375 px): activar, desactivar y que aparezca o no en la búsqueda. Lint y build OK. | T6.2 |
 | 28/10 | Renzo León | Burndown del 21/10 al 27/10: 30 h pendientes cada día, porque ningún PR del Sprint 2 entró a `main` (#11, #13, #14 y #15 siguen abiertos sin revisión). | Burndown |
@@ -152,6 +153,8 @@ Una línea por entrega, la más reciente arriba.
 | 15 | 17/10 | Cambiar el estado de una solicitud desde el admin de Django deja `respondida` vacía y permite saltarse la regla de una sola respuesta. | T4.1/T4.2 | David | 🟡 |
 | 16 | 18/10 | La carga de certificados no pide sesión: cualquiera puede subir un archivo con el ID de otro prestador. Se corrige con la autenticación de HU-5. | HU-2, HU-5 | Equipo | 🟡 |
 | 17 | 18/10 | El Sprint 2 se planificó el 18/10: el 15/10 y el 16/10 pasaron sin horas. Quedan 8 días hábiles para 30 h (1,25 h diarias por integrante). Si en el Daily del 23/10 quedan más de 15 h, el Product Owner decide qué pasa al Sprint 3. | Sprint 2 | Equipo | 🟡 |
+| 20 | 28/10 | T8.1 (push con FCM) no se empezó y el sprint cerró el 28/10: el criterio de HU-8 «la notificación llega al móvil en < 5 s» queda sin cumplir ni probar. Decisión del PO: HU-8 completa pasa al Sprint 3. | HU-8, T8.1, T8.2, T8.3 | Luis / David | ➡️ Sprint 3 |
+| 21 | 28/10 | Con HU-8, el Sprint 3 suma 35 h para 30 h de capacidad. Se ajusta en el Sprint Planning del 29/10 (propuesta: HU-13 al Sprint 4). | Sprint 3 | Equipo | 🟡 |
 | 14 | 15/10 | El PR 4 y el PR 7 se unieron sin revisión de otro integrante. Acción: activar la protección de `main` en GitHub para exigir 1 aprobación. | Proceso | Renzo | 🟡 |
 
 ## 8. Decisiones técnicas

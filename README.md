@@ -16,6 +16,7 @@ Proyecto Integrador — Diseño y Desarrollo de Software · IV ciclo · Tecsup 2
 | [AVANCES.md](AVANCES.md) | Estado de cada tarea, bitácora, impedimentos y burndown |
 | [TABLERO.md](TABLERO.md) | Tablero estilo Trello del sprint: Por hacer, En curso, En revisión y Terminado |
 | [docs/](docs/) | Documentos fuente: visión del producto y Lab 07 (historias, criterios y estimaciones) |
+| [docs/demo-sprint1.md](docs/demo-sprint1.md) | Demo del Sprint 1 en vivo: mis historias, cuentas de prueba (`preparar_demo`), manejo de sesiones y guion de 10 minutos |
 | [docs/sprint2-review.md](docs/sprint2-review.md) | Cierre del Sprint 2 (15 de 23 h; HU-5, HU-6 y HU-9 completas): estado por tarea, guion de la demo y propuesta de retrospectiva |
 | [docs/API_AUTENTICACION.md](docs/API_AUTENTICACION.md) | Autenticación con roles (T5.1, Sprint 2): rutas, sesión y CSRF, roles y permisos para las demás apps |
 
@@ -202,7 +203,7 @@ datos/rendimiento en T3.4; su avance separado en `certificaciones` se conserva.
 
 ### Avance HU-4: T4.1
 
-La API de solicitudes ya está en `main` y permite el flujo solicitar → aceptar o rechazar. Al enviar, se valida que el prestador esté disponible, ofrezca el rubro y cubra la ubicación del cliente. Solo el prestador dueño de la solicitud puede responderla, y solo mientras siga Pendiente. Mientras no exista el inicio de sesión (HU-5), la bandeja y las respuestas se prueban con autenticación básica (usuario y contraseña del registro), por ejemplo desde Postman.
+La API de solicitudes ya está en `main` y permite el flujo solicitar → aceptar o rechazar. Al enviar, se valida que el prestador esté disponible, ofrezca el rubro y cubra la ubicación del cliente. Solo el prestador dueño de la solicitud puede responderla, y solo mientras siga Pendiente. Desde el Sprint 2 (HU-5) la bandeja y las respuestas piden la sesión del prestador: se inicia en `/ingresar` y se responde desde la API navegable (`/api/servicios/solicitudes/<id>/aceptar/`). Ya no se acepta la autenticación básica. Guion de la demo y cuentas de prueba (`python manage.py preparar_demo`): [docs/demo-sprint1.md](docs/demo-sprint1.md).
 
 Verificado el 15/10/2026 en `main`, con una instalación limpia: 49 de 49 pruebas aprobadas, y en el navegador el cliente solicita el servicio desde la tarjeta del prestador y ve el cambio a Aceptada o Rechazada sin recargar. Sprint 1 cerrado con 26 de 30 h (HU-1 y HU-4 completas); T2.2 y T3.4 pasaron al Sprint 2 y se unieron el 18/10 con el PR 9 (58 de 58 pruebas OK; ver [TABLERO.md](TABLERO.md)).
 

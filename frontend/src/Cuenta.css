@@ -1,0 +1,22 @@
+.cuenta { width: min(520px, calc(100% - 32px)); }
+.una-columna { grid-template-columns: 1fr; }
+.pie-cuenta { margin-top: 16px; text-align: center; color: #58675f; font-size: 14px; }
+.pie-cuenta a { color: #16734f; font-weight: 600; }
+
+.sesion { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; margin-top: 12px; font-size: 14px; color: #58675f; }
+.sesion strong { color: #20352a; }
+.sesion button { padding: 6px 14px; border: 1px solid #cbded3; border-radius: 999px; background: #fff; color: #20352a; font: inherit; cursor: pointer; }
+.sesion button:disabled { opacity: 0.6; cursor: wait; }
+
+.disponibilidad { text-align: center; }
+.interruptor { display: inline-flex; align-items: center; gap: 14px; margin-top: 20px; cursor: pointer; font-size: 20px; font-weight: 700; color: #58675f; }
+.interruptor input { position: absolute; opacity: 0; width: 1px; height: 1px; }
+.pista { position: relative; width: 64px; height: 36px; border-radius: 999px; background: #cbded3; transition: background 0.2s; }
+.pista::after { content: ''; position: absolute; top: 4px; left: 4px; width: 28px; height: 28px; border-radius: 50%; background: #fff; box-shadow: 0 1px 3px #0003; transition: transform 0.2s; }
+.interruptor.activo { color: #16734f; }
+.interruptor.activo .pista { background: #16734f; }
+.interruptor.activo .pista::after { transform: translateX(28px); }
+.interruptor input:focus-visible + .pista { outline: 3px solid #16734f; outline-offset: 3px; }
+.interruptor input:disabled + .pista { opacity: 0.6; }
+.resumen-disponibilidad { margin-top: 16px; color: #58675f; }
+.aviso-verificacion { margin-top: 16px; background: #fdf6e3; color: #6b5413; }

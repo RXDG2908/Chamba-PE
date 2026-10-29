@@ -111,7 +111,7 @@ Chamba-PE/
 ├── servicios/          Búsqueda por rubro, disponibilidad y cobertura (HU-3) y solicitudes de servicio (HU-4)
 ├── usuarios/           App Django: cuentas, inicio de sesión y roles cliente, prestador y administrador (HU-5)
 ├── certificaciones/    App Django: carga de certificaciones PDF/JPG ≤ 5 MB (HU-2)
-├── frontend/           Frontend React + Vite: listado de prestadores (HU-3) y formulario de registro (HU-1)
+├── frontend/           Frontend React + Vite: listado de prestadores (HU-3), formulario de registro (HU-1) e inicio de sesión y cuenta de cliente (HU-5) e interruptor de disponibilidad del prestador (HU-6)
 ├── src/                Componente React de carga de certificaciones (HU-2)
 ├── docs/               Visión del producto, Lab 07 y maquetas (docs/renders/)
 ├── manage.py
@@ -158,6 +158,7 @@ La API queda en `http://127.0.0.1:8000/` y el panel de Django en `/admin/`.
 | `GET /api/usuarios/csrf/` | Deja la cookie `csrftoken` para los `POST` desde React (HU-5) |
 | `POST /api/usuarios/registro/` | Registro del cliente; queda con la sesión iniciada (HU-5) |
 | `POST /api/usuarios/login/` · `.../logout/` | Inicio de sesión con usuario o correo, y cierre de sesión (HU-5) |
+| `GET` · `PATCH /api/usuarios/disponibilidad/` | El prestador consulta o cambia su disponibilidad, Activo o Inactivo (HU-6) |
 | `GET /api/usuarios/yo/` | Quién tiene la sesión y con qué rol; 403 sin sesión (HU-5); [contrato completo](docs/API_AUTENTICACION.md) |
 
 Pruebas del backend:

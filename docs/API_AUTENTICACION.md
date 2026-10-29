@@ -128,6 +128,27 @@ qué menú mostrar y si debe mandar al inicio de sesión.
   demás, del `User`.
 - Sin sesión: `403`.
 
+### `GET` y `PATCH /api/usuarios/disponibilidad/` (T6.1, HU-6)
+
+Solo para el prestador con sesión (`EsPrestador`). `GET` devuelve su estado
+actual y `PATCH` lo cambia entre Activo (`true`) e Inactivo (`false`).
+
+```json
+{"disponible": true}
+```
+
+Respuesta `200 OK`:
+
+```json
+{"disponible": true, "estado": "verificado"}
+```
+
+- `estado` es el de la verificación (HU-9), solo de lectura.
+- Un prestador inactivo no aparece en `GET /api/prestadores/buscar/` y no
+  recibe solicitudes; ambas cosas ya filtran por `disponible`.
+- Sin `disponible` o con un valor que no es booleano: `400`. Sin sesión, con
+  otro rol o sin `X-CSRFToken`: `403`.
+
 ## Permisos para las demás apps
 
 `usuarios/permisos.py` expone tres clases de DRF. Cada una exige sesión iniciada

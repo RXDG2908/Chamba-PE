@@ -65,3 +65,9 @@ class UsuarioActualSerializer(serializers.Serializer):
             'rol': rol_de(usuario),
             'prestador_id': prestador.id if prestador else None,
         }
+
+
+class DisponibilidadSerializer(serializers.Serializer):
+    """T6.1: el prestador pasa de Activo a Inactivo y al revés."""
+    disponible = serializers.BooleanField()
+    estado = serializers.CharField(read_only=True)

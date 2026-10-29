@@ -178,7 +178,7 @@ Cada uno construye las historias de la app de Django de la que es dueño ([PLAN_
 | T5.1 | API de autenticación con roles (cliente, prestador, administrador) | Backend | 3 | 🟡 |
 | T6.1 | Endpoint para activar y desactivar la disponibilidad | Backend | 2 | 🟡 |
 | T5.2 | Pantallas de registro e inicio de sesión (móvil y web) | Frontend | 3 | 🟡 |
-| T6.2 | Interruptor de disponibilidad en la app móvil | Frontend | 2 | ☐ |
+| T6.2 | Interruptor de disponibilidad en la app móvil | Frontend | 2 | 🟡 |
 | | **Subtotal** | | **10** | |
 
 ### Luis Abad — 10 h · app `servicios`
@@ -254,11 +254,11 @@ Horas pendientes al final de cada día. La línea ideal baja 3 h por día.
 | 2 | 16/10 (vie) | 24 | 30 |
 | 3 | 19/10 (lun) | 21 | 30 |
 | 4 | 20/10 (mar) | 18 | 30 |
-| 5 | 21/10 (mié) | 15 | |
-| 6 | 22/10 (jue) | 12 | |
-| 7 | 23/10 (vie) | 9 | |
-| 8 | 26/10 (lun) | 6 | |
-| 9 | 27/10 (mar) | 3 | |
+| 5 | 21/10 (mié) | 15 | 30 |
+| 6 | 22/10 (jue) | 12 | 30 |
+| 7 | 23/10 (vie) | 9 | 30 |
+| 8 | 26/10 (lun) | 6 | 30 |
+| 9 | 27/10 (mar) | 3 | 30 |
 | 10 | 28/10 (mié) | 0 | |
 
 ## Retrospectiva

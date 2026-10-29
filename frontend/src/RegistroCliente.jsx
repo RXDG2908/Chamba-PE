@@ -1,13 +1,12 @@
 import { useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, Navigate } from 'react-router-dom'
 import { enviarJson, erroresPorCampo } from './api.js'
 import './RegistroPrestador.css'
 import './Cuenta.css'
 
 const VACIO = { nombres: '', apellidos: '', username: '', email: '', password: '' }
 
-function RegistroCliente({ alIniciar }) {
-  const navegar = useNavigate()
+function RegistroCliente({ usuario, alIniciar }) {
   const [datos, setDatos] = useState(VACIO)
   const [errores, setErrores] = useState({})
   const [estado, setEstado] = useState('inicial') // inicial | enviando | fallo
@@ -38,7 +37,6 @@ function RegistroCliente({ alIniciar }) {
       if (respuesta.ok) {
         // El registro ya deja la sesión iniciada.
         alIniciar(cuerpo)
-        navegar('/resultados', { replace: true })
         return
       }
       setErrores(erroresPorCampo(cuerpo))
@@ -55,6 +53,8 @@ function RegistroCliente({ alIniciar }) {
       {errores[nombre] && <small className="error">{errores[nombre]}</small>}
     </label>
   )
+
+  if (usuario) return <Navigate to="/resultados" replace />
 
   return (
     <form className="registro cuenta" onSubmit={enviar} noValidate>

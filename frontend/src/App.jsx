@@ -1,13 +1,23 @@
 import { useEffect, useState } from 'react'
-import { Navigate, NavLink, Route, Routes, useNavigate } from 'react-router-dom'
+import { Navigate, NavLink, Route, Routes, useLocation, useNavigate } from 'react-router-dom'
 import './App.css'
 import './Cuenta.css'
 import { enviarJson, NOMBRE_ROL } from './api.js'
+import Disponibilidad from './Disponibilidad.jsx'
 import IniciarSesion from './IniciarSesion.jsx'
 import RegistroCliente from './RegistroCliente.jsx'
 import RegistroPrestador from './RegistroPrestador.jsx'
 import ResultadosPrestadores from './ResultadosPrestadores.jsx'
 import UploadCertificado from './UploadCertificado.jsx'
+
+// Sin sesión manda a iniciar sesión; con otro rol vuelve al inicio.
+function RutaPrivada({ usuario, rol, children }) {
+  const ubicacion = useLocation()
+  if (usuario === undefined) return <p className="registro cuenta" role="status">Cargando…</p>
+  if (usuario === null) return <Navigate to="/ingresar" replace state={{ desde: ubicacion.pathname }} />
+  if (usuario.rol !== rol) return <Navigate to="/" replace />
+  return children
+}
 
 function App() {
   const navegar = useNavigate()
@@ -45,6 +55,7 @@ function App() {
             <NavLink to="/" end>Registro de prestador</NavLink>
             <NavLink to="/resultados">Resultados</NavLink>
             <NavLink to="/certificaciones">Cargar certificado</NavLink>
+            {usuario?.rol === 'prestador' && <NavLink to="/disponibilidad">Mi disponibilidad</NavLink>}
             {usuario === null && <NavLink to="/ingresar">Iniciar sesión</NavLink>}
             {usuario === null && <NavLink to="/crear-cuenta">Crear cuenta</NavLink>}
           </nav>
@@ -64,12 +75,16 @@ function App() {
         <Route path="/resultados" element={<ResultadosPrestadores />} />
         <Route path="/certificaciones" element={<UploadCertificado />} />
         <Route
+          path="/disponibilidad"
+          element={<RutaPrivada usuario={usuario} rol="prestador"><Disponibilidad /></RutaPrivada>}
+        />
+        <Route
           path="/ingresar"
-          element={usuario ? <Navigate to="/resultados" replace /> : <IniciarSesion alIniciar={setUsuario} />}
+          element={<IniciarSesion usuario={usuario} alIniciar={setUsuario} />}
         />
         <Route
           path="/crear-cuenta"
-          element={usuario ? <Navigate to="/resultados" replace /> : <RegistroCliente alIniciar={setUsuario} />}
+          element={<RegistroCliente usuario={usuario} alIniciar={setUsuario} />}
         />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>

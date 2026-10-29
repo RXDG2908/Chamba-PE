@@ -9,7 +9,7 @@ Reglas de reparto y flujo de trabajo en [PLAN_EQUIPO.md](PLAN_EQUIPO.md). Detall
 | Sprint | Fechas | Historias | SP | Horas | Estado |
 |:---:|:---:|:---:|:---:|:---:|:---:|
 | [1](#sprint-1--0110--14102026) | 01/10 – 14/10/2026 | HU-1 a HU-4 | 13 | 30 h | ✅ Cerrado (26 de 30 h) |
-| [2](#sprint-2--1510--28102026) | 15/10 – 28/10/2026 | HU-5 a HU-9 | 13 | 30 h | 🟠 Cierre el 28/10: 0 de 30 h en `main`, 19 h en PRs por revisar |
+| [2](#sprint-2--1510--28102026) | 15/10 – 28/10/2026 | HU-5 a HU-9 | 13 | 30 h | ✅ Cerrado el 28/10: 15 de 23 h (HU-5, HU-6 y HU-9 completas) |
 | [3](#sprint-3--2910--11112026) | 29/10 – 11/11/2026 | HU-19, HU-20, HU-21, HU-13 | 13 | 28 h | ⚪ Por planificar |
 | [4](#sprint-4--1211--25112026) | 12/11 – 25/11/2026 | HU-10, HU-11, HU-12 | 12 | 26 h | ⚪ Por planificar |
 | [—](#backlog-futuro) | — | HU-14 a HU-18 | 11 | 30 h | 📦 Backlog futuro |
@@ -148,7 +148,7 @@ Horas pendientes al final de cada día. La línea ideal baja 3 h por día.
 
 > ⚠️ **Arranque tardío:** el reparto se armó el 18/10 y el 15/10 y el 16/10 pasaron sin horas. Quedan 8 días hábiles (19/10 – 28/10) para 30 h, unas **1,25 h diarias por integrante**. Si en el Daily del 23/10 quedan más de 15 h, el Product Owner decide qué tarea pasa al Sprint 3 (candidatas: T8.2 y T8.3, notificaciones).
 
-> 🟠 **Cierre (28/10):** ninguna tarea entró a `main`, así que quedan 0 de 30 h terminadas. Hay 19 h de código en PRs abiertos esperando revisión (#11 y #13 a #18) y 4 h en los PRs de pruebas de David (T5.3, T6.3 y T7.3), abiertos el 28/10. T8.1 y T8.2 (5 h, HU-8) no se empezaron. **Decisión del PO (28/10):** HU-8 (T8.1, T8.2 y T8.3, 7 h) pasa completa al Sprint 3; la prueba de la bandeja de T8.3 queda como base parcial. El compromiso del Sprint 2 baja a 23 h. Con todos los PRs unidos pasan 116 de 116 pruebas. Estado por tarea, guion de la demo, decisiones para el PO y propuesta de retrospectiva en [docs/sprint2-review.md](docs/sprint2-review.md).
+> ✅ **Cierre (28/10):** entre las 22:26 y las 23:59 del 28/10 se unieron a `main` los PRs #13, #15, #17 y #18 (Renzo, 10 h), #11 (T9.1 y T9.2, 4 h) y #21 (T5.3, 1 h): **15 de 23 h comprometidas terminadas** (65 %). **Decisión del PO (28/10):** HU-8 (T8.1, T8.2 y T8.3, 7 h) pasa completa al Sprint 3, porque T8.1 no se empezó, y la prueba de la bandeja de T8.3 queda como base parcial. Quedan 8 h en PRs sin unir: T7.1 #14 y T7.2 #16 (Luis, 5 h), y T6.3 #20 y T7.3 #23 (David, 3 h). Pasan al inicio del Sprint 3. `main` queda con 145 pruebas OK (3 fallos esperados por el impedimento 16), lint y build OK. Detalle en [docs/sprint2-review.md](docs/sprint2-review.md).
 
 ## Pendientes que pasan del Sprint 1
 
@@ -177,10 +177,10 @@ Cada uno construye las historias de la app de Django de la que es dueño ([PLAN_
 
 | Tarea | Descripción | Tipo | Horas | ✔ |
 |:---:|---|:---:|:---:|:---:|
-| T5.1 | API de autenticación con roles (cliente, prestador, administrador) | Backend | 3 | 🟡 |
-| T6.1 | Endpoint para activar y desactivar la disponibilidad | Backend | 2 | 🟡 |
-| T5.2 | Pantallas de registro e inicio de sesión (móvil y web) | Frontend | 3 | 🟡 |
-| T6.2 | Interruptor de disponibilidad en la app móvil | Frontend | 2 | 🟡 |
+| T5.1 | API de autenticación con roles (cliente, prestador, administrador) | Backend | 3 | ✅ |
+| T6.1 | Endpoint para activar y desactivar la disponibilidad | Backend | 2 | ✅ |
+| T5.2 | Pantallas de registro e inicio de sesión (móvil y web) | Frontend | 3 | ✅ |
+| T6.2 | Interruptor de disponibilidad en la app móvil | Frontend | 2 | ✅ |
 | | **Subtotal** | | **10** | |
 
 ### Luis Abad — 10 h · app `servicios`
@@ -197,9 +197,9 @@ Cada uno construye las historias de la app de Django de la que es dueño ([PLAN_
 
 | Tarea | Descripción | Tipo | Horas | ✔ |
 |:---:|---|:---:|:---:|:---:|
-| T9.1 | Modelo y API en Django para revisar documentos | Backend | 2 | 🟡 |
-| T9.2 | Pantalla web (React) para aprobar o rechazar | Frontend | 2 | 🟡 |
-| T5.3 | Pruebas de autenticación y acceso por rol | Pruebas | 1 | 🟡 |
+| T9.1 | Modelo y API en Django para revisar documentos | Backend | 2 | ✅ |
+| T9.2 | Pantalla web (React) para aprobar o rechazar | Frontend | 2 | ✅ |
+| T5.3 | Pruebas de autenticación y acceso por rol | Pruebas | 1 | ✅ |
 | T7.3 | Pruebas de precisión del radio de cobertura | Pruebas | 2 | 🟡 |
 | T6.3 | Pruebas: solo los prestadores activos aparecen en la búsqueda | Pruebas | 1 | 🟡 |
 | T8.3 | Pruebas de entrega de notificaciones | Pruebas | 2 | ➡️ S3 |
@@ -261,7 +261,9 @@ Horas pendientes al final de cada día. La línea ideal baja 3 h por día.
 | 7 | 23/10 (vie) | 9 | 30 |
 | 8 | 26/10 (lun) | 6 | 30 |
 | 9 | 27/10 (mar) | 3 | 30 |
-| 10 | 28/10 (mié) | 0 | 30 |
+| 10 | 28/10 (mié) | 0 | 15 |
+
+> El 28/10 en la noche entraron a `main` 15 h (#13, #15, #17, #18, #11 y #21). De las 15 h que quedan, 7 son de HU-8, que el PO pasó al Sprint 3, y 8 están en PRs sin unir (#14, #16, #20 y #23).
 
 ## Retrospectiva
 

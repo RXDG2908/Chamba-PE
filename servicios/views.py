@@ -29,7 +29,7 @@ class BuscarPrestadoresView(APIView):
         parametros.is_valid(raise_exception=True)
         datos = parametros.validated_data
         candidatos = Prestador.objects.filter(
-            disponible=True, rubros__id=datos['rubro'],
+            disponible=True, estado=Prestador.Estado.VERIFICADO, rubros__id=datos['rubro'],
         ).prefetch_related('rubros')
         resultados = []
         for prestador in candidatos:

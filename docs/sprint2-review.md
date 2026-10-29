@@ -1,29 +1,29 @@
 # Cierre del Sprint 2 · 28/10/2026
 
-Guía para la Sprint Review y la Retrospectiva. La preparó Renzo León (Scrum Master) con el estado de GitHub al 28/10.
+Guía para la Sprint Review y la Retrospectiva. La preparó Renzo León (Scrum Master); el estado se actualizó el 29/10 con lo que se unió a `main` la noche del 28/10.
 
 ## 1. Estado al cierre
 
-**Ninguna tarea del Sprint 2 está en `main`.** Por la [definición de terminado](../PLAN_EQUIPO.md#8-definición-de-terminado) quedan **0 de 30 h terminadas**, aunque casi todo el código ya existe en PRs abiertos y funciona junto (sección 2).
+**15 de 23 h terminadas** (65 %). La noche del 28/10, entre las 22:26 y las 23:59, entraron a `main` #13, #15, #17, #18, #11 y #21. HU-8 (7 h) salió del sprint por decisión del PO, así que el compromiso quedó en 23 h. `main` queda con 145 pruebas OK (3 fallos esperados por el impedimento 16), y lint y build OK.
 
 | Tarea | Responsable | Horas | Dónde está | Estado |
 |:---:|---|:---:|---|---|
-| T5.1 API de autenticación con roles | Renzo | 3 | [#13](https://github.com/RXDG2908/Chamba-PE/pull/13) | 👀 En revisión desde el 19/10, sin revisar |
-| T6.1 Endpoint de disponibilidad | Renzo | 2 | [#15](https://github.com/RXDG2908/Chamba-PE/pull/15) | 👀 En revisión, sale de #13 |
-| T5.2 Pantallas de registro e inicio de sesión | Renzo | 3 | [#17](https://github.com/RXDG2908/Chamba-PE/pull/17) | 👀 En revisión, sale de #15 |
-| T6.2 Interruptor de disponibilidad | Renzo | 2 | [#18](https://github.com/RXDG2908/Chamba-PE/pull/18) | 👀 En revisión, sale de #17 |
+| T5.1 API de autenticación con roles | Renzo | 3 | [#13](https://github.com/RXDG2908/Chamba-PE/pull/13) | ✅ Unido a `main` el 28/10 |
+| T6.1 Endpoint de disponibilidad | Renzo | 2 | [#15](https://github.com/RXDG2908/Chamba-PE/pull/15) | ✅ Unido a `main` el 28/10 |
+| T5.2 Pantallas de registro e inicio de sesión | Renzo | 3 | [#17](https://github.com/RXDG2908/Chamba-PE/pull/17) | ✅ Unido a `main` el 28/10 |
+| T6.2 Interruptor de disponibilidad | Renzo | 2 | [#18](https://github.com/RXDG2908/Chamba-PE/pull/18) | ✅ Unido a `main` el 28/10 |
 | T7.1 Consulta por coordenadas | Luis | 2 | [#14](https://github.com/RXDG2908/Chamba-PE/pull/14) | 👀 En revisión, sin revisor asignado |
 | T7.2 Mapa con marcadores | Luis | 3 | [#16](https://github.com/RXDG2908/Chamba-PE/pull/16) | 👀 En revisión |
-| T8.1 Notificaciones push (FCM) | Luis | 3 | — | ☐ Sin rama |
-| T8.2 Recepción y aceptar/rechazar | Luis | 2 | — | ☐ Sin rama |
-| T9.1 Modelo y API de revisión | David | 2 | [#11](https://github.com/RXDG2908/Chamba-PE/pull/11) | 👀 En revisión, ya atendió las observaciones |
-| T9.2 Pantalla de aprobar o rechazar | David | 2 | [#11](https://github.com/RXDG2908/Chamba-PE/pull/11) | 👀 En revisión, va en el mismo PR que T9.1 |
-| T5.3 Pruebas de autenticación y rol | David | 1 | rama `feature/t5.3-pruebas-acceso-rol` | 🟡 Sin PR |
-| T6.3 Pruebas de disponibilidad | David | 1 | rama `feature/t6.3-pruebas-disponibilidad` | 🟡 Sin PR |
-| T7.3 Pruebas del radio | David | 2 | rama `feature/t7.3-pruebas-radio` | 🟡 Sin PR |
-| T8.3 Pruebas de entrega (< 5 s) | David | 2 | rama `feature/t8.3-pruebas-notificaciones` | 🟡 Sin PR; depende de T8.1 |
+| T8.1 Notificaciones push (FCM) | Luis | 3 | — | ➡️ Sprint 3 |
+| T8.2 Recepción y aceptar/rechazar | Luis | 2 | — | ➡️ Sprint 3 |
+| T9.1 Modelo y API de revisión | David | 2 | [#11](https://github.com/RXDG2908/Chamba-PE/pull/11) | ✅ Unido a `main` el 28/10 |
+| T9.2 Pantalla de aprobar o rechazar | David | 2 | [#11](https://github.com/RXDG2908/Chamba-PE/pull/11) | ✅ Unido a `main` el 28/10 |
+| T5.3 Pruebas de autenticación y rol | David | 1 | [#21](https://github.com/RXDG2908/Chamba-PE/pull/21) | ✅ Unido a `main` el 28/10 |
+| T6.3 Pruebas de disponibilidad | David | 1 | [#20](https://github.com/RXDG2908/Chamba-PE/pull/20) | 👀 En revisión; choca con `main` |
+| T7.3 Pruebas del radio | David | 2 | [#23](https://github.com/RXDG2908/Chamba-PE/pull/23) | 👀 En revisión; choca con `main` |
+| T8.3 Pruebas de entrega (< 5 s) | David | 2 | [#22](https://github.com/RXDG2908/Chamba-PE/pull/22) | ➡️ Sprint 3 (base parcial); depende de T8.1 |
 
-**Por historia:** HU-5, HU-6 y HU-9 tienen todo el código listo en PRs y solo les falta la revisión. HU-7 tiene backend y mapa en PRs. HU-8, las notificaciones, no tiene ni T8.1 ni T8.2.
+**Por historia:** HU-5, HU-6 y HU-9 quedan ✅ completas en `main`. A HU-7 le faltan unir #14 y #16 (Luis) y #23 (pruebas). HU-8 pasa completa al Sprint 3.
 
 ## 2. Demo de la Review
 
@@ -73,7 +73,7 @@ Son puntos que salen de los hechos del sprint. El equipo los confirma o cambia e
 
 | ¿Qué salió bien? | ¿Qué mejorar? | Acciones para el Sprint 3 |
 |---|---|---|
-| El contrato de T5.1 se escribió el primer día y los demás trabajaron contra él sin esperar (David integró T5.1 en T9.1 y T5.3). | **Ningún PR entró a `main` en todo el sprint**: el #13 esperó 9 días su revisión y el burndown no bajó nunca de 30 h. | Revisar cada PR en máximo **1 día hábil**; si no se puede, otro integrante lo revisa. |
+| El contrato de T5.1 se escribió el primer día y los demás trabajaron contra él sin esperar (David integró T5.1 en T9.1 y T5.3). | **Todo se revisó y se unió el último día, el 28/10 en la noche**: el #13 esperó 9 días su revisión y el burndown estuvo en 30 h hasta el cierre. | Revisar cada PR en máximo **1 día hábil**; si no se puede, otro integrante lo revisa. |
 | Las pruebas cruzadas encontraron problemas a tiempo (cambio a `EsAdministrador`, la carga de certificados sin sesión). | El sprint empezó tarde: el 15/10 y el 16/10 pasaron sin horas y no quedó registrada la decisión de recorte del Daily del 23/10. | Planificar el último día del sprint anterior (29/10 para el Sprint 3) y hacer el recorte en el Daily de la mitad del sprint. |
 | Todo junto funciona: 116 de 116 pruebas OK con los PRs unidos. | Los PRs encadenados (#13 → #15 → #17 → #18) acumulan riesgo si el primero no se revisa. | Activar la protección de `main` con 1 aprobación (impedimento 14) y unir apenas haya aprobación. |
 | | HU-8 (notificaciones) no avanzó: no hubo rama de T8.1 ni T8.2. | Avisar en el Daily cuando una tarea no arranca, para repartirla. |

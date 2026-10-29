@@ -213,7 +213,7 @@ la cookie en cada petición y no se guarda en una variable.
 |---|---|---|
 | `POST /api/prestadores/registro/` | Crea el perfil con rol `prestador`; correo único | Renzo, en T5.1 |
 | `GET /api/servicios/solicitudes/recibidas/`, aceptar y rechazar | Pasan de `IsAuthenticated` a `EsPrestador` | Renzo, en T5.1 (las escribió en T4.1) |
-| Revisión de documentos (T9.1) | Cambia `IsAdminUser` por `EsAdministrador` cuando T5.1 esté en `main` | David |
+| Revisión de documentos (T9.1) | Usa `EsAdministrador` en vez de `IsAdminUser` (hecho en el PR 11, 21/10) | David |
 | `POST /api/certificaciones/upload/` | Pedir `EsPrestador` y tomar el prestador de la sesión (impedimento 16) | Se acuerda con David |
 | `POST /api/servicios/solicitudes/` | Enlazar la solicitud a la cuenta del cliente | Se acuerda con Luis |
 

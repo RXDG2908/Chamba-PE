@@ -9,6 +9,7 @@ import RegistroCliente from './RegistroCliente.jsx'
 import RegistroPrestador from './RegistroPrestador.jsx'
 import ResultadosPrestadores from './ResultadosPrestadores.jsx'
 import UploadCertificado from './UploadCertificado.jsx'
+import RevisionDocumentos from './RevisionDocumentos.jsx'
 
 // Sin sesión manda a iniciar sesión; con otro rol vuelve al inicio.
 function RutaPrivada({ usuario, rol, children }) {
@@ -55,9 +56,13 @@ function App() {
             <NavLink to="/" end>Registro de prestador</NavLink>
             <NavLink to="/resultados">Resultados</NavLink>
             <NavLink to="/certificaciones">Cargar certificado</NavLink>
+
+            <NavLink to="/administracion/revisiones">Revisión de documentos</NavLink>
+
             {usuario?.rol === 'prestador' && <NavLink to="/disponibilidad">Mi disponibilidad</NavLink>}
             {usuario === null && <NavLink to="/ingresar">Iniciar sesión</NavLink>}
             {usuario === null && <NavLink to="/crear-cuenta">Crear cuenta</NavLink>}
+
           </nav>
           {usuario && (
             <div className="sesion">
@@ -74,6 +79,9 @@ function App() {
         <Route path="/" element={<RegistroPrestador />} />
         <Route path="/resultados" element={<ResultadosPrestadores />} />
         <Route path="/certificaciones" element={<UploadCertificado />} />
+
+        <Route path="/administracion/revisiones" element={<RevisionDocumentos />} />
+
         <Route
           path="/disponibilidad"
           element={<RutaPrivada usuario={usuario} rol="prestador"><Disponibilidad /></RutaPrivada>}

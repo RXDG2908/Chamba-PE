@@ -1,38 +1,21 @@
 # Tablero del Sprint — Chamba PE
 
-## Sprint 2 · 15/10 – 28/10/2026
+## Sprint 2 · 15/10 – 28/10/2026 (cerrado)
 
-**Actualizado:** 28/10/2026 · **Meta:** cuentas, disponibilidad, mapa y notificaciones; prestadores verificados por administración. Reparto y orden en [SPRINTS.md](SPRINTS.md#sprint-2--1510--28102026).
+**Actualizado:** 29/10/2026 · **Meta:** cuentas, disponibilidad, mapa y notificaciones; prestadores verificados por administración. Reparto y orden en [SPRINTS.md](SPRINTS.md#sprint-2--1510--28102026).
 
-Resumen: **0 terminadas · 11 en revisión · 0 en curso · 0 por hacer · 3 pasan al Sprint 3** · 0 de 23 h terminadas (HU-8, 7 h, sale del sprint por decisión del PO).
+Resumen: **7 terminadas · 4 en revisión · 0 en curso · 0 por hacer · 3 pasan al Sprint 3** · 15 de 23 h terminadas (HU-8, 7 h, salió del sprint por decisión del PO).
 
-> 🟣 **Decisión del Product Owner (David, 28/10):** HU-8 (T8.1, T8.2 y T8.3, 7 h) pasa completa al Sprint 3, porque T8.1 no se empezó. La prueba de la bandeja de T8.3 queda como base parcial. El compromiso del Sprint 2 baja de 30 h a 23 h.
+> 🟣 **Decisión del Product Owner (David, 28/10):** HU-8 (T8.1, T8.2 y T8.3, 7 h) pasa completa al Sprint 3, porque T8.1 no se empezó. La prueba de la bandeja de T8.3 queda como base parcial.
 
-### 📋 Por hacer (0)
-
-Sin tarjetas.
-
-### 🔨 En curso (0)
-
-Sin tarjetas.
-
-### 👀 En revisión (11)
-
-Orden de unión: #13 → #15 → #17 → #18 → #11 → #14 → #16 → PRs de pruebas. Al unir un PR de la cadena, primero se cambia la base del siguiente a `main` y después se borra la rama.
+### 👀 En revisión (4) · pasan al inicio del Sprint 3
 
 | Tarjeta | HU | Responsable | Horas | PR | Nota |
 |---|:---:|---|:---:|:---:|---|
-| **T5.1** API de autenticación con roles | HU-5 | Renzo León | 3 | [#13](https://github.com/RXDG2908/Chamba-PE/pull/13) | Revisa David; primero de la cadena. [Contrato](docs/API_AUTENTICACION.md) |
-| **T6.1** Endpoint de disponibilidad | HU-6 | Renzo León | 2 | [#15](https://github.com/RXDG2908/Chamba-PE/pull/15) | Base: rama de T5.1. Se une después del #13 |
-| **T5.2** Pantallas de registro e inicio de sesión | HU-5 | Renzo León | 3 | [#17](https://github.com/RXDG2908/Chamba-PE/pull/17) | Base: rama de T6.1. Se une después del #15 |
-| **T6.2** Interruptor de disponibilidad | HU-6 | Renzo León | 2 | [#18](https://github.com/RXDG2908/Chamba-PE/pull/18) | Base: rama de T5.2. Se une después del #17 |
-| **T9.1** Modelo y API de revisión de documentos | HU-9 | David Valcarcel | 2 | [#11](https://github.com/RXDG2908/Chamba-PE/pull/11) | Incluye T5.1; se une después del #18. Revisa Renzo |
-| **T9.2** Pantalla de aprobar o rechazar | HU-9 | David Valcarcel | 2 | [#11](https://github.com/RXDG2908/Chamba-PE/pull/11) | Mismo PR que T9.1 |
 | **T7.1** Consulta por coordenadas dentro del radio | HU-7 | Luis Abad | 2 | [#14](https://github.com/RXDG2908/Chamba-PE/pull/14) | Falta asignar quién revisa |
 | **T7.2** Mapa con marcadores | HU-7 | Luis Abad | 3 | [#16](https://github.com/RXDG2908/Chamba-PE/pull/16) | Incluye T7.1; se une después del #14 |
-| **T5.3** Pruebas de autenticación y rol | HU-5 | David Valcarcel | 1 | PR hacia `main` (28/10) | Rama `feature/t5.3-pruebas-acceso-rol`; incluye #11 y #13, se une después de ellos |
-| **T6.3** Pruebas: solo activos en la búsqueda | HU-6 | David Valcarcel | 1 | PR hacia `main` (28/10) | Rama `feature/t6.3-pruebas-disponibilidad`; incluye #11 y #15, se une después de ellos |
-| **T7.3** Pruebas del radio de cobertura | HU-7 | David Valcarcel | 2 | PR hacia `main` (28/10) | Rama `feature/t7.3-pruebas-radio`; sale de `main`, no depende de otros PRs |
+| **T6.3** Pruebas: solo activos en la búsqueda | HU-6 | David Valcarcel | 1 | [#20](https://github.com/RXDG2908/Chamba-PE/pull/20) | Choca con `main`: hay que traer `main` |
+| **T7.3** Pruebas del radio de cobertura | HU-7 | David Valcarcel | 2 | [#23](https://github.com/RXDG2908/Chamba-PE/pull/23) | Choca con `main`: hay que traer `main` |
 
 ### ➡️ Pasan al Sprint 3 (3)
 
@@ -40,11 +23,19 @@ Orden de unión: #13 → #15 → #17 → #18 → #11 → #14 → #16 → PRs de 
 |---|:---:|---|:---:|---|
 | **T8.1** Notificaciones push (FCM) | HU-8 | Luis Abad | 3 | No se empezó en el Sprint 2 |
 | **T8.2** Recepción y aceptar/rechazar desde la notificación | HU-8 | Luis Abad | 2 | Depende de T8.1 |
-| **T8.3** Pruebas de entrega (< 5 s) | HU-8 | David Valcarcel | 2 | Base parcial en PR hacia `main` (28/10): 7 pruebas de la bandeja (rama `feature/t8.3-pruebas-notificaciones`). Falta la prueba del push |
+| **T8.3** Pruebas de entrega (< 5 s) | HU-8 | David Valcarcel | 2 | Base parcial en [#22](https://github.com/RXDG2908/Chamba-PE/pull/22): 7 pruebas de la bandeja. Falta la prueba del push |
 
-### ✅ Terminado (0)
+### ✅ Terminado (7)
 
-Sin tarjetas.
+| Tarjeta | HU | Responsable | Horas | PR | Nota |
+|---|:---:|---|:---:|:---:|---|
+| **T5.1** API de autenticación con roles | HU-5 | Renzo León | 3 | [#13](https://github.com/RXDG2908/Chamba-PE/pull/13) | Unido el 28/10. [Contrato](docs/API_AUTENTICACION.md) |
+| **T6.1** Endpoint de disponibilidad | HU-6 | Renzo León | 2 | [#15](https://github.com/RXDG2908/Chamba-PE/pull/15) | Unido el 28/10 |
+| **T5.2** Pantallas de registro e inicio de sesión | HU-5 | Renzo León | 3 | [#17](https://github.com/RXDG2908/Chamba-PE/pull/17) | Unido el 28/10 |
+| **T6.2** Interruptor de disponibilidad | HU-6 | Renzo León | 2 | [#18](https://github.com/RXDG2908/Chamba-PE/pull/18) | Unido el 28/10 |
+| **T9.1** Modelo y API de revisión de documentos | HU-9 | David Valcarcel | 2 | [#11](https://github.com/RXDG2908/Chamba-PE/pull/11) | Unido el 28/10; usa `EsAdministrador` |
+| **T9.2** Pantalla de aprobar o rechazar | HU-9 | David Valcarcel | 2 | [#11](https://github.com/RXDG2908/Chamba-PE/pull/11) | Unido el 28/10, junto con T9.1 |
+| **T5.3** Pruebas de autenticación y rol | HU-5 | David Valcarcel | 1 | [#21](https://github.com/RXDG2908/Chamba-PE/pull/21) | Unido el 28/10; 3 fallos esperados por el impedimento 16 |
 
 ---
 

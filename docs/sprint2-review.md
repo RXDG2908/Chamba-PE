@@ -63,8 +63,8 @@ El 28/10 se probaron por API los pasos 3 a 8 con la rama de demo, y todos dieron
 
 ## 3. Decisiones para el Product Owner (David)
 
-1. **Qué pasa al Sprint 3.** Propuesta: las tareas con PR solo esperan revisión, así que se unen el 29/10 y cuentan al inicio del Sprint 3. T8.1, T8.2 y T8.3 (7 h, HU-8) pasan completas al Sprint 3.
-2. **Orden de unión:** #13 → #15 → #17 → #18 → #11 → #14 → #16. Después, los PRs de pruebas de David (T5.3, T6.3 y T7.3). Al unir un PR de la cadena, se cambia la base del siguiente a `main` **antes** de borrar su rama.
+1. ✅ **Decidido por el PO el 28/10. Qué pasa al Sprint 3:** las tareas con PR solo esperan revisión, así que se unen el 29/10 y cuentan al inicio del Sprint 3. T8.1, T8.2 y T8.3 (7 h, HU-8) pasan completas al Sprint 3.
+2. **Orden de unión:** #13 → #15 → #17 → #18 → #11 → #14 → #16. Después, los PRs de pruebas de David (T5.3, T6.3 y T7.3, abiertos el 28/10) y la base parcial de T8.3. Al unir un PR de la cadena, se cambia la base del siguiente a `main` **antes** de borrar su rama.
 3. **Revisión de PRs:** quién revisa #14 y #16 de Luis.
 
 ## 4. Retrospectiva (propuesta para discutir)

@@ -83,6 +83,8 @@ Una línea por entrega, la más reciente arriba.
 
 | Fecha | Quién | Qué se hizo | Tarea |
 |:---:|---|---|:---:|
+| 28/10 | Renzo León | T5.2 en la rama `feature/t5.2-login-registro` (sale de T6.1): pantallas React de crear cuenta de cliente (`/crear-cuenta`) e iniciar sesión con usuario o correo (`/ingresar`), sesión en la cabecera con el nombre y el rol, y cierre de sesión. `api.js` envía `X-CSRFToken` en cada cambio. Probado en el navegador: registro, cierre, inicio con correo, contraseña incorrecta y sesión al recargar. Lint y build OK. | T5.2 |
+| 28/10 | Renzo León | T5.1: agrega `CSRF_TRUSTED_ORIGINS` para el origen de Vite. Al probar T5.2 en el navegador, el proxy de Vite reescribe el Host y Django rechazaba el `Origin` con 403 en registro e inicio de sesión. Es el mismo bloque del PR 11, así que no choca. | T5.1 |
 | 21/10 | Renzo León | T6.1 en la rama `feature/t6.1-disponibilidad` (sale de T5.1): `GET` y `PATCH /api/usuarios/disponibilidad/` solo para el prestador con sesión; un inactivo no aparece en la búsqueda. 6 pruebas nuevas; 87 de 87 OK. PR 15 abierto, revisa David; se une después del PR 13. | T6.1 |
 | 21/10 | Renzo León | Burndown del 20/10: 30 h pendientes (ideal 18). Ninguna tarea entró a `main`: T5.1 (PR 13) espera la revisión de David, y T9.1 (PR 11) y T7.1 (PR 14) siguen abiertos. Revisó el PR 11 y le dejó observaciones (choques con `main` y con T5.1, cambiar a `EsAdministrador`). | Burndown |
 | 20/10 | Renzo León | Unió el PR 10 (planificación del Sprint 2) a `main` e integró `main` en la rama de T5.1. Burndown del 19/10: 30 h pendientes (ideal 21), porque T5.1 sigue en revisión y ninguna tarea entró a `main`. | Planning/T5.1 |

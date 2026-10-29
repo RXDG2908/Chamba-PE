@@ -50,7 +50,9 @@ prestadores que cumplan los filtros devuelve una lista vacía.
 
 La búsqueda reside en `servicios`, conforme a la organización del backend
 en `PLAN_EQUIPO.md`, y reutiliza los modelos de `prestadores` sin modificarlos.
-Primero filtra en la base de datos por rubro y `disponible=True`.
+Primero filtra en la base de datos por rubro, `disponible=True` y
+`estado='verificado'` (desde T9.2: solo prestadores con un documento aprobado
+por administración).
 Después calcula la distancia geográfica entre el centro de cobertura del
 prestador y el cliente mediante Haversine, usando un radio terrestre medio
 de 6371.0088 km. No es una distancia de ruta ni un tiempo de llegada.

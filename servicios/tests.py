@@ -39,7 +39,7 @@ class BusquedaPrestadoresTests(TestCase):
         datos = {
             'usuario': usuario, 'dni': f'{numero:08d}', 'nombres': 'Ana',
             'apellidos': 'Pérez', 'latitud': 0, 'longitud': 0,
-            'radio_cobertura_km': 5, 'disponible': True,
+            'radio_cobertura_km': 5, 'disponible': True, 'estado': Prestador.Estado.VERIFICADO,
         }
         prestador = Prestador.objects.create(**{**datos, **cambios})
         prestador.rubros.set(rubros if rubros is not None else [self.rubro])
@@ -62,6 +62,14 @@ class BusquedaPrestadoresTests(TestCase):
         respuesta = self.buscar()
         self.assertEqual(respuesta.status_code, 200)
         self.assertEqual([p['id'] for p in respuesta.json()], [incluido.id])
+
+    def test_solo_aparecen_prestadores_verificados(self):
+        verificado = self.crear_prestador()
+        self.crear_prestador(estado=Prestador.Estado.PENDIENTE)
+        self.crear_prestador(estado=Prestador.Estado.RECHAZADO)
+        respuesta = self.buscar()
+        self.assertEqual(respuesta.status_code, 200)
+        self.assertEqual([p['id'] for p in respuesta.json()], [verificado.id])
 
     def test_respuesta_solo_contiene_datos_publicos(self):
         self.crear_prestador()
@@ -192,7 +200,7 @@ class SolicitudTests(TestCase):
         datos = {
             'usuario': usuario, 'dni': f'{Prestador.objects.count() + 1:08d}', 'nombres': 'Ana',
             'apellidos': 'Pérez', 'latitud': 0, 'longitud': 0,
-            'radio_cobertura_km': 5, 'disponible': True,
+            'radio_cobertura_km': 5, 'disponible': True, 'estado': Prestador.Estado.VERIFICADO,
         }
         prestador = Prestador.objects.create(**{**datos, **cambios})
         prestador.rubros.set([self.rubro])
@@ -225,6 +233,15 @@ class SolicitudTests(TestCase):
         r = self.enviar()
         self.assertEqual(r.status_code, 400)
         self.assertIn('prestador', r.json())
+
+    def test_prestador_no_verificado_no_recibe_solicitudes(self):
+        for estado in [Prestador.Estado.PENDIENTE, Prestador.Estado.RECHAZADO]:
+            self.prestador.estado = estado
+            self.prestador.save()
+            r = self.enviar()
+            self.assertEqual(r.status_code, 400, estado)
+            self.assertIn('prestador', r.json())
+        self.assertFalse(Solicitud.objects.exists())
 
     def test_rubro_que_no_ofrece(self):
         r = self.enviar(rubro=self.otro_rubro.id)

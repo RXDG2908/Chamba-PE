@@ -101,6 +101,9 @@ class SolicitudSerializer(serializers.ModelSerializer):
 
     def validate(self, datos):
         prestador = datos['prestador']
+        # HU-9: solo un prestador verificado por administración recibe solicitudes.
+        if prestador.estado != Prestador.Estado.VERIFICADO:
+            raise serializers.ValidationError({'prestador': 'El prestador aún no está verificado.'})
         if not prestador.disponible:
             raise serializers.ValidationError({'prestador': 'El prestador no está disponible.'})
         if not prestador.rubros.filter(pk=datos['rubro'].pk).exists():

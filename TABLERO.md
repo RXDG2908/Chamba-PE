@@ -2,19 +2,25 @@
 
 ## Sprint 2 · 15/10 – 28/10/2026
 
+
+**Actualizado:** 21/10/2026 · **Meta:** cuentas, disponibilidad, mapa y notificaciones; prestadores verificados por administración. Reparto y orden en [SPRINTS.md](SPRINTS.md#sprint-2--1510--28102026).
+
+Resumen: **0 terminadas · 3 en revisión · 0 en curso · 11 por hacer** · 0 de 30 h terminadas.
+
+### 📋 Por hacer (11)
+
 **Actualizado:** 28/10/2026 · **Meta:** cuentas, disponibilidad, mapa y notificaciones; prestadores verificados por administración. Reparto y orden en [SPRINTS.md](SPRINTS.md#sprint-2--1510--28102026).
 
 Resumen: **0 terminadas · 4 en revisión · 0 en curso · 10 por hacer** · 0 de 30 h terminadas.
 
 ### 📋 Por hacer (10)
 
+
 | Tarjeta | HU | Responsable | Horas | Cuándo |
 |---|:---:|---|:---:|---|
 | **T7.1** Consulta por coordenadas dentro del radio | HU-7 | Luis Abad | 2 | 19–20/10 · bloquea T7.2 |
-| **T9.1** Modelo y API de revisión de documentos | HU-9 | David Valcarcel | 2 | 19–20/10 · bloquea T9.2 |
 | **T8.1** Notificaciones push (FCM) | HU-8 | Luis Abad | 3 | Firebase el 19–20/10; envío al crear la solicitud el 21–23/10 |
 | **T7.2** Mapa con marcadores | HU-7 | Luis Abad | 3 | 21–23/10 |
-| **T9.2** Pantalla de aprobar o rechazar | HU-9 | David Valcarcel | 2 | 21–23/10 |
 | **T5.3** Pruebas de autenticación y rol | HU-5 | David Valcarcel | 1 | 21–23/10 |
 | **T7.3** Pruebas del radio de cobertura | HU-7 | David Valcarcel | 2 | 21–23/10 |
 | **T8.2** Recepción y aceptar/rechazar desde la notificación | HU-8 | Luis Abad | 2 | 26–28/10 |
@@ -25,14 +31,23 @@ Resumen: **0 terminadas · 4 en revisión · 0 en curso · 10 por hacer** · 0 d
 
 Sin tarjetas.
 
+
+### 👀 En revisión (3)
+
 ### 👀 En revisión (4)
+
 
 | Tarjeta | HU | Responsable | Horas | PR | Nota |
 |---|:---:|---|:---:|:---:|---|
 | **T5.1** API de autenticación con roles | HU-5 | Renzo León | 3 | [#13](https://github.com/RXDG2908/Chamba-PE/pull/13) | Revisa David; desbloquea T6.1, T5.2, T9.1 y T8.1. [Contrato](docs/API_AUTENTICACION.md) |
+
+| **T9.1** Modelo y API de revisión de documentos | HU-9 | David Valcarcel | 2 | [#11](https://github.com/RXDG2908/Chamba-PE/pull/11) | Con `main` y T5.1 integrados; usa `EsAdministrador`. Se une después del #13 |
+| **T9.2** Pantalla de aprobar o rechazar | HU-9 | David Valcarcel | 2 | [#11](https://github.com/RXDG2908/Chamba-PE/pull/11) | Va en el mismo PR que T9.1 |
+
 | **T6.1** Endpoint de disponibilidad | HU-6 | Renzo León | 2 | [#15](https://github.com/RXDG2908/Chamba-PE/pull/15) | `GET`/`PATCH /api/usuarios/disponibilidad/`; sale de la rama de T5.1, se une después del #13 |
 | **T5.2** Pantallas de registro e inicio de sesión | HU-5 | Renzo León | 3 | [#17](https://github.com/RXDG2908/Chamba-PE/pull/17) | Crear cuenta de cliente, iniciar con usuario o correo y cerrar sesión; React responsive. Se une después del #15 |
 | **T6.2** Interruptor de disponibilidad | HU-6 | Renzo León | 2 | [#18](https://github.com/RXDG2908/Chamba-PE/pull/18) | Pantalla `/disponibilidad` solo para el prestador, con aviso si aún no está verificado. Se une después del #17 |
+
 
 ### ✅ Terminado (0)
 

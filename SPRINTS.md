@@ -14,6 +14,9 @@ Reglas de reparto y flujo de trabajo en [PLAN_EQUIPO.md](PLAN_EQUIPO.md). Detall
 | [4](#sprint-4--1211--25112026) | 12/11 – 25/11/2026 | HU-10, HU-11, HU-12 | 12 | 26 h | ⚪ Por planificar |
 | [—](#backlog-futuro) | — | HU-14 a HU-18 | 11 | 30 h | 📦 Backlog futuro |
 
+
+> **Actualización aprobada del 29/10/2026:** la fila de S3 del calendario y la plantilla original se conservan como referencia histórica. El compromiso vigente es el [Plan aprobado del Sprint 3](#plan-aprobado-del-sprint-3): 24 h de trabajo (3 ya integradas) y 6 h de reserva. HU-13/HU-20 quedan fuera del compromiso inicial; no se suman las estimaciones anteriores.
+
 ### Cambios respecto al Lab 07
 
 - Las fechas se recorrieron 2 semanas porque el Sprint 1 empezó el 01/10/2026.
@@ -278,6 +281,9 @@ Horas pendientes al final de cada día. La línea ideal baja 3 h por día.
 
 # Sprint 3 · 29/10 – 11/11/2026
 
+> **Referencia histórica:** se conserva a continuación la plantilla previa al acuerdo. Sus 28/35 h, responsables por asignar y propuesta de HU-13 a S4 no son el compromiso vigente. Consultar el [plan aprobado](#plan-aprobado-del-sprint-3).
+
+
 > ⚪ **Plantilla: por planificar en el Sprint Planning.** Los responsables se asignan en la reunión.
 
 **Meta:** Verificación de identidad del prestador (escaneo del DNI + reconocimiento facial) y moderación de cuentas.
@@ -426,3 +432,149 @@ Historias del Lab 07 que salen del alcance de los 4 sprints para dar prioridad a
 | HU-16 | Gestión de rubros, categorías y comisiones | 2 | 5 | Los rubros del MVP pueden cargarse con datos iniciales |
 | HU-17 | Configuración de parámetros del matching | 2 | 6 | Los parámetros pueden quedar fijos en la configuración |
 | HU-18 | Dashboard de métricas operativas | 2 | 6 | Administrativo; no afecta al usuario final |
+
+---
+
+# Plan aprobado del Sprint 3
+
+**Fechas:** 29/10–11/11/2026.
+
+> 🟢 **Planificación aprobada.** El Scrum Master comunica la aprobación de David (PO) y Renzo a la propuesta de Sprint Backlog. Se formaliza el 29/10/2026. Capacidad: **30 h, 10 h por integrante**. Este acuerdo no declara terminadas HU-7 ni HU-8.
+
+**Sprint Goal:** cerrar el flujo de búsqueda en mapa y atención de solicitudes de HU-7/HU-8 mediante revisión, validación e integración; corregir los permisos y la propiedad en la carga de certificados; avanzar el escaneo/validación del DNI (HU-19) y el consentimiento/eliminación de datos (HU-21), con pruebas cruzadas y una base segura para la verificación posterior.
+
+## Capacidad y reglas de contabilización
+
+| Integrante | Trabajo asignado S3 | Reserva | Capacidad |
+|---|---:|---:|---:|
+| Luis Abad | 7 h | 3 h | 10 h |
+| David Valcarcel | 8 h | 2 h | 10 h |
+| Renzo León | 9 h | 1 h | 10 h |
+| **Total** | **24 h** | **6 h** | **30 h** |
+
+Las 24 h incluyen **3 h heredadas ya integradas el 29/10** y **21 h de trabajo pendiente al formalizar**. Las horas originales de mapa (5 h) y HU-8 (7 h) son referencia histórica: no se suman de nuevo a las estimaciones restantes aprobadas. Las reservas son capacidad disponible, no tareas completadas ni horas consumidas; su uso se registra por responsable, motivo y saldo. No se suman story points originales de historias parciales para inventar una velocidad nueva.
+
+El cierre del Sprint 2 se conserva en **15 de 23 h terminadas al 28/10** (horas, no cantidad de tareas). Las 3 h integradas el 29/10 cuentan una sola vez al inicio de S3 y no aumentan el resultado histórico de S2.
+
+## Sprint Backlog aprobado
+
+Los identificadores S3-MAPA-R, S3-MAPA-I y S3-CERT-16 son etiquetas de seguimiento para revisión/integración o corrección, no historias nuevas ni duplicaciones de T7.1/T7.2.
+
+| Origen | Referencia | Trabajo / resultado esperado | Responsable | Horas S3 | Estado inicial |
+|---|---|---|---|---:|---|
+| Heredado integrado | T6.3 · HU-6 | Pruebas de disponibilidad, PR #20 integrado el 29/10 | David | 1 | ✅ Integrado |
+| Heredado integrado | T7.3 · HU-7 | Pruebas de cobertura, PR #23 integrado el 29/10 | David | 2 | ✅ Integrado |
+| Heredado pendiente | S3-MAPA-R · T7.1/T7.2 | Revisar #14/#16 y regresiones con roles, disponibilidad y verificación | David | 1 | Pendiente |
+| Heredado pendiente | S3-MAPA-I · T7.1/T7.2 | Ajustes de revisión e integración del mapa, sin reconstruir lo implementado | Luis | 1 | Pendiente |
+| Heredado con avance local | T8.1 + T8.2 · HU-8 | Completar escenarios, revisión y preparación de integración del backend push y frontend responsive existentes | Luis | 2 | 🟡 Local/parcial |
+| Heredado parcial | T8.3 · HU-8 | Validación cruzada de push real, repetición de medidas y evidencia; revisar base #22 | David | 2 | 🟡 Base de bandeja; push pendiente de validación |
+| Deuda heredada | S3-CERT-16 | Corregir carga de certificados: sesión, rol, propiedad desde el usuario, CSRF y regresiones; retirar expectedFailure cuando corresponda | David | 2 | Pendiente |
+| Nuevo | T19.1 · HU-19 | Pantalla de escaneo del DNI con cámara en React responsive | Renzo | 3 | Sin iniciar |
+| Nuevo | T19.2 · HU-19 | OCR: extraer número/nombres y recortar foto | Renzo | 4 | Sin iniciar |
+| Nuevo | T19.3 · HU-19 | Validador intercambiable, consulta a fuente y revisión manual ante fallo/no coincidencia | Renzo | 2 | Sin iniciar |
+| Nuevo | T19.4 · HU-19 | Pruebas cruzadas con muestras acordadas de lectura y coincidencia | Luis | 2 | Sin iniciar |
+| Nuevo | T21.1 · HU-21 | Pantalla de consentimiento y registro de aceptación | Luis | 1 | Sin iniciar |
+| Nuevo | T21.2 · HU-21 | Endpoint de solicitud de eliminación y trazabilidad de su atención | Luis | 1 | Sin iniciar |
+| | | **Total de trabajo asignado** | | **24** | **3 integradas + 21 pendientes** |
+
+Reparto: Renzo construye HU-19 y Luis realiza T19.4; Luis construye HU-8/HU-21 y David valida T8.3 y revisa HU-21. David corrige certificados con revisión de Renzo por su propiedad sobre prestadores/permisos. Las revisiones de HU-19/HU-21 se organizan dentro de sus tareas y, si requieren capacidad adicional, se registra el uso de reserva sin inventar horas ya consumidas.
+
+### Situación heredada y Pull Requests
+
+Estado consultado el 29/10 contra origin/main `f515837c6453d1d2a8a17e742c9ff9323f0ab94e`:
+
+| PR / rama | Situación | Próximo paso / dependencia |
+|---|---|---|
+| [#14](https://github.com/RXDG2908/Chamba-PE/pull/14) · T7.1 | Abierto; código de coordenadas existente | Revisión de David y regresión sobre main con filtro Verificado; antes de #16 |
+| [#16](https://github.com/RXDG2908/Chamba-PE/pull/16) · T7.2 | Abierto; incluye cambios heredados de #14 | Revisar diff tras #14; comprobar marcadores coincidentes, encuadre, cancelación, errores y accesibilidad |
+| [#20](https://github.com/RXDG2908/Chamba-PE/pull/20) · T6.3 | Integrado el 29/10 | 1 h contabilizada una sola vez; no queda como trabajo pendiente |
+| [#23](https://github.com/RXDG2908/Chamba-PE/pull/23) · T7.3 | Integrado el 29/10 | 2 h contabilizadas una sola vez; no queda como trabajo pendiente |
+| [#22](https://github.com/RXDG2908/Chamba-PE/pull/22) · T8.3 | Abierto, base parcial de bandeja HTTP | Coordinar con el push local; no usar tiempos de bandeja como entrega FCM |
+| feature/hu8-notificaciones | Cambios locales de T8.1/T8.2 sin commit ni PR | Preservar código, configuración y evidencia; revisar contra main antes de integración futura autorizada |
+
+Las dependencias de autenticación/login/disponibilidad y revisión (#13, #15, #17, #18, #11, #21) ya estaban integradas al cierre de S2. La copia local de HU-8 parte de una base anterior; actualizarla y resolver diferencias será trabajo futuro, no una acción realizada al documentar este plan.
+
+## Avance local de HU-8 y criterio de cierre
+
+Existe implementación local y evidencia de recepción real, aceptación/rechazo, primer/segundo plano, pestaña cerrada con Chrome abierto y comprobaciones tras logout/cambio a administrador. El ensayo grabado #17 mostró aproximadamente **1,3 s**, con margen visual orientativo ±0,1 s. No es garantía general ni sustituye la validación cruzada.
+
+Quedan por completar las comprobaciones de sesión vencida, permiso denegado, soporte y escenarios de cuenta que falten en la matriz, repetir medidas con condiciones registradas y revisar/integrar el trabajo. David valida T8.3. **HU-8 continúa parcial y abierta**; no se contabilizan como terminadas sus 2 h restantes ni las 2 h de T8.3. Detalle y evidencia en la guía local HU8_NOTIFICACIONES.md, todavía no publicada y disponible para revisión.
+
+## Trabajo postergado del compromiso inicial
+
+| Historia | Tareas conservadas como referencia | Estimación original | Decisión aprobada |
+|---|---|---:|---|
+| HU-20 · Reconocimiento facial | T20.1 selfie/parpadeo 3 h; T20.2 comparación 4 h; T20.3 reglas/panel 2 h; T20.4 calibración 2 h | 11 h | Fuera del compromiso inicial S3; replanificar con PO/equipo |
+| HU-13 · Suspensión y bloqueo | T13.1 API 2 h; T13.2 gestión React 2 h | 4 h | Fuera del compromiso inicial S3; replanificar con PO/equipo |
+
+Estas 15 h no forman parte de las 24 h asignadas ni de las 6 h de reserva. No se asignan automáticamente al Sprint 4 ni se consume su holgura. La verificación facial, el parpadeo, la comparación y la decisión biométrica automática quedan como flujo futuro de HU-20, no como criterios de entrega de este compromiso.
+
+## Criterios de aceptación y dependencias
+
+- **HU-7:** revisión e integración de #14 → #16; conservar cobertura inclusiva, rubro, disponibilidad y verificación. No inventar puntuaciones: acordar con PO el tratamiento de «Sin calificaciones» mientras HU-12 sigue pendiente.
+- **HU-8:** mantener sesión Django/CSRF, destinatario y privacidad del aviso; completar pruebas reales y evidencia <5 s, con resultados y pérdidas/duplicados registrados. Aplicar la definición de terminado por revisión e integración, sin cerrar por una demo local.
+- **Certificados:** impedir carga anónima, por otro rol o para otro prestador; conservar formatos/tamaño y flujo administrativo. Las tres expectedFailure actuales documentan el defecto, no su solución.
+- **HU-19:** número con validación del dígito verificador; nombres comparados sin tildes/mayúsculas; si la fuente falla o los nombres no coinciden, revisión manual, nunca aprobación automática. Requiere HU-1 y panel HU-9. Renzo define el contrato cámara/OCR/validador antes de conectar los componentes y Luis prueba lectura/coincidencia y errores.
+- **HU-21:** aceptación registrada y verificable; sin consentimiento no se inicia futura verificación facial. Registrar y atender la solicitud de eliminación, definiendo estados y responsable operativo. Su contrato debe estar disponible antes de conectar el futuro flujo de HU-20.
+- Toda pantalla se construye en `frontend/` responsive. Credenciales de Firebase fuera del repositorio; ejemplos sin secretos. No se requieren cambios de credenciales para formalizar esta planificación.
+
+## Impedimentos y riesgos a seguir
+
+| Referencia | Riesgo / bloqueo | Responsable de seguimiento | Acción / condición para resolver |
+|---|---|---|---|
+| Impedimento 16 | Carga de certificados sin sesión/propiedad | David; revisión Renzo | S3-CERT-16 con pruebas negativas y CSRF |
+| #14/#16 | Espera de revisión y diferencias con main actual | David / Luis | Revisar en orden; no dar HU-7 por integrada desde la copia local |
+| HU-8 / #22 | Confundir mocks/bandeja con entrega real; evidencia insuficiente para cierre | Luis / David | Separar evidencias y repetir medidas; validación cruzada |
+| HU-19 | Calidad de OCR y disponibilidad/contrato de eldni.com | Renzo | Muestras acordadas, validador intercambiable y alternativa manual |
+| HU-21 | Definición operativa de consentimiento y atención de eliminación | Luis / PO David | Acordar contrato y criterios verificables antes de cierre |
+| Impedimento 14 | Protección/revisión de main pendiente de verificar | Scrum Master | Confirmar 1 aprobación y revisión oportuna; no asumir configuración aplicada |
+| Capacidad | Reservas limitadas por integrante | Scrum Master / equipo | Registrar consumo; si se supera, acordar ajuste con PO sin añadir HU-13/HU-20 automáticamente |
+
+## Orden de ejecución
+
+1. Dar por incorporadas únicamente T6.3/T7.3; revisar #14/#16 y cerrar la corrección de certificados.
+2. Completar revisión de HU-8 y validación real T8.3 aprovechando la implementación existente; en paralelo, contratos de HU-19/HU-21.
+3. Construir y probar HU-19/HU-21; completar evidencia e integración revisada.
+4. En cada Daily actualizar trabajo restante, bloqueos, reserva usada y responsable del siguiente paso. Una aprobación de Planning no es autorización para publicar o integrar los cambios locales actuales.
+
+## Seguimiento del Sprint 3
+
+Estado inicial: **24 h asignadas; 3 h integradas, 21 h pendientes; 6 h de reserva sin consumo registrado**. No se conocen horas reales consumidas de las tareas locales: no se deducen de sus estimaciones históricas.
+
+| Fecha | Referencia / responsable | Avance o bloqueo | Resultado / evidencia | Trabajo S3 pendiente | Reserva usada |
+|---|---|---|---|---:|---:|
+| 29/10 | T6.3 / David | Integrado | PR #20 | 0 h | 0 h |
+| 29/10 | T7.3 / David | Integrado | PR #23 | 0 h | 0 h |
+| 29/10 | HU-8 / Luis y David | Local/parcial; validación cruzada e integración pendientes | Guía HU-8 y video; 1 ensayo ≈1,3 s | 4 h (2 + 2) | 0 h |
+| 29/10 | Resto del backlog | Planificado; sin cierre adicional registrado | Aprobación comunicada por Scrum Master | 17 h | 0 h |
+| Por registrar | Tarea / responsable | Avance, bloqueo y próximo paso | PR / prueba / evidencia | Actualizar | Registrar motivo y saldo |
+
+Los 0 h de reserva indican **sin consumo registrado**, no una medición de dedicación real. Registrar decisiones posteriores sin sobrescribir el historial.
+
+### Burndown de trabajo asignado (reserva separada)
+
+La línea ideal es referencia de planificación para 24 h en 10 días hábiles; no representa horas reales ni una entrega prometida por día. El primer corte refleja las 3 h integradas el 29/10.
+
+| Día / fecha | Ideal pendiente (h) | Pendiente registrado (h) | Integrado acumulado (h) | Reserva disponible (h) |
+|---|---:|---:|---:|---:|
+| Inicio | 24 | 24 | 0 | 6 |
+| 1 · 29/10 | 21,6 | 21 | 3 | 6 |
+| 2 · 30/10 | 19,2 | — | — | — |
+| 3 · 02/11 | 16,8 | — | — | — |
+| 4 · 03/11 | 14,4 | — | — | — |
+| 5 · 04/11 | 12 | — | — | — |
+| 6 · 05/11 | 9,6 | — | — | — |
+| 7 · 06/11 | 7,2 | — | — | — |
+| 8 · 09/11 | 4,8 | — | — | — |
+| 9 · 10/11 | 2,4 | — | — | — |
+| 10 · 11/11 | 0 | — | — | — |
+
+No mezclar horas estimadas retiradas al completar tareas con horas reales gastadas. Registrar por separado cualquier reestimación o uso de reserva y mantener el límite de 10 h por integrante.
+
+## Review y retrospectiva
+
+El 11/11 revisar el Sprint Goal, pendientes de HU-7/HU-8, corrección de certificados y entregables de HU-19/HU-21 con evidencia. Documentar tareas integradas, trabajo restante y decisiones del PO; no dar por completadas HU-13/HU-20 por estar descritas como futuras.
+
+| Qué salió bien | Qué mejorar | Acción y responsable |
+|---|---|---|
+| Por completar en la retrospectiva | Por completar | Por acordar |

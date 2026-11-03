@@ -94,6 +94,7 @@ function RegistroPrestador() {
       <section className="registro exito" role="status">
         <h2>¡Registro enviado!</h2>
         <p>Tu perfil quedó <strong>Pendiente de verificación</strong>. Te avisaremos cuando sea revisado.</p>
+        <p>Ya puedes <Link to="/ingresar">iniciar sesión</Link> con tu usuario y contraseña.</p>
         {prestadorId && (
           <>
             <p>Tu ID de prestador es <strong>{prestadorId}</strong>.</p>

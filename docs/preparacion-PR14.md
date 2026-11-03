@@ -1,5 +1,7 @@
 # Preparación local de T7.1 · PR #14
 
+> **Actualización autorizada del 02/11/2026:** main f515837 ya se incorporó por merge normal en esta preparación. Pasaron 168 pruebas Django (165 aprobadas y los 3 fallos esperados de certificados), sin migraciones pendientes ni cambios de frontend frente a main. Las secciones siguientes conservan la preparación y secuencia originales como historial; ya no describen una sincronización pendiente. El PR #14 continúa abierto para revisión; no se integra a main ni se modifica #16 en esta operación.
+
 Fecha: 02/11/2026. Rama local: `prepare/hu7-t71-pr14`.
 Base: `origin/feature/t7.1-mapa-prestadores 5ddaa14d6eaa19eb697184b8e72e27e41fe425d4`.
 Destino de documentación reconciliada: `origin/main f515837`.

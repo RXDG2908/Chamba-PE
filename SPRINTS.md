@@ -430,3 +430,5 @@ Historias del Lab 07 que salen del alcance de los 4 sprints para dar prioridad a
 ## Seguimiento documental HU-7 · T7.1 / #14 · 02/11/2026
 
 Preparación local de revisión/publicación, sin tarea terminada ni horas adicionales descontadas. Se conservan sin modificación todos los registros y la planificación precedente de main. Documentación resuelta sobre main; sincronización de código e historial pendiente de autorización. Ver AVANCES.md y la guía de preparación del PR.
+
+**Actualización de seguimiento T7.1 (02/11):** autorizada la sincronización y publicación de #14; main f515837 incorporado por merge normal. 168 pruebas Django (165 pasan y 3 expectedFailure conocidas), sin migraciones pendientes. #14 sigue pendiente de revisión/integración; no se contabilizan nuevas horas terminadas ni se cambia el cierre S2 o el compromiso S3. #16 permanece sin modificar.

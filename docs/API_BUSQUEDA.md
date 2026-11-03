@@ -140,3 +140,5 @@ inválidos, extremos válidos y ausencia de resultados.
 ## Nota de preparación documental · 02/11/2026
 
 Este contrato describe el destino probado con main en el worktree integrado. La preparación de T7.1 / #14 parte de su cabecera remota y todavía no sincroniza el código de main. Conservar Verificado, disponibilidad, rubro y cobertura al autorizar esa sincronización. No se crean endpoints ni se añaden datos personales al resultado.
+
+**Actualización del 02/11/2026:** la sincronización con main f515837 ya se realizó en la actualización autorizada de #14 y se validó con 168 pruebas Django (165 aprobadas y 3 fallos esperados de certificados). Se conservan sus filtros, autenticación y contratos; sin cambios de frontend/T7.2. La nota de preparación anterior queda como historial previo a esta sincronización.

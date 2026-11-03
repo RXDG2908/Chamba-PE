@@ -212,27 +212,42 @@ Una línea por entrega, la más reciente arriba.
 | | PR 4 y PR 7 se unieron sin revisión de otro integrante. | Si un PR agrega una librería, también actualiza `requirements.txt`; quien revisa instala desde cero. |
 | | AVANCES.md no se actualizó a diario y los informes de pruebas salieron muy largos. | AVANCES.md al cierre de cada día, en pocas líneas; el detalle va en `docs/`. |
 
+## Preparación T7.1 / PR #14 · 02/11/2026
+
+Se conserva íntegro el documento de main f515837 y, abajo, el historial particular de T7.1 como evidencia fechada. El código del PR devuelve coordenadas numéricas de solo lectura y no incluye marcadores, CSS de mapa ni Playwright. No se requiere una corrección funcional adicional de T7.1 según la revisión integrada.
+
+La prueba de integración con main se realizó en review/hu7-t71-t72: 165 Django pasan y 3 expectedFailure heredadas. Este worktree parte de la cabecera remota #14 (5ddaa14) y todavía NO contiene la sincronización de código con main. El contrato de destino usa los filtros actuales de main, que deberán conservarse al sincronizar después de autorización. T7.1 sigue pendiente de revisión e integración; 0 h adicionales terminadas, sin cambios de cierre S2 ni planificación S3.
+
+### Historial particular conservado (afirmaciones del corte original)
+
+## 10. Sprint 2 — avance local de T7.1 (19/10/2026)
+
+| Tarea | Responsable | Horas plan | Estado | Rama / PR |
+|---|---|---|---|---|
+| T7.1 — consulta por coordenadas | Luis Abad | 2 h | 🟡 Implementada localmente; pendiente de revisión/PR y de integrar el filtro Verificado | `feature/t7.1-mapa-prestadores`, commits locales sin push |
+
+- **Implementado:** misma búsqueda pública, ahora con latitud/longitud numéricas del centro de cobertura; conserva tarjetas, Haversine, filtros, radios propios, orden y cabecera de tiempo. Contrato en [docs/API_BUSQUEDA.md](docs/API_BUSQUEDA.md).
+- **Probado:** Python de `venv`, `manage.py test --noinput`: 60 pruebas OK en 2.574 s, sin problemas en el system check; dos pruebas nuevas y contrato público actualizado. Datos exclusivamente en la base de pruebas; sin modificar registros locales. Sin prueba visual del frontend.
+- **Evidencia manual reportada por Luis (19/10):** búsqueda HTTP 200, prestador ficticio id `2`, latitud `-12.046374`, longitud `-77.042793`, `distancia_km: 0.0` y cabecera `X-Execution-Time-Ms: 16.782`. Confirma la respuesta para ese caso; no valida el filtro Verificado pendiente.
+- **Integración/revisión pendiente:** David revisa el PR y ejecuta T7.3; T9.1 todavía debe actualizar el estado del prestador e integrar el filtro de verificados en búsqueda/solicitudes. Renzo debe confirmar continuidad de consulta pública al integrar roles/disponibilidad. Sin soporte real de calificaciones: propuesta de promedio `null`, cantidad `0` y texto «Sin calificaciones», aún fuera de la respuesta.
+- **Bitácora:** 19/10, Luis/asistente: verificados rama limpia y HEAD `8198a83`; fetch remoto completado con certificados de Windows; revisadas planificación y ramas T5.1/T9.1 sin fusionar. Preparados código, pruebas y documentación para revisión local.
+- **Horas y burndown:** 2 h planificadas para T7.1; horas reales no informadas por Luis. Se suman **0 h terminadas** hasta revisión e integración; no se descuenta T7.1 del burndown ni se infiere el avance de otros integrantes.
+- **Alcance:** T7.2, T7.3, HU-7 y Sprint 2 siguen pendientes; sin notificaciones ni HU-12 implementadas.
+
+## Actualización autorizada de T7.1 / PR #14 · 02/11/2026
+
+- Cabecera remota comprobada sin cambios: 5ddaa14. Se conserva su historial y se incorpora main f515837 por merge normal, sin rebase ni force push. No hubo conflictos de código ni conflictos documentales residuales: las resoluciones previamente preparadas se combinaron automáticamente.
+- Registros de main y avances históricos preservados; cierre S2 sigue en 15 de 23 h. No cambia la planificación de S3.
+- Pruebas de esta combinación real: 168 Django en 23,807 s (165 aprobadas y 3 expectedFailure conocidas del impedimento 16), system check sin problemas y makemigrations --check --dry-run sin cambios. git diff --check correcto.
+- Diff contra main limitado a coordenadas/pruebas T7.1 y sus documentos; sin marcadores, frontend, Playwright ni cambios HU-8/Firebase. Actualización autorizada únicamente de la rama original de #14; David sigue pendiente de revisar y no se declara HU-7 terminada.
+
+
 ## Preparación T7.2 / PR #16 · 02/11/2026
 
 Se conserva íntegro el documento de main f515837. Este worktree parte de #16 (485edb4), que ya contiene #14 (5ddaa14). Se trasladan únicamente las dos correcciones de mapa, su suite Chromium y documentación; servicios/serializers.py y servicios/tests.py no reciben otra copia de T7.1.
 
 Prueba integrada previa en review/hu7-t71-t72: 165 Django pasan, 3 expectedFailure heredadas, 16 Chromium con API/teselas simuladas, lint/build OK. Esta evidencia se conserva diferenciada de la prueba sobre la cabecera antigua. La sincronización de código con main sigue pendiente de autorización; documentos resueltos no equivalen a un merge de historial. T7.2/HU-7 no terminadas, sin horas adicionales descontadas ni cambios de cierre S2 o planificación S3.
 
-### Historial particular conservado (afirmaciones del corte original)
-
-## 10. Sprint 2 — avance de T7.1 (implementación y pruebas del 19/10/2026)
-
-| Tarea | Responsable | Horas plan | Estado | Rama / PR |
-|---|---|---|---|---|
-| T7.1 — consulta por coordenadas | Luis Abad | 2 h | 🟡 Implementación y pruebas realizadas; PR #14 pendiente de revisión e integración del filtro Verificado | `feature/t7.1-mapa-prestadores`, PR [#14](https://github.com/RXDG2908/Chamba-PE/pull/14) |
-
-- **Implementado:** misma búsqueda pública, ahora con latitud/longitud numéricas del centro de cobertura; conserva tarjetas, Haversine, filtros, radios propios, orden y cabecera de tiempo. Contrato en [docs/API_BUSQUEDA.md](docs/API_BUSQUEDA.md).
-- **Probado:** Python de `venv`, `manage.py test --noinput`: 60 pruebas OK en 2.574 s, sin problemas en el system check; dos pruebas nuevas y contrato público actualizado. Datos exclusivamente en la base de pruebas; sin modificar registros locales. Sin prueba visual del frontend.
-- **Evidencia manual reportada por Luis (19/10):** búsqueda HTTP 200, prestador ficticio id `2`, latitud `-12.046374`, longitud `-77.042793`, `distancia_km: 0.0` y cabecera `X-Execution-Time-Ms: 16.782`. Confirma la respuesta para ese caso; no valida el filtro Verificado pendiente.
-- **Integración/revisión pendiente:** David revisa el PR #14 y ejecuta T7.3; T9.1 todavía debe actualizar el estado del prestador e integrar el filtro de verificados en búsqueda/solicitudes. Renzo debe confirmar continuidad de consulta pública al integrar roles/disponibilidad. Sin soporte real de calificaciones: propuesta de promedio `null`, cantidad `0` y texto «Sin calificaciones», aún fuera de la respuesta.
-- **Bitácora:** 19/10, Luis/asistente: verificados rama limpia y HEAD `8198a83`; fetch remoto completado con certificados de Windows; revisadas planificación y ramas T5.1/T9.1 sin fusionar. Preparados código, pruebas y documentación para revisión local.
-- **Horas y burndown:** 2 h planificadas para T7.1; horas reales no informadas por Luis. Se suman **0 h terminadas** hasta revisión e integración; no se descuenta T7.1 del burndown ni se infiere el avance de otros integrantes.
-- **Alcance:** T7.2, T7.3, HU-7 y Sprint 2 siguen pendientes; sin notificaciones ni HU-12 implementadas.
 
 ## 11. Sprint 2 — T7.2, implementación y pruebas manuales (27/10/2026)
 
@@ -248,3 +263,18 @@ Prueba integrada previa en review/hu7-t71-t72: 165 Django pasan, 3 expectedFailu
 - Rama prepare/hu7-t72-pr16: incorporados encuadres sin animación y suite de 14 integraciones desde el worktree de validación, preservando payload/accesibilidad y pruebas previas. Sin cambios backend/T7.1 ni copia de documentos sobre los registros existentes.
 - Pruebas nuevas en destino: 16 Chromium simuladas aprobadas y 14 integraciones aprobadas. Las integraciones combinan este frontend con el backend compatible del worktree de validación; la base antigua de #16 no se sincronizó ni se declara integrada. SQLite ficticia nueva en destino. Lint/build/diff-check correctos. [Detalle y limitaciones](docs/pruebas-T7.2.md).
 - Estado sin cierre: pendiente revisión de David, sincronización de dependencias, repetición de pruebas sobre la combinación final y validación física/humana. No se modifican PR #14/#16 ni se publica. Horas reales no informadas; 0 h nuevas terminadas, burndown y cierre histórico intactos.
+
+## Sincronización local T7.2 con T7.1 · 02/11/2026
+
+- Tras verificar cabeceras remotas #14 8c887ae y #16 485edb4, se conserva el historial de #16 y se integra localmente #14 mediante merge normal; sin publicación. Conflictos documentales resueltos preservando registros de main, actualización de T7.1 e historial particular de T7.2. Sin conflictos de código.
+- Se mantienen login, disponibilidad, filtros, coordenadas y mapa corregido. Pruebas sobre el backend propio del worktree pendientes de esta ejecución; las 14 aprobadas anteriores usaron backend externo compatible.
+- HU-7/T7.2 sin cierre, horas reales no informadas y 0 h nuevas terminadas; no se altera el cierre histórico 15/23 h ni la planificación S3.
+
+**Detención por fallo nuevo (02/11):** Django sobre backend propio: 168 pruebas en 25,426 s, 165 aprobadas y 3 expectedFailure conocidas; system check correcto. Suite T7.2: 15 aprobadas y 1 fallida, «cambiar rubro o coordenadas retira tarjetas y marcadores anteriores» (mapa.spec.mjs:81): esperaba dos tarjetas y obtuvo cero tras la primera búsqueda. Causa no confirmada. Se detiene el trabajo conforme a la instrucción del usuario; no se reintenta ni corrige para ocultar el fallo. Las 14 integraciones, lint y build independiente no se ejecutaron después de esta detención; el build previo de la suite sí completó. Merge pendiente de commit, documentos resueltos en índice, cabecera entrante 8c887ae; único commit nuevo 23831c2. Sin publicación. Otros cinco worktrees, HU-8/Firebase y base principal verificados intactos.
+
+## Depuración y validación del merge local T7.2 · 03/11/2026
+
+- El fallo 0 tarjetas/carga se reprodujo de forma intermitente: 8/10 aprobadas y 2 fallidas con page.route. Traza: respuesta CSRF simulada entregada por fulfill pero no recibida por Chromium; búsqueda sin evento de emisión. Causa localizada en interceptación/entrega del entorno de prueba, no en datos recibidos/render; defecto interno del navegador no determinado.
+- Corrección exclusiva de prueba: interceptar API/teselas por contexto aislado y adjuntar eventos de red. Sin cambios de producto, tiempos ni aserciones. 10/10 repeticiones y 16/16 suite completa aprobadas; 14/14 integración con backend propio, sin HU7_TEST_BACKEND_ROOT. Django: 168, 165 aprobadas + 3 expectedFailure conocidas; lint/build/diff-check correctos. [Detalle](docs/pruebas-T7.2.md).
+- Merge local autorizado de #14 8c887ae sobre T7.2 23831c2, documentos resueltos preservando main y ambos historiales; sin publicación. Backend de #14 intacto. HU-8/Firebase y demás worktrees verificados sin cambios.
+- HU-7/T7.2 sin cierre; pendiente revisión y validación física/humana. Horas reales no informadas, 0 h nuevas terminadas; cierre S2 15/23 h y planificación S3 sin cambios.

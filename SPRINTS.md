@@ -427,6 +427,17 @@ Historias del Lab 07 que salen del alcance de los 4 sprints para dar prioridad a
 | HU-17 | Configuración de parámetros del matching | 2 | 6 | Los parámetros pueden quedar fijos en la configuración |
 | HU-18 | Dashboard de métricas operativas | 2 | 6 | Administrativo; no afecta al usuario final |
 
+## Seguimiento documental HU-7 · T7.1 / #14 · 02/11/2026
+
+Preparación local de revisión/publicación, sin tarea terminada ni horas adicionales descontadas. Se conservan sin modificación todos los registros y la planificación precedente de main. Documentación resuelta sobre main; sincronización de código e historial pendiente de autorización. Ver AVANCES.md y la guía de preparación del PR.
+
+**Actualización de seguimiento T7.1 (02/11):** autorizada la sincronización y publicación de #14; main f515837 incorporado por merge normal. 168 pruebas Django (165 pasan y 3 expectedFailure conocidas), sin migraciones pendientes. #14 sigue pendiente de revisión/integración; no se contabilizan nuevas horas terminadas ni se cambia el cierre S2 o el compromiso S3. #16 permanece sin modificar.
+
+
 ## Seguimiento documental HU-7 · T7.2 / #16 · 02/11/2026
 
 Preparación local de revisión/publicación, sin tarea terminada ni horas adicionales descontadas. Se conservan sin modificación todos los registros y la planificación precedente de main. Documentación resuelta sobre main; sincronización de código e historial pendiente de autorización. Ver AVANCES.md y la guía de preparación del PR.
+
+**Seguimiento local T7.2 (02/11):** autorizada e iniciada la sincronización local con #14 (8c887ae) por merge normal, preservando main f515837 y registros históricos. Validación del backend propio en curso; sin publicación ni nuevas horas terminadas. Las notas anteriores describen cortes históricos, no el estado vigente.
+
+**Validación local T7.2 (03/11):** tras corregir la interceptación de pruebas, 16/16 automatizadas y 14/14 integraciones con backend propio; Django 165 aprobadas y tres expectedFailure conocidas, lint/build correctos. Documentos resueltos y merge local de #14 autorizado; sin publicar ni marcar HU-7 terminada, sin nuevas horas descontadas.

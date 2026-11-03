@@ -139,4 +139,13 @@ inválidos, extremos válidos y ausencia de resultados.
 
 ## Nota de preparación documental · 02/11/2026
 
+Este contrato describe el destino probado con main en el worktree integrado. La preparación de T7.1 / #14 parte de su cabecera remota y todavía no sincroniza el código de main. Conservar Verificado, disponibilidad, rubro y cobertura al autorizar esa sincronización. No se crean endpoints ni se añaden datos personales al resultado.
+
+**Actualización del 02/11/2026:** la sincronización con main f515837 ya se realizó en la actualización autorizada de #14 y se validó con 168 pruebas Django (165 aprobadas y 3 fallos esperados de certificados). Se conservan sus filtros, autenticación y contratos; sin cambios de frontend/T7.2. La nota de preparación anterior queda como historial previo a esta sincronización.
+
+
 Este contrato describe el destino probado con main en el worktree integrado. La preparación de T7.2 / #16 parte de su cabecera remota y todavía no sincroniza el código de main. Conservar Verificado, disponibilidad, rubro y cobertura al autorizar esa sincronización. No se crean endpoints ni se añaden datos personales al resultado.
+
+**Actualización local T7.2 del 02/11/2026:** se incorpora el backend publicado de #14 (8c887ae) al worktree de preparación de #16 mediante merge normal. Las notas de sincronización pendiente anteriores se conservan como historia. Se preservan las coordenadas, disponibilidad, Verificado, rubro y cobertura, sin modificar el contrato backend de #14. Repetición de pruebas sobre el backend propio en curso, sin publicación.
+
+**Validación del 03/11/2026:** el backend propio de la preparación T7.2 coincide con #14 8c887ae. Las 14 integraciones sobre este backend y las 168 pruebas Django (165 aprobadas, tres expectedFailure conocidas) completaron sin fallos nuevos. Las notas históricas de validación pendiente no describen ya este corte local.

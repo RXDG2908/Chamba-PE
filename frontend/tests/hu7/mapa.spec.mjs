@@ -1,5 +1,26 @@
 import { test, expect } from '@playwright/test'
 
+// Diagnóstico de red sin alterar respuestas ni tiempos de la aplicación.
+const redes = new WeakMap()
+test.beforeEach(async ({ page }) => {
+  const eventos = []
+  redes.set(page, eventos)
+  for (const evento of ['request', 'response', 'requestfinished', 'requestfailed']) {
+    page.on(evento, (dato) => {
+      const req = evento === 'response' ? dato.request() : dato
+      if (!req.url().includes('/api/')) return
+      eventos.push({ evento, url: req.url(), estado: evento === 'response' ? dato.status() : undefined,
+        fallo: evento === 'requestfailed' ? req.failure()?.errorText : undefined, tiempo: Date.now() })
+    })
+  }
+})
+test.afterEach(async ({ page }, info) => {
+  await info.attach('red-api', { body: JSON.stringify({ eventos: redes.get(page),
+    estado: await page.getByRole('status').allTextContents().catch(() => []),
+    tarjetas: await page.locator('.lista-prestadores > li').count().catch(() => -1) }, null, 2), contentType: 'application/json' })
+})
+
+
 const centro = { latitud: -12.046374, longitud: -77.042793 }
 const rubros = [{ id: 1, nombre: 'Gasfitería' }, { id: 2, nombre: 'Electricidad' }]
 const persona = (id, cambios = {}) => ({
@@ -13,11 +34,12 @@ const par = [persona(1), persona(2, {
 async function preparar(page, opciones = {}) {
   const errores = []
   page.on('pageerror', (e) => errores.push(e.message))
-  await page.route('https://tile.openstreetmap.org/**', (r) => r.fulfill({
+  await page.context().route('https://tile.openstreetmap.org/**', (r) => r.fulfill({
     contentType: 'image/png',
     body: Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQIHWP4z8DwHwAFgAI/ScLbtAAAAABJRU5ErkJggg==', 'base64'),
   }))
-  await page.route('**/api/**', async (route) => {
+  // Mantener la interceptación en el contexto aislado, también durante el arranque de sesión.
+  await page.context().route('**/api/**', async (route) => {
     const url = new URL(route.request().url())
     if (url.pathname.endsWith('/csrf/')) return route.fulfill({ json: {} })
     if (url.pathname.endsWith('/yo/')) return route.fulfill({ status: 403, json: {} })
@@ -210,7 +232,7 @@ test('seleccionar punto libre limpia resultados; volver al mapa no cambia ubicac
 test('solicitar desde tarjeta conserva prestador, rubro y coordenadas elegidas', async ({ page }) => {
   await preparar(page)
   let enviada
-  await page.route('**/api/servicios/solicitudes/', async (route) => {
+  await page.context().route('**/api/servicios/solicitudes/', async (route) => {
     enviada = route.request().postDataJSON()
     await route.fulfill({ status: 201, json: { id: 42, estado: 'pendiente' } })
   })

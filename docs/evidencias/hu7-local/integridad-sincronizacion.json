@@ -1,0 +1,54 @@
+{
+  "fecha": "2026-11-03",
+  "otrosWorktrees": [
+    {
+      "worktree": "C:/Users/denis/OneDrive/Documentos/a/4to ciclo/Proyecto intgrador/Chamba-PE",
+      "changed": [],
+      "headSame": true,
+      "statusSame": true,
+      "branchSame": true
+    },
+    {
+      "worktree": "C:/Users/denis/AppData/Local/Temp/Chamba-PE-hu7-revision",
+      "changed": [],
+      "headSame": true,
+      "statusSame": true,
+      "branchSame": true
+    },
+    {
+      "worktree": "C:/Users/denis/AppData/Local/Temp/Chamba-PE-hu7-t71-preparacion",
+      "changed": [],
+      "headSame": true,
+      "statusSame": true,
+      "branchSame": true
+    },
+    {
+      "worktree": "C:/Users/denis/AppData/Local/Temp/Chamba-PE-hu7-validacion-local",
+      "changed": [],
+      "headSame": true,
+      "statusSame": true,
+      "branchSame": true
+    },
+    {
+      "worktree": "C:/Users/denis/AppData/Local/Temp/Chamba-PE-sprint3-docs",
+      "changed": [],
+      "headSame": true,
+      "statusSame": true,
+      "branchSame": true
+    }
+  ],
+  "ports": [
+    {
+      "port": 5187,
+      "listening": false
+    },
+    {
+      "port": 5189,
+      "listening": false
+    },
+    {
+      "port": 8019,
+      "listening": false
+    }
+  ]
+}

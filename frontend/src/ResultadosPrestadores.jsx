@@ -7,6 +7,15 @@ import SolicitudServicio from './SolicitudServicio.jsx'
 const LIMA = [-12.046374, -77.042793]
 const formatoDistancia = new Intl.NumberFormat('es-PE', { maximumFractionDigits: 2 })
 
+// Validar el contrato antes de renderizar tarjetas y marcadores con los mismos datos.
+function prestadorValido(prestador) {
+  return prestador && Number.isSafeInteger(prestador.id) && prestador.id > 0
+    && typeof prestador.nombres === 'string' && typeof prestador.apellidos === 'string'
+    && Number.isFinite(prestador.distancia_km) && prestador.distancia_km >= 0
+    && Array.isArray(prestador.rubros) && prestador.rubros.every((rubro) =>
+      rubro && Number.isSafeInteger(rubro.id) && rubro.id > 0 && typeof rubro.nombre === 'string')
+}
+
 function UbicacionCliente({ ubicacion, onElegir }) {
   useMapEvents({
     click: ({ latlng, originalEvent }) => {
@@ -31,7 +40,8 @@ function VistaResultados({ ubicacion, prestadores }) {
   useEffect(() => {
     if (!ubicacion) return
     const puntos = [ubicacion, ...prestadores.map((p) => [p.latitud, p.longitud])]
-    mapa.fitBounds(puntos, { padding: [32, 32], maxZoom: 15 })
+    // Aplicar cada resultado de inmediato: Leaflet ignora nuevos zooms mientras anima otro.
+    mapa.fitBounds(puntos, { padding: [32, 32], maxZoom: 15, animate: false })
   }, [mapa, ubicacion, prestadores])
 
   return ubicacion && (
@@ -40,7 +50,7 @@ function VistaResultados({ ubicacion, prestadores }) {
     }}>
       <button type="button" onClick={() => mapa.fitBounds(
         [ubicacion, ...prestadores.map((p) => [p.latitud, p.longitud])],
-        { padding: [32, 32], maxZoom: 15 },
+        { padding: [32, 32], maxZoom: 15, animate: false },
       )}>Ver ubicación y resultados</button>
     </div>
   )
@@ -170,9 +180,12 @@ function ResultadosPrestadores() {
         throw new Error(mensajes.join(' ') || 'No se pudo realizar la búsqueda. Inténtalo de nuevo.')
       }
       if (!Array.isArray(datos)) throw new Error('El servidor devolvió una respuesta inesperada. Inténtalo de nuevo.')
-      if (datos.some((p) => !Number.isFinite(p.latitud) || Math.abs(p.latitud) > 90
-        || !Number.isFinite(p.longitud) || Math.abs(p.longitud) > 180)) {
+      if (datos.some((p) => !Number.isFinite(p?.latitud) || Math.abs(p.latitud) > 90
+        || !Number.isFinite(p?.longitud) || Math.abs(p.longitud) > 180)) {
         throw new Error('El servidor devolvió coordenadas inválidas. Inténtalo de nuevo.')
+      }
+      if (!datos.every(prestadorValido) || new Set(datos.map((p) => p.id)).size !== datos.length) {
+        throw new Error('El servidor devolvió datos de prestadores inválidos. Inténtalo de nuevo.')
       }
       // Una petición cancelada nunca puede reemplazar una búsqueda más reciente.
       if (!controlador.signal.aborted && peticion.current === controlador) {
@@ -222,6 +235,7 @@ function ResultadosPrestadores() {
         <fieldset>
           <legend>Tu ubicación</legend>
           <p id="ayuda-ubicacion">Toca el mapa para elegir dónde necesitas el servicio o introduce tus coordenadas.</p>
+          <div role="region" aria-label="Mapa de prestadores y ubicación">
           <MapContainer center={LIMA} zoom={13} className="mapa-busqueda" scrollWheelZoom={false}>
             <TileLayer
               attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
@@ -231,6 +245,7 @@ function ResultadosPrestadores() {
             <MarcadoresPrestadores prestadores={prestadores} />
             <VistaResultados ubicacion={ubicacion} prestadores={prestadores} />
           </MapContainer>
+          </div>
           <p className="leyenda-mapa">● Azul: tu ubicación · Marcadores verdes numerados: prestadores (centro de cobertura). El signo + indica varios en el mismo punto; abre la ventana para verlos todos.</p>
           <div className="coordenadas-busqueda">
             <label className="campo-busqueda">

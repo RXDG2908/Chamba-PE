@@ -1,0 +1,65 @@
+{
+  "protectedWorktrees": [
+    {
+      "worktree": "C:/Users/denis/OneDrive/Documentos/a/4to ciclo/Proyecto intgrador/Chamba-PE",
+      "filesChecked": 149,
+      "changed": [],
+      "headSame": true,
+      "branchSame": true,
+      "statusSame": true
+    },
+    {
+      "worktree": "C:/Users/denis/AppData/Local/Temp/Chamba-PE-hu7-revision",
+      "filesChecked": 141,
+      "changed": [],
+      "headSame": true,
+      "branchSame": true,
+      "statusSame": true
+    },
+    {
+      "worktree": "C:/Users/denis/AppData/Local/Temp/Chamba-PE-hu7-t71-preparacion",
+      "filesChecked": 139,
+      "changed": [],
+      "headSame": true,
+      "branchSame": true,
+      "statusSame": true
+    },
+    {
+      "worktree": "C:/Users/denis/AppData/Local/Temp/Chamba-PE-hu7-validacion-local",
+      "filesChecked": 215,
+      "changed": [],
+      "headSame": true,
+      "branchSame": true,
+      "statusSame": true
+    },
+    {
+      "worktree": "C:/Users/denis/AppData/Local/Temp/Chamba-PE-sprint3-docs",
+      "filesChecked": 137,
+      "changed": [],
+      "headSame": true,
+      "branchSame": true,
+      "statusSame": true
+    }
+  ],
+  "destinationFilesChangedThisSession": [
+    ".gitignore",
+    "AVANCES.md",
+    "docs/pruebas-T7.2.md",
+    "frontend/package.json",
+    "frontend/src/ResultadosPrestadores.jsx"
+  ],
+  "ports": [
+    {
+      "port": 5187,
+      "listening": false
+    },
+    {
+      "port": 5189,
+      "listening": false
+    },
+    {
+      "port": 8019,
+      "listening": false
+    }
+  ]
+}

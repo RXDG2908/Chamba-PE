@@ -8,6 +8,8 @@ Lo escribió Renzo León el 29/10/2026, al inicio del Sprint 3, antes de escribi
 
 Luis prepara T19.4 (pruebas cruzadas) contra este documento, sin esperar el código. Si algo cambia al implementar, se actualiza aquí en el mismo PR.
 
+> **Cambios al implementar T19.2 (03/11):** las fotos van a `RAIZ_PRIVADA` y no a `MEDIA_ROOT/privado/` (ver sección 6). `eldni` está registrado pero responde siempre `no_disponible` (ver sección 5), así que con él todo va a revisión manual; con `simulado` un intento correcto queda `validado`. El `403` por falta de consentimiento se activa con el PR de T21.1.
+
 ## Resumen
 
 | Tema | Acuerdo |
@@ -128,6 +130,7 @@ Sobre **eldni.com**: la propia página dice que sus datos vienen de fuentes púb
 - tiene un tiempo de espera máximo de **5 s**;
 - cualquier error, demora o cambio en la página da `no_disponible` y el caso pasa a **revisión manual**;
 - el PO decide si se activa en la demo.
+- **Estado al 03/11:** el validador `eldni` está registrado pero todavía no consulta la página: no tiene API (es un formulario con token y publicidad) y hace falta decidir cómo usarla. Mientras tanto responde `no_disponible`. Se elige con la variable de entorno `VALIDADOR_DNI`.
 
 ## 6. Datos que se guardan
 
@@ -140,7 +143,7 @@ Modelo `verificacion.IntentoDni`:
 | `motivos` | Lista de códigos de la sección 3 |
 | `dni_leido`, `apellidos_leidos`, `nombres_leidos`, `fecha_nacimiento`, `fecha_vencimiento` | Lo leído de la MRZ |
 | `fuente`, `estado_fuente` | Validador usado y su respuesta |
-| `anverso`, `reverso`, `foto_titular` | Archivos en una carpeta **privada** (`MEDIA_ROOT/privado/dni/`), fuera de `/media/` público |
+| `anverso`, `reverso`, `foto_titular` | Archivos en una carpeta **privada** (`RAIZ_PRIVADA/dni/`, la carpeta `privado/` junto a `manage.py`), fuera de `MEDIA_ROOT` porque Django publica todo `/media/` en desarrollo |
 | `creado` | Fecha y hora |
 
 - **No se guarda** la respuesta completa de la fuente externa, solo el estado y si coincidió.

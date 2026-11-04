@@ -50,3 +50,18 @@ class IntentoDni(models.Model):
 
     def __str__(self):
         return f'Intento de DNI de {self.prestador} - {self.resultado}'
+
+    def eliminar_datos_biometricos(self):
+        """Borra las fotos y lo leído del DNI; solo quedan resultado, motivos y fecha.
+
+        La usa la solicitud de eliminación de HU-21.
+        """
+        for campo in (self.anverso, self.reverso, self.foto_titular):
+            if campo:
+                campo.delete(save=False)
+        self.dni_leido = self.apellidos_leidos = self.nombres_leidos = ''
+        self.fecha_nacimiento = self.fecha_vencimiento = None
+        self.mrz_valida = False
+        self.fuente = ''
+        self.estado_fuente = 'no_disponible'
+        self.save()

@@ -14,6 +14,22 @@ const MOTIVOS = {
   fuente_no_disponible: 'No pudimos confirmar tus nombres con la fuente externa.',
   nombres_distintos: 'Tus nombres no coinciden con los de la fuente externa.',
   sin_foto: 'No pudimos recortar la foto del DNI.',
+  lector_no_disponible: 'El lector del DNI no está disponible por ahora.',
+}
+
+// Texto para el prestador según la respuesta del servidor.
+function mensajeDeError(estado, cuerpo) {
+  const porCampo = erroresPorCampo(cuerpo)
+  if (estado === 400) {
+    const lados = ['anverso', 'reverso'].filter((l) => porCampo[l])
+    if (lados.length) {
+      return lados.map((l) => `${l === 'anverso' ? 'Frente' : 'Reverso'}: ${porCampo[l]}`).join(' ')
+    }
+  }
+  if (estado === 401 || (estado === 403 && !porCampo.detail)) return 'Tu sesión terminó. Vuelve a iniciar sesión.'
+  if (estado === 403 || estado === 429) return porCampo.detail
+  if (estado >= 500) return 'El servidor tuvo un problema. Inténtalo de nuevo en unos minutos.'
+  return 'No pudimos enviar las fotos. Inténtalo de nuevo.'
 }
 
 // Foto desde la cámara; si no hay cámara o permiso, se usa el selector del celular.
@@ -157,8 +173,9 @@ function VerificarDni() {
     setPaso('enviando')
     setError('')
     const datos = new FormData()
-    datos.append('anverso', fotos.anverso.blob, 'anverso.jpg')
-    datos.append('reverso', fotos.reverso.blob, 'reverso.jpg')
+    for (const lado of ['anverso', 'reverso']) {
+      datos.append(lado, fotos[lado].blob, `${lado}.${fotos[lado].blob.type === 'image/png' ? 'png' : 'jpg'}`)
+    }
     try {
       const respuesta = await fetch('/api/verificacion/dni/', {
         method: 'POST',
@@ -171,8 +188,7 @@ function VerificarDni() {
         setPaso('resultado')
         return
       }
-      const porCampo = erroresPorCampo(cuerpo)
-      setError(porCampo.detail || porCampo.anverso || porCampo.reverso || 'No pudimos enviar las fotos.')
+      setError(mensajeDeError(respuesta.status, cuerpo))
     } catch {
       setError('No hay conexión con el servidor. Inténtalo de nuevo.')
     }

@@ -1,31 +1,56 @@
+import io
+
 from django.core.files.base import ContentFile
 from django.http import FileResponse, Http404
 from django.utils import timezone
+from PIL import Image
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from usuarios.permisos import EsAdministrador, EsPrestador
 
 from . import servicio
+from .consentimiento import tiene_consentimiento
 from .lector import obtener_lector
 from .models import IntentoDni
 
 MAX_IMAGEN = 5 * 1024 * 1024  # 5 MB
 INTENTOS_POR_DIA = 5
-FIRMAS = (b'\xff\xd8\xff', b'\x89PNG\r\n\x1a\n')  # JPG y PNG
+FIRMAS = {b'\xff\xd8\xff': 'jpg', b'\x89PNG\r\n\x1a\n': 'png'}
+TIPOS = {'jpg': 'image/jpeg', 'png': 'image/png'}
 FOTOS = ('anverso', 'reverso', 'titular')
 
 
+def extension_de(cabecera):
+    """'jpg' o 'png' según los primeros bytes, o None si no es ninguno."""
+    for firma, extension in FIRMAS.items():
+        if cabecera.startswith(firma):
+            return extension
+    return None
+
+
+def imagen_valida(contenido):
+    """Abre la imagen entera: un archivo roto con buen encabezado no pasa."""
+    try:
+        Image.open(io.BytesIO(contenido)).verify()
+        Image.open(io.BytesIO(contenido)).load()  # verify() no detecta un archivo cortado
+    except Exception:
+        return False
+    return True
+
+
 def error_de_imagen(archivo):
-    """Texto del error si la imagen falta o no es un JPG o PNG de hasta 5 MB."""
+    """Texto del error si la imagen falta o no es un JPG o PNG sano de hasta 5 MB."""
     if archivo is None:
         return 'Este campo es obligatorio.'
     if archivo.size > MAX_IMAGEN:
         return 'La imagen excede el límite de 5 MB.'
-    cabecera = archivo.read(8)
+    contenido = archivo.read()
     archivo.seek(0)
-    if not cabecera.startswith(FIRMAS):
+    if extension_de(contenido[:8]) is None:
         return 'Solo se permiten imágenes JPG o PNG.'
+    if not imagen_valida(contenido):
+        return 'La imagen está dañada o incompleta. Toma la foto de nuevo.'
     return None
 
 
@@ -56,6 +81,10 @@ class IntentoDniView(APIView):
 
     def post(self, request):
         prestador = request.user.prestador
+        if not tiene_consentimiento(prestador):
+            return Response(
+                {'detail': 'Antes de verificar tu DNI debes aceptar el uso de tus datos.'}, status=403,
+            )
         errores = {}
         for campo in ('anverso', 'reverso'):
             error = error_de_imagen(request.FILES.get(campo))
@@ -90,8 +119,8 @@ class IntentoDniView(APIView):
             intento.fecha_nacimiento = lectura.fecha_nacimiento
             intento.fecha_vencimiento = lectura.fecha_vencimiento
             intento.mrz_valida = lectura.mrz_valida
-        intento.anverso.save('anverso.jpg', ContentFile(anverso), save=False)
-        intento.reverso.save('reverso.jpg', ContentFile(reverso), save=False)
+        intento.anverso.save(f'anverso.{extension_de(anverso)}', ContentFile(anverso), save=False)
+        intento.reverso.save(f'reverso.{extension_de(reverso)}', ContentFile(reverso), save=False)
         if foto:
             intento.foto_titular.save('titular.jpg', ContentFile(foto), save=False)
         intento.save()
@@ -126,4 +155,5 @@ class FotoIntentoDni(APIView):
         archivo = intento.foto_titular if tipo == 'titular' else getattr(intento, tipo)
         if not archivo:
             raise Http404
-        return FileResponse(archivo.open('rb'), content_type='image/jpeg')
+        extension = archivo.name.rsplit('.', 1)[-1].lower()
+        return FileResponse(archivo.open('rb'), content_type=TIPOS.get(extension, 'image/jpeg'))

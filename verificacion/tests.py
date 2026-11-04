@@ -4,6 +4,7 @@ T19.2: lectura de la MRZ del DNI y API de intentos de verificación.
 El lector (EasyOCR) se reemplaza por uno falso que devuelve las líneas de la MRZ,
 así las pruebas no dependen de instalar el OCR ni de fotos de DNIs reales.
 """
+import io
 import os
 from datetime import date
 from tempfile import TemporaryDirectory
@@ -15,6 +16,7 @@ from django.core.exceptions import ImproperlyConfigured
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase, override_settings
 from django.urls import reverse
+from PIL import Image
 from rest_framework.test import APIClient
 
 from prestadores.models import Prestador, Rubro
@@ -29,7 +31,17 @@ from .validadores import (
 
 User = get_user_model()
 CLAVE = 'Clave-segura-2026'
-JPG = b'\xff\xd8\xff\xe0' + b'0' * 100
+
+
+def imagen(formato):
+    """Una imagen de verdad: la validación abre el archivo completo."""
+    salida = io.BytesIO()
+    Image.new('RGB', (40, 30), 'gray').save(salida, formato)
+    return salida.getvalue()
+
+
+JPG = imagen('JPEG')
+PNG = imagen('PNG')
 
 
 def hacer_mrz(dni='12345678', nacimiento='950412', vencimiento='310412',
@@ -46,11 +58,14 @@ def hacer_mrz(dni='12345678', nacimiento='950412', vencimiento='310412',
 
 
 class LectorFalso(LectorDni):
-    def __init__(self, lineas, foto=b'foto'):
+    def __init__(self, lineas, foto=b'foto', falla=False):
         self.lineas = lineas
         self.foto = foto
+        self.falla = falla
 
     def leer_textos(self, imagen):
+        if self.falla:
+            raise RuntimeError('El OCR no está instalado')
         return self.lineas
 
     def recortar_titular(self, imagen):
@@ -186,7 +201,7 @@ class ApiDniTests(TestCase):
             cliente.credentials(HTTP_X_CSRFTOKEN=cliente.cookies['csrftoken'].value)
         return cliente
 
-    def enviar(self, cliente, lineas=None, foto=b'foto', **archivos):
+    def enviar(self, cliente, lineas=None, foto=b'foto', falla=False, **archivos):
         datos = {
             'anverso': SimpleUploadedFile('a.jpg', JPG, content_type='image/jpeg'),
             'reverso': SimpleUploadedFile('r.jpg', JPG, content_type='image/jpeg'),
@@ -194,7 +209,7 @@ class ApiDniTests(TestCase):
         datos.update(archivos)
         datos = {k: v for k, v in datos.items() if v is not None}
         with mock.patch('verificacion.views.obtener_lector',
-                        return_value=LectorFalso(hacer_mrz() if lineas is None else lineas, foto)):
+                        return_value=LectorFalso(hacer_mrz() if lineas is None else lineas, foto, falla)):
             return cliente.post(reverse('verificacion_dni'), datos, format='multipart')
 
     def test_mrz_correcta_guarda_la_lectura_y_la_foto(self):
@@ -340,3 +355,73 @@ class ApiDniTests(TestCase):
             cuerpo = self.enviar(self.sesion(self.prestador.usuario), lineas=hacer_mrz(dni='11111111')).json()
         validador.assert_not_called()
         self.assertEqual(cuerpo['motivos'], ['dni_distinto'])
+
+    def test_una_imagen_con_buen_encabezado_pero_rota_se_rechaza(self):
+        cliente = self.sesion(self.prestador.usuario)
+        rota = SimpleUploadedFile('r.jpg', JPG[:3] + b'basura' * 50, content_type='image/jpeg')
+        cortada = SimpleUploadedFile('r.jpg', JPG[:len(JPG) // 2], content_type='image/jpeg')
+        for archivo in (rota, cortada):
+            respuesta = self.enviar(cliente, reverso=archivo)
+            self.assertEqual(respuesta.status_code, 400)
+            self.assertIn('reverso', respuesta.json())
+        self.assertEqual(IntentoDni.objects.count(), 0)
+
+    def test_un_png_se_guarda_y_se_sirve_como_png(self):
+        archivo = SimpleUploadedFile('frente.jpg', PNG, content_type='image/jpeg')
+        intento_id = self.enviar(self.sesion(self.prestador.usuario), anverso=archivo).json()['id']
+        intento = IntentoDni.objects.get(id=intento_id)
+        self.assertTrue(intento.anverso.name.endswith('.png'))
+        self.assertTrue(intento.reverso.name.endswith('.jpg'))
+        respuesta = self.sesion(self.admin).get(reverse('verificacion_dni_foto', args=[intento_id, 'anverso']))
+        respuesta.close()
+        self.assertEqual(respuesta['Content-Type'], 'image/png')
+
+    def test_si_falla_el_ocr_pasa_a_revision_manual_sin_error_500(self):
+        respuesta = self.enviar(self.sesion(self.prestador.usuario), falla=True)
+        self.assertEqual(respuesta.status_code, 201)
+        cuerpo = respuesta.json()
+        self.assertEqual(cuerpo['resultado'], 'revision_manual')
+        self.assertEqual(cuerpo['motivos'], ['lector_no_disponible'])
+
+    def test_si_falla_el_recorte_o_la_fuente_tampoco_hay_error_500(self):
+        class SinRecorte(LectorFalso):
+            def recortar_titular(self, imagen):
+                raise RuntimeError('Pillow falló')
+
+        class FuenteRota:
+            nombre = 'rota'
+
+            def consultar(self, dni):
+                raise TimeoutError('sin internet')
+
+        datos = {
+            'anverso': SimpleUploadedFile('a.jpg', JPG, content_type='image/jpeg'),
+            'reverso': SimpleUploadedFile('r.jpg', JPG, content_type='image/jpeg'),
+        }
+        with mock.patch('verificacion.views.obtener_lector', return_value=SinRecorte(hacer_mrz())),                 mock.patch('verificacion.servicio.obtener_validador', return_value=FuenteRota()):
+            respuesta = self.sesion(self.prestador.usuario).post(
+                reverse('verificacion_dni'), datos, format='multipart',
+            )
+        self.assertEqual(respuesta.status_code, 201)
+        cuerpo = respuesta.json()
+        self.assertEqual(cuerpo['resultado'], 'revision_manual')
+        self.assertEqual(cuerpo['motivos'], ['sin_foto', 'fuente_no_disponible'])
+
+    def test_sin_consentimiento_no_se_procesa_el_dni(self):
+        with mock.patch('verificacion.views.tiene_consentimiento', return_value=False):
+            respuesta = self.enviar(self.sesion(self.prestador.usuario))
+        self.assertEqual(respuesta.status_code, 403)
+        self.assertEqual(IntentoDni.objects.count(), 0)
+
+    def test_eliminar_datos_biometricos_deja_solo_la_trazabilidad(self):
+        intento_id = self.enviar(self.sesion(self.prestador.usuario)).json()['id']
+        intento = IntentoDni.objects.get(id=intento_id)
+        rutas = [intento.anverso.path, intento.reverso.path, intento.foto_titular.path]
+        intento.eliminar_datos_biometricos()
+        intento.refresh_from_db()
+        self.assertFalse(any(os.path.exists(ruta) for ruta in rutas))
+        self.assertEqual((intento.anverso.name, intento.reverso.name, intento.foto_titular.name), ('', '', ''))
+        self.assertEqual((intento.dni_leido, intento.apellidos_leidos, intento.nombres_leidos), ('', '', ''))
+        self.assertIsNone(intento.fecha_nacimiento)
+        self.assertEqual(intento.resultado, 'validado')
+        self.assertEqual(intento.motivos, [])

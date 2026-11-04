@@ -17,6 +17,9 @@ def analizar(anverso, reverso, prestador, lector):
         lectura = interpretar(lector.leer_textos(reverso))
     except ErrorMrz as error:
         motivos.append(error.motivo)
+    except Exception:
+        # El OCR no está instalado o falló: no es culpa del prestador, lo revisa un administrador.
+        motivos.append('lector_no_disponible')
 
     if lectura:
         if lectura.dni != prestador.dni:
@@ -24,14 +27,20 @@ def analizar(anverso, reverso, prestador, lector):
         if lectura.fecha_vencimiento < date.today():
             motivos.append('dni_vencido')
 
-    foto = lector.recortar_titular(anverso)
+    try:
+        foto = lector.recortar_titular(anverso)
+    except Exception:
+        foto = None
     if foto is None:
         motivos.append('sin_foto')
 
     # Solo se consulta si hay un DNI válido y es el del prestador: si no, ya va a revisión.
     if lectura and 'dni_distinto' not in motivos:
         validador = obtener_validador()
-        datos = validador.consultar(lectura.dni)
+        try:
+            datos = validador.consultar(lectura.dni)
+        except Exception:
+            datos = {'estado': 'no_disponible'}
         fuente['nombre'] = validador.nombre
         if datos['estado'] != 'ok':
             motivos.append('fuente_no_disponible')

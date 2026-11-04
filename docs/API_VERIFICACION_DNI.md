@@ -166,7 +166,7 @@ Modelo `verificacion.IntentoDni`:
 
 | Con | Qué | Cuándo |
 |---|---|---|
-| **Luis · HU-21** | Función `tiene_consentimiento(prestador)` en `verificacion/consentimiento.py`: Renzo la deja escrita y devuelve `True` mientras no exista T21.1; el PR de T21.1 la reemplaza con su registro de aceptación. `POST /dni/` ya responde `403` si devuelve `False`. Para la eliminación, el endpoint de Luis llama a `IntentoDni.eliminar_datos_biometricos()`, que borra las fotos y lo leído y deja `resultado`, `motivos` y `creado` | Antes de integrar |
+| **Luis · HU-21** | Función `tiene_consentimiento(prestador)` en `verificacion/consentimiento.py`: Renzo la deja escrita y devuelve `True` mientras no exista T21.1; el PR de T21.1 la reemplaza con su registro de aceptación. `POST /dni/` ya responde `403` si devuelve `False`. Para la eliminación, el endpoint de Luis llama a `IntentoDni.eliminar_datos_biometricos()`, que borra las fotos y lo leído y deja `resultado`, `motivos` y `creado`. Si un archivo no se puede borrar no lanza error: devuelve la lista de campos que fallaron (`[]` si todo salió bien) y esos archivos conservan su nombre para repetir la llamada. Luis registra ese resultado (atendida o parcial, con los campos pendientes) en su solicitud de T21.2 | Antes de integrar |
 | **Luis · T19.4** | Las muestras de DNI son **ficticias** (espécimen o imágenes generadas). **No se suben DNIs reales al repositorio**. Los DNIs de prueba se agregan a la tabla del validador `simulado` | Desde hoy |
 | **David · HU-9** | Mostrar el último intento (resultado, motivos y fotos) junto a los certificados en el panel de revisión | Al tener T19.2 |
 | **HU-20** (postergada) | Usará `foto_titular` para la comparación facial | Cuando se replanifique |

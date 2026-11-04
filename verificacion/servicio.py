@@ -2,7 +2,21 @@
 from datetime import date
 
 from .mrz import ErrorMrz, interpretar
-from .validadores import nombres_coinciden, obtener_validador
+from .validadores import NO_DISPONIBLE, nombres_coinciden, obtener_validador
+
+
+def consultar_fuente(validador, dni):
+    """Respuesta de la fuente, o NO_DISPONIBLE si falla o viene mal formada."""
+    try:
+        datos = validador.consultar(dni)
+    except Exception:
+        return NO_DISPONIBLE
+    if not isinstance(datos, dict) or datos.get('estado') != 'ok':
+        return NO_DISPONIBLE
+    for campo in ('apellidos', 'nombres'):
+        if not isinstance(datos.get(campo), str) or not datos[campo].strip():
+            return NO_DISPONIBLE
+    return datos
 
 
 def analizar(anverso, reverso, prestador, lector):
@@ -37,10 +51,7 @@ def analizar(anverso, reverso, prestador, lector):
     # Solo se consulta si hay un DNI válido y es el del prestador: si no, ya va a revisión.
     if lectura and 'dni_distinto' not in motivos:
         validador = obtener_validador()
-        try:
-            datos = validador.consultar(lectura.dni)
-        except Exception:
-            datos = {'estado': 'no_disponible'}
+        datos = consultar_fuente(validador, lectura.dni)
         fuente['nombre'] = validador.nombre
         if datos['estado'] != 'ok':
             motivos.append('fuente_no_disponible')

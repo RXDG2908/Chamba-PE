@@ -425,3 +425,44 @@ class ApiDniTests(TestCase):
         self.assertIsNone(intento.fecha_nacimiento)
         self.assertEqual(intento.resultado, 'validado')
         self.assertEqual(intento.motivos, [])
+
+    def test_una_fuente_con_respuesta_mal_formada_pasa_a_revision_manual(self):
+        respuestas = [
+            None, 'texto', [], {}, {'estado': 'ok'}, {'estado': 'ok', 'apellidos': 'PEREZ GOMEZ'},
+            {'estado': 'ok', 'apellidos': 5, 'nombres': None},
+            {'estado': 'ok', 'apellidos': '  ', 'nombres': 'JUAN CARLOS'},
+        ]
+        for respuesta in respuestas:
+            class FuenteMala:
+                nombre = 'mala'
+
+                def consultar(self, dni, respuesta=respuesta):
+                    return respuesta
+
+            with self.subTest(respuesta=respuesta):
+                with mock.patch('verificacion.servicio.obtener_validador', return_value=FuenteMala()):
+                    cuerpo = self.enviar(self.sesion(self.otro.usuario), lineas=hacer_mrz(dni='87654321')).json()
+                self.assertEqual(cuerpo['resultado'], 'revision_manual')
+                self.assertEqual(cuerpo['motivos'], ['fuente_no_disponible'])
+                IntentoDni.objects.all().delete()
+
+    def test_si_un_archivo_no_se_puede_borrar_se_informa_y_se_puede_repetir(self):
+        intento = IntentoDni.objects.get(id=self.enviar(self.sesion(self.prestador.usuario)).json()['id'])
+        ruta_titular = intento.foto_titular.path
+        original = type(intento.reverso.storage).delete
+
+        def borrar(almacen, nombre):
+            if nombre.endswith('reverso.jpg'):
+                raise PermissionError('archivo en uso')
+            return original(almacen, nombre)
+
+        with mock.patch.object(type(intento.reverso.storage), 'delete', borrar):
+            fallidos = intento.eliminar_datos_biometricos()
+        self.assertEqual(fallidos, ['reverso'])
+        self.assertFalse(os.path.exists(ruta_titular))
+        intento.refresh_from_db()
+        self.assertEqual(intento.dni_leido, '')
+        self.assertTrue(intento.reverso.name.endswith('reverso.jpg'))
+        # Al repetir, ya sin el fallo, queda todo borrado.
+        self.assertEqual(intento.eliminar_datos_biometricos(), [])
+        self.assertFalse(intento.reverso)

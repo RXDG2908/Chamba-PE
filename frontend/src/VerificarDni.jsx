@@ -27,7 +27,7 @@ function mensajeDeError(estado, cuerpo) {
     }
   }
   if (estado === 401 || (estado === 403 && !porCampo.detail)) return 'Tu sesión terminó. Vuelve a iniciar sesión.'
-  if (estado === 403 || estado === 429) return porCampo.detail
+  if (estado === 403 || estado === 429) return porCampo.detail || 'No tienes permiso para esta acción.'
   if (estado >= 500) return 'El servidor tuvo un problema. Inténtalo de nuevo en unos minutos.'
   return 'No pudimos enviar las fotos. Inténtalo de nuevo.'
 }
@@ -139,15 +139,24 @@ function VerificarDni() {
 
   useEffect(() => {
     fetch('/api/verificacion/dni/')
-      .then((r) => (r.ok ? r.json() : null))
+      .then((r) => {
+        if (r.ok) return r.json()
+        // 404 es normal: todavía no hizo ningún intento.
+        if (r.status !== 404) setError('No pudimos cargar tu último intento, pero puedes verificar tu DNI.')
+        return null
+      })
       .then((cuerpo) => {
         setIntento(cuerpo)
         setPaso(cuerpo ? 'resultado' : 'anverso')
       })
-      .catch(() => setPaso('anverso'))
+      .catch(() => {
+        setError('No hay conexión con el servidor. Revisa tu internet.')
+        setPaso('anverso')
+      })
   }, [])
 
   const guardarFoto = (lado, blob) => {
+    setError('')
     setFotos((antes) => ({ ...antes, [lado]: { blob, url: URL.createObjectURL(blob) } }))
     setPaso(lado === 'anverso' ? 'reverso' : 'enviar')
   }
@@ -203,6 +212,7 @@ function VerificarDni() {
 
       {(paso === 'anverso' || paso === 'reverso') && (
         <>
+          {error && <p className="error caja" role="alert">{error}</p>}
           <p className="ayuda">Paso {paso === 'anverso' ? 1 : 2} de 2: toma una foto {LADOS[paso]}.</p>
           <Camara key={paso} alCapturar={(blob) => guardarFoto(paso, blob)} />
         </>

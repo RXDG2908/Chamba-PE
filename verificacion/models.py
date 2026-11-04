@@ -54,14 +54,23 @@ class IntentoDni(models.Model):
     def eliminar_datos_biometricos(self):
         """Borra las fotos y lo leído del DNI; solo quedan resultado, motivos y fecha.
 
-        La usa la solicitud de eliminación de HU-21.
+        La usa la solicitud de eliminación de HU-21. No lanza errores por un archivo que no
+        se pudo borrar: devuelve la lista de los campos que fallaron ([] si todo salió bien).
+        Esos archivos conservan su nombre para poder repetir la llamada.
         """
-        for campo in (self.anverso, self.reverso, self.foto_titular):
-            if campo:
+        fallidos = []
+        for nombre in ('anverso', 'reverso', 'foto_titular'):
+            campo = getattr(self, nombre)
+            if not campo:
+                continue
+            try:
                 campo.delete(save=False)
+            except Exception:
+                fallidos.append(nombre)
         self.dni_leido = self.apellidos_leidos = self.nombres_leidos = ''
         self.fecha_nacimiento = self.fecha_vencimiento = None
         self.mrz_valida = False
         self.fuente = ''
         self.estado_fuente = 'no_disponible'
         self.save()
+        return fallidos

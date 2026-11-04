@@ -1,16 +1,12 @@
 import { useState } from 'react'
-import { useLocation } from 'react-router-dom'
+import { leerCookie } from './api.js'
 import './UploadCertificado.css'
 
 const MAX_FILE_SIZE = 5 * 1024 * 1024
 const ALLOWED_TYPES = ['application/pdf', 'image/jpeg']
 
 export default function UploadCertificado() {
-  const location = useLocation()
   const [archivo, setArchivo] = useState(null)
-  const [prestadorId, setPrestadorId] = useState(
-    () => String(location.state?.prestadorId || ''),
-  )
   const [estadoCarga, setEstadoCarga] = useState('inicial')
   const [mensajeError, setMensajeError] = useState('')
   const [datosRespuesta, setDatosRespuesta] = useState(null)
@@ -48,20 +44,16 @@ export default function UploadCertificado() {
       return
     }
 
-    if (!/^[1-9]\d*$/.test(prestadorId)) {
-      setMensajeError('Ingresa un ID de prestador válido.')
-      return
-    }
-
     setEstadoCarga('cargando')
     setMensajeError('')
 
     const formData = new FormData()
     formData.append('file', archivo)
-    formData.append('prestador', prestadorId)
     try {
+      // S3-CERT-16: el certificado va al perfil de la sesión; el token CSRF es obligatorio.
       const respuesta = await fetch('/api/certificaciones/upload/', {
         method: 'POST',
+        headers: { 'X-CSRFToken': leerCookie('csrftoken') },
         body: formData,
       })
 
@@ -71,7 +63,9 @@ export default function UploadCertificado() {
         setDatosRespuesta(resultado)
         setEstadoCarga('exito')
       } else {
-        setMensajeError(resultado.error || 'Ocurrió un error al procesar la solicitud.')
+        setMensajeError(resultado.error || (respuesta.status === 403
+          ? 'Tu sesión venció o no es de prestador. Vuelve a iniciar sesión.'
+          : 'Ocurrió un error al procesar la solicitud.'))
         setEstadoCarga('error')
       }
     } catch {
@@ -83,27 +77,9 @@ export default function UploadCertificado() {
   return (
     <main className="container-certificacion">
       <h2>Cargar certificado</h2>
-      <p className="descripcion">Adjunta un documento PDF o JPG de hasta 5 MB para el perfil del prestador.</p>
+      <p className="descripcion">Adjunta un documento PDF o JPG de hasta 5 MB. Se agrega a tu perfil de prestador.</p>
 
       <form onSubmit={enviarSolicitud} className="form-certificacion">
-        <label htmlFor="prestador-id">ID del prestador</label>
-        <input
-          id="prestador-id"
-          name="prestador"
-          type="number"
-          min="1"
-          step="1"
-          required
-          value={prestadorId}
-          onChange={(evento) => {
-            setPrestadorId(evento.target.value)
-            setMensajeError('')
-            setDatosRespuesta(null)
-            setEstadoCarga('inicial')
-          }}
-        />
-        <small>Ingresa el ID de tu perfil de prestador.</small>
-
         <label htmlFor="archivo-certificado">Archivo del certificado</label>
         <input
           id="archivo-certificado"

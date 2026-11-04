@@ -15,7 +15,7 @@ export default defineConfig({
   timeout: 45000,
   use: { baseURL: 'http://127.0.0.1:5189', browserName: 'chromium', channel: 'chromium', headless: true,
     screenshot: 'only-on-failure', trace: 'retain-on-failure' },
-  reporter: [['list'], ['json', { outputFile: '../docs/evidencias/hu7-local/resultados.json' }]],
+  reporter: [['list'], ['./hu7-evidence-reporter.mjs']],
   webServer: [
     { command: `"${python}" tools/hu7_backend_local.py`, cwd: root,
       url: 'http://127.0.0.1:8019/api/prestadores/rubros/', reuseExistingServer: false, timeout: 90000,

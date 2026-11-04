@@ -5,6 +5,9 @@
 
 **Última actualización:** 29/10/2026 · **Sprint 1:** ✅ cerrado el 14/10/2026 (01/10 – 14/10) · **Sprint 2:** ✅ cerrado el 28/10/2026 con 15 de 23 h (HU-8 pasa al Sprint 3; T6.3 y T7.3 se unieron el 29/10) · **Meta:** el prestador se registra y el cliente lo encuentra y le envía una solicitud.
 
+
+> **Actualización de Planning S3 (29/10):** acuerdo aprobado de David y Renzo, comunicado por el Scrum Master: 24 h de trabajo + 6 h de reserva, incluyendo las 3 h integradas de #20/#23. HU-8 sigue parcial con avance local; HU-13/HU-20 se postergan del compromiso inicial. [Seguimiento](#10-seguimiento-del-sprint-3--291011112026). Este acuerdo reemplaza la propuesta de sobrecarga de 35 h, conservada en el historial.
+
 Estados: ✅ terminada · 🟡 en curso / parcial · ⚪ sin iniciar · 🔴 bloqueada
 
 ---
@@ -212,6 +215,56 @@ Una línea por entrega, la más reciente arriba.
 | | PR 4 y PR 7 se unieron sin revisión de otro integrante. | Si un PR agrega una librería, también actualiza `requirements.txt`; quien revisa instala desde cero. |
 | | AVANCES.md no se actualizó a diario y los informes de pruebas salieron muy largos. | AVANCES.md al cierre de cada día, en pocas líneas; el detalle va en `docs/`. |
 
+## 10. Seguimiento del Sprint 3 · 29/10–11/11/2026
+
+**Plan aprobado por David y Renzo, comunicado por el Scrum Master el 29/10.** Objetivo: cierre de HU-7/HU-8, corrección de certificados y avance de HU-19/HU-21. [Backlog, criterios, dependencias y burndown](SPRINTS.md#plan-aprobado-del-sprint-3).
+
+| Responsable | Trabajo S3 asignado | Ya integrado en S3 | Pendiente al formalizar | Reserva sin consumo registrado | Capacidad |
+|---|---:|---:|---:|---:|---:|
+| Luis | 7 h | 0 h | 7 h | 3 h | 10 h |
+| David | 8 h | 3 h | 5 h | 2 h | 10 h |
+| Renzo | 9 h | 0 h | 9 h | 1 h | 10 h |
+| **Total** | **24 h** | **3 h** | **21 h** | **6 h** | **30 h** |
+
+Las 3 h de David son T6.3 (#20, 1 h) y T7.3 (#23, 2 h), integradas el 29/10 según origin/main `f515837`. No cambian el cierre de S2: **15 de 23 h**, no una cuenta de tareas. No volver a sumar las estimaciones originales de mapa/HU-8 a las horas restantes del nuevo plan. Las cifras de planificación no acreditan horas reales consumidas.
+
+| Referencia | Responsable | Horas S3 pendientes iniciales | Estado / próximo paso |
+|---|---|---:|---|
+| T6.3 + T7.3 | David | 0 | ✅ Integradas #20/#23; 3 h ya incluidas en su asignación S3 |
+| S3-MAPA-R | David | 1 | Revisar #14/#16 y regresiones sobre main |
+| S3-MAPA-I | Luis | 1 | Ajustes/integración de T7.1/T7.2, sin duplicar su desarrollo original |
+| T8.1 + T8.2 | Luis | 2 | 🟡 Código local conservado; completar escenarios y revisión, sin commit/PR |
+| T8.3 | David | 2 | 🟡 #22 base parcial de bandeja; repetir push real y validar evidencia |
+| S3-CERT-16 | David | 2 | Pendiente sesión, rol, propiedad y CSRF de carga; pruebas y expectedFailure |
+| T19.1 / T19.2 / T19.3 | Renzo | 3 + 4 + 2 | Sin iniciar; contrato cámara/OCR/validador y alternativa manual |
+| T19.4 | Luis | 2 | Prueba cruzada de HU-19 |
+| T21.1 / T21.2 | Luis | 1 + 1 | Consentimiento y eliminación; revisión de David |
+
+**HU-8 continúa abierta.** Se conserva toda la evidencia local: pruebas automatizadas previas (127 Django y 3 worker simuladas), recepción real, aceptación/rechazo, primer/segundo plano y pestaña cerrada con Chrome abierto, logout y cambio a administrador. Un ensayo grabado #17 dio ≈1,3 s (margen visual orientativo ±0,1 s); no sustituye repetición/validación de David ni demuestra una garantía general. Las pruebas locales anteriores tampoco equivalen a ejecutar la suite sobre el main remoto más reciente. Detalle en la guía local HU8_NOTIFICACIONES.md (todavía no publicada).
+
+**HU-13 (4 h) y HU-20 (11 h) quedan postergadas fuera del compromiso inicial S3**, por acuerdo aprobado. Sin asignación automática a S4 y sin restar sus horas de la reserva. La propuesta anterior de 35 h queda sustituida por este plan de 24 + 6.
+
+### Registro diario de avances, bloqueos y completadas
+
+| Fecha | Referencia / responsable | Avance / bloqueo | Evidencia / condición de cierre | Próximo paso |
+|---|---|---|---|---|
+| 29/10 | T6.3 / David | ✅ Integrada, 1 h de referencia | #20 | No replanificar implementación |
+| 29/10 | T7.3 / David | ✅ Integrada, 2 h de referencia | #23 | Regresión conjunta al revisar mapa |
+| 29/10 | Planning / Scrum Master | Acuerdo de David y Renzo formalizado; 21 h pendientes + 6 h reserva | SPRINTS.md; sin horas nuevas consumidas por documentarlo | Iniciar revisión y contratos |
+| 29/10 | HU-8 / Luis y David | Local/parcial; medición y escenarios documentados | Guía HU-8; falta validación cruzada e integración | Completar matriz y revisión |
+| Por registrar | Tarea / responsable | Avance o bloqueo | PR / prueba / evidencia | Acción, responsable y fecha |
+
+### Bloqueos y decisiones vigentes
+
+- David: impedimento 16 de certificados; Renzo revisa cambios de prestadores/permisos.
+- David/Luis: #14 y #16 abiertos; revisar #14 antes de #16, conservar funcionalidades al preparar integración futura.
+- David/Luis: #22 no acredita entrega FCM; HU-8 requiere evidencia real y revisión.
+- Renzo: calidad OCR y disponibilidad/contrato de fuente externa; revisión manual ante fallo.
+- Luis/PO David: acordar contrato y atención de eliminación/consentimiento, y tratamiento de «Sin calificaciones» en HU-7.
+- Scrum Master: verificar protección de main/revisión; registrar consumo de reserva por persona. El impedimento de capacidad de 35 h se resuelve documentalmente con el recorte aprobado, sin dar por resueltos los riesgos técnicos.
+
+**Corte inicial del burndown S3:** 24 h asignadas, 3 h integradas el 29/10, 21 h pendientes, 6 h de reserva sin consumo registrado. Los cortes siguientes y el uso de reserva se anotan en SPRINTS.md sin reemplazar los resultados históricos de S2. Al completar una tarea, actualizar estado, evidencia, pendiente y saldo de reserva; no convertir una prueba local en cierre de historia.
+
 ## Preparación T7.1 / PR #14 · 02/11/2026
 
 Se conserva íntegro el documento de main f515837 y, abajo, el historial particular de T7.1 como evidencia fechada. El código del PR devuelve coordenadas numéricas de solo lectura y no incluye marcadores, CSS de mapa ni Playwright. No se requiere una corrección funcional adicional de T7.1 según la revisión integrada.
@@ -240,6 +293,11 @@ La prueba de integración con main se realizó en review/hu7-t71-t72: 165 Django
 - Registros de main y avances históricos preservados; cierre S2 sigue en 15 de 23 h. No cambia la planificación de S3.
 - Pruebas de esta combinación real: 168 Django en 23,807 s (165 aprobadas y 3 expectedFailure conocidas del impedimento 16), system check sin problemas y makemigrations --check --dry-run sin cambios. git diff --check correcto.
 - Diff contra main limitado a coordenadas/pruebas T7.1 y sus documentos; sin marcadores, frontend, Playwright ni cambios HU-8/Firebase. Actualización autorizada únicamente de la rama original de #14; David sigue pendiente de revisar y no se declara HU-7 terminada.
+
+
+## Preparaci?n local tras revisi?n de David ? 03/11/2026
+
+Se incorpora main 15d8dc9 en la preparaci?n de #14 mediante merge normal, conservando ?ntegra la planificaci?n aprobada por #26 y el historial de T7.1. Cierre S2: 15 de 23 h; S3: 24 h de trabajo y 6 h de reserva. Las coordenadas p?blicas conservan su comportamiento y precisi?n actuales; cualquier cambio queda pendiente del PO. HU-7 sigue abierta, sin horas nuevas terminadas. Esta preparaci?n no publica ni actualiza el PR.
 
 
 ## Preparación T7.2 / PR #16 · 02/11/2026
@@ -278,3 +336,8 @@ Prueba integrada previa en review/hu7-t71-t72: 165 Django pasan, 3 expectedFailu
 - Corrección exclusiva de prueba: interceptar API/teselas por contexto aislado y adjuntar eventos de red. Sin cambios de producto, tiempos ni aserciones. 10/10 repeticiones y 16/16 suite completa aprobadas; 14/14 integración con backend propio, sin HU7_TEST_BACKEND_ROOT. Django: 168, 165 aprobadas + 3 expectedFailure conocidas; lint/build/diff-check correctos. [Detalle](docs/pruebas-T7.2.md).
 - Merge local autorizado de #14 8c887ae sobre T7.2 23831c2, documentos resueltos preservando main y ambos historiales; sin publicación. Backend de #14 intacto. HU-8/Firebase y demás worktrees verificados sin cambios.
 - HU-7/T7.2 sin cierre; pendiente revisión y validación física/humana. Horas reales no informadas, 0 h nuevas terminadas; cierre S2 15/23 h y planificación S3 sin cambios.
+
+
+## Preparaci?n de correcciones T7.2 tras #26 ? 03/11/2026
+
+Merge local del #14 preparado (`36de951`) conservando el historial de #16 y toda la planificaci?n de main `15d8dc9`. Conflictos AVANCES/SPRINTS resueltos sin quitar registros. Django 168 (165 aprobadas y tres expectedFailure conocidas), Playwright 16/16 e integraci?n real propia 14/14; lint/build correctos. Evidencias p?blicas saneadas; informes locales de integridad archivados en carpeta ignorada. [Informe y l?mites](docs/preparacion-correcciones-HU7.md). Precisi?n de coordenadas y ?Sin calificaciones? sin cambios, pendientes del PO. Sin push ni actualizaci?n de PR, sin cierre de HU-7 ni horas nuevas terminadas.

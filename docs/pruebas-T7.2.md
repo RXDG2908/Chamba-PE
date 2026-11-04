@@ -317,3 +317,10 @@ Pendiente teléfono físico, tacto/orientación/GPS, Safari/iOS/Firefox, lector 
 **Después:** diez repeticiones consecutivas aprobadas (22,7 s), suite completa 16 aprobadas (19,5 s), 14 integraciones reales propias aprobadas (25,6 s), 168 Django (165 aprobadas y tres expectedFailure conocidas de certificados; 25,697 s), lint/build y diff-check correctos. Sin reintentos que oculten fallos ni aumento de timeout. API y teselas simuladas en la suite de 16; Django/teselas OSM reales en las 14, con SQLite ficticia nueva; desconexión emulada y respuesta real demorada para cancelación. [Evidencia de red y resultados](evidencias/hu7-local/depuracion-red.json). Trazas completas de diagnóstico se conservan localmente bajo .hu7-local/diagnostico-anterior/, excluidas de Git.
 
 Se comprobaron nuevamente los documentos: sin conflictos pendientes ni marcadores, cierre histórico de 15/23 h conservado y docs/sprint2-review.md igual a main. No se cambia la planificación S3. Pendientes teléfono físico, GPS/permisos, otros navegadores, accesibilidad humana y revisión del equipo. T7.2/HU-7 no se declaran terminadas.
+
+
+## Correcciones preparadas tras integrar #26 ? 03/11/2026
+
+Se sincronizan localmente main `15d8dc9` ? T7.1 `36de951` ? T7.2 sin duplicar backend ni commits. El documento hist?rico anterior se conserva; el estado vigente de esta preparaci?n es: 168 Django (165 aprobadas y 3 expectedFailure de certificados), 16/16 Playwright y 14/14 integraciones con backend propio y SQLite ficticia, sin reintentos. Lint, builds y diff-check correctos. Las evidencias actuales se regeneraron con datos ficticios y teselas OSM reales; el reporte p?blico omite rutas del equipo, configuraci?n, adjuntos y logs. Informes crudos de integridad archivados solo en `.hu7-local`, ignorado.
+
+[Informe de resoluci?n, privacidad y decisiones pendientes](preparacion-correcciones-HU7.md). No se cambia precisi?n de coordenadas ni ?Sin calificaciones?: se requiere decisi?n del PO. Sin publicaci?n, sin merge a main y sin cierre de HU-7.

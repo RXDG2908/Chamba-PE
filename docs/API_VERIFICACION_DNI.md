@@ -8,6 +8,8 @@ Lo escribió Renzo León el 29/10/2026, al inicio del Sprint 3, antes de escribi
 
 Luis prepara T19.4 (pruebas cruzadas) contra este documento, sin esperar el código. Si algo cambia al implementar, se actualiza aquí en el mismo PR.
 
+> **Cambios al implementar T19.2 (03/11):** las fotos van a `RAIZ_PRIVADA` y no a `MEDIA_ROOT/privado/` (ver sección 6). `eldni` está registrado pero responde siempre `no_disponible` (ver sección 5), así que con él todo va a revisión manual; con `simulado` un intento correcto queda `validado`. El `403` por falta de consentimiento se activa con el PR de T21.1.
+
 ## Resumen
 
 | Tema | Acuerdo |
@@ -44,7 +46,7 @@ En el DNI peruano la Ñ aparece en la MRZ como `NXX` (por ejemplo, `NUNXXEZ` = N
 
 | # | Paso | Si falla |
 |:---:|---|---|
-| 1 | Comprobar las imágenes: JPG o PNG, 5 MB como máximo cada una, las dos presentes | `400` por campo; no se guarda nada |
+| 1 | Comprobar las imágenes: JPG o PNG, 5 MB como máximo cada una, las dos presentes y **abiertas completas** (un archivo roto o cortado con buen encabezado no pasa) | `400` por campo; no se guarda nada |
 | 2 | **OCR del reverso**: ubicar las 3 líneas de la MRZ y leerlas | Resultado `revision_manual`, motivo `mrz_ilegible` |
 | 3 | **Dígitos de control** de la MRZ: número de documento, fecha de nacimiento, vencimiento y control compuesto | `revision_manual`, motivo `mrz_invalida` |
 | 4 | **Número**: el DNI de la MRZ (8 dígitos) debe ser igual a `Prestador.dni` | `revision_manual`, motivo `dni_distinto` |
@@ -55,6 +57,10 @@ En el DNI peruano la Ñ aparece en la MRZ como `NXX` (por ejemplo, `NUNXXEZ` = N
 | 9 | Si todo pasó | Resultado `validado` |
 
 **Comparación de nombres (paso 8):** se pasa a mayúsculas, se quitan las tildes y la diéresis, se convierten `NXX` y `Ñ` a `N` y se dejan los espacios simples. Coinciden si los apellidos y los nombres son iguales después de normalizar. No se aceptan coincidencias "parecidas": ante la duda, revisión manual.
+
+**Nunca un `500` por el lector o la fuente:** si EasyOCR no está instalado o falla, el intento se guarda con el motivo `lector_no_disponible` y va a revisión manual. Lo mismo si el recorte de la foto o la consulta a la fuente lanzan un error (`sin_foto` y `fuente_no_disponible`).
+
+**Archivos:** se guardan con la extensión real según su contenido (`.jpg` o `.png`) y se sirven con su tipo.
 
 **OCR (T19.2):** se usa **EasyOCR**, como dice [PLAN_EQUIPO.md](../PLAN_EQUIPO.md#4-stack-tecnológico), detrás de una interfaz `LectorDni` para poder cambiarlo. Si la instalación de EasyOCR resulta muy pesada, se evalúa Tesseract **sin cambiar este contrato**.
 
@@ -128,6 +134,7 @@ Sobre **eldni.com**: la propia página dice que sus datos vienen de fuentes púb
 - tiene un tiempo de espera máximo de **5 s**;
 - cualquier error, demora o cambio en la página da `no_disponible` y el caso pasa a **revisión manual**;
 - el PO decide si se activa en la demo.
+- **Estado al 03/11:** el validador `eldni` está registrado pero todavía no consulta la página: no tiene API (es un formulario con token y publicidad) y hace falta decidir cómo usarla. Mientras tanto responde `no_disponible`. Se elige con la variable de entorno `VALIDADOR_DNI`.
 
 ## 6. Datos que se guardan
 
@@ -140,7 +147,7 @@ Modelo `verificacion.IntentoDni`:
 | `motivos` | Lista de códigos de la sección 3 |
 | `dni_leido`, `apellidos_leidos`, `nombres_leidos`, `fecha_nacimiento`, `fecha_vencimiento` | Lo leído de la MRZ |
 | `fuente`, `estado_fuente` | Validador usado y su respuesta |
-| `anverso`, `reverso`, `foto_titular` | Archivos en una carpeta **privada** (`MEDIA_ROOT/privado/dni/`), fuera de `/media/` público |
+| `anverso`, `reverso`, `foto_titular` | Archivos en una carpeta **privada** (`RAIZ_PRIVADA/dni/`, la carpeta `privado/` junto a `manage.py`), fuera de `MEDIA_ROOT` porque Django publica todo `/media/` en desarrollo |
 | `creado` | Fecha y hora |
 
 - **No se guarda** la respuesta completa de la fuente externa, solo el estado y si coincidió.
@@ -159,7 +166,7 @@ Modelo `verificacion.IntentoDni`:
 
 | Con | Qué | Cuándo |
 |---|---|---|
-| **Luis · HU-21** | Función `tiene_consentimiento(prestador)` en `verificacion`. `POST /dni/` responde `403` sin consentimiento. Si T21.1 no está en `main` cuando se una HU-19, la comprobación se activa en el PR de T21.1 | Antes de integrar |
+| **Luis · HU-21** | Función `tiene_consentimiento(prestador)` en `verificacion/consentimiento.py`: Renzo la deja escrita y devuelve `True` mientras no exista T21.1; el PR de T21.1 la reemplaza con su registro de aceptación. `POST /dni/` ya responde `403` si devuelve `False`. Para la eliminación, el endpoint de Luis llama a `IntentoDni.eliminar_datos_biometricos()`, que borra las fotos y lo leído y deja `resultado`, `motivos` y `creado` | Antes de integrar |
 | **Luis · T19.4** | Las muestras de DNI son **ficticias** (espécimen o imágenes generadas). **No se suben DNIs reales al repositorio**. Los DNIs de prueba se agregan a la tabla del validador `simulado` | Desde hoy |
 | **David · HU-9** | Mostrar el último intento (resultado, motivos y fotos) junto a los certificados en el panel de revisión | Al tener T19.2 |
 | **HU-20** (postergada) | Usará `foto_titular` para la comparación facial | Cuando se replanifique |

@@ -95,6 +95,7 @@ Una línea por entrega, la más reciente arriba.
 
 | Fecha | Quién | Qué se hizo | Tarea |
 |:---:|---|---|:---:|
+| 04/11 | David Valcarcel | Menú y rutas según el rol, y nuevo diseño del frontend (decisión del PO), en `feature/menu-por-rol-y-diseno`. Portada nueva en `/` con botones por rol, cómo funciona y rubros reales; el registro de prestador pasa a `/registro-prestador`. Cada rol ve solo lo suyo: visitante (buscar, ofrecer servicios, sesión), cliente (buscar), prestador (disponibilidad, certificado) y administrador (revisión de documentos); `/certificaciones` y `/administracion/revisiones` pasan a rutas privadas y el admin entra directo a su panel. Tema visual común en `Tema.css`, cabecera fija y pie. Probado en el navegador con los 4 roles y a 375 px sin desbordes; lint, build y 170 pruebas Django OK. Sin horas del Sprint 3 asignadas: se registra como uso de reserva si el equipo lo aprueba. | Frontend |
 | 04/11 | Renzo León | Limpieza de ramas del Sprint 2: se unieron a `main` los PR #14 y #16 (mapa de HU-7, de Luis), #25 (guía de exposición) y #12 (documento Word). Antes de unir, #16 se probó con `main` integrado: 168 pruebas OK (3 fallas esperadas), lint y build OK; la revisión automática dejó 7 observaciones no bloqueantes (la más importante: la búsqueda ahora entrega las coordenadas exactas del prestador, a decidir con el PO). Los conflictos de AVANCES de #25 y #12 se resolvieron conservando las filas de ambos lados. | Cierre S2 |
 | 18/10 | Renzo León | Documento Word con la descripción del proyecto (problema, casos de uso, verificación del prestador, IA, arquitectura, API y plan de sprints): [docs/Chamba_PE_Descripcion_del_Proyecto.docx](docs/Chamba_PE_Descripcion_del_Proyecto.docx). | — |
 | 29/10 | Renzo León | Guía de exposición y pruebas en vivo de los Sprints 1 y 2 en `docs/exposicion-renzo-sprint1-2.md`: resumen de T1.1–T1.3, T4.1, T5.1, T5.2, T6.1 y T6.2, checklist, guion de la demo, pruebas automáticas (10, 13 y 29 OK), plan B y preguntas probables. Se probó que aceptar una solicitud desde la API navegable funciona con el proxy de Vite. | Exposición |
@@ -255,6 +256,7 @@ Las 3 h de David son T6.3 (#20, 1 h) y T7.3 (#23, 2 h), integradas el 29/10 seg�
 | 29/10 | T7.3 / David | ✅ Integrada, 2 h de referencia | #23 | Regresión conjunta al revisar mapa |
 | 29/10 | Planning / Scrum Master | Acuerdo de David y Renzo formalizado; 21 h pendientes + 6 h reserva | SPRINTS.md; sin horas nuevas consumidas por documentarlo | Iniciar revisión y contratos |
 | 29/10 | HU-8 / Luis y David | Local/parcial; medición y escenarios documentados | Guía HU-8; falta validación cruzada e integración | Completar matriz y revisión |
+| 04/11 | Menú por rol y diseño / David | 🟡 Cambios listos en `feature/menu-por-rol-y-diseno`, sin commit | 4 roles probados en el navegador; 170 pruebas OK | Commit, PR y revisión; unir después del #29 (ambos tocan rutas de `App.jsx`) |
 | Por registrar | Tarea / responsable | Avance o bloqueo | PR / prueba / evidencia | Acción, responsable y fecha |
 
 ### Bloqueos y decisiones vigentes

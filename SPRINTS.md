@@ -190,9 +190,9 @@ Cada uno construye las historias de la app de Django de la que es dueño ([PLAN_
 
 | Tarea | Descripción | Tipo | Horas | ✔ |
 |:---:|---|:---:|:---:|:---:|
-| T7.1 | Consulta de prestadores por coordenadas dentro del radio | Backend | 2 | 🟡 |
+| T7.1 | Consulta de prestadores por coordenadas dentro del radio | Backend | 2 | ✅ |
 | T8.1 | Integrar notificaciones push (Firebase Cloud Messaging) | Backend | 3 | ➡️ S3 |
-| T7.2 | Integrar el mapa con marcadores (móvil y web) | Frontend | 3 | 🟡 |
+| T7.2 | Integrar el mapa con marcadores (móvil y web) | Frontend | 3 | ✅ |
 | T8.2 | Recepción de la notificación y pantalla aceptar/rechazar | Frontend | 2 | ➡️ S3 |
 | | **Subtotal** | | **10** | |
 
@@ -269,6 +269,8 @@ Horas pendientes al final de cada día. La línea ideal baja 3 h por día.
 > El 28/10 en la noche entraron a `main` 15 h (#13, #15, #17, #18, #11 y #21). De las 15 h que quedan, 7 son de HU-8, que el PO pasó al Sprint 3, y 8 están en PRs sin unir (#14, #16, #20 y #23).
 >
 > 29/10 (inicio del Sprint 3): se unieron #20 (T6.3) y #23 (T7.3), 3 h. El Sprint 2 queda cerrado en 15 h; siguen abiertos #14 y #16 (T7.1 y T7.2, 5 h).
+
+> 04/11: se unieron #14 y #16 (T7.1 y T7.2, 5 h) a `main`; el Sprint 2 queda sin PR abiertos.
 
 ## Retrospectiva
 

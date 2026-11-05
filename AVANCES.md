@@ -264,3 +264,37 @@ Las 3 h de David son T6.3 (#20, 1 h) y T7.3 (#23, 2 h), integradas el 29/10 seg�
 - Scrum Master: verificar protección de main/revisión; registrar consumo de reserva por persona. El impedimento de capacidad de 35 h se resuelve documentalmente con el recorte aprobado, sin dar por resueltos los riesgos técnicos.
 
 **Corte inicial del burndown S3:** 24 h asignadas, 3 h integradas el 29/10, 21 h pendientes, 6 h de reserva sin consumo registrado. Los cortes siguientes y el uso de reserva se anotan en SPRINTS.md sin reemplazar los resultados históricos de S2. Al completar una tarea, actualizar estado, evidencia, pendiente y saldo de reserva; no convertir una prueba local en cierre de historia.
+
+## Preparación T7.1 / PR #14 · 02/11/2026
+
+Se conserva íntegro el documento de main f515837 y, abajo, el historial particular de T7.1 como evidencia fechada. El código del PR devuelve coordenadas numéricas de solo lectura y no incluye marcadores, CSS de mapa ni Playwright. No se requiere una corrección funcional adicional de T7.1 según la revisión integrada.
+
+La prueba de integración con main se realizó en review/hu7-t71-t72: 165 Django pasan y 3 expectedFailure heredadas. Este worktree parte de la cabecera remota #14 (5ddaa14) y todavía NO contiene la sincronización de código con main. El contrato de destino usa los filtros actuales de main, que deberán conservarse al sincronizar después de autorización. T7.1 sigue pendiente de revisión e integración; 0 h adicionales terminadas, sin cambios de cierre S2 ni planificación S3.
+
+### Historial particular conservado (afirmaciones del corte original)
+
+## 10. Sprint 2 — avance local de T7.1 (19/10/2026)
+
+| Tarea | Responsable | Horas plan | Estado | Rama / PR |
+|---|---|---|---|---|
+| T7.1 — consulta por coordenadas | Luis Abad | 2 h | 🟡 Implementada localmente; pendiente de revisión/PR y de integrar el filtro Verificado | `feature/t7.1-mapa-prestadores`, commits locales sin push |
+
+- **Implementado:** misma búsqueda pública, ahora con latitud/longitud numéricas del centro de cobertura; conserva tarjetas, Haversine, filtros, radios propios, orden y cabecera de tiempo. Contrato en [docs/API_BUSQUEDA.md](docs/API_BUSQUEDA.md).
+- **Probado:** Python de `venv`, `manage.py test --noinput`: 60 pruebas OK en 2.574 s, sin problemas en el system check; dos pruebas nuevas y contrato público actualizado. Datos exclusivamente en la base de pruebas; sin modificar registros locales. Sin prueba visual del frontend.
+- **Evidencia manual reportada por Luis (19/10):** búsqueda HTTP 200, prestador ficticio id `2`, latitud `-12.046374`, longitud `-77.042793`, `distancia_km: 0.0` y cabecera `X-Execution-Time-Ms: 16.782`. Confirma la respuesta para ese caso; no valida el filtro Verificado pendiente.
+- **Integración/revisión pendiente:** David revisa el PR y ejecuta T7.3; T9.1 todavía debe actualizar el estado del prestador e integrar el filtro de verificados en búsqueda/solicitudes. Renzo debe confirmar continuidad de consulta pública al integrar roles/disponibilidad. Sin soporte real de calificaciones: propuesta de promedio `null`, cantidad `0` y texto «Sin calificaciones», aún fuera de la respuesta.
+- **Bitácora:** 19/10, Luis/asistente: verificados rama limpia y HEAD `8198a83`; fetch remoto completado con certificados de Windows; revisadas planificación y ramas T5.1/T9.1 sin fusionar. Preparados código, pruebas y documentación para revisión local.
+- **Horas y burndown:** 2 h planificadas para T7.1; horas reales no informadas por Luis. Se suman **0 h terminadas** hasta revisión e integración; no se descuenta T7.1 del burndown ni se infiere el avance de otros integrantes.
+- **Alcance:** T7.2, T7.3, HU-7 y Sprint 2 siguen pendientes; sin notificaciones ni HU-12 implementadas.
+
+## Actualización autorizada de T7.1 / PR #14 · 02/11/2026
+
+- Cabecera remota comprobada sin cambios: 5ddaa14. Se conserva su historial y se incorpora main f515837 por merge normal, sin rebase ni force push. No hubo conflictos de código ni conflictos documentales residuales: las resoluciones previamente preparadas se combinaron automáticamente.
+- Registros de main y avances históricos preservados; cierre S2 sigue en 15 de 23 h. No cambia la planificación de S3.
+- Pruebas de esta combinación real: 168 Django en 23,807 s (165 aprobadas y 3 expectedFailure conocidas del impedimento 16), system check sin problemas y makemigrations --check --dry-run sin cambios. git diff --check correcto.
+- Diff contra main limitado a coordenadas/pruebas T7.1 y sus documentos; sin marcadores, frontend, Playwright ni cambios HU-8/Firebase. Actualización autorizada únicamente de la rama original de #14; David sigue pendiente de revisar y no se declara HU-7 terminada.
+
+
+## Preparaci?n local tras revisi?n de David ? 03/11/2026
+
+Se incorpora main 15d8dc9 en la preparaci?n de #14 mediante merge normal, conservando ?ntegra la planificaci?n aprobada por #26 y el historial de T7.1. Cierre S2: 15 de 23 h; S3: 24 h de trabajo y 6 h de reserva. Las coordenadas p?blicas conservan su comportamiento y precisi?n actuales; cualquier cambio queda pendiente del PO. HU-7 sigue abierta, sin horas nuevas terminadas. Esta preparaci?n no publica ni actualiza el PR.

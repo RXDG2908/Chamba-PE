@@ -10,6 +10,7 @@ if (!python) throw new Error('Define HU7_TEST_PYTHON con un intérprete que teng
 
 export default defineConfig({
   testDir: './tests/hu7-local',
+  outputDir: './test-results/hu7-local',
   workers: 1,
   fullyParallel: false,
   timeout: 45000,

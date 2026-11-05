@@ -49,8 +49,10 @@ test('API real: rubro, estados, cobertura, coordenadas y entradas inválidas', a
     expect(typeof p.latitud).toBe('number')
     expect(typeof p.longitud).toBe('number')
     const fixture = Object.values(fixtures.prestadores).find((f) => f.id === p.id)
-    expect(p.latitud).toBe(fixture.latitud)
-    expect(p.longitud).toBe(fixture.longitud)
+    expect(p.latitud).toBe(Number(fixture.latitud.toFixed(3)))
+    expect(p.longitud).toBe(Number(fixture.longitud.toFixed(3)))
+    expect(String(p.latitud)).toMatch(/^-?\d+(\.\d{1,3})?$/)
+    expect(String(p.longitud)).toMatch(/^-?\d+(\.\d{1,3})?$/)
     expect(Object.keys(p).sort()).toEqual(['id', 'nombres', 'apellidos', 'rubros', 'latitud', 'longitud', 'distancia_km'].sort())
   }
   const electrico = await (await request.get(urlBusqueda(fixtures.rubros.Electricidad))).json()

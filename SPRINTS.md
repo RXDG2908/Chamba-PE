@@ -549,6 +549,11 @@ Estado inicial: **24 h asignadas; 3 h integradas, 21 h pendientes; 6 h de reserv
 | 29/10 | T7.3 / David | Integrado | PR #23 | 0 h | 0 h |
 | 29/10 | HU-8 / Luis y David | Local/parcial; validación cruzada e integración pendientes | Guía HU-8 y video; 1 ensayo ≈1,3 s | 4 h (2 + 2) | 0 h |
 | 29/10 | Resto del backlog | Planificado; sin cierre adicional registrado | Aprobación comunicada por Scrum Master | 17 h | 0 h |
+| 03/11 | S3-MAPA-R / David | Revisión de #14 → #16 hecha; comentarios por publicar; sigue S3-MAPA-I de Luis | 168 pruebas OK sobre `main` + #14 + #16; mapa probado en el navegador | 1 h hasta publicar la revisión | 0 h |
+| 03/11 | S3-CERT-16 / David | Corrección lista; PR por abrir y revisión de Renzo | `feature/s3-cert-16-carga-certificados`: 172 OK, sin `expectedFailure` | 2 h hasta unirse a `main` | 0 h |
+| 03/11 | T8.3 / David | 🔴 Bloqueada: rama de HU-8 sin publicar | — | 2 h | 0 h |
+| 05/11 | S3-MAPA-R / David | ✅ Revisión cerrada | #14 y #16 unidos el 04/11; #31 (3 decimales) | 0 h | 0 h |
+| 05/11 | S3-CERT-16 / David | ✅ Unida con #29; impedimento 16 cerrado | Aprobado por Renzo; 173 OK | 0 h | 0 h |
 | Por registrar | Tarea / responsable | Avance, bloqueo y próximo paso | PR / prueba / evidencia | Actualizar | Registrar motivo y saldo |
 
 Los 0 h de reserva indican **sin consumo registrado**, no una medición de dedicación real. Registrar decisiones posteriores sin sobrescribir el historial.
@@ -563,7 +568,7 @@ La línea ideal es referencia de planificación para 24 h en 10 días hábiles; 
 | 1 · 29/10 | 21,6 | 21 | 3 | 6 |
 | 2 · 30/10 | 19,2 | — | — | — |
 | 3 · 02/11 | 16,8 | — | — | — |
-| 4 · 03/11 | 14,4 | — | — | — |
+| 4 · 03/11 | 14,4 | 21 | 3 | 6 |
 | 5 · 04/11 | 12 | — | — | — |
 | 6 · 05/11 | 9,6 | — | — | — |
 | 7 · 06/11 | 7,2 | — | — | — |

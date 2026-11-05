@@ -78,7 +78,10 @@ function App() {
       <Routes>
         <Route path="/" element={<RegistroPrestador />} />
         <Route path="/resultados" element={<ResultadosPrestadores />} />
-        <Route path="/certificaciones" element={<UploadCertificado />} />
+        <Route
+          path="/certificaciones"
+          element={<RutaPrivada usuario={usuario} rol="prestador"><UploadCertificado /></RutaPrivada>}
+        />
 
         <Route path="/administracion/revisiones" element={<RevisionDocumentos />} />
 

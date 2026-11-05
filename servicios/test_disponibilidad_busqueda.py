@@ -107,7 +107,7 @@ class FlujoVerificacionYDisponibilidadTests(TestCase):
 
     def subir_certificado(self):
         archivo = SimpleUploadedFile('certificado.pdf', PDF, content_type='application/pdf')
-        respuesta = self.cliente.post(
+        respuesta = self.sesion_prestador.post(
             reverse('upload_certification'), {'prestador': self.prestador.id, 'file': archivo},
         )
         self.assertEqual(respuesta.status_code, 201, respuesta.content)

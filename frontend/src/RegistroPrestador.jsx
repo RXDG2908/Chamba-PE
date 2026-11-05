@@ -98,7 +98,7 @@ function RegistroPrestador() {
         {prestadorId && (
           <>
             <p>Tu ID de prestador es <strong>{prestadorId}</strong>.</p>
-            <Link to="/certificaciones" state={{ prestadorId }}>Cargar un certificado</Link>
+            <Link to="/certificaciones">Cargar un certificado</Link>
           </>
         )}
       </section>

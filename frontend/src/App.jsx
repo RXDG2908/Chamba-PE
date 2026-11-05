@@ -10,6 +10,7 @@ import RegistroPrestador from './RegistroPrestador.jsx'
 import ResultadosPrestadores from './ResultadosPrestadores.jsx'
 import UploadCertificado from './UploadCertificado.jsx'
 import RevisionDocumentos from './RevisionDocumentos.jsx'
+import VerificarDni from './VerificarDni.jsx'
 
 // Sin sesión manda a iniciar sesión; con otro rol vuelve al inicio.
 function RutaPrivada({ usuario, rol, children }) {
@@ -60,6 +61,7 @@ function App() {
             <NavLink to="/administracion/revisiones">Revisión de documentos</NavLink>
 
             {usuario?.rol === 'prestador' && <NavLink to="/disponibilidad">Mi disponibilidad</NavLink>}
+            {usuario?.rol === 'prestador' && <NavLink to="/verificar-dni">Verificar mi DNI</NavLink>}
             {usuario === null && <NavLink to="/ingresar">Iniciar sesión</NavLink>}
             {usuario === null && <NavLink to="/crear-cuenta">Crear cuenta</NavLink>}
 
@@ -85,6 +87,10 @@ function App() {
         <Route
           path="/disponibilidad"
           element={<RutaPrivada usuario={usuario} rol="prestador"><Disponibilidad /></RutaPrivada>}
+        />
+        <Route
+          path="/verificar-dni"
+          element={<RutaPrivada usuario={usuario} rol="prestador"><VerificarDni /></RutaPrivada>}
         />
         <Route
           path="/ingresar"

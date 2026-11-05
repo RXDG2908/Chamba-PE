@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     'servicios',
     'administracion',
     'usuarios',
+    'verificacion',
 ]
 
 MIDDLEWARE = [
@@ -145,6 +146,10 @@ MAILERS = {
 # Archivos multimedia (Certificaciones PDF/JPG)
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+# Archivos sensibles (fotos del DNI): fuera de MEDIA_ROOT, sin URL pública.
+RAIZ_PRIVADA = os.path.join(BASE_DIR, 'privado')
+# Fuente de los nombres del DNI: 'simulado' (por defecto) o 'eldni'.
+VALIDADOR_DNI = os.environ.get('VALIDADOR_DNI', 'simulado')
 
 # Límite máximo de carga de archivos (5 MB = 5242880 bytes)
 DATA_UPLOAD_MAX_MEMORY_SIZE = 5242880

@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import { useLocation } from 'react-router-dom'
 import { CircleMarker, MapContainer, Marker, Popup, TileLayer, useMap, useMapEvents } from 'react-leaflet'
 import { divIcon, DomEvent } from 'leaflet'
 import 'leaflet/dist/leaflet.css'
@@ -92,10 +93,12 @@ function MarcadoresPrestadores({ prestadores }) {
 }
 
 function ResultadosPrestadores() {
+  const { state } = useLocation()
   const [rubros, setRubros] = useState([])
   const [estadoRubros, setEstadoRubros] = useState('cargando')
   const [intentoRubros, setIntentoRubros] = useState(0)
-  const [rubro, setRubro] = useState('')
+  // La portada puede llegar con un rubro elegido; se confirma al cargar la lista.
+  const [rubro, setRubro] = useState(() => String(state?.rubro ?? ''))
   const [ubicacion, setUbicacion] = useState(null)
   const [coordenadas, setCoordenadas] = useState({ latitud: '', longitud: '' })
   const [prestadores, setPrestadores] = useState([])
@@ -113,6 +116,7 @@ function ResultadosPrestadores() {
         if (!Array.isArray(datos)) throw new Error('Respuesta inválida.')
         if (!controlador.signal.aborted) {
           setRubros(datos)
+          setRubro((actual) => (datos.some((r) => String(r.id) === actual) ? actual : ''))
           setEstadoRubros(datos.length ? 'listo' : 'vacio')
         }
       } catch {

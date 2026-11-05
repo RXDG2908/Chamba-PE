@@ -5,7 +5,7 @@ import './RegistroPrestador.css'
 import './Cuenta.css'
 
 // Pantalla a la que va cada rol después de iniciar sesión.
-const INICIO_POR_ROL = { cliente: '/resultados', prestador: '/disponibilidad', administrador: '/resultados' }
+const INICIO_POR_ROL = { cliente: '/resultados', prestador: '/disponibilidad', administrador: '/administracion/revisiones' }
 
 function IniciarSesion({ usuario, alIniciar }) {
   const { state } = useLocation()
@@ -68,7 +68,7 @@ function IniciarSesion({ usuario, alIniciar }) {
         {estado === 'enviando' ? 'Ingresando…' : 'Ingresar'}
       </button>
       <p className="pie-cuenta">
-        ¿No tienes cuenta? <Link to="/crear-cuenta">Crear cuenta de cliente</Link> o <Link to="/">regístrate como prestador</Link>.
+        ¿No tienes cuenta? <Link to="/crear-cuenta">Crear cuenta de cliente</Link> o <Link to="/registro-prestador">regístrate como prestador</Link>.
       </p>
     </form>
   )

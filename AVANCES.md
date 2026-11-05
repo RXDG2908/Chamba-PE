@@ -363,3 +363,51 @@ Prueba integrada previa en review/hu7-t71-t72: 165 Django pasan, 3 expectedFailu
 ## Preparaci?n de correcciones T7.2 tras #26 ? 03/11/2026
 
 Merge local del #14 preparado (`36de951`) conservando el historial de #16 y toda la planificaci?n de main `15d8dc9`. Conflictos AVANCES/SPRINTS resueltos sin quitar registros. Django 168 (165 aprobadas y tres expectedFailure conocidas), Playwright 16/16 e integraci?n real propia 14/14; lint/build correctos. Evidencias p?blicas saneadas; informes locales de integridad archivados en carpeta ignorada. [Informe y l?mites](docs/preparacion-correcciones-HU7.md). Precisi?n de coordenadas y ?Sin calificaciones? sin cambios, pendientes del PO. Sin push ni actualizaci?n de PR, sin cierre de HU-7 ni horas nuevas terminadas.
+
+## Preparación del cierre técnico HU-7 · 04/11/2026
+
+El usuario autoriza preparar y validar la corrección pendiente, sin commit, push, merge ni PR. Se crea el worktree independiente `Chamba-PE-hu7-cierre-tecnico`, rama `fix/hu7-cierre-tecnico`, desde `origin/main 1d80cb7`. La base ya contiene #14, #16 y #31, incluido el redondeo público y la decisión del PO; no se vuelven a integrar. Las notas anteriores se conservan como historia. Esta preparación no acredita horas nuevas terminadas, consumo de reserva ni cierre funcional adicional; no modifica el historial S2 ni la planificación S3.
+
+### Cambios preparados
+
+- `frontend/tests/hu7-local/integracion.spec.mjs`: compara las coordenadas públicas con el fixture redondeado a tres decimales y comprueba su precisión máxima. Se conservan tipos, campos, distancias, cobertura, filtros y todos los escenarios existentes.
+- `frontend/playwright.config.mjs`: mantiene Chromium/canal `chromium`, aserciones y timeout de 30 s; ejecuta un worker para reproducibilidad en este entorno, conserva trazas ante fallos y separa la salida en `test-results/hu7`.
+- `frontend/playwright.hu7-local.config.mjs`: únicamente separa la salida en `test-results/hu7-local`; mantiene Chromium, un worker, timeout de 45 s, Django propio y OSM real.
+- Sin cambios al producto, serializer, modelos, cálculos internos, coordenadas almacenadas ni «Sin calificaciones». Sin cambios de dependencias. No se eliminan pruebas, aserciones ni escenarios; no se agregan retries, sleeps o ampliaciones de timeout.
+
+### Investigación y resultados conservados
+
+| Experimento | Resultado | Conclusión |
+|---|---|---|
+| Configuración inicial, dos workers, dos casos repetidos tres veces | 5/6 aprobados, un fallo, 38,469 s | Intermitencia reproducida en el worktree nuevo |
+| Chromium directo sin proxy, mismos dos workers | 10/10 casos dirigidos y 16/16 suite completa; serie ampliada posterior 18/20, dos fallos en 46,666 s | Experimento descartado: no demuestra solución; flag retirado |
+| Headless shell, dos workers | 20/20 casos dirigidos; suite completa posterior 15/16, un fallo en 39,057 s | Experimento descartado como solución por sí solo; canal original restaurado |
+| Headless shell, un worker, tres suites completas | 48/48, 42,648 s | Control diagnóstico de ejecución serial |
+| Configuración FINAL: canal Chromium original, un worker, tres suites completas | **48/48, 52,265 s**, sin fallos, omisiones ni retries | Los 16 escenarios pasan tres veces, con cancelación y respuestas tardías conservadas |
+
+Las trazas muestran bloqueos de arranque/entrega de red y, en un caso, búsqueda cancelada sin respuesta posterior observable. La evidencia es compatible con contención en la automatización paralela; el componente interno exacto no está identificado. La mitigación comprobada es ejecutar serialmente, sin presentar como resuelto el fallo de transporte bajo dos workers. Se sigue la recomendación de [Playwright para estabilidad y reproducibilidad en CI](https://playwright.dev/docs/ci). El paralelismo se puede volver a investigar mediante controles explícitos; los fallos anteriores no se sustituyen por las ejecuciones aprobadas.
+
+### Verificación final sobre la rama preparada
+
+| Verificación | Resultado |
+|---|---|
+| Django, `manage.py test --noinput` | 170 ejecutadas en 27,158 s: 167 aprobadas y 3 expectedFailure heredadas de certificados; system check correcto |
+| `makemigrations --check --dry-run` | Sin cambios |
+| Playwright T7.2 | 48/48, tres ejecuciones completas de los 16 escenarios, canal original y un worker |
+| 14 integraciones, configuración final | **14/14, 26,574 s**, cero retries; backend del PROPIO worktree, sin HU7_TEST_BACKEND_ROOT, SQLite ficticia temporal y teselas OSM HTTPS reales |
+| Lint y build | Correctos; build final 253 ms |
+| `git diff --check` | Correcto |
+
+Las integraciones comprueban precisión pública, proyección de marcadores, cobertura, rubros, disponibilidad, estados, lista/mapa, vacío, errores de red, cancelación, sesión/CSRF, solicitud ficticia, puntos compartidos, encuadre, teclado y responsive 320/390/1280. Las llamadas de sesión/disponibilidad son pruebas de regresión ya existentes: no se modifica HU-8, Firebase, HU-19, HU-21 ni credenciales.
+
+Los resultados y evidencias nuevos se archivan localmente en `.hu7-local/cierre-tecnico/` y `frontend/.hu7-local/`; las capturas y registros históricos versionados se conservan. Se guardan todos los fallos, JSON y trazas de los experimentos descartados, incluido el fallo de la suite completa en headless shell. Las carpetas de pruebas/diagnóstico están ignoradas y fuera del diff propuesto. Los siete worktrees anteriores, incluida la carpeta original, conservan HEAD, estado y hashes de sus archivos locales respecto del manifiesto inicial.
+
+**Estado para revisión:** sí hace falta una corrección adicional de pruebas/configuración: main aún compara fixtures de seis decimales en la integración pese a que #31 ya redondea la API. La propuesta se limita a esa expectativa, la ejecución reproducible y esta evidencia. No requiere otra implementación del mapa o del backend. Quedan pendientes teléfono físico, GPS/permisos, otros navegadores y accesibilidad humana, además de la revisión final de David. La ejecución paralela no se declara estabilizada y las muestras seriales no garantizan ausencia universal de intermitencias. Sin commit, push, merge ni PR; se detiene para revisión del usuario.
+
+### Publicación autorizada para revisión de David · 04/11/2026
+
+El usuario revisó esta preparación y autorizó un commit, push normal de `fix/hu7-cierre-tecnico` y un PR nuevo hacia main, sin integrarlo ni cerrar HU-7. Fetch previo confirma `origin/main 1d80cb7`, idéntico a la base validada. Se revisa el diff completo, limitado a los cuatro archivos anteriores; no se incluyen temporales, trazas, rutas personales, credenciales ni evidencias privadas.
+
+Se comprueban los tres `expectedFailure` de `usuarios.test_acceso_por_rol.CargaDeCertificacionPorRolTests`: anónimo, cliente y prestador que intenta subir certificaciones para otro prestador. Los decoradores, las aserciones y el código de carga ya están en main y no cambian aquí. La verificación aislada previa a publicar ejecuta cuatro pruebas en 0,082 s: una aprobada y esos mismos tres fallos esperados, system check correcto. No son regresiones introducidas por HU-7 ni se ocultan o eliminan.
+
+Se conservan los resultados completos y limitaciones arriba registrados: 170 Django (167 aprobadas y tres fallos esperados), 48/48 T7.2, 14/14 integraciones reales, lint/build y diff-check correctos. El PR documentará la mitigación serial, los fallos paralelos conservados y las validaciones manuales pendientes. La autorización no cambia el estado de HU-7, el historial S2, la planificación S3 ni los otros worktrees; la integración queda pendiente de revisión de David.

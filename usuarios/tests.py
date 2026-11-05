@@ -169,6 +169,20 @@ class UsuarioActualTests(TestCase):
         self.client.force_login(admin)
         self.assertEqual(self.client.get(reverse('usuario_actual')).json()['rol'], 'administrador')
 
+    def test_administrador_con_prestador_vinculado_ve_su_propio_nombre(self):
+        # Caso real: la cuenta admin tenía vinculado un prestador de prueba del Sprint 1.
+        admin = User.objects.create_superuser('admin', 'admin@correo.pe', 'Clave-segura-123', first_name='David')
+        Prestador.objects.create(
+            usuario=admin, nombres='Oscar', apellidos='Huyla', dni='67859405',
+            latitud='-12.046374', longitud='-77.042793', radio_cobertura_km=5,
+        )
+        Perfil.objects.filter(usuario=admin).update(rol=Perfil.Rol.ADMINISTRADOR)
+        self.client.force_login(admin)
+        datos = self.client.get(reverse('usuario_actual')).json()
+        self.assertEqual(datos['rol'], 'administrador')
+        self.assertEqual(datos['nombres'], 'David')
+        self.assertIsNone(datos['prestador_id'])
+
 
 class RegistroPrestadorAsignaRolTests(TestCase):
     def test_registro_de_prestador_queda_con_rol_prestador(self):

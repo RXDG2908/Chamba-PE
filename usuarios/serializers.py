@@ -55,14 +55,17 @@ class UsuarioActualSerializer(serializers.Serializer):
     """Cuerpo de GET /api/usuarios/yo/."""
 
     def to_representation(self, usuario):
-        prestador = getattr(usuario, 'prestador', None)
+        rol = rol_de(usuario)
+        # Solo el prestador muestra los datos de su perfil: una cuenta de administrador o
+        # cliente con un prestador vinculado por error mostraba el nombre de otra persona.
+        prestador = getattr(usuario, 'prestador', None) if rol == Perfil.Rol.PRESTADOR else None
         return {
             'id': usuario.id,
             'username': usuario.username,
             'email': usuario.email,
             'nombres': prestador.nombres if prestador else usuario.first_name,
             'apellidos': prestador.apellidos if prestador else usuario.last_name,
-            'rol': rol_de(usuario),
+            'rol': rol,
             'prestador_id': prestador.id if prestador else None,
         }
 

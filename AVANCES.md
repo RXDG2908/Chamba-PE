@@ -95,6 +95,9 @@ Una línea por entrega, la más reciente arriba.
 
 | Fecha | Quién | Qué se hizo | Tarea |
 |:---:|---|---|:---:|
+| 05/11 | David Valcarcel | Renzo aprobó el #29 (173/173 OK, lint OK). Se trajo `main` a la rama (conflicto solo en esta bitácora, se conservaron las filas de ambos lados) y se une: **S3-CERT-16 ✅ y el impedimento 16 queda cerrado** (2 h). También queda cerrada **S3-MAPA-R ✅** (1 h): la revisión de #14/#16 terminó con su integración el 04/11 y el redondeo a 3 decimales (#31) que decidió el PO. | S3-CERT-16/S3-MAPA-R |
+| 05/11 | David Valcarcel | S3-CERT-16 (#29), revisión de Renzo: con JSON `{"prestador": 5}` (número) la validación del ID lanzaba `TypeError` y la API respondía 500. Ahora el ID se valida como texto: número propio sigue (400 si falta el archivo), de otro prestador 403, decimal/booleano/lista 400. 1 prueba nueva; suite 173 OK sin fallas esperadas. | S3-CERT-16 |
+| 03/11 | David Valcarcel | Sprint 3: revisó #14 y #16 sobre `main` (168 OK, mapa probado en el navegador; observaciones por publicar), corrigió el impedimento 16 en `feature/s3-cert-16-carga-certificados` (172 OK, sin `expectedFailure`) y dejó T8.3 bloqueada hasta que Luis publique la rama de HU-8. Detalle en la sección 10. | S3-MAPA-R/S3-CERT-16/T8.3 |
 | 04/11 | David Valcarcel | Menú y rutas según el rol, y nuevo diseño del frontend (decisión del PO), en `feature/menu-por-rol-y-diseno`. Portada nueva en `/` con botones por rol, cómo funciona y rubros reales; el registro de prestador pasa a `/registro-prestador`. Cada rol ve solo lo suyo: visitante (buscar, ofrecer servicios, sesión), cliente (buscar), prestador (disponibilidad, certificado) y administrador (revisión de documentos); `/certificaciones` y `/administracion/revisiones` pasan a rutas privadas y el admin entra directo a su panel. Tema visual común en `Tema.css`, cabecera fija y pie. Probado en el navegador con los 4 roles y a 375 px sin desbordes; lint, build y 170 pruebas Django OK. Sin horas del Sprint 3 asignadas: se registra como uso de reserva si el equipo lo aprueba. | Frontend |
 | 04/11 | Renzo León | Limpieza de ramas del Sprint 2: se unieron a `main` los PR #14 y #16 (mapa de HU-7, de Luis), #25 (guía de exposición) y #12 (documento Word). Antes de unir, #16 se probó con `main` integrado: 168 pruebas OK (3 fallas esperadas), lint y build OK; la revisión automática dejó 7 observaciones no bloqueantes (la más importante: la búsqueda ahora entrega las coordenadas exactas del prestador, a decidir con el PO). Los conflictos de AVANCES de #25 y #12 se resolvieron conservando las filas de ambos lados. | Cierre S2 |
 | 18/10 | Renzo León | Documento Word con la descripción del proyecto (problema, casos de uso, verificación del prestador, IA, arquitectura, API y plan de sprints): [docs/Chamba_PE_Descripcion_del_Proyecto.docx](docs/Chamba_PE_Descripcion_del_Proyecto.docx). | — |
@@ -179,7 +182,7 @@ Una línea por entrega, la más reciente arriba.
 | 10 | 12/10 | Riesgo de cerrar el sprint sin HU-2, HU-3 ni HU-4. Se cerró con 26 de 30 h; pasan 4 h al Sprint 2 (T2.2 y T3.4). | Sprint 1 | Equipo | ✅ |
 | 11 | 14/10 | El commit de CORS del 13/10 agregó `corsheaders` a la configuración sin sumarlo a `requirements.txt`: con una instalación nueva, `main` no arranca. Corregido en el PR 4. Además, la vista de carga pone cabeceras CORS a mano aunque ya se usa `django-cors-headers`, y el proxy de Vite ya evita CORS en desarrollo. | Todas | David / Renzo | 🟡 |
 | 15 | 17/10 | Cambiar el estado de una solicitud desde el admin de Django deja `respondida` vacía y permite saltarse la regla de una sola respuesta. | T4.1/T4.2 | David | 🟡 |
-| 16 | 18/10 | La carga de certificados no pide sesión: cualquiera puede subir un archivo con el ID de otro prestador. Se corrige con la autenticación de HU-5. Desde el 20/10, 3 pruebas `expectedFailure` de T5.3 (cliente, anónimo y otro prestador deberían recibir 403) lo documentan; al corregir la vista pasan y hay que quitarles el decorador. Hoy no se corrige porque el formulario de carga (T2.2) aún no tiene inicio de sesión (T5.2). | HU-2, HU-5 | Equipo | 🟡 |
+| 16 | 18/10 | La carga de certificados no pide sesión: cualquiera puede subir un archivo con el ID de otro prestador. Se corrige con la autenticación de HU-5. Desde el 20/10, 3 pruebas `expectedFailure` de T5.3 (cliente, anónimo y otro prestador deberían recibir 403) lo documentan; al corregir la vista pasan y hay que quitarles el decorador. Hoy no se corrige porque el formulario de carga (T2.2) aún no tiene inicio de sesión (T5.2). 03/11: corregido en `feature/s3-cert-16-carga-certificados` (S3-CERT-16), en revisión de Renzo; se cierra al unirse a `main`. 05/11: cerrado con #29, aprobado por Renzo. | HU-2, HU-5 | Equipo | ✅ |
 | 17 | 18/10 | El Sprint 2 se planificó el 18/10: el 15/10 y el 16/10 pasaron sin horas. Quedan 8 días hábiles para 30 h (1,25 h diarias por integrante). Si en el Daily del 23/10 quedan más de 15 h, el Product Owner decide qué pasa al Sprint 3. | Sprint 2 | Equipo | 🟡 |
 | 18 | 18/10 | La API de revisión (T9.1) exige un administrador, pero aún no hay pantalla de inicio de sesión (T5.2). Desde el 21/10 usa `EsAdministrador` (T5.1), así que también entra el rol `administrador` por `/api/usuarios/login/`. Mientras tanto, la pantalla de T9.2 solo funciona con la sesión del admin de Django (`/admin/`). Mitigado el 19/10: el login de `/admin/` pasa por el proxy de Vite y la pantalla enlaza a él; con HU-5 se reemplaza por el login propio. | T9.2, HU-5 | David / Equipo | 🟡 |
 | 19 | 19/10 | Desde T9.2, la búsqueda solo muestra prestadores Verificado. Los prestadores que hoy están en Pendiente dejan de aparecer hasta que un administrador apruebe uno de sus documentos. Hay que avisar al equipo antes de las pruebas manuales. | HU-3, HU-4 | David | 🟡 |
@@ -256,7 +259,12 @@ Las 3 h de David son T6.3 (#20, 1 h) y T7.3 (#23, 2 h), integradas el 29/10 seg�
 | 29/10 | T7.3 / David | ✅ Integrada, 2 h de referencia | #23 | Regresión conjunta al revisar mapa |
 | 29/10 | Planning / Scrum Master | Acuerdo de David y Renzo formalizado; 21 h pendientes + 6 h reserva | SPRINTS.md; sin horas nuevas consumidas por documentarlo | Iniciar revisión y contratos |
 | 29/10 | HU-8 / Luis y David | Local/parcial; medición y escenarios documentados | Guía HU-8; falta validación cruzada e integración | Completar matriz y revisión |
-| 04/11 | Menú por rol y diseño / David | 🟡 Cambios listos en `feature/menu-por-rol-y-diseno`, sin commit | 4 roles probados en el navegador; 170 pruebas OK | Commit, PR y revisión; unir después del #29 (ambos tocan rutas de `App.jsx`) |
+| 03/11 | S3-MAPA-R / David | Revisión de #14 y luego #16 unidos sobre `main` `15d8dc9`: 168 pruebas OK (3 fallas esperadas), lint y build OK; mapa probado en el navegador con marcadores coincidentes, encuadre, popups y teclado. Observaciones: ambos chocan con #26 en AVANCES/SPRINTS; las coordenadas públicas tienen 6 decimales; «Sin calificaciones» espera decisión del PO; #16 suma ~2 MB de evidencias y una ruta local en `resultados.json` | Comentarios por publicar en #14 y #16 | Luis ajusta e integra (S3-MAPA-I), primero #14 |
+| 03/11 | S3-CERT-16 / David | 🟡 Corrección en `feature/s3-cert-16-carga-certificados`: la carga exige sesión de prestador y CSRF, y el documento va al perfil de la sesión (otro perfil, cliente, admin o anónimo: 403). Se mantienen formatos, 5 MB y firma. `/certificaciones` pasa a ruta privada sin campo de ID. 6 pruebas nuevas y se quitan los 3 `expectedFailure` de T5.3: 172 OK sin fallas esperadas; lint, build y prueba en el navegador OK | PR por abrir; revisa Renzo | Abrir PR y pedir revisión a Renzo |
+| 03/11 | T8.3 / David | 🔴 Bloqueada: el push de HU-8 (`feature/hu8-notificaciones`) sigue solo en la máquina de Luis, sin commit ni PR | Sin rama publicada no hay push real que validar | Luis publica la rama; David valida y repite medidas |
+| 04/11 | Menú por rol y diseño / David | 🟡 PR #32 (`feature/menu-por-rol-y-diseno`), con `main` integrado el 05/11 | 4 roles probados en el navegador; 170 pruebas OK | Commit, PR y revisión; unir después del #29 (ambos tocan rutas de `App.jsx`) |
+| 05/11 | S3-MAPA-R / David | ✅ Revisión cerrada | #14 y #16 unidos el 04/11; #31 redondea coordenadas a 3 decimales | — |
+| 05/11 | S3-CERT-16 / David | ✅ Unida a `main` con #29; impedimento 16 cerrado | Aprobado por Renzo; 173 OK sin `expectedFailure` | Burndown: lo actualiza el Scrum Master |
 | Por registrar | Tarea / responsable | Avance o bloqueo | PR / prueba / evidencia | Acción, responsable y fecha |
 
 ### Bloqueos y decisiones vigentes
@@ -365,3 +373,51 @@ Prueba integrada previa en review/hu7-t71-t72: 165 Django pasan, 3 expectedFailu
 ## Preparaci?n de correcciones T7.2 tras #26 ? 03/11/2026
 
 Merge local del #14 preparado (`36de951`) conservando el historial de #16 y toda la planificaci?n de main `15d8dc9`. Conflictos AVANCES/SPRINTS resueltos sin quitar registros. Django 168 (165 aprobadas y tres expectedFailure conocidas), Playwright 16/16 e integraci?n real propia 14/14; lint/build correctos. Evidencias p?blicas saneadas; informes locales de integridad archivados en carpeta ignorada. [Informe y l?mites](docs/preparacion-correcciones-HU7.md). Precisi?n de coordenadas y ?Sin calificaciones? sin cambios, pendientes del PO. Sin push ni actualizaci?n de PR, sin cierre de HU-7 ni horas nuevas terminadas.
+
+## Preparación del cierre técnico HU-7 · 04/11/2026
+
+El usuario autoriza preparar y validar la corrección pendiente, sin commit, push, merge ni PR. Se crea el worktree independiente `Chamba-PE-hu7-cierre-tecnico`, rama `fix/hu7-cierre-tecnico`, desde `origin/main 1d80cb7`. La base ya contiene #14, #16 y #31, incluido el redondeo público y la decisión del PO; no se vuelven a integrar. Las notas anteriores se conservan como historia. Esta preparación no acredita horas nuevas terminadas, consumo de reserva ni cierre funcional adicional; no modifica el historial S2 ni la planificación S3.
+
+### Cambios preparados
+
+- `frontend/tests/hu7-local/integracion.spec.mjs`: compara las coordenadas públicas con el fixture redondeado a tres decimales y comprueba su precisión máxima. Se conservan tipos, campos, distancias, cobertura, filtros y todos los escenarios existentes.
+- `frontend/playwright.config.mjs`: mantiene Chromium/canal `chromium`, aserciones y timeout de 30 s; ejecuta un worker para reproducibilidad en este entorno, conserva trazas ante fallos y separa la salida en `test-results/hu7`.
+- `frontend/playwright.hu7-local.config.mjs`: únicamente separa la salida en `test-results/hu7-local`; mantiene Chromium, un worker, timeout de 45 s, Django propio y OSM real.
+- Sin cambios al producto, serializer, modelos, cálculos internos, coordenadas almacenadas ni «Sin calificaciones». Sin cambios de dependencias. No se eliminan pruebas, aserciones ni escenarios; no se agregan retries, sleeps o ampliaciones de timeout.
+
+### Investigación y resultados conservados
+
+| Experimento | Resultado | Conclusión |
+|---|---|---|
+| Configuración inicial, dos workers, dos casos repetidos tres veces | 5/6 aprobados, un fallo, 38,469 s | Intermitencia reproducida en el worktree nuevo |
+| Chromium directo sin proxy, mismos dos workers | 10/10 casos dirigidos y 16/16 suite completa; serie ampliada posterior 18/20, dos fallos en 46,666 s | Experimento descartado: no demuestra solución; flag retirado |
+| Headless shell, dos workers | 20/20 casos dirigidos; suite completa posterior 15/16, un fallo en 39,057 s | Experimento descartado como solución por sí solo; canal original restaurado |
+| Headless shell, un worker, tres suites completas | 48/48, 42,648 s | Control diagnóstico de ejecución serial |
+| Configuración FINAL: canal Chromium original, un worker, tres suites completas | **48/48, 52,265 s**, sin fallos, omisiones ni retries | Los 16 escenarios pasan tres veces, con cancelación y respuestas tardías conservadas |
+
+Las trazas muestran bloqueos de arranque/entrega de red y, en un caso, búsqueda cancelada sin respuesta posterior observable. La evidencia es compatible con contención en la automatización paralela; el componente interno exacto no está identificado. La mitigación comprobada es ejecutar serialmente, sin presentar como resuelto el fallo de transporte bajo dos workers. Se sigue la recomendación de [Playwright para estabilidad y reproducibilidad en CI](https://playwright.dev/docs/ci). El paralelismo se puede volver a investigar mediante controles explícitos; los fallos anteriores no se sustituyen por las ejecuciones aprobadas.
+
+### Verificación final sobre la rama preparada
+
+| Verificación | Resultado |
+|---|---|
+| Django, `manage.py test --noinput` | 170 ejecutadas en 27,158 s: 167 aprobadas y 3 expectedFailure heredadas de certificados; system check correcto |
+| `makemigrations --check --dry-run` | Sin cambios |
+| Playwright T7.2 | 48/48, tres ejecuciones completas de los 16 escenarios, canal original y un worker |
+| 14 integraciones, configuración final | **14/14, 26,574 s**, cero retries; backend del PROPIO worktree, sin HU7_TEST_BACKEND_ROOT, SQLite ficticia temporal y teselas OSM HTTPS reales |
+| Lint y build | Correctos; build final 253 ms |
+| `git diff --check` | Correcto |
+
+Las integraciones comprueban precisión pública, proyección de marcadores, cobertura, rubros, disponibilidad, estados, lista/mapa, vacío, errores de red, cancelación, sesión/CSRF, solicitud ficticia, puntos compartidos, encuadre, teclado y responsive 320/390/1280. Las llamadas de sesión/disponibilidad son pruebas de regresión ya existentes: no se modifica HU-8, Firebase, HU-19, HU-21 ni credenciales.
+
+Los resultados y evidencias nuevos se archivan localmente en `.hu7-local/cierre-tecnico/` y `frontend/.hu7-local/`; las capturas y registros históricos versionados se conservan. Se guardan todos los fallos, JSON y trazas de los experimentos descartados, incluido el fallo de la suite completa en headless shell. Las carpetas de pruebas/diagnóstico están ignoradas y fuera del diff propuesto. Los siete worktrees anteriores, incluida la carpeta original, conservan HEAD, estado y hashes de sus archivos locales respecto del manifiesto inicial.
+
+**Estado para revisión:** sí hace falta una corrección adicional de pruebas/configuración: main aún compara fixtures de seis decimales en la integración pese a que #31 ya redondea la API. La propuesta se limita a esa expectativa, la ejecución reproducible y esta evidencia. No requiere otra implementación del mapa o del backend. Quedan pendientes teléfono físico, GPS/permisos, otros navegadores y accesibilidad humana, además de la revisión final de David. La ejecución paralela no se declara estabilizada y las muestras seriales no garantizan ausencia universal de intermitencias. Sin commit, push, merge ni PR; se detiene para revisión del usuario.
+
+### Publicación autorizada para revisión de David · 04/11/2026
+
+El usuario revisó esta preparación y autorizó un commit, push normal de `fix/hu7-cierre-tecnico` y un PR nuevo hacia main, sin integrarlo ni cerrar HU-7. Fetch previo confirma `origin/main 1d80cb7`, idéntico a la base validada. Se revisa el diff completo, limitado a los cuatro archivos anteriores; no se incluyen temporales, trazas, rutas personales, credenciales ni evidencias privadas.
+
+Se comprueban los tres `expectedFailure` de `usuarios.test_acceso_por_rol.CargaDeCertificacionPorRolTests`: anónimo, cliente y prestador que intenta subir certificaciones para otro prestador. Los decoradores, las aserciones y el código de carga ya están en main y no cambian aquí. La verificación aislada previa a publicar ejecuta cuatro pruebas en 0,082 s: una aprobada y esos mismos tres fallos esperados, system check correcto. No son regresiones introducidas por HU-7 ni se ocultan o eliminan.
+
+Se conservan los resultados completos y limitaciones arriba registrados: 170 Django (167 aprobadas y tres fallos esperados), 48/48 T7.2, 14/14 integraciones reales, lint/build y diff-check correctos. El PR documentará la mitigación serial, los fallos paralelos conservados y las validaciones manuales pendientes. La autorización no cambia el estado de HU-7, el historial S2, la planificación S3 ni los otros worktrees; la integración queda pendiente de revisión de David.

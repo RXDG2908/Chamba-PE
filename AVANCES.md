@@ -95,6 +95,7 @@ Una línea por entrega, la más reciente arriba.
 
 | Fecha | Quién | Qué se hizo | Tarea |
 |:---:|---|---|:---:|
+| 04/11 | Renzo León | Limpieza de ramas del Sprint 2: se unieron a `main` los PR #14 y #16 (mapa de HU-7, de Luis), #25 (guía de exposición) y #12 (documento Word). Antes de unir, #16 se probó con `main` integrado: 168 pruebas OK (3 fallas esperadas), lint y build OK; la revisión automática dejó 7 observaciones no bloqueantes (la más importante: la búsqueda ahora entrega las coordenadas exactas del prestador, a decidir con el PO). Los conflictos de AVANCES de #25 y #12 se resolvieron conservando las filas de ambos lados. | Cierre S2 |
 | 18/10 | Renzo León | Documento Word con la descripción del proyecto (problema, casos de uso, verificación del prestador, IA, arquitectura, API y plan de sprints): [docs/Chamba_PE_Descripcion_del_Proyecto.docx](docs/Chamba_PE_Descripcion_del_Proyecto.docx). | — |
 | 29/10 | Renzo León | Guía de exposición y pruebas en vivo de los Sprints 1 y 2 en `docs/exposicion-renzo-sprint1-2.md`: resumen de T1.1–T1.3, T4.1, T5.1, T5.2, T6.1 y T6.2, checklist, guion de la demo, pruebas automáticas (10, 13 y 29 OK), plan B y preguntas probables. Se probó que aceptar una solicitud desde la API navegable funciona con el proxy de Vite. | Exposición |
 | 29/10 | David Valcarcel | Unió a `main` el PR 20 (T6.3) y el PR 23 (T7.3), al inicio del Sprint 3; al unir T7.3 chocaron AVANCES y TABLERO y se conservaron las filas de ambas tareas. El Sprint 2 sigue cerrado con 15 de 23 h; estas 3 h cuentan como terminadas el 29/10. Antes de unir verificó las 6 tareas de David juntas (`main` + T6.3 + T7.3 + T8.3): `administracion` 25, T5.3 31 (3 fallas esperadas), T7.3 12, T6.3 9 y T8.3 7 pruebas OK; suite 173 OK, lint y build OK. Recorrido en la app (Django + React, base de prueba aparte): el admin aprueba el certificado en `/administracion/revisiones` y el prestador queda Verificado; aparece a 0, 3 y 4,9 km y no a 5,5 ni 8 km (radio 5 km); con el interruptor de `/disponibilidad` desaparece y reaparece en la búsqueda; la solicitud llega a la bandeja en 66 ms y el cliente la ve aceptada; cliente, prestador y anónimo reciben 403 donde corresponde. Quedan abiertos #14, #16 (Luis) y #22 (base parcial de T8.3). | T6.3/T7.3 |
@@ -279,7 +280,7 @@ La prueba de integración con main se realizó en review/hu7-t71-t72: 165 Django
 
 | Tarea | Responsable | Horas plan | Estado | Rama / PR |
 |---|---|---|---|---|
-| T7.1 — consulta por coordenadas | Luis Abad | 2 h | 🟡 Implementada localmente; pendiente de revisión/PR y de integrar el filtro Verificado | `feature/t7.1-mapa-prestadores`, commits locales sin push |
+| T7.1 — consulta por coordenadas | Luis Abad | 2 h | ✅ Unido a `main` el 04/11 (PR #14) | `main` (PR #14) |
 
 - **Implementado:** misma búsqueda pública, ahora con latitud/longitud numéricas del centro de cobertura; conserva tarjetas, Haversine, filtros, radios propios, orden y cabecera de tiempo. Contrato en [docs/API_BUSQUEDA.md](docs/API_BUSQUEDA.md).
 - **Probado:** Python de `venv`, `manage.py test --noinput`: 60 pruebas OK en 2.574 s, sin problemas en el system check; dos pruebas nuevas y contrato público actualizado. Datos exclusivamente en la base de pruebas; sin modificar registros locales. Sin prueba visual del frontend.

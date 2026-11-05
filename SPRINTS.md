@@ -190,9 +190,9 @@ Cada uno construye las historias de la app de Django de la que es dueño ([PLAN_
 
 | Tarea | Descripción | Tipo | Horas | ✔ |
 |:---:|---|:---:|:---:|:---:|
-| T7.1 | Consulta de prestadores por coordenadas dentro del radio | Backend | 2 | 🟡 |
+| T7.1 | Consulta de prestadores por coordenadas dentro del radio | Backend | 2 | ✅ |
 | T8.1 | Integrar notificaciones push (Firebase Cloud Messaging) | Backend | 3 | ➡️ S3 |
-| T7.2 | Integrar el mapa con marcadores (móvil y web) | Frontend | 3 | 🟡 |
+| T7.2 | Integrar el mapa con marcadores (móvil y web) | Frontend | 3 | ✅ |
 | T8.2 | Recepción de la notificación y pantalla aceptar/rechazar | Frontend | 2 | ➡️ S3 |
 | | **Subtotal** | | **10** | |
 
@@ -269,6 +269,8 @@ Horas pendientes al final de cada día. La línea ideal baja 3 h por día.
 > El 28/10 en la noche entraron a `main` 15 h (#13, #15, #17, #18, #11 y #21). De las 15 h que quedan, 7 son de HU-8, que el PO pasó al Sprint 3, y 8 están en PRs sin unir (#14, #16, #20 y #23).
 >
 > 29/10 (inicio del Sprint 3): se unieron #20 (T6.3) y #23 (T7.3), 3 h. El Sprint 2 queda cerrado en 15 h; siguen abiertos #14 y #16 (T7.1 y T7.2, 5 h).
+
+> 04/11: se unieron #14 y #16 (T7.1 y T7.2, 5 h) a `main`; el Sprint 2 queda sin PR abiertos.
 
 ## Retrospectiva
 
@@ -550,6 +552,8 @@ Estado inicial: **24 h asignadas; 3 h integradas, 21 h pendientes; 6 h de reserv
 | 03/11 | S3-MAPA-R / David | Revisión de #14 → #16 hecha; comentarios por publicar; sigue S3-MAPA-I de Luis | 168 pruebas OK sobre `main` + #14 + #16; mapa probado en el navegador | 1 h hasta publicar la revisión | 0 h |
 | 03/11 | S3-CERT-16 / David | Corrección lista; PR por abrir y revisión de Renzo | `feature/s3-cert-16-carga-certificados`: 172 OK, sin `expectedFailure` | 2 h hasta unirse a `main` | 0 h |
 | 03/11 | T8.3 / David | 🔴 Bloqueada: rama de HU-8 sin publicar | — | 2 h | 0 h |
+| 05/11 | S3-MAPA-R / David | ✅ Revisión cerrada | #14 y #16 unidos el 04/11; #31 (3 decimales) | 0 h | 0 h |
+| 05/11 | S3-CERT-16 / David | ✅ Unida con #29; impedimento 16 cerrado | Aprobado por Renzo; 173 OK | 0 h | 0 h |
 | Por registrar | Tarea / responsable | Avance, bloqueo y próximo paso | PR / prueba / evidencia | Actualizar | Registrar motivo y saldo |
 
 Los 0 h de reserva indican **sin consumo registrado**, no una medición de dedicación real. Registrar decisiones posteriores sin sobrescribir el historial.
@@ -581,3 +585,28 @@ El 11/11 revisar el Sprint Goal, pendientes de HU-7/HU-8, corrección de certifi
 | Qué salió bien | Qué mejorar | Acción y responsable |
 |---|---|---|
 | Por completar en la retrospectiva | Por completar | Por acordar |
+
+## Seguimiento documental HU-7 · T7.1 / #14 · 02/11/2026
+
+Preparación local de revisión/publicación, sin tarea terminada ni horas adicionales descontadas. Se conservan sin modificación todos los registros y la planificación precedente de main. Documentación resuelta sobre main; sincronización de código e historial pendiente de autorización. Ver AVANCES.md y la guía de preparación del PR.
+
+**Actualización de seguimiento T7.1 (02/11):** autorizada la sincronización y publicación de #14; main f515837 incorporado por merge normal. 168 pruebas Django (165 pasan y 3 expectedFailure conocidas), sin migraciones pendientes. #14 sigue pendiente de revisión/integración; no se contabilizan nuevas horas terminadas ni se cambia el cierre S2 o el compromiso S3. #16 permanece sin modificar.
+
+
+## Preparaci?n local tras revisi?n de David ? 03/11/2026
+
+Se incorpora main 15d8dc9 en la preparaci?n de #14 mediante merge normal, conservando ?ntegra la planificaci?n aprobada por #26 y el historial de T7.1. Cierre S2: 15 de 23 h; S3: 24 h de trabajo y 6 h de reserva. Las coordenadas p?blicas conservan su comportamiento y precisi?n actuales; cualquier cambio queda pendiente del PO. HU-7 sigue abierta, sin horas nuevas terminadas. Esta preparaci?n no publica ni actualiza el PR.
+
+
+## Seguimiento documental HU-7 · T7.2 / #16 · 02/11/2026
+
+Preparación local de revisión/publicación, sin tarea terminada ni horas adicionales descontadas. Se conservan sin modificación todos los registros y la planificación precedente de main. Documentación resuelta sobre main; sincronización de código e historial pendiente de autorización. Ver AVANCES.md y la guía de preparación del PR.
+
+**Seguimiento local T7.2 (02/11):** autorizada e iniciada la sincronización local con #14 (8c887ae) por merge normal, preservando main f515837 y registros históricos. Validación del backend propio en curso; sin publicación ni nuevas horas terminadas. Las notas anteriores describen cortes históricos, no el estado vigente.
+
+**Validación local T7.2 (03/11):** tras corregir la interceptación de pruebas, 16/16 automatizadas y 14/14 integraciones con backend propio; Django 165 aprobadas y tres expectedFailure conocidas, lint/build correctos. Documentos resueltos y merge local de #14 autorizado; sin publicar ni marcar HU-7 terminada, sin nuevas horas descontadas.
+
+
+## Preparaci?n de correcciones T7.2 tras #26 ? 03/11/2026
+
+Merge local del #14 preparado (`36de951`) conservando el historial de #16 y toda la planificaci?n de main `15d8dc9`. Conflictos AVANCES/SPRINTS resueltos sin quitar registros. Django 168 (165 aprobadas y tres expectedFailure conocidas), Playwright 16/16 e integraci?n real propia 14/14; lint/build correctos. Evidencias p?blicas saneadas; informes locales de integridad archivados en carpeta ignorada. [Informe y l?mites](docs/preparacion-correcciones-HU7.md). Precisi?n de coordenadas y ?Sin calificaciones? sin cambios, pendientes del PO. Sin push ni actualizaci?n de PR, sin cierre de HU-7 ni horas nuevas terminadas.

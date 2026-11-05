@@ -1,4 +1,6 @@
+from decimal import Decimal
 from io import StringIO
+import json
 from math import degrees, pi
 from pathlib import Path
 from tempfile import TemporaryDirectory
@@ -74,9 +76,81 @@ class BusquedaPrestadoresTests(TestCase):
     def test_respuesta_solo_contiene_datos_publicos(self):
         self.crear_prestador()
         resultado = self.buscar().json()[0]
-        self.assertEqual(set(resultado), {'id', 'nombres', 'apellidos', 'rubros', 'distancia_km'})
+        self.assertEqual(set(resultado), {
+            'id', 'nombres', 'apellidos', 'rubros', 'latitud', 'longitud', 'distancia_km',
+        })
         self.assertEqual(resultado['rubros'], [{'id': self.rubro.id, 'nombre': self.rubro.nombre}])
         self.assertEqual(resultado['distancia_km'], 0)
+
+    def test_marcador_usa_coordenadas_del_prestador_y_conserva_tarjeta(self):
+        prestador = self.crear_prestador(
+            latitud='-12.046374', longitud='-77.042793',
+            rubros=[self.rubro, self.otro_rubro], estado=Prestador.Estado.VERIFICADO,
+        )
+        respuesta = self.buscar(latitud=-12.05, longitud=-77.04)
+        self.assertEqual(respuesta.status_code, 200)
+        resultado = respuesta.json()[0]
+        self.assertIsInstance(resultado['latitud'], float)
+        self.assertIsInstance(resultado['longitud'], float)
+        self.assertEqual(resultado['latitud'], -12.046)
+        self.assertEqual(resultado['longitud'], -77.043)
+        self.assertEqual(resultado['id'], prestador.id)
+        self.assertEqual(resultado['nombres'], 'Ana')
+        self.assertEqual(resultado['apellidos'], 'Pérez')
+        self.assertEqual({r['id'] for r in resultado['rubros']}, {self.rubro.id, self.otro_rubro.id})
+        self.assertAlmostEqual(resultado['distancia_km'], distancia_km(
+            prestador.latitud, prestador.longitud, -12.05, -77.04,
+        ))
+        self.assertGreaterEqual(float(respuesta['X-Execution-Time-Ms']), 0)
+
+    def test_marcadores_conservan_filtros_cobertura_y_orden(self):
+        centro = {'latitud': '-12.046374', 'longitud': '-77.042793'}
+        cercano = self.crear_prestador(**centro, estado=Prestador.Estado.VERIFICADO)
+        lejano = self.crear_prestador(
+            latitud='-12.056374', longitud=centro['longitud'],
+            estado=Prestador.Estado.VERIFICADO,
+        )
+        self.crear_prestador(**centro, disponible=False)
+        self.crear_prestador(**centro, rubros=[self.otro_rubro])
+        self.crear_prestador(latitud='-12.066374', longitud=centro['longitud'], radio_cobertura_km=1)
+        respuesta = self.buscar(**centro)
+        self.assertEqual(respuesta.status_code, 200)
+        resultados = respuesta.json()
+        self.assertEqual([p['id'] for p in resultados], [cercano.id, lejano.id])
+        self.assertEqual(resultados[0]['distancia_km'], 0)
+        self.assertGreater(resultados[1]['distancia_km'], 1)
+        self.assertEqual(resultados[1]['latitud'], -12.056)
+        self.assertEqual(resultados[1]['longitud'], -77.043)
+
+    def test_api_publica_devuelve_como_maximo_tres_decimales_sin_alterar_bd(self):
+        for latitud, longitud in [('-12.046374', '-77.042793'),
+                                  ('12.046876', '77.042123'), ('0.000001', '-0.000001')]:
+            with self.subTest(latitud=latitud, longitud=longitud):
+                prestador = self.crear_prestador(latitud=latitud, longitud=longitud)
+                respuesta = self.buscar(latitud=latitud, longitud=longitud)
+                self.assertEqual(respuesta.status_code, 200)
+                datos = json.loads(respuesta.content, parse_float=Decimal, parse_int=Decimal)
+                resultado = next(p for p in datos if p['id'] == prestador.id)
+                for campo, original in [('latitud', latitud), ('longitud', longitud)]:
+                    self.assertGreaterEqual(resultado[campo].as_tuple().exponent, -3)
+                    self.assertEqual(resultado[campo], round(Decimal(original), 3))
+                self.assertEqual(resultado['distancia_km'], 0)
+                prestador.refresh_from_db()
+                self.assertEqual(prestador.latitud, Decimal(latitud))
+                self.assertEqual(prestador.longitud, Decimal(longitud))
+
+    def test_redondeo_publico_no_altera_orden_distancias_ni_cobertura(self):
+        lejano = self.crear_prestador(latitud='0.008990', radio_cobertura_km=1)
+        cercano = self.crear_prestador(latitud='0.008980', radio_cobertura_km=1)
+        self.crear_prestador(latitud='0.009001', radio_cobertura_km=1)
+        resultados = self.buscar().json()
+        self.assertEqual([p['id'] for p in resultados], [cercano.id, lejano.id])
+        self.assertEqual([p['latitud'] for p in resultados], [0.009, 0.009])
+        for resultado, prestador in zip(resultados, [cercano, lejano]):
+            self.assertAlmostEqual(resultado['distancia_km'], distancia_km(
+                prestador.latitud, prestador.longitud, 0, 0,
+            ))
+            self.assertGreater(resultado['distancia_km'], 0)
 
     def test_radio_de_cada_prestador(self):
         self.crear_prestador(radio_cobertura_km=1)

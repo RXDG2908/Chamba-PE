@@ -34,8 +34,10 @@ def upload_certification(request):
     prestador_asociado = request.user.prestador
 
     # El campo prestador es opcional; si llega, tiene que ser el del usuario con sesión.
+    # Con JSON puede llegar como número o lista: se valida como texto para responder 400 y no 500.
     prestador_id = request.data.get('prestador') or request.data.get('prestador_id')
     if prestador_id:
+        prestador_id = str(prestador_id)
         if not PRESTADOR_ID.fullmatch(prestador_id):
             return Response({'error': 'El prestador debe ser un número entero positivo.'}, status=400)
         if int(prestador_id) != prestador_asociado.pk:

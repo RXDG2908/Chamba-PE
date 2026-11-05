@@ -217,6 +217,22 @@ class PermisosCargaCertificacionTests(BaseCargaCertificacion):
         self.verificar_rechazo(self.cargar(prestador=otro.pk))
         self.assertEqual(otro.certificaciones.count(), 0)
 
+    def test_prestador_como_numero_json_no_da_500(self):
+        # Revisión de Renzo en #29: un número JSON lanzaba TypeError en la validación del ID.
+        otro = self.crear_prestador('otro_json', '99887766')
+        casos = [
+            (self.prestador.pk, 400),  # el propio: sigue y falta el archivo
+            (otro.pk, 403),            # otro prestador
+            (1.5, 400),
+            (True, 400),
+            ([self.prestador.pk], 400),
+        ]
+        for valor, esperado in casos:
+            with self.subTest(prestador=valor):
+                respuesta = self.client.post(self.url, {'prestador': valor}, content_type='application/json')
+                self.assertEqual(respuesta.status_code, esperado)
+        self.assertEqual(CertificacionPrestador.objects.count(), 0)
+
     def test_get_no_permitido(self):
         self.assertEqual(self.client.get(self.url).status_code, 405)
 

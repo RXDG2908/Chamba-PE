@@ -122,3 +122,7 @@ Sin PR abiertos: del #1 al #9 están unidos a `main`.
 | 3 | 29/10 – 11/11 | HU-19 Escaneo del DNI · HU-20 Reconocimiento facial · HU-21 Consentimiento biométrico · HU-13 Suspensión y bloqueo |
 | 4 | 12/11 – 25/11 | HU-10 Recomendación con IA · HU-11 Seguimiento en tiempo real · HU-12 Calificación |
 | Futuro | — | HU-14 a HU-18 |
+
+## Nota técnica T7.2 / #16 · 02/11/2026
+
+Correcciones y pruebas preparadas localmente; #14 y #16 siguen abiertos. Mantener #14 antes de #16, sin dar HU-7 por terminada ni descontar nuevas horas. Los estados y registros anteriores de main se conservan íntegros.

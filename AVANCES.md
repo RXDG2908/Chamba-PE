@@ -298,3 +298,46 @@ La prueba de integración con main se realizó en review/hu7-t71-t72: 165 Django
 ## Preparaci?n local tras revisi?n de David ? 03/11/2026
 
 Se incorpora main 15d8dc9 en la preparaci?n de #14 mediante merge normal, conservando ?ntegra la planificaci?n aprobada por #26 y el historial de T7.1. Cierre S2: 15 de 23 h; S3: 24 h de trabajo y 6 h de reserva. Las coordenadas p?blicas conservan su comportamiento y precisi?n actuales; cualquier cambio queda pendiente del PO. HU-7 sigue abierta, sin horas nuevas terminadas. Esta preparaci?n no publica ni actualiza el PR.
+
+
+## Preparación T7.2 / PR #16 · 02/11/2026
+
+Se conserva íntegro el documento de main f515837. Este worktree parte de #16 (485edb4), que ya contiene #14 (5ddaa14). Se trasladan únicamente las dos correcciones de mapa, su suite Chromium y documentación; servicios/serializers.py y servicios/tests.py no reciben otra copia de T7.1.
+
+Prueba integrada previa en review/hu7-t71-t72: 165 Django pasan, 3 expectedFailure heredadas, 16 Chromium con API/teselas simuladas, lint/build OK. Esta evidencia se conserva diferenciada de la prueba sobre la cabecera antigua. La sincronización de código con main sigue pendiente de autorización; documentos resueltos no equivalen a un merge de historial. T7.2/HU-7 no terminadas, sin horas adicionales descontadas ni cambios de cierre S2 o planificación S3.
+
+
+## 11. Sprint 2 — T7.2, implementación y pruebas manuales (27/10/2026)
+
+- **Luis/asistente:** mapa existente con un marcador por prestador en sus coordenadas, cliente azul y prestadores verdes; ventanas con nombre, rubros, distancia y «Sin calificaciones». Coordenadas coincidentes permiten consultar a todos en la misma ventana. Se conservan tarjetas y solicitudes, cancelación y limpieza al cambiar filtros, carga, errores y ausencia de resultados. Encuadre automático al cambiar ubicación/resultados y botón para recuperarlo después de explorar.
+- **Validación ejecutada:** `npm run lint` y `npm run build` en `frontend/`, ambos OK. Se restauraron las dependencias del lockfile con `npm ci --ignore-scripts` y certificados del sistema; sin cambios de versiones ni bibliotecas nuevas. El primer build falló por `react-router-dom` ausente en la instalación local; el build posterior pasó.
+- **Pruebas manuales realizadas por Luis en Chrome:** Gasfitería muestra al ficticio Demo Gasfitero en mapa y tarjeta; ventana con nombre, rubro, distancia y «Sin calificaciones»; cerrar/abrir no cambia coordenadas; cambiar rubro elimina marcador y tarjeta; rubro sin coincidencias muestra el aviso correspondiente. A 390 px, mapa y ventana correctos; a 320 × 800, tarjeta, campos y botón de solicitud sin cortes. Las variaciones de distancia entre capturas se deben al cambio manual de ubicación por Luis.
+- **Pruebas pendientes:** coordenadas compartidas, envío y validaciones de solicitudes, encuadre/exploración, limpieza al cambiar ubicación, cancelación con respuestas tardías y estados de carga/error; no se presentan como aprobadas. La automatización anterior fue bloqueada por Computer Use; las pruebas visuales registradas son de Luis. No se alteraron registros locales durante esta actualización. Detalle en [docs/pruebas-T7.2.md](docs/pruebas-T7.2.md).
+- **Estado y dependencias:** entrega autorizada en dos commits y un único PR de T7.2; pendiente de revisión e integración. Consulta pública a GitHub el 27/10: PR #14 abierto y sin integrar. La rama hereda T7.1 (`5c30dfb`, `5ddaa14`) y el merge `e42ae77`; los cambios nuevos T7.2 son JSX/CSS y documentación. David debe integrar el filtro Verificado en T9.1 y ejecutar T7.3. Sin Firebase/T8.1/T8.2 ni calificaciones inventadas. HU-7 y Sprint 2 siguen abiertos.
+- **Horas y burndown:** horas reales no informadas; 0 h adicionales terminadas y sin descuento del burndown hasta revisión e integración. Se conserva el reparto del equipo.
+
+## Transferencia selectiva local T7.2 · 02/11/2026
+
+- Rama prepare/hu7-t72-pr16: incorporados encuadres sin animación y suite de 14 integraciones desde el worktree de validación, preservando payload/accesibilidad y pruebas previas. Sin cambios backend/T7.1 ni copia de documentos sobre los registros existentes.
+- Pruebas nuevas en destino: 16 Chromium simuladas aprobadas y 14 integraciones aprobadas. Las integraciones combinan este frontend con el backend compatible del worktree de validación; la base antigua de #16 no se sincronizó ni se declara integrada. SQLite ficticia nueva en destino. Lint/build/diff-check correctos. [Detalle y limitaciones](docs/pruebas-T7.2.md).
+- Estado sin cierre: pendiente revisión de David, sincronización de dependencias, repetición de pruebas sobre la combinación final y validación física/humana. No se modifican PR #14/#16 ni se publica. Horas reales no informadas; 0 h nuevas terminadas, burndown y cierre histórico intactos.
+
+## Sincronización local T7.2 con T7.1 · 02/11/2026
+
+- Tras verificar cabeceras remotas #14 8c887ae y #16 485edb4, se conserva el historial de #16 y se integra localmente #14 mediante merge normal; sin publicación. Conflictos documentales resueltos preservando registros de main, actualización de T7.1 e historial particular de T7.2. Sin conflictos de código.
+- Se mantienen login, disponibilidad, filtros, coordenadas y mapa corregido. Pruebas sobre el backend propio del worktree pendientes de esta ejecución; las 14 aprobadas anteriores usaron backend externo compatible.
+- HU-7/T7.2 sin cierre, horas reales no informadas y 0 h nuevas terminadas; no se altera el cierre histórico 15/23 h ni la planificación S3.
+
+**Detención por fallo nuevo (02/11):** Django sobre backend propio: 168 pruebas en 25,426 s, 165 aprobadas y 3 expectedFailure conocidas; system check correcto. Suite T7.2: 15 aprobadas y 1 fallida, «cambiar rubro o coordenadas retira tarjetas y marcadores anteriores» (mapa.spec.mjs:81): esperaba dos tarjetas y obtuvo cero tras la primera búsqueda. Causa no confirmada. Se detiene el trabajo conforme a la instrucción del usuario; no se reintenta ni corrige para ocultar el fallo. Las 14 integraciones, lint y build independiente no se ejecutaron después de esta detención; el build previo de la suite sí completó. Merge pendiente de commit, documentos resueltos en índice, cabecera entrante 8c887ae; único commit nuevo 23831c2. Sin publicación. Otros cinco worktrees, HU-8/Firebase y base principal verificados intactos.
+
+## Depuración y validación del merge local T7.2 · 03/11/2026
+
+- El fallo 0 tarjetas/carga se reprodujo de forma intermitente: 8/10 aprobadas y 2 fallidas con page.route. Traza: respuesta CSRF simulada entregada por fulfill pero no recibida por Chromium; búsqueda sin evento de emisión. Causa localizada en interceptación/entrega del entorno de prueba, no en datos recibidos/render; defecto interno del navegador no determinado.
+- Corrección exclusiva de prueba: interceptar API/teselas por contexto aislado y adjuntar eventos de red. Sin cambios de producto, tiempos ni aserciones. 10/10 repeticiones y 16/16 suite completa aprobadas; 14/14 integración con backend propio, sin HU7_TEST_BACKEND_ROOT. Django: 168, 165 aprobadas + 3 expectedFailure conocidas; lint/build/diff-check correctos. [Detalle](docs/pruebas-T7.2.md).
+- Merge local autorizado de #14 8c887ae sobre T7.2 23831c2, documentos resueltos preservando main y ambos historiales; sin publicación. Backend de #14 intacto. HU-8/Firebase y demás worktrees verificados sin cambios.
+- HU-7/T7.2 sin cierre; pendiente revisión y validación física/humana. Horas reales no informadas, 0 h nuevas terminadas; cierre S2 15/23 h y planificación S3 sin cambios.
+
+
+## Preparaci?n de correcciones T7.2 tras #26 ? 03/11/2026
+
+Merge local del #14 preparado (`36de951`) conservando el historial de #16 y toda la planificaci?n de main `15d8dc9`. Conflictos AVANCES/SPRINTS resueltos sin quitar registros. Django 168 (165 aprobadas y tres expectedFailure conocidas), Playwright 16/16 e integraci?n real propia 14/14; lint/build correctos. Evidencias p?blicas saneadas; informes locales de integridad archivados en carpeta ignorada. [Informe y l?mites](docs/preparacion-correcciones-HU7.md). Precisi?n de coordenadas y ?Sin calificaciones? sin cambios, pendientes del PO. Sin push ni actualizaci?n de PR, sin cierre de HU-7 ni horas nuevas terminadas.

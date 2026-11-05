@@ -589,3 +589,17 @@ Preparación local de revisión/publicación, sin tarea terminada ni horas adici
 ## Preparaci?n local tras revisi?n de David ? 03/11/2026
 
 Se incorpora main 15d8dc9 en la preparaci?n de #14 mediante merge normal, conservando ?ntegra la planificaci?n aprobada por #26 y el historial de T7.1. Cierre S2: 15 de 23 h; S3: 24 h de trabajo y 6 h de reserva. Las coordenadas p?blicas conservan su comportamiento y precisi?n actuales; cualquier cambio queda pendiente del PO. HU-7 sigue abierta, sin horas nuevas terminadas. Esta preparaci?n no publica ni actualiza el PR.
+
+
+## Seguimiento documental HU-7 · T7.2 / #16 · 02/11/2026
+
+Preparación local de revisión/publicación, sin tarea terminada ni horas adicionales descontadas. Se conservan sin modificación todos los registros y la planificación precedente de main. Documentación resuelta sobre main; sincronización de código e historial pendiente de autorización. Ver AVANCES.md y la guía de preparación del PR.
+
+**Seguimiento local T7.2 (02/11):** autorizada e iniciada la sincronización local con #14 (8c887ae) por merge normal, preservando main f515837 y registros históricos. Validación del backend propio en curso; sin publicación ni nuevas horas terminadas. Las notas anteriores describen cortes históricos, no el estado vigente.
+
+**Validación local T7.2 (03/11):** tras corregir la interceptación de pruebas, 16/16 automatizadas y 14/14 integraciones con backend propio; Django 165 aprobadas y tres expectedFailure conocidas, lint/build correctos. Documentos resueltos y merge local de #14 autorizado; sin publicar ni marcar HU-7 terminada, sin nuevas horas descontadas.
+
+
+## Preparaci?n de correcciones T7.2 tras #26 ? 03/11/2026
+
+Merge local del #14 preparado (`36de951`) conservando el historial de #16 y toda la planificaci?n de main `15d8dc9`. Conflictos AVANCES/SPRINTS resueltos sin quitar registros. Django 168 (165 aprobadas y tres expectedFailure conocidas), Playwright 16/16 e integraci?n real propia 14/14; lint/build correctos. Evidencias p?blicas saneadas; informes locales de integridad archivados en carpeta ignorada. [Informe y l?mites](docs/preparacion-correcciones-HU7.md). Precisi?n de coordenadas y ?Sin calificaciones? sin cambios, pendientes del PO. Sin push ni actualizaci?n de PR, sin cierre de HU-7 ni horas nuevas terminadas.

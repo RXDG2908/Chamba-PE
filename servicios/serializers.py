@@ -60,6 +60,13 @@ class PrestadorBusquedaSerializer(serializers.ModelSerializer):
         model = Prestador
         fields = ['id', 'nombres', 'apellidos', 'rubros', 'latitud', 'longitud', 'distancia_km']
 
+    def to_representation(self, instance):
+        datos = super().to_representation(instance)
+        # Solo la salida pública: los cálculos usan las coordenadas originales.
+        for campo in ('latitud', 'longitud'):
+            datos[campo] = round(datos[campo], 3)
+        return datos
+
 
 class SolicitudSerializer(serializers.ModelSerializer):
     """Envío de una solicitud por el cliente (HU-4)."""

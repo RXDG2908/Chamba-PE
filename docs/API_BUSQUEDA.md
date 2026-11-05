@@ -27,8 +27,8 @@ Respuesta `200 OK`, ejemplo ilustrativo del formato, sin crear registros:
     "nombres": "Ana",
     "apellidos": "Pérez",
     "rubros": [{"id": 1, "nombre": "Gasfitería"}],
-    "latitud": -12.046374,
-    "longitud": -77.042793,
+    "latitud": -12.046,
+    "longitud": -77.043,
     "distancia_km": 0.0
   }
 ]
@@ -39,7 +39,14 @@ Devuelve todos los rubros de cada prestador. Los únicos campos de salida son
 teléfono, datos de cuenta, contraseñas ni calificaciones.
 Latitud y longitud son números JSON de solo lectura, con el centro de cobertura
 registrado del prestador (no ubicación en tiempo real ni coordenadas del cliente).
-La distancia se conserva sin redondear.
+Por decisión de David (PO, 04/11/2026), la salida pública redondea latitud y
+longitud a un máximo de 3 decimales; siguen siendo números JSON de solo lectura.
+No modifica las coordenadas almacenadas ni las coordenadas de entrada del cliente.
+Distancias, orden y filtro de cobertura se calculan con las coordenadas originales;
+la distancia se conserva sin redondear. El mapa representa estas coordenadas públicas
+aproximadas y puede agrupar prestadores que coincidan tras el redondeo.
+El PO confirma mantener «Sin calificaciones» mientras HU-12 no esté implementada,
+sin añadir puntuaciones ni campos de calificaciones a esta API.
 Sin coincidencias devuelve `200 OK` con `[]`, sin paginación.
 
 Los errores devuelven `400 Bad Request` por parámetro, en español. Ejemplo:

@@ -62,6 +62,15 @@
 .busqueda legend { padding: 0; font-weight: 700; color: #16734f; }
 .busqueda fieldset > p { color: #58675f; font-size: 14px; margin-block: 10px; }
 .mapa-busqueda { height: 320px; width: 100%; border-radius: 12px; z-index: 0; }
+.marcador-prestador { background: transparent; }
+.marcador-prestador span { display: grid; place-items: center; width: 36px; height: 36px; border: 2px solid #fff; border-radius: 50% 50% 50% 4px; background: #16734f; color: #fff; font: 700 14px system-ui; box-shadow: 0 2px 6px #20352a66; }
+.contenido-marcador { overflow-wrap: anywhere; }
+.contenido-marcador article + article { border-top: 1px solid #cbded3; margin-top: 12px; padding-top: 12px; }
+.contenido-marcador p { margin: 4px 0; }
+.mapa-busqueda .leaflet-popup-content { max-width: min(240px, calc(100vw - 130px)); }
+.volver-mapa { position: absolute; bottom: 24px; left: 8px; z-index: 800; max-width: calc(100% - 16px); }
+.volver-mapa button { padding: 6px 10px; background: #fff; font-size: 12px; box-shadow: 0 1px 5px #20352a33; }
+.leyenda-mapa { overflow-wrap: anywhere; }
 .coordenadas-busqueda { display: grid; grid-template-columns: 1fr 1fr auto; gap: 12px; align-items: end; margin-top: 16px; }
 .busqueda button { padding: 12px 16px; border: 1px solid #cbded3; border-radius: 10px; background: #eaf4ee; color: #20352a; font: inherit; cursor: pointer; }
 .busqueda .boton-buscar { width: 100%; margin-top: 16px; border-color: #16734f; background: #16734f; color: #fff; font-weight: 700; }

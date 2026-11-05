@@ -19,3 +19,5 @@ build/
 .idea/
 .DS_Store
 Thumbs.db
+# SQLite y archivos temporales exclusivos de validación HU-7
+.hu7-local/

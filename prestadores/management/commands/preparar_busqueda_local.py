@@ -22,7 +22,7 @@ class Command(BaseCommand):
         datos = {
             'nombres': 'Demo', 'apellidos': 'Gasfitero ficticio', 'dni': dni,
             'latitud': Decimal('-12.046374'), 'longitud': Decimal('-77.042793'),
-            'radio_cobertura_km': 5, 'disponible': True,
+            'radio_cobertura_km': 5, 'disponible': True, 'estado': Prestador.Estado.VERIFICADO,
         }
         usuario = get_user_model().objects.filter(username=username).first()
         if usuario is not None:

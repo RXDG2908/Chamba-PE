@@ -43,7 +43,7 @@ class FlujoT43Tests(TestCase):
         self.prestador = Prestador.objects.create(
             usuario=self.usuario, nombres='Prestador', apellidos='Prueba T43',
             dni='77777777', latitud=0, longitud=0, radio_cobertura_km=5,
-            disponible=True)
+            disponible=True, estado=Prestador.Estado.VERIFICADO)
         self.prestador.rubros.set([self.rubro])
         self.cliente = Client()
         self.proveedor = Client()

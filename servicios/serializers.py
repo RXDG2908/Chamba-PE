@@ -51,11 +51,14 @@ class BusquedaPrestadorSerializer(serializers.Serializer):
 
 class PrestadorBusquedaSerializer(serializers.ModelSerializer):
     rubros = RubroSerializer(many=True, read_only=True)
+    # Coordenadas numéricas del centro de cobertura, listas para el mapa.
+    latitud = serializers.FloatField(read_only=True)
+    longitud = serializers.FloatField(read_only=True)
     distancia_km = serializers.FloatField(read_only=True)
 
     class Meta:
         model = Prestador
-        fields = ['id', 'nombres', 'apellidos', 'rubros', 'distancia_km']
+        fields = ['id', 'nombres', 'apellidos', 'rubros', 'latitud', 'longitud', 'distancia_km']
 
 
 class SolicitudSerializer(serializers.ModelSerializer):
@@ -101,6 +104,9 @@ class SolicitudSerializer(serializers.ModelSerializer):
 
     def validate(self, datos):
         prestador = datos['prestador']
+        # HU-9: solo un prestador verificado por administración recibe solicitudes.
+        if prestador.estado != Prestador.Estado.VERIFICADO:
+            raise serializers.ValidationError({'prestador': 'El prestador aún no está verificado.'})
         if not prestador.disponible:
             raise serializers.ValidationError({'prestador': 'El prestador no está disponible.'})
         if not prestador.rubros.filter(pk=datos['rubro'].pk).exists():

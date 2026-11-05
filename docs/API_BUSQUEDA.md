@@ -1,4 +1,4 @@
-# Búsqueda de prestadores — T3.1 y T3.3
+# Búsqueda de prestadores — T3.1, T3.3 y T7.1
 
 ## Endpoint
 
@@ -27,14 +27,19 @@ Respuesta `200 OK`, ejemplo ilustrativo del formato, sin crear registros:
     "nombres": "Ana",
     "apellidos": "Pérez",
     "rubros": [{"id": 1, "nombre": "Gasfitería"}],
-    "distancia_km": 2.345678
+    "latitud": -12.046374,
+    "longitud": -77.042793,
+    "distancia_km": 0.0
   }
 ]
 ```
 
 Devuelve todos los rubros de cada prestador. Los únicos campos de salida son
-`id`, `nombres`, `apellidos`, `rubros` y `distancia_km`; no incluye DNI,
+`id`, `nombres`, `apellidos`, `rubros`, `latitud`, `longitud` y `distancia_km`; no incluye DNI,
 teléfono, datos de cuenta, contraseñas ni calificaciones.
+Latitud y longitud son números JSON de solo lectura, con el centro de cobertura
+registrado del prestador (no ubicación en tiempo real ni coordenadas del cliente).
+La distancia se conserva sin redondear.
 Sin coincidencias devuelve `200 OK` con `[]`, sin paginación.
 
 Los errores devuelven `400 Bad Request` por parámetro, en español. Ejemplo:
@@ -50,7 +55,9 @@ prestadores que cumplan los filtros devuelve una lista vacía.
 
 La búsqueda reside en `servicios`, conforme a la organización del backend
 en `PLAN_EQUIPO.md`, y reutiliza los modelos de `prestadores` sin modificarlos.
-Primero filtra en la base de datos por rubro y `disponible=True`.
+Primero filtra en la base de datos por rubro, `disponible=True` y
+`estado='verificado'` (desde T9.2: solo prestadores con un documento aprobado
+por administración).
 Después calcula la distancia geográfica entre el centro de cobertura del
 prestador y el cliente mediante Haversine, usando un radio terrestre medio
 de 6371.0088 km. No es una distancia de ruta ni un tiempo de llegada.
@@ -129,3 +136,16 @@ problemas. Incluye 7 pruebas existentes de registro y 11 nuevas de distancia
 y búsqueda: filtros combinados, distintos radios, límite y puntos a ambos
 lados, comparación sin redondear, campos públicos, parámetros faltantes e
 inválidos, extremos válidos y ausencia de resultados.
+
+## Nota de preparación documental · 02/11/2026
+
+Este contrato describe el destino probado con main en el worktree integrado. La preparación de T7.1 / #14 parte de su cabecera remota y todavía no sincroniza el código de main. Conservar Verificado, disponibilidad, rubro y cobertura al autorizar esa sincronización. No se crean endpoints ni se añaden datos personales al resultado.
+
+**Actualización del 02/11/2026:** la sincronización con main f515837 ya se realizó en la actualización autorizada de #14 y se validó con 168 pruebas Django (165 aprobadas y 3 fallos esperados de certificados). Se conservan sus filtros, autenticación y contratos; sin cambios de frontend/T7.2. La nota de preparación anterior queda como historial previo a esta sincronización.
+
+
+Este contrato describe el destino probado con main en el worktree integrado. La preparación de T7.2 / #16 parte de su cabecera remota y todavía no sincroniza el código de main. Conservar Verificado, disponibilidad, rubro y cobertura al autorizar esa sincronización. No se crean endpoints ni se añaden datos personales al resultado.
+
+**Actualización local T7.2 del 02/11/2026:** se incorpora el backend publicado de #14 (8c887ae) al worktree de preparación de #16 mediante merge normal. Las notas de sincronización pendiente anteriores se conservan como historia. Se preservan las coordenadas, disponibilidad, Verificado, rubro y cobertura, sin modificar el contrato backend de #14. Repetición de pruebas sobre el backend propio en curso, sin publicación.
+
+**Validación del 03/11/2026:** el backend propio de la preparación T7.2 coincide con #14 8c887ae. Las 14 integraciones sobre este backend y las 168 pruebas Django (165 aprobadas, tres expectedFailure conocidas) completaron sin fallos nuevos. Las notas históricas de validación pendiente no describen ya este corte local.

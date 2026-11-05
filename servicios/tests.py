@@ -39,7 +39,7 @@ class BusquedaPrestadoresTests(TestCase):
         datos = {
             'usuario': usuario, 'dni': f'{numero:08d}', 'nombres': 'Ana',
             'apellidos': 'Pérez', 'latitud': 0, 'longitud': 0,
-            'radio_cobertura_km': 5, 'disponible': True,
+            'radio_cobertura_km': 5, 'disponible': True, 'estado': Prestador.Estado.VERIFICADO,
         }
         prestador = Prestador.objects.create(**{**datos, **cambios})
         prestador.rubros.set(rubros if rubros is not None else [self.rubro])
@@ -63,12 +63,62 @@ class BusquedaPrestadoresTests(TestCase):
         self.assertEqual(respuesta.status_code, 200)
         self.assertEqual([p['id'] for p in respuesta.json()], [incluido.id])
 
+    def test_solo_aparecen_prestadores_verificados(self):
+        verificado = self.crear_prestador()
+        self.crear_prestador(estado=Prestador.Estado.PENDIENTE)
+        self.crear_prestador(estado=Prestador.Estado.RECHAZADO)
+        respuesta = self.buscar()
+        self.assertEqual(respuesta.status_code, 200)
+        self.assertEqual([p['id'] for p in respuesta.json()], [verificado.id])
+
     def test_respuesta_solo_contiene_datos_publicos(self):
         self.crear_prestador()
         resultado = self.buscar().json()[0]
-        self.assertEqual(set(resultado), {'id', 'nombres', 'apellidos', 'rubros', 'distancia_km'})
+        self.assertEqual(set(resultado), {
+            'id', 'nombres', 'apellidos', 'rubros', 'latitud', 'longitud', 'distancia_km',
+        })
         self.assertEqual(resultado['rubros'], [{'id': self.rubro.id, 'nombre': self.rubro.nombre}])
         self.assertEqual(resultado['distancia_km'], 0)
+
+    def test_marcador_usa_coordenadas_del_prestador_y_conserva_tarjeta(self):
+        prestador = self.crear_prestador(
+            latitud='-12.046374', longitud='-77.042793',
+            rubros=[self.rubro, self.otro_rubro], estado=Prestador.Estado.VERIFICADO,
+        )
+        respuesta = self.buscar(latitud=-12.05, longitud=-77.04)
+        self.assertEqual(respuesta.status_code, 200)
+        resultado = respuesta.json()[0]
+        self.assertIsInstance(resultado['latitud'], float)
+        self.assertIsInstance(resultado['longitud'], float)
+        self.assertEqual(resultado['latitud'], -12.046374)
+        self.assertEqual(resultado['longitud'], -77.042793)
+        self.assertEqual(resultado['id'], prestador.id)
+        self.assertEqual(resultado['nombres'], 'Ana')
+        self.assertEqual(resultado['apellidos'], 'Pérez')
+        self.assertEqual({r['id'] for r in resultado['rubros']}, {self.rubro.id, self.otro_rubro.id})
+        self.assertAlmostEqual(resultado['distancia_km'], distancia_km(
+            resultado['latitud'], resultado['longitud'], -12.05, -77.04,
+        ))
+        self.assertGreaterEqual(float(respuesta['X-Execution-Time-Ms']), 0)
+
+    def test_marcadores_conservan_filtros_cobertura_y_orden(self):
+        centro = {'latitud': '-12.046374', 'longitud': '-77.042793'}
+        cercano = self.crear_prestador(**centro, estado=Prestador.Estado.VERIFICADO)
+        lejano = self.crear_prestador(
+            latitud='-12.056374', longitud=centro['longitud'],
+            estado=Prestador.Estado.VERIFICADO,
+        )
+        self.crear_prestador(**centro, disponible=False)
+        self.crear_prestador(**centro, rubros=[self.otro_rubro])
+        self.crear_prestador(latitud='-12.066374', longitud=centro['longitud'], radio_cobertura_km=1)
+        respuesta = self.buscar(**centro)
+        self.assertEqual(respuesta.status_code, 200)
+        resultados = respuesta.json()
+        self.assertEqual([p['id'] for p in resultados], [cercano.id, lejano.id])
+        self.assertEqual(resultados[0]['distancia_km'], 0)
+        self.assertGreater(resultados[1]['distancia_km'], 1)
+        self.assertEqual(resultados[1]['latitud'], -12.056374)
+        self.assertEqual(resultados[1]['longitud'], -77.042793)
 
     def test_radio_de_cada_prestador(self):
         self.crear_prestador(radio_cobertura_km=1)
@@ -192,7 +242,7 @@ class SolicitudTests(TestCase):
         datos = {
             'usuario': usuario, 'dni': f'{Prestador.objects.count() + 1:08d}', 'nombres': 'Ana',
             'apellidos': 'Pérez', 'latitud': 0, 'longitud': 0,
-            'radio_cobertura_km': 5, 'disponible': True,
+            'radio_cobertura_km': 5, 'disponible': True, 'estado': Prestador.Estado.VERIFICADO,
         }
         prestador = Prestador.objects.create(**{**datos, **cambios})
         prestador.rubros.set([self.rubro])
@@ -225,6 +275,15 @@ class SolicitudTests(TestCase):
         r = self.enviar()
         self.assertEqual(r.status_code, 400)
         self.assertIn('prestador', r.json())
+
+    def test_prestador_no_verificado_no_recibe_solicitudes(self):
+        for estado in [Prestador.Estado.PENDIENTE, Prestador.Estado.RECHAZADO]:
+            self.prestador.estado = estado
+            self.prestador.save()
+            r = self.enviar()
+            self.assertEqual(r.status_code, 400, estado)
+            self.assertIn('prestador', r.json())
+        self.assertFalse(Solicitud.objects.exists())
 
     def test_rubro_que_no_ofrece(self):
         r = self.enviar(rubro=self.otro_rubro.id)

@@ -9,10 +9,13 @@ Reglas de reparto y flujo de trabajo en [PLAN_EQUIPO.md](PLAN_EQUIPO.md). Detall
 | Sprint | Fechas | Historias | SP | Horas | Estado |
 |:---:|:---:|:---:|:---:|:---:|:---:|
 | [1](#sprint-1--0110--14102026) | 01/10 – 14/10/2026 | HU-1 a HU-4 | 13 | 30 h | ✅ Cerrado (26 de 30 h) |
-| [2](#sprint-2--1510--28102026) | 15/10 – 28/10/2026 | HU-5 a HU-9 | 13 | 30 h | 🟢 Planning el 15/10 |
+| [2](#sprint-2--1510--28102026) | 15/10 – 28/10/2026 | HU-5 a HU-9 | 13 | 30 h | ✅ Cerrado el 28/10: 15 de 23 h (HU-5, HU-6 y HU-9 completas) |
 | [3](#sprint-3--2910--11112026) | 29/10 – 11/11/2026 | HU-19, HU-20, HU-21, HU-13 | 13 | 28 h | ⚪ Por planificar |
 | [4](#sprint-4--1211--25112026) | 12/11 – 25/11/2026 | HU-10, HU-11, HU-12 | 12 | 26 h | ⚪ Por planificar |
 | [—](#backlog-futuro) | — | HU-14 a HU-18 | 11 | 30 h | 📦 Backlog futuro |
+
+
+> **Actualización aprobada del 29/10/2026:** la fila de S3 del calendario y la plantilla original se conservan como referencia histórica. El compromiso vigente es el [Plan aprobado del Sprint 3](#plan-aprobado-del-sprint-3): 24 h de trabajo (3 ya integradas) y 6 h de reserva. HU-13/HU-20 quedan fuera del compromiso inicial; no se suman las estimaciones anteriores.
 
 ### Cambios respecto al Lab 07
 
@@ -140,57 +143,132 @@ Horas pendientes al final de cada día. La línea ideal baja 3 h por día.
 
 # Sprint 2 · 15/10 – 28/10/2026
 
-> ⚪ **Plantilla — por planificar en el Sprint Planning.** Las tareas y horas vienen del Lab 07; los responsables se asignan en la reunión.
-
 **Meta:** Cuentas, disponibilidad, mapa y notificaciones; prestadores verificados por administración.
 
 | Story points | Horas | Capacidad |
 |:---:|:---:|:---:|
 | 13 SP | 30 h | 3 × 10 h |
 
-## Pendientes que pasan del Sprint 1
+> ⚠️ **Arranque tardío:** el reparto se armó el 18/10 y el 15/10 y el 16/10 pasaron sin horas. Quedan 8 días hábiles (19/10 – 28/10) para 30 h, unas **1,25 h diarias por integrante**. Si en el Daily del 23/10 quedan más de 15 h, el Product Owner decide qué tarea pasa al Sprint 3 (candidatas: T8.2 y T8.3, notificaciones).
 
-Van primero en el sprint. Las horas restantes se vuelven a estimar en el Planning.
+> ✅ **Cierre (28/10):** entre las 22:26 y las 23:59 del 28/10 se unieron a `main` los PRs #13, #15, #17 y #18 (Renzo, 10 h), #11 (T9.1 y T9.2, 4 h) y #21 (T5.3, 1 h): **15 de 23 h comprometidas terminadas** (65 %). **Decisión del PO (28/10):** HU-8 (T8.1, T8.2 y T8.3, 7 h) pasa completa al Sprint 3, porque T8.1 no se empezó, y la prueba de la bandeja de T8.3 queda como base parcial. Quedan 8 h en PRs sin unir: T7.1 #14 y T7.2 #16 (Luis, 5 h), y T6.3 #20 y T7.3 #23 (David, 3 h). Pasan al inicio del Sprint 3. `main` queda con 145 pruebas OK (3 fallos esperados por el impedimento 16), lint y build OK. Detalle en [docs/sprint2-review.md](docs/sprint2-review.md).
+
+## Pendientes que pasan del Sprint 1
 
 | Tarea | Descripción | Responsable | Horas plan | Estado | Resultado |
 |:---:|---|---|:---:|:---:|---|
 | T2.2 | Componente de carga de certificados | David Valcarcel | 2 | ✅ | PR 9 unido el 18/10: ruta `/certificaciones` en el menú, envía el prestador y usa su CSS |
 | T3.4 | Tiempo de respuesta < 3 s | David Valcarcel | 2 | ✅ | PR 9 unido el 18/10: `manage.py medir_busqueda` mide `/api/prestadores/buscar/` (máx. 32,5 ms) |
 
-## Historias y tareas
+## Historias comprometidas
 
-| HU | Tarea | Descripción | Tipo | Horas | Responsable |
-|:---:|:---:|---|:---:|:---:|:---:|
-| HU-5 · Registro e inicio de sesión | T5.1 | API de autenticación con roles (cliente, prestador, administrador) | Backend | 3 | |
-| | T5.2 | Pantallas de registro e inicio de sesión (móvil y web) | Frontend | 3 | |
-| | T5.3 | Pruebas de autenticación y acceso por rol | Pruebas | 1 | |
-| HU-6 · Disponibilidad activo/inactivo | T6.1 | Endpoint para activar y desactivar la disponibilidad | Backend | 2 | |
-| | T6.2 | Interruptor de disponibilidad en la app móvil | Frontend | 2 | |
-| | T6.3 | Pruebas: solo los prestadores activos aparecen en la búsqueda | Pruebas | 1 | |
-| HU-7 · Mapa de prestadores | T7.1 | Consulta de prestadores por coordenadas dentro del radio | Backend | 2 | |
-| | T7.2 | Integrar el mapa con marcadores (móvil y web) | Frontend | 3 | |
-| | T7.3 | Pruebas de precisión del radio de cobertura | Pruebas | 2 | |
-| HU-8 · Notificaciones instantáneas | T8.1 | Integrar notificaciones push (Firebase Cloud Messaging) | Backend | 3 | |
-| | T8.2 | Recepción de la notificación y pantalla aceptar/rechazar | Frontend | 2 | |
-| | T8.3 | Pruebas de entrega de notificaciones | Pruebas | 2 | |
-| HU-9 · Validación de prestadores | T9.1 | Modelo y API en Django para revisar documentos | Backend | 2 | |
-| | T9.2 | Pantalla web (React) para aprobar o rechazar | Frontend | 2 | |
-| | | **Total** | | **30** | |
+| HU | Historia | SP | Horas | Criterios de aceptación |
+|:---:|---|:---:|:---:|---|
+| HU-5 | Como **cliente o prestador**, quiero registrarme e iniciar sesión de forma segura, a fin de acceder a las funciones de mi perfil. | 3 | 7 h | • El registro valida correo y contraseña y asigna el rol (cliente o prestador).<br>• Sin sesión iniciada no se accede a las funciones privadas. |
+| HU-6 | Como **prestador**, quiero activar o desactivar mi disponibilidad en tiempo real, a fin de recibir solicitudes solo cuando esté listo para trabajar. | 2 | 5 h | • El prestador cambia su estado entre Activo e Inactivo desde la app.<br>• Un prestador inactivo no aparece en las búsquedas ni recibe solicitudes. |
+| HU-7 | Como **cliente**, quiero ver en un mapa a los prestadores dentro del radio de cobertura, a fin de saber qué tan cerca están de mi ubicación. | 3 | 7 h | • El mapa muestra solo prestadores dentro del radio de cobertura de la ubicación del cliente.<br>• Al tocar un marcador se ve nombre, rubro, calificación y distancia. |
+| HU-8 | Como **prestador**, quiero recibir una notificación inmediata en mi móvil cuando me llegue una solicitud, a fin de aceptarla o rechazarla en pocos segundos. | 3 | 7 h | • La notificación llega en menos de 5 s tras enviarse la solicitud.<br>• Desde la notificación el prestador puede aceptar o rechazar. |
+| HU-9 | Como **administrador**, quiero validar la identidad y las certificaciones de los prestadores antes de activarlos, a fin de garantizar la seguridad de los usuarios. | 2 | 4 h | • El administrador ve el DNI y las certificaciones, y puede aprobarlas o rechazarlas indicando un motivo.<br>• Al aprobar, el estado cambia a "Verificado" y el prestador ya puede recibir solicitudes. |
 
-## Carga por integrante
+## Reparto de tareas
+
+Cada uno construye las historias de la app de Django de la que es dueño ([PLAN_EQUIPO.md §5](PLAN_EQUIPO.md#5-organización-del-backend)). David, que tiene la historia más chica, hace las pruebas cruzadas de las demás.
+
+✅ terminada (en `main` por PR revisado) · 🟡 en curso o pendiente de PR · ☐ sin iniciar. Detalle en [AVANCES.md](AVANCES.md).
+
+### Renzo León — 10 h · app `usuarios`
+
+| Tarea | Descripción | Tipo | Horas | ✔ |
+|:---:|---|:---:|:---:|:---:|
+| T5.1 | API de autenticación con roles (cliente, prestador, administrador) | Backend | 3 | ✅ |
+| T6.1 | Endpoint para activar y desactivar la disponibilidad | Backend | 2 | ✅ |
+| T5.2 | Pantallas de registro e inicio de sesión (móvil y web) | Frontend | 3 | ✅ |
+| T6.2 | Interruptor de disponibilidad en la app móvil | Frontend | 2 | ✅ |
+| | **Subtotal** | | **10** | |
+
+### Luis Abad — 10 h · app `servicios`
+
+| Tarea | Descripción | Tipo | Horas | ✔ |
+|:---:|---|:---:|:---:|:---:|
+| T7.1 | Consulta de prestadores por coordenadas dentro del radio | Backend | 2 | 🟡 |
+| T8.1 | Integrar notificaciones push (Firebase Cloud Messaging) | Backend | 3 | ➡️ S3 |
+| T7.2 | Integrar el mapa con marcadores (móvil y web) | Frontend | 3 | 🟡 |
+| T8.2 | Recepción de la notificación y pantalla aceptar/rechazar | Frontend | 2 | ➡️ S3 |
+| | **Subtotal** | | **10** | |
+
+### David Valcarcel — 10 h · app `administracion`
+
+| Tarea | Descripción | Tipo | Horas | ✔ |
+|:---:|---|:---:|:---:|:---:|
+| T9.1 | Modelo y API en Django para revisar documentos | Backend | 2 | ✅ |
+| T9.2 | Pantalla web (React) para aprobar o rechazar | Frontend | 2 | ✅ |
+| T5.3 | Pruebas de autenticación y acceso por rol | Pruebas | 1 | ✅ |
+| T7.3 | Pruebas de precisión del radio de cobertura | Pruebas | 2 | ✅ 29/10 |
+| T6.3 | Pruebas: solo los prestadores activos aparecen en la búsqueda | Pruebas | 1 | ✅ 29/10 |
+| T8.3 | Pruebas de entrega de notificaciones | Pruebas | 2 | ➡️ S3 |
+| | **Subtotal** | | **10** | |
+
+### Resumen de carga
 
 | Integrante | Backend | Frontend | Pruebas | Total |
 |---|:---:|:---:|:---:|:---:|
-| | | | | |
-| | | | | |
-| | | | | |
+| Renzo León | 5 h | 5 h | — | **10 h** |
+| Luis Abad | 5 h | 5 h | — | **10 h** |
+| David Valcarcel | 2 h | 2 h | 6 h | **10 h** |
+| **Equipo** | **12 h** | **12 h** | **6 h** | **30 h** |
+
+### Pruebas cruzadas y revisión de PR
+
+| Historia | Construye | Prueba | Revisa el PR |
+|:---:|---|---|---|
+| HU-5 | Renzo | David (T5.3) | David |
+| HU-6 | Renzo | David (T6.3) | David |
+| HU-7 | Luis | David (T7.3) | David |
+| HU-8 | Luis | David (T8.3) | David |
+| HU-9 | David | Luis (prueba manual antes de la Review, sin horas) | Renzo (dueño de `prestadores`, donde vive el estado del prestador) |
+
+## Orden de trabajo
+
+Dependencias: **T5.1 → T6.1, T5.2, T9.1 (permisos por rol) y T8.1 (token del dispositivo por usuario)** · **T6.1 → T6.2** · **T7.1 → T7.2** · **T8.1 → T8.2** · cada prueba va después del PR de su historia.
+
+Lo que bloquea va en los primeros dos días. **T5.1** es la única tarea de la que dependen los otros dos, así que su PR se abre a más tardar el 20/10; mientras tanto, Luis y David avanzan en lo que no depende de ella.
+
+| Momento | Renzo | Luis | David |
+|---|---|---|---|
+| **19/10 – 20/10** · bloqueantes | **T5.1 API de autenticación con roles** (PR el 20/10) | **T7.1 consulta por coordenadas** · crear el proyecto de Firebase y hacer un envío de prueba (inicio de T8.1) | **T9.1 modelo y API de revisión**, con `IsAdminUser` hasta que entre el rol de T5.1 |
+| **21/10 – 23/10** | T6.1 disponibilidad · T5.2 pantallas de registro e inicio de sesión | T8.1 notificación al crear la solicitud · T7.2 mapa con marcadores | T9.2 pantalla de aprobar o rechazar · T5.3 pruebas de autenticación · T7.3 pruebas del radio |
+| **26/10 – 28/10** | T6.2 interruptor de disponibilidad | T8.2 recepción y aceptar/rechazar desde la notificación | T6.3 pruebas de disponibilidad · T8.3 pruebas de entrega (< 5 s) |
+
+**Acuerdos para el Daily del 19/10, antes de escribir código**, para que nadie se bloquee:
+
+1. **Contrato de T5.1:** rutas de registro, inicio y cierre de sesión y "quién soy"; cómo viaja la sesión desde React (sesión de Django + CSRF por el proxy de Vite, como hoy); dónde se guarda el rol. Renzo lo deja escrito en `docs/` el 19/10.
+2. **"Móvil" = web responsive:** la app nativa sigue por definir ([impedimento 5](AVANCES.md#7-impedimentos-y-riesgos)), así que T5.2, T6.2 y T7.2 se hacen en React responsive y T8.2 usa notificaciones web de FCM (service worker).
+3. **HU-9 cambia la búsqueda y las solicitudes:** solo un prestador "Verificado" aparece y recibe solicitudes. David agrega ese filtro en T9.1 y Luis revisa el cambio en `servicios`.
+4. **Credenciales de Firebase fuera del repositorio** (variables de entorno); en `main` solo va un archivo de ejemplo.
+
+**Cierre (28/10):** Sprint Review con demo de iniciar sesión → activar disponibilidad → ver prestadores en el mapa → enviar solicitud → notificación al prestador → aceptar, y del administrador aprobando a un prestador. Luego, Retrospectiva.
 
 ## Burndown
 
-| Día | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 |
-|---|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
-| **Ideal (h)** | 27 | 24 | 21 | 18 | 15 | 12 | 9 | 6 | 3 | 0 |
-| **Real (h)** | | | | | | | | | | |
+Horas pendientes al final de cada día. La línea ideal baja 3 h por día.
+
+| Día | Fecha | Ideal (h) | Real (h) |
+|:---:|:---:|:---:|:---:|
+| Inicio | 15/10 | 30 | 30 |
+| 1 | 15/10 (jue) | 27 | 30 |
+| 2 | 16/10 (vie) | 24 | 30 |
+| 3 | 19/10 (lun) | 21 | 30 |
+| 4 | 20/10 (mar) | 18 | 30 |
+| 5 | 21/10 (mié) | 15 | 30 |
+| 6 | 22/10 (jue) | 12 | 30 |
+| 7 | 23/10 (vie) | 9 | 30 |
+| 8 | 26/10 (lun) | 6 | 30 |
+| 9 | 27/10 (mar) | 3 | 30 |
+| 10 | 28/10 (mié) | 0 | 15 |
+
+> El 28/10 en la noche entraron a `main` 15 h (#13, #15, #17, #18, #11 y #21). De las 15 h que quedan, 7 son de HU-8, que el PO pasó al Sprint 3, y 8 están en PRs sin unir (#14, #16, #20 y #23).
+>
+> 29/10 (inicio del Sprint 3): se unieron #20 (T6.3) y #23 (T7.3), 3 h. El Sprint 2 queda cerrado en 15 h; siguen abiertos #14 y #16 (T7.1 y T7.2, 5 h).
 
 ## Retrospectiva
 
@@ -203,9 +281,25 @@ Van primero en el sprint. Las horas restantes se vuelven a estimar en el Plannin
 
 # Sprint 3 · 29/10 – 11/11/2026
 
+> **Referencia histórica:** se conserva a continuación la plantilla previa al acuerdo. Sus 28/35 h, responsables por asignar y propuesta de HU-13 a S4 no son el compromiso vigente. Consultar el [plan aprobado](#plan-aprobado-del-sprint-3).
+
+
 > ⚪ **Plantilla: por planificar en el Sprint Planning.** Los responsables se asignan en la reunión.
 
 **Meta:** Verificación de identidad del prestador (escaneo del DNI + reconocimiento facial) y moderación de cuentas.
+
+## Pendientes que pasan del Sprint 2
+
+Decisión del Product Owner del 28/10: HU-8 pasa completa porque T8.1 no se empezó en el Sprint 2.
+
+| HU | Tarea | Descripción | Tipo | Horas | Responsable | Punto de partida |
+|:---:|:---:|---|:---:|:---:|---|---|
+| HU-8 | T8.1 | Integrar notificaciones push (Firebase Cloud Messaging) | Backend | 3 | Luis Abad | Sin código |
+| | T8.2 | Recepción de la notificación y pantalla aceptar/rechazar | Frontend | 2 | Luis Abad | Sin código; depende de T8.1 |
+| | T8.3 | Pruebas de entrega de notificaciones (< 5 s) | Pruebas | 2 | David Valcarcel | Base parcial: 7 pruebas de la bandeja del prestador en `servicios/test_notificaciones.py`; falta la prueba del push |
+| | | **Total** | | **7** | | |
+
+> ⚠️ **Capacidad:** con HU-8 el Sprint 3 suma 35 h (28 + 7) para 30 h de capacidad. Se ajusta en el Sprint Planning del 29/10. Propuesta: HU-13 (suspensión y bloqueo, 4 h) pasa al Sprint 4, que tiene 4 h de holgura, y queda 1 h de sobrecarga a vigilar en el Daily.
 
 | Story points | Horas | Capacidad | Holgura |
 |:---:|:---:|:---:|:---:|
@@ -338,3 +432,174 @@ Historias del Lab 07 que salen del alcance de los 4 sprints para dar prioridad a
 | HU-16 | Gestión de rubros, categorías y comisiones | 2 | 5 | Los rubros del MVP pueden cargarse con datos iniciales |
 | HU-17 | Configuración de parámetros del matching | 2 | 6 | Los parámetros pueden quedar fijos en la configuración |
 | HU-18 | Dashboard de métricas operativas | 2 | 6 | Administrativo; no afecta al usuario final |
+
+---
+
+# Plan aprobado del Sprint 3
+
+**Fechas:** 29/10–11/11/2026.
+
+> 🟢 **Planificación aprobada.** El Scrum Master comunica la aprobación de David (PO) y Renzo a la propuesta de Sprint Backlog. Se formaliza el 29/10/2026. Capacidad: **30 h, 10 h por integrante**. Este acuerdo no declara terminadas HU-7 ni HU-8.
+
+**Sprint Goal:** cerrar el flujo de búsqueda en mapa y atención de solicitudes de HU-7/HU-8 mediante revisión, validación e integración; corregir los permisos y la propiedad en la carga de certificados; avanzar el escaneo/validación del DNI (HU-19) y el consentimiento/eliminación de datos (HU-21), con pruebas cruzadas y una base segura para la verificación posterior.
+
+## Capacidad y reglas de contabilización
+
+| Integrante | Trabajo asignado S3 | Reserva | Capacidad |
+|---|---:|---:|---:|
+| Luis Abad | 7 h | 3 h | 10 h |
+| David Valcarcel | 8 h | 2 h | 10 h |
+| Renzo León | 9 h | 1 h | 10 h |
+| **Total** | **24 h** | **6 h** | **30 h** |
+
+Las 24 h incluyen **3 h heredadas ya integradas el 29/10** y **21 h de trabajo pendiente al formalizar**. Las horas originales de mapa (5 h) y HU-8 (7 h) son referencia histórica: no se suman de nuevo a las estimaciones restantes aprobadas. Las reservas son capacidad disponible, no tareas completadas ni horas consumidas; su uso se registra por responsable, motivo y saldo. No se suman story points originales de historias parciales para inventar una velocidad nueva.
+
+El cierre del Sprint 2 se conserva en **15 de 23 h terminadas al 28/10** (horas, no cantidad de tareas). Las 3 h integradas el 29/10 cuentan una sola vez al inicio de S3 y no aumentan el resultado histórico de S2.
+
+## Sprint Backlog aprobado
+
+Los identificadores S3-MAPA-R, S3-MAPA-I y S3-CERT-16 son etiquetas de seguimiento para revisión/integración o corrección, no historias nuevas ni duplicaciones de T7.1/T7.2.
+
+| Origen | Referencia | Trabajo / resultado esperado | Responsable | Horas S3 | Estado inicial |
+|---|---|---|---|---:|---|
+| Heredado integrado | T6.3 · HU-6 | Pruebas de disponibilidad, PR #20 integrado el 29/10 | David | 1 | ✅ Integrado |
+| Heredado integrado | T7.3 · HU-7 | Pruebas de cobertura, PR #23 integrado el 29/10 | David | 2 | ✅ Integrado |
+| Heredado pendiente | S3-MAPA-R · T7.1/T7.2 | Revisar #14/#16 y regresiones con roles, disponibilidad y verificación | David | 1 | Pendiente |
+| Heredado pendiente | S3-MAPA-I · T7.1/T7.2 | Ajustes de revisión e integración del mapa, sin reconstruir lo implementado | Luis | 1 | Pendiente |
+| Heredado con avance local | T8.1 + T8.2 · HU-8 | Completar escenarios, revisión y preparación de integración del backend push y frontend responsive existentes | Luis | 2 | 🟡 Local/parcial |
+| Heredado parcial | T8.3 · HU-8 | Validación cruzada de push real, repetición de medidas y evidencia; revisar base #22 | David | 2 | 🟡 Base de bandeja; push pendiente de validación |
+| Deuda heredada | S3-CERT-16 | Corregir carga de certificados: sesión, rol, propiedad desde el usuario, CSRF y regresiones; retirar expectedFailure cuando corresponda | David | 2 | Pendiente |
+| Nuevo | T19.1 · HU-19 | Pantalla de escaneo del DNI con cámara en React responsive | Renzo | 3 | Sin iniciar |
+| Nuevo | T19.2 · HU-19 | OCR: extraer número/nombres y recortar foto | Renzo | 4 | Sin iniciar |
+| Nuevo | T19.3 · HU-19 | Validador intercambiable, consulta a fuente y revisión manual ante fallo/no coincidencia | Renzo | 2 | Sin iniciar |
+| Nuevo | T19.4 · HU-19 | Pruebas cruzadas con muestras acordadas de lectura y coincidencia | Luis | 2 | Sin iniciar |
+| Nuevo | T21.1 · HU-21 | Pantalla de consentimiento y registro de aceptación | Luis | 1 | Sin iniciar |
+| Nuevo | T21.2 · HU-21 | Endpoint de solicitud de eliminación y trazabilidad de su atención | Luis | 1 | Sin iniciar |
+| | | **Total de trabajo asignado** | | **24** | **3 integradas + 21 pendientes** |
+
+Reparto: Renzo construye HU-19 y Luis realiza T19.4; Luis construye HU-8/HU-21 y David valida T8.3 y revisa HU-21. David corrige certificados con revisión de Renzo por su propiedad sobre prestadores/permisos. Las revisiones de HU-19/HU-21 se organizan dentro de sus tareas y, si requieren capacidad adicional, se registra el uso de reserva sin inventar horas ya consumidas.
+
+### Situación heredada y Pull Requests
+
+Estado consultado el 29/10 contra origin/main `f515837c6453d1d2a8a17e742c9ff9323f0ab94e`:
+
+| PR / rama | Situación | Próximo paso / dependencia |
+|---|---|---|
+| [#14](https://github.com/RXDG2908/Chamba-PE/pull/14) · T7.1 | Abierto; código de coordenadas existente | Revisión de David y regresión sobre main con filtro Verificado; antes de #16 |
+| [#16](https://github.com/RXDG2908/Chamba-PE/pull/16) · T7.2 | Abierto; incluye cambios heredados de #14 | Revisar diff tras #14; comprobar marcadores coincidentes, encuadre, cancelación, errores y accesibilidad |
+| [#20](https://github.com/RXDG2908/Chamba-PE/pull/20) · T6.3 | Integrado el 29/10 | 1 h contabilizada una sola vez; no queda como trabajo pendiente |
+| [#23](https://github.com/RXDG2908/Chamba-PE/pull/23) · T7.3 | Integrado el 29/10 | 2 h contabilizadas una sola vez; no queda como trabajo pendiente |
+| [#22](https://github.com/RXDG2908/Chamba-PE/pull/22) · T8.3 | Abierto, base parcial de bandeja HTTP | Coordinar con el push local; no usar tiempos de bandeja como entrega FCM |
+| feature/hu8-notificaciones | Cambios locales de T8.1/T8.2 sin commit ni PR | Preservar código, configuración y evidencia; revisar contra main antes de integración futura autorizada |
+
+Las dependencias de autenticación/login/disponibilidad y revisión (#13, #15, #17, #18, #11, #21) ya estaban integradas al cierre de S2. La copia local de HU-8 parte de una base anterior; actualizarla y resolver diferencias será trabajo futuro, no una acción realizada al documentar este plan.
+
+## Avance local de HU-8 y criterio de cierre
+
+Existe implementación local y evidencia de recepción real, aceptación/rechazo, primer/segundo plano, pestaña cerrada con Chrome abierto y comprobaciones tras logout/cambio a administrador. El ensayo grabado #17 mostró aproximadamente **1,3 s**, con margen visual orientativo ±0,1 s. No es garantía general ni sustituye la validación cruzada.
+
+Quedan por completar las comprobaciones de sesión vencida, permiso denegado, soporte y escenarios de cuenta que falten en la matriz, repetir medidas con condiciones registradas y revisar/integrar el trabajo. David valida T8.3. **HU-8 continúa parcial y abierta**; no se contabilizan como terminadas sus 2 h restantes ni las 2 h de T8.3. Detalle y evidencia en la guía local HU8_NOTIFICACIONES.md, todavía no publicada y disponible para revisión.
+
+## Trabajo postergado del compromiso inicial
+
+| Historia | Tareas conservadas como referencia | Estimación original | Decisión aprobada |
+|---|---|---:|---|
+| HU-20 · Reconocimiento facial | T20.1 selfie/parpadeo 3 h; T20.2 comparación 4 h; T20.3 reglas/panel 2 h; T20.4 calibración 2 h | 11 h | Fuera del compromiso inicial S3; replanificar con PO/equipo |
+| HU-13 · Suspensión y bloqueo | T13.1 API 2 h; T13.2 gestión React 2 h | 4 h | Fuera del compromiso inicial S3; replanificar con PO/equipo |
+
+Estas 15 h no forman parte de las 24 h asignadas ni de las 6 h de reserva. No se asignan automáticamente al Sprint 4 ni se consume su holgura. La verificación facial, el parpadeo, la comparación y la decisión biométrica automática quedan como flujo futuro de HU-20, no como criterios de entrega de este compromiso.
+
+## Criterios de aceptación y dependencias
+
+- **HU-7:** revisión e integración de #14 → #16; conservar cobertura inclusiva, rubro, disponibilidad y verificación. No inventar puntuaciones: acordar con PO el tratamiento de «Sin calificaciones» mientras HU-12 sigue pendiente.
+- **HU-8:** mantener sesión Django/CSRF, destinatario y privacidad del aviso; completar pruebas reales y evidencia <5 s, con resultados y pérdidas/duplicados registrados. Aplicar la definición de terminado por revisión e integración, sin cerrar por una demo local.
+- **Certificados:** impedir carga anónima, por otro rol o para otro prestador; conservar formatos/tamaño y flujo administrativo. Las tres expectedFailure actuales documentan el defecto, no su solución.
+- **HU-19:** número con validación del dígito verificador; nombres comparados sin tildes/mayúsculas; si la fuente falla o los nombres no coinciden, revisión manual, nunca aprobación automática. Requiere HU-1 y panel HU-9. Renzo define el contrato cámara/OCR/validador antes de conectar los componentes y Luis prueba lectura/coincidencia y errores.
+- **HU-21:** aceptación registrada y verificable; sin consentimiento no se inicia futura verificación facial. Registrar y atender la solicitud de eliminación, definiendo estados y responsable operativo. Su contrato debe estar disponible antes de conectar el futuro flujo de HU-20.
+- Toda pantalla se construye en `frontend/` responsive. Credenciales de Firebase fuera del repositorio; ejemplos sin secretos. No se requieren cambios de credenciales para formalizar esta planificación.
+
+## Impedimentos y riesgos a seguir
+
+| Referencia | Riesgo / bloqueo | Responsable de seguimiento | Acción / condición para resolver |
+|---|---|---|---|
+| Impedimento 16 | Carga de certificados sin sesión/propiedad | David; revisión Renzo | S3-CERT-16 con pruebas negativas y CSRF |
+| #14/#16 | Espera de revisión y diferencias con main actual | David / Luis | Revisar en orden; no dar HU-7 por integrada desde la copia local |
+| HU-8 / #22 | Confundir mocks/bandeja con entrega real; evidencia insuficiente para cierre | Luis / David | Separar evidencias y repetir medidas; validación cruzada |
+| HU-19 | Calidad de OCR y disponibilidad/contrato de eldni.com | Renzo | Muestras acordadas, validador intercambiable y alternativa manual |
+| HU-21 | Definición operativa de consentimiento y atención de eliminación | Luis / PO David | Acordar contrato y criterios verificables antes de cierre |
+| Impedimento 14 | Protección/revisión de main pendiente de verificar | Scrum Master | Confirmar 1 aprobación y revisión oportuna; no asumir configuración aplicada |
+| Capacidad | Reservas limitadas por integrante | Scrum Master / equipo | Registrar consumo; si se supera, acordar ajuste con PO sin añadir HU-13/HU-20 automáticamente |
+
+## Orden de ejecución
+
+1. Dar por incorporadas únicamente T6.3/T7.3; revisar #14/#16 y cerrar la corrección de certificados.
+2. Completar revisión de HU-8 y validación real T8.3 aprovechando la implementación existente; en paralelo, contratos de HU-19/HU-21.
+3. Construir y probar HU-19/HU-21; completar evidencia e integración revisada.
+4. En cada Daily actualizar trabajo restante, bloqueos, reserva usada y responsable del siguiente paso. Una aprobación de Planning no es autorización para publicar o integrar los cambios locales actuales.
+
+## Seguimiento del Sprint 3
+
+Estado inicial: **24 h asignadas; 3 h integradas, 21 h pendientes; 6 h de reserva sin consumo registrado**. No se conocen horas reales consumidas de las tareas locales: no se deducen de sus estimaciones históricas.
+
+| Fecha | Referencia / responsable | Avance o bloqueo | Resultado / evidencia | Trabajo S3 pendiente | Reserva usada |
+|---|---|---|---|---:|---:|
+| 29/10 | T6.3 / David | Integrado | PR #20 | 0 h | 0 h |
+| 29/10 | T7.3 / David | Integrado | PR #23 | 0 h | 0 h |
+| 29/10 | HU-8 / Luis y David | Local/parcial; validación cruzada e integración pendientes | Guía HU-8 y video; 1 ensayo ≈1,3 s | 4 h (2 + 2) | 0 h |
+| 29/10 | Resto del backlog | Planificado; sin cierre adicional registrado | Aprobación comunicada por Scrum Master | 17 h | 0 h |
+| Por registrar | Tarea / responsable | Avance, bloqueo y próximo paso | PR / prueba / evidencia | Actualizar | Registrar motivo y saldo |
+
+Los 0 h de reserva indican **sin consumo registrado**, no una medición de dedicación real. Registrar decisiones posteriores sin sobrescribir el historial.
+
+### Burndown de trabajo asignado (reserva separada)
+
+La línea ideal es referencia de planificación para 24 h en 10 días hábiles; no representa horas reales ni una entrega prometida por día. El primer corte refleja las 3 h integradas el 29/10.
+
+| Día / fecha | Ideal pendiente (h) | Pendiente registrado (h) | Integrado acumulado (h) | Reserva disponible (h) |
+|---|---:|---:|---:|---:|
+| Inicio | 24 | 24 | 0 | 6 |
+| 1 · 29/10 | 21,6 | 21 | 3 | 6 |
+| 2 · 30/10 | 19,2 | — | — | — |
+| 3 · 02/11 | 16,8 | — | — | — |
+| 4 · 03/11 | 14,4 | — | — | — |
+| 5 · 04/11 | 12 | — | — | — |
+| 6 · 05/11 | 9,6 | — | — | — |
+| 7 · 06/11 | 7,2 | — | — | — |
+| 8 · 09/11 | 4,8 | — | — | — |
+| 9 · 10/11 | 2,4 | — | — | — |
+| 10 · 11/11 | 0 | — | — | — |
+
+No mezclar horas estimadas retiradas al completar tareas con horas reales gastadas. Registrar por separado cualquier reestimación o uso de reserva y mantener el límite de 10 h por integrante.
+
+## Review y retrospectiva
+
+El 11/11 revisar el Sprint Goal, pendientes de HU-7/HU-8, corrección de certificados y entregables de HU-19/HU-21 con evidencia. Documentar tareas integradas, trabajo restante y decisiones del PO; no dar por completadas HU-13/HU-20 por estar descritas como futuras.
+
+| Qué salió bien | Qué mejorar | Acción y responsable |
+|---|---|---|
+| Por completar en la retrospectiva | Por completar | Por acordar |
+
+## Seguimiento documental HU-7 · T7.1 / #14 · 02/11/2026
+
+Preparación local de revisión/publicación, sin tarea terminada ni horas adicionales descontadas. Se conservan sin modificación todos los registros y la planificación precedente de main. Documentación resuelta sobre main; sincronización de código e historial pendiente de autorización. Ver AVANCES.md y la guía de preparación del PR.
+
+**Actualización de seguimiento T7.1 (02/11):** autorizada la sincronización y publicación de #14; main f515837 incorporado por merge normal. 168 pruebas Django (165 pasan y 3 expectedFailure conocidas), sin migraciones pendientes. #14 sigue pendiente de revisión/integración; no se contabilizan nuevas horas terminadas ni se cambia el cierre S2 o el compromiso S3. #16 permanece sin modificar.
+
+
+## Preparaci?n local tras revisi?n de David ? 03/11/2026
+
+Se incorpora main 15d8dc9 en la preparaci?n de #14 mediante merge normal, conservando ?ntegra la planificaci?n aprobada por #26 y el historial de T7.1. Cierre S2: 15 de 23 h; S3: 24 h de trabajo y 6 h de reserva. Las coordenadas p?blicas conservan su comportamiento y precisi?n actuales; cualquier cambio queda pendiente del PO. HU-7 sigue abierta, sin horas nuevas terminadas. Esta preparaci?n no publica ni actualiza el PR.
+
+
+## Seguimiento documental HU-7 · T7.2 / #16 · 02/11/2026
+
+Preparación local de revisión/publicación, sin tarea terminada ni horas adicionales descontadas. Se conservan sin modificación todos los registros y la planificación precedente de main. Documentación resuelta sobre main; sincronización de código e historial pendiente de autorización. Ver AVANCES.md y la guía de preparación del PR.
+
+**Seguimiento local T7.2 (02/11):** autorizada e iniciada la sincronización local con #14 (8c887ae) por merge normal, preservando main f515837 y registros históricos. Validación del backend propio en curso; sin publicación ni nuevas horas terminadas. Las notas anteriores describen cortes históricos, no el estado vigente.
+
+**Validación local T7.2 (03/11):** tras corregir la interceptación de pruebas, 16/16 automatizadas y 14/14 integraciones con backend propio; Django 165 aprobadas y tres expectedFailure conocidas, lint/build correctos. Documentos resueltos y merge local de #14 autorizado; sin publicar ni marcar HU-7 terminada, sin nuevas horas descontadas.
+
+
+## Preparaci?n de correcciones T7.2 tras #26 ? 03/11/2026
+
+Merge local del #14 preparado (`36de951`) conservando el historial de #16 y toda la planificaci?n de main `15d8dc9`. Conflictos AVANCES/SPRINTS resueltos sin quitar registros. Django 168 (165 aprobadas y tres expectedFailure conocidas), Playwright 16/16 e integraci?n real propia 14/14; lint/build correctos. Evidencias p?blicas saneadas; informes locales de integridad archivados en carpeta ignorada. [Informe y l?mites](docs/preparacion-correcciones-HU7.md). Precisi?n de coordenadas y ?Sin calificaciones? sin cambios, pendientes del PO. Sin push ni actualizaci?n de PR, sin cierre de HU-7 ni horas nuevas terminadas.

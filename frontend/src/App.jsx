@@ -103,7 +103,10 @@ function App() {
 
       <Routes>
         <Route path="/" element={<Inicio usuario={usuario} />} />
-        <Route path="/registro-prestador" element={<RegistroPrestador />} />
+        <Route
+          path="/registro-prestador"
+          element={usuario ? <Navigate to="/" replace /> : <RegistroPrestador />}
+        />
         <Route path="/resultados" element={<ResultadosPrestadores />} />
         <Route
           path="/certificaciones"

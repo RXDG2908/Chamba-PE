@@ -100,7 +100,7 @@ function Inicio({ usuario }) {
           <h3 className="seccion-titulo">¿Qué necesitas hoy?</h3>
           <ul className="rubros-inicio">
             {rubros.map((rubro) => (
-              <li key={rubro.id}><Link to="/resultados">{rubro.nombre}</Link></li>
+              <li key={rubro.id}><Link to="/resultados" state={{ rubro: rubro.id }}>{rubro.nombre}</Link></li>
             ))}
           </ul>
         </section>

@@ -95,6 +95,7 @@ Una línea por entrega, la más reciente arriba.
 
 | Fecha | Quién | Qué se hizo | Tarea |
 |:---:|---|---|:---:|
+| 05/11 | David Valcarcel | PR #32 (menú por rol y diseño), revisión de Renzo: se integró `main` (#29 y #33; conflicto solo en AVANCES, `App.jsx` se une solo). Los rubros de la portada abren la búsqueda con ese rubro elegido y `/registro-prestador` manda al inicio si ya hay sesión. Se comprobó en el navegador que la cabecera fija queda encima del mapa, sus controles y popups al hacer scroll (el mapa tiene su propio `z-index: 0`). **Pendientes:** actualizar `docs/GUIA_NAVEGACION.md` y `docs/GUIA_T6.3.md` (el registro ya no está en `/`), y que el Scrum Master o el PO aprueben las horas como uso de reserva. | Frontend |
 | 05/11 | David Valcarcel | Renzo aprobó el #29 (173/173 OK, lint OK). Se trajo `main` a la rama (conflicto solo en esta bitácora, se conservaron las filas de ambos lados) y se une: **S3-CERT-16 ✅ y el impedimento 16 queda cerrado** (2 h). También queda cerrada **S3-MAPA-R ✅** (1 h): la revisión de #14/#16 terminó con su integración el 04/11 y el redondeo a 3 decimales (#31) que decidió el PO. | S3-CERT-16/S3-MAPA-R |
 | 05/11 | David Valcarcel | S3-CERT-16 (#29), revisión de Renzo: con JSON `{"prestador": 5}` (número) la validación del ID lanzaba `TypeError` y la API respondía 500. Ahora el ID se valida como texto: número propio sigue (400 si falta el archivo), de otro prestador 403, decimal/booleano/lista 400. 1 prueba nueva; suite 173 OK sin fallas esperadas. | S3-CERT-16 |
 | 03/11 | David Valcarcel | Sprint 3: revisó #14 y #16 sobre `main` (168 OK, mapa probado en el navegador; observaciones por publicar), corrigió el impedimento 16 en `feature/s3-cert-16-carga-certificados` (172 OK, sin `expectedFailure`) y dejó T8.3 bloqueada hasta que Luis publique la rama de HU-8. Detalle en la sección 10. | S3-MAPA-R/S3-CERT-16/T8.3 |
@@ -265,6 +266,7 @@ Las 3 h de David son T6.3 (#20, 1 h) y T7.3 (#23, 2 h), integradas el 29/10 seg�
 | 04/11 | Menú por rol y diseño / David | 🟡 PR #32 (`feature/menu-por-rol-y-diseno`), con `main` integrado el 05/11 | 4 roles probados en el navegador; 170 pruebas OK | Commit, PR y revisión; unir después del #29 (ambos tocan rutas de `App.jsx`) |
 | 05/11 | S3-MAPA-R / David | ✅ Revisión cerrada | #14 y #16 unidos el 04/11; #31 redondea coordenadas a 3 decimales | — |
 | 05/11 | S3-CERT-16 / David | ✅ Unida a `main` con #29; impedimento 16 cerrado | Aprobado por Renzo; 173 OK sin `expectedFailure` | Burndown: lo actualiza el Scrum Master |
+| 05/11 | Menú por rol y diseño / David | 🟡 PR #32 revisado por Renzo; observaciones atendidas | Cabecera vs. mapa comprobada en el navegador; rubro preseleccionado y guardia del registro | Unir #32; actualizar las guías de navegación |
 | Por registrar | Tarea / responsable | Avance o bloqueo | PR / prueba / evidencia | Acción, responsable y fecha |
 
 ### Bloqueos y decisiones vigentes

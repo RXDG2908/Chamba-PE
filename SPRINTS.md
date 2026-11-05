@@ -554,6 +554,7 @@ Estado inicial: **24 h asignadas; 3 h integradas, 21 h pendientes; 6 h de reserv
 | 03/11 | T8.3 / David | 🔴 Bloqueada: rama de HU-8 sin publicar | — | 2 h | 0 h |
 | 05/11 | S3-MAPA-R / David | ✅ Revisión cerrada | #14 y #16 unidos el 04/11; #31 (3 decimales) | 0 h | 0 h |
 | 05/11 | S3-CERT-16 / David | ✅ Unida con #29; impedimento 16 cerrado | Aprobado por Renzo; 173 OK | 0 h | 0 h |
+| 05/11 | Menú por rol y diseño (fuera del backlog aprobado) / David | 🟡 PR #32 revisado por Renzo; por unir. Pendiente actualizar `GUIA_NAVEGACION.md` y `GUIA_T6.3.md` | Menú y rutas por rol, portada y tema; probado con los 4 roles | — | Por aprobar por SM/PO |
 | Por registrar | Tarea / responsable | Avance, bloqueo y próximo paso | PR / prueba / evidencia | Actualizar | Registrar motivo y saldo |
 
 Los 0 h de reserva indican **sin consumo registrado**, no una medición de dedicación real. Registrar decisiones posteriores sin sobrescribir el historial.

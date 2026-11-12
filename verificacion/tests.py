@@ -302,6 +302,18 @@ class ApiDniTests(TestCase):
         self.assertEqual(len(respuesta.json()), 1)
         self.assertEqual(self.sesion(self.prestador.usuario).get(url).status_code, 403)
 
+    def test_la_cola_del_administrador_lista_los_intentos_en_revision_manual(self):
+        self.enviar(self.sesion(self.prestador.usuario), lineas=['BORROSO'])
+        url = f"{reverse('verificacion_dni')}?resultado=revision_manual"
+        respuesta = self.sesion(self.admin).get(url)
+        self.assertEqual(respuesta.status_code, 200)
+        datos = respuesta.json()
+        self.assertEqual(len(datos), 1)
+        self.assertEqual(datos[0]['resultado'], 'revision_manual')
+        self.assertEqual(datos[0]['prestador']['dni'], self.prestador.dni)
+        self.assertEqual(self.sesion(self.prestador.usuario).get(url).status_code, 403)
+        self.assertEqual(self.sesion(self.admin).get(f"{reverse('verificacion_dni')}?resultado=x").status_code, 400)
+
     def test_las_fotos_no_tienen_url_publica_y_solo_las_ve_el_administrador(self):
         intento_id = self.enviar(self.sesion(self.prestador.usuario)).json()['id']
         intento = IntentoDni.objects.get(id=intento_id)

@@ -5,6 +5,18 @@ const API = '/api/administracion/revisiones/'
 const RUTA_PANEL = '/administracion/revisiones'
 const LOGIN_ADMIN = `/admin/login/?next=${encodeURIComponent(RUTA_PANEL)}`
 
+const API_DNI = '/api/verificacion/dni/'
+const MOTIVOS_DNI = {
+  lector_no_disponible: 'El lector automático no está disponible; hay que leer el DNI a mano.',
+  mrz_ilegible: 'No se pudo leer la zona MRZ del reverso.',
+  mrz_invalida: 'Los dígitos de control de la MRZ no cuadran.',
+  dni_distinto: 'El DNI de la foto no es el que registró el prestador.',
+  dni_vencido: 'El DNI está vencido.',
+  fuente_no_disponible: 'La fuente externa no respondió.',
+  nombres_distintos: 'Los nombres no coinciden con la fuente externa.',
+  sin_foto: 'No se pudo recortar la foto del titular.',
+}
+
 const ETIQUETAS = { aprobado: 'Aprobado', rechazado: 'Rechazado' }
 
 function leerCookie(nombre) {
@@ -146,6 +158,69 @@ function TarjetaRevision({ revision, onResuelta }) {
   )
 }
 
+function RevisionDni() {
+  const [intentos, setIntentos] = useState([])
+  const [estado, setEstado] = useState('cargando')
+
+  useEffect(() => {
+    const controlador = new AbortController()
+    fetch(`${API_DNI}?resultado=revision_manual`, { signal: controlador.signal })
+      .then((respuesta) => {
+        if (!respuesta.ok) throw new Error(`HTTP ${respuesta.status}`)
+        return respuesta.json()
+      })
+      .then((datos) => {
+        setIntentos(datos)
+        setEstado('listo')
+      })
+      .catch(() => {
+        if (!controlador.signal.aborted) setEstado('error')
+      })
+    return () => controlador.abort()
+  }, [])
+
+  return (
+    <section className="revision-dni" aria-labelledby="titulo-dni">
+      <h2 id="titulo-dni">DNI en revisión manual</h2>
+      <p>Intentos de verificación del DNI que el sistema no pudo aprobar solo. Revisa las fotos y los motivos.</p>
+      {estado === 'cargando' && <p className="revision-aviso" role="status">Cargando intentos…</p>}
+      {estado === 'error' && <p className="revision-aviso revision-aviso-error" role="alert">No se pudieron cargar los intentos de DNI.</p>}
+      {estado === 'listo' && intentos.length === 0 && <p className="revision-aviso">No hay DNI por revisar.</p>}
+      {estado === 'listo' && intentos.length > 0 && (
+        <ul className="revision-lista">
+          {intentos.map((intento) => (
+            <li key={intento.id} className="revision-tarjeta">
+              <div className="revision-cabecera">
+                <div className="revision-datos">
+                  <h3>{intento.prestador.nombre}</h3>
+                  <dl>
+                    <div><dt>DNI registrado</dt><dd>{intento.prestador.dni}</dd></div>
+                    <div><dt>DNI leído</dt><dd>{intento.lectura.dni || '—'}</dd></div>
+                    <div><dt>Recibido</dt><dd>{formatearFecha(intento.creado)}</dd></div>
+                  </dl>
+                </div>
+                {intento.tiene_foto && (
+                  <a className="revision-ver" href={`${API_DNI}${intento.id}/foto/titular/`} target="_blank" rel="noopener noreferrer">
+                    Ver foto del titular
+                  </a>
+                )}
+              </div>
+              <ul className="revision-motivos">
+                {intento.motivos.map((motivo) => <li key={motivo}>{MOTIVOS_DNI[motivo] ?? motivo}</li>)}
+              </ul>
+              <p>
+                <a href={`${API_DNI}${intento.id}/foto/anverso/`} target="_blank" rel="noopener noreferrer">Frente</a>
+                {' · '}
+                <a href={`${API_DNI}${intento.id}/foto/reverso/`} target="_blank" rel="noopener noreferrer">Reverso</a>
+              </p>
+            </li>
+          ))}
+        </ul>
+      )}
+    </section>
+  )
+}
+
 export default function RevisionDocumentos() {
   const [revisiones, setRevisiones] = useState([])
   const [estado, setEstado] = useState('cargando')
@@ -228,6 +303,8 @@ export default function RevisionDocumentos() {
           )}
         </>
       )}
+
+      {estado === 'listo' && <RevisionDni />}
     </main>
   )
 }

@@ -9,7 +9,6 @@ las credenciales.
 """
 from base64 import b64encode
 from tempfile import TemporaryDirectory
-from unittest import expectedFailure
 
 from django.contrib.auth import get_user_model
 from django.core.files.uploadedfile import SimpleUploadedFile
@@ -248,10 +247,8 @@ class RutasDePrestadorTests(AccesoPorRolBase):
 
 class CargaDeCertificacionPorRolTests(AccesoPorRolBase):
     """
-    POST /api/certificaciones/upload/ todavía no pide sesión: recibe el ID del prestador
-    en el formulario. Las pruebas marcadas con expectedFailure describen lo que debería
-    pasar con HU-5 y hoy fallan; cuando la vista exija la sesión del prestador dueño,
-    pasarán y unittest las marcará como «unexpected success» para quitarles el decorador.
+    POST /api/certificaciones/upload/ exige la sesión del prestador dueño del perfil
+    (S3-CERT-16, impedimento 16). Hasta el Sprint 2 estas tres pruebas eran expectedFailure.
     """
 
     def setUp(self):
@@ -271,15 +268,12 @@ class CargaDeCertificacionPorRolTests(AccesoPorRolBase):
     def test_el_prestador_sube_su_certificacion(self):
         self.assertEqual(self.subir(self.prestador.usuario, self.prestador).status_code, 201)
 
-    @expectedFailure
     def test_cliente_no_puede_subir_certificaciones(self):
         self.assertEqual(self.subir(self.cliente, self.prestador).status_code, 403)
 
-    @expectedFailure
     def test_anonimo_no_puede_subir_certificaciones(self):
         self.assertEqual(self.subir(None, self.prestador).status_code, 403)
 
-    @expectedFailure
     def test_prestador_no_sube_a_nombre_de_otro(self):
         self.assertEqual(self.subir(self.otro_prestador.usuario, self.prestador).status_code, 403)
 

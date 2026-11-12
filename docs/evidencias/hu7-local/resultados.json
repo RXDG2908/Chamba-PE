@@ -1,0 +1,183 @@
+{
+  "formato": "hu7-resumen-publico-v1",
+  "entorno": "Datos exclusivamente ficticios; Django y teselas OSM reales; sin Firebase.",
+  "estado": "passed",
+  "stats": {
+    "startTime": "2026-11-04T03:38:35.041Z",
+    "duration": 37302.879,
+    "expected": 14,
+    "skipped": 0,
+    "unexpected": 0,
+    "reintentos": 0
+  },
+  "pruebas": [
+    {
+      "titulo": "API real: rubro, estados, cobertura, coordenadas y entradas inválidas",
+      "archivo": "tests/hu7-local/integracion.spec.mjs",
+      "estadoEsperado": "passed",
+      "resultados": [
+        {
+          "estado": "passed",
+          "duracionMs": 451,
+          "reintento": 0
+        }
+      ]
+    },
+    {
+      "titulo": "coordenadas reales coinciden con la proyección de cada marcador",
+      "archivo": "tests/hu7-local/integracion.spec.mjs",
+      "estadoEsperado": "passed",
+      "resultados": [
+        {
+          "estado": "passed",
+          "duracionMs": 2214,
+          "reintento": 0
+        }
+      ]
+    },
+    {
+      "titulo": "filtros reales limpian resultados y ubicación lejana muestra vacío",
+      "archivo": "tests/hu7-local/integracion.spec.mjs",
+      "estadoEsperado": "passed",
+      "resultados": [
+        {
+          "estado": "passed",
+          "duracionMs": 1701,
+          "reintento": 0
+        }
+      ]
+    },
+    {
+      "titulo": "respuesta real demorada y cancelada no repone datos del rubro anterior",
+      "archivo": "tests/hu7-local/integracion.spec.mjs",
+      "estadoEsperado": "passed",
+      "resultados": [
+        {
+          "estado": "passed",
+          "duracionMs": 1388,
+          "reintento": 0
+        }
+      ]
+    },
+    {
+      "titulo": "red desconectada emulada muestra error y recupera búsqueda real",
+      "archivo": "tests/hu7-local/integracion.spec.mjs",
+      "estadoEsperado": "passed",
+      "resultados": [
+        {
+          "estado": "passed",
+          "duracionMs": 1815,
+          "reintento": 0
+        }
+      ]
+    },
+    {
+      "titulo": "disponibilidad real mediante sesión/CSRF cambia lista y mapa",
+      "archivo": "tests/hu7-local/integracion.spec.mjs",
+      "estadoEsperado": "passed",
+      "resultados": [
+        {
+          "estado": "passed",
+          "duracionMs": 1889,
+          "reintento": 0
+        }
+      ]
+    },
+    {
+      "titulo": "solicitud desde tarjeta se guarda realmente solo en la BD ficticia",
+      "archivo": "tests/hu7-local/integracion.spec.mjs",
+      "estadoEsperado": "passed",
+      "resultados": [
+        {
+          "estado": "passed",
+          "duracionMs": 1635,
+          "reintento": 0
+        }
+      ]
+    },
+    {
+      "titulo": "puntos compartidos y recuperación de encuadre a 320 px",
+      "archivo": "tests/hu7-local/integracion.spec.mjs",
+      "estadoEsperado": "passed",
+      "resultados": [
+        {
+          "estado": "passed",
+          "duracionMs": 2585,
+          "reintento": 0
+        }
+      ]
+    },
+    {
+      "titulo": "puntos compartidos y recuperación de encuadre a 390 px",
+      "archivo": "tests/hu7-local/integracion.spec.mjs",
+      "estadoEsperado": "passed",
+      "resultados": [
+        {
+          "estado": "passed",
+          "duracionMs": 2631,
+          "reintento": 0
+        }
+      ]
+    },
+    {
+      "titulo": "puntos compartidos y recuperación de encuadre a 1280 px",
+      "archivo": "tests/hu7-local/integracion.spec.mjs",
+      "estadoEsperado": "passed",
+      "resultados": [
+        {
+          "estado": "passed",
+          "duracionMs": 2663,
+          "reintento": 0
+        }
+      ]
+    },
+    {
+      "titulo": "responsive real a 320 px",
+      "archivo": "tests/hu7-local/integracion.spec.mjs",
+      "estadoEsperado": "passed",
+      "resultados": [
+        {
+          "estado": "passed",
+          "duracionMs": 1888,
+          "reintento": 0
+        }
+      ]
+    },
+    {
+      "titulo": "responsive real a 390 px",
+      "archivo": "tests/hu7-local/integracion.spec.mjs",
+      "estadoEsperado": "passed",
+      "resultados": [
+        {
+          "estado": "passed",
+          "duracionMs": 1750,
+          "reintento": 0
+        }
+      ]
+    },
+    {
+      "titulo": "responsive real a 1280 px",
+      "archivo": "tests/hu7-local/integracion.spec.mjs",
+      "estadoEsperado": "passed",
+      "resultados": [
+        {
+          "estado": "passed",
+          "duracionMs": 2068,
+          "reintento": 0
+        }
+      ]
+    },
+    {
+      "titulo": "teselas OSM reales y teclado sin cambiar la ubicación",
+      "archivo": "tests/hu7-local/integracion.spec.mjs",
+      "estadoEsperado": "passed",
+      "resultados": [
+        {
+          "estado": "passed",
+          "duracionMs": 1710,
+          "reintento": 0
+        }
+      ]
+    }
+  ]
+}

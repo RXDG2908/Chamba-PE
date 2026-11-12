@@ -1,0 +1,7 @@
+{
+  "failure": "net::ERR_ABORTED",
+  "finalIds": [
+    6
+  ],
+  "metodo": "Respuesta de Django real demorada por Playwright; datos sin sustituir."
+}

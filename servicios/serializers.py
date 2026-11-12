@@ -51,11 +51,21 @@ class BusquedaPrestadorSerializer(serializers.Serializer):
 
 class PrestadorBusquedaSerializer(serializers.ModelSerializer):
     rubros = RubroSerializer(many=True, read_only=True)
+    # Coordenadas numéricas del centro de cobertura, listas para el mapa.
+    latitud = serializers.FloatField(read_only=True)
+    longitud = serializers.FloatField(read_only=True)
     distancia_km = serializers.FloatField(read_only=True)
 
     class Meta:
         model = Prestador
-        fields = ['id', 'nombres', 'apellidos', 'rubros', 'distancia_km']
+        fields = ['id', 'nombres', 'apellidos', 'rubros', 'latitud', 'longitud', 'distancia_km']
+
+    def to_representation(self, instance):
+        datos = super().to_representation(instance)
+        # Solo la salida pública: los cálculos usan las coordenadas originales.
+        for campo in ('latitud', 'longitud'):
+            datos[campo] = round(datos[campo], 3)
+        return datos
 
 
 class SolicitudSerializer(serializers.ModelSerializer):

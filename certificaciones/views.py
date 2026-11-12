@@ -3,12 +3,10 @@ import os
 import math
 import re
 from django.http import JsonResponse
-from django.views.decorators.csrf import csrf_exempt
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 
-# Importar el modelo Prestador para asociar la certificación (T2.1)
-from prestadores.models import Prestador
+from usuarios.permisos import EsPrestador
 from .models import CertificacionPrestador
 
 MAX_FILE_SIZE = 5 * 1024 * 1024  # 5 MB en bytes
@@ -28,65 +26,41 @@ def contenido_coincide(archivo, firma):
     archivo.seek(0)
     return cabecera == firma
 
-@csrf_exempt
+@api_view(['POST'])
+@permission_classes([EsPrestador])
 def upload_certification(request):
-    # 1. Responder a la petición previa del navegador (Preflight OPTIONS)
-    if request.method == 'OPTIONS':
-        res = JsonResponse({})
-        res["Access-Control-Allow-Origin"] = "*"
-        res["Access-Control-Allow-Methods"] = "POST, OPTIONS"
-        res["Access-Control-Allow-Headers"] = "*"
-        return res
+    """Carga de certificados (HU-2). S3-CERT-16: exige la sesión del prestador, con su CSRF,
+    y el documento siempre queda en su propio perfil, nunca en el que diga el formulario."""
+    prestador_asociado = request.user.prestador
 
-    # 2. Validar que sea método POST
-    if request.method != 'POST':
-        res = JsonResponse({'error': 'Método no permitido. Usa POST.'}, status=405)
-        res["Access-Control-Allow-Origin"] = "*"
-        res["Access-Control-Allow-Headers"] = "*"
-        return res
-
-    prestador_id = request.POST.get('prestador') or request.POST.get('prestador_id')
-    if not prestador_id:
-        return JsonResponse({'error': 'El prestador es obligatorio.'}, status=400)
-    if not PRESTADOR_ID.fullmatch(prestador_id):
-        return JsonResponse({'error': 'El prestador debe ser un número entero positivo.'}, status=400)
-
-    try:
-        prestador_asociado = Prestador.objects.get(id=prestador_id)
-    except Prestador.DoesNotExist:
-        return JsonResponse({'error': 'El prestador especificado no existe.'}, status=404)
+    # El campo prestador es opcional; si llega, tiene que ser el del usuario con sesión.
+    # Con JSON puede llegar como número o lista: se valida como texto para responder 400 y no 500.
+    prestador_id = request.data.get('prestador') or request.data.get('prestador_id')
+    if prestador_id:
+        prestador_id = str(prestador_id)
+        if not PRESTADOR_ID.fullmatch(prestador_id):
+            return Response({'error': 'El prestador debe ser un número entero positivo.'}, status=400)
+        if int(prestador_id) != prestador_asociado.pk:
+            return Response({'error': 'Solo puedes subir certificados a tu propio perfil.'}, status=403)
 
     # Capturar el archivo de la petición
     uploaded_file = request.FILES.get('file') or request.FILES.get('certificacion')
-    
     if not uploaded_file:
-        res = JsonResponse({'error': 'No se adjuntó ningún archivo.'}, status=400)
-        res["Access-Control-Allow-Origin"] = "*"
-        res["Access-Control-Allow-Headers"] = "*"
-        return res
+        return Response({'error': 'No se adjuntó ningún archivo.'}, status=400)
 
-    # 3. Validar que el archivo pese menos de 5 MB
+    # 1. Validar que el archivo pese menos de 5 MB
     if uploaded_file.size > MAX_FILE_SIZE:
-        res = JsonResponse({'error': 'El archivo excede el límite permitido de 5 MB.'}, status=400)
-        res["Access-Control-Allow-Origin"] = "*"
-        res["Access-Control-Allow-Headers"] = "*"
-        return res
+        return Response({'error': 'El archivo excede el límite permitido de 5 MB.'}, status=400)
 
-    # 4. Validar que extensión y tipo MIME correspondan al mismo formato (PDF o JPG)
+    # 2. Validar que extensión y tipo MIME correspondan al mismo formato (PDF o JPG)
     ext = os.path.splitext(uploaded_file.name)[1].lower()
     mime_esperado, firma = FORMATOS_PERMITIDOS.get(ext, (None, None))
     if uploaded_file.content_type != mime_esperado:
-        res = JsonResponse({'error': 'Formato no válido. Solo se permiten archivos PDF o JPG.'}, status=400)
-        res["Access-Control-Allow-Origin"] = "*"
-        res["Access-Control-Allow-Headers"] = "*"
-        return res
+        return Response({'error': 'Formato no válido. Solo se permiten archivos PDF o JPG.'}, status=400)
 
-    # 5. Validar el contenido real (magic bytes): un .txt renombrado a .pdf no pasa
+    # 3. Validar el contenido real (magic bytes): un .txt renombrado a .pdf no pasa
     if not contenido_coincide(uploaded_file, firma):
-        res = JsonResponse({'error': 'El contenido del archivo no corresponde a un PDF o JPG válido.'}, status=400)
-        res["Access-Control-Allow-Origin"] = "*"
-        res["Access-Control-Allow-Headers"] = "*"
-        return res
+        return Response({'error': 'El contenido del archivo no corresponde a un PDF o JPG válido.'}, status=400)
 
     # Tarea T2.1: Crear y persistir la certificación vinculada al prestador correcto
     cert = CertificacionPrestador.objects.create(
@@ -95,18 +69,12 @@ def upload_certification(request):
         estado='Pendiente'
     )
 
-    res = JsonResponse({
+    return Response({
         'message': 'Certificación cargada y vinculada exitosamente',
         'file_name': cert.archivo.name,
         'file_url': cert.archivo.url,
         'status': 'Pendiente de verificación'
     }, status=201)
-
-    # Inyectar las cabeceras CORS obligatorias en la respuesta de éxito
-    res["Access-Control-Allow-Origin"] = "*"
-    res["Access-Control-Allow-Methods"] = "POST, OPTIONS"
-    res["Access-Control-Allow-Headers"] = "*"
-    return res
 
 
 # --- FÓRMULA DE HAVERSINE PARA LA TAREA T3.3 ---

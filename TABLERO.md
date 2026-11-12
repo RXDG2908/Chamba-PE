@@ -8,6 +8,8 @@ Resumen: **7 terminadas · 4 en revisión · 0 en curso · 0 por hacer · 3 pasa
 
 > 29/10 (inicio del Sprint 3): T6.3 (#20) y T7.3 (#23) se unieron a `main` y pasan a Terminado; quedan en revisión T7.1 (#14) y T7.2 (#16).
 
+> 04/11: T7.1 (#14) y T7.2 (#16) se unieron a `main` (merge normal, 168 pruebas OK, lint y build OK) y pasan a Terminado. El Sprint 2 queda sin PR abiertos.
+
 > 🟣 **Decisión del Product Owner (David, 28/10):** HU-8 (T8.1, T8.2 y T8.3, 7 h) pasa completa al Sprint 3, porque T8.1 no se empezó. La prueba de la bandeja de T8.3 queda como base parcial.
 
 ### 👀 En revisión (2) · pasan al inicio del Sprint 3
@@ -122,3 +124,7 @@ Sin PR abiertos: del #1 al #9 están unidos a `main`.
 | 3 | 29/10 – 11/11 | HU-19 Escaneo del DNI · HU-20 Reconocimiento facial · HU-21 Consentimiento biométrico · HU-13 Suspensión y bloqueo |
 | 4 | 12/11 – 25/11 | HU-10 Recomendación con IA · HU-11 Seguimiento en tiempo real · HU-12 Calificación |
 | Futuro | — | HU-14 a HU-18 |
+
+## Nota técnica T7.2 / #16 · 02/11/2026
+
+Correcciones y pruebas preparadas localmente; #14 y #16 siguen abiertos. Mantener #14 antes de #16, sin dar HU-7 por terminada ni descontar nuevas horas. Los estados y registros anteriores de main se conservan íntegros.

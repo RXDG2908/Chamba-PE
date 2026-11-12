@@ -471,9 +471,9 @@ Los identificadores S3-MAPA-R, S3-MAPA-I y S3-CERT-16 son etiquetas de seguimien
 | Heredado con avance local | T8.1 + T8.2 · HU-8 | Completar escenarios, revisión y preparación de integración del backend push y frontend responsive existentes | Luis | 2 | 🟡 Local/parcial |
 | Heredado parcial | T8.3 · HU-8 | Validación cruzada de push real, repetición de medidas y evidencia; revisar base #22 | David | 2 | 🟡 Base de bandeja; push pendiente de validación |
 | Deuda heredada | S3-CERT-16 | Corregir carga de certificados: sesión, rol, propiedad desde el usuario, CSRF y regresiones; retirar expectedFailure cuando corresponda | David | 2 | Pendiente |
-| Nuevo | T19.1 · HU-19 | Pantalla de escaneo del DNI con cámara en React responsive | Renzo | 3 | Sin iniciar |
-| Nuevo | T19.2 · HU-19 | OCR: extraer número/nombres y recortar foto | Renzo | 4 | Sin iniciar |
-| Nuevo | T19.3 · HU-19 | Validador intercambiable, consulta a fuente y revisión manual ante fallo/no coincidencia | Renzo | 2 | Sin iniciar |
+| Nuevo | T19.1 · HU-19 | Pantalla de escaneo del DNI con cámara en React responsive | Renzo | 3 | ✅ Integrado (PR #27 y #28, 11/11) |
+| Nuevo | T19.2 · HU-19 | OCR: extraer número/nombres y recortar foto | Renzo | 4 | ✅ Integrado (PR #27 y #28, 11/11) |
+| Nuevo | T19.3 · HU-19 | Validador intercambiable, consulta a fuente y revisión manual ante fallo/no coincidencia | Renzo | 2 | ✅ Integrado (PR #27 y #28, 11/11) |
 | Nuevo | T19.4 · HU-19 | Pruebas cruzadas con muestras acordadas de lectura y coincidencia | Luis | 2 | Sin iniciar |
 | Nuevo | T21.1 · HU-21 | Pantalla de consentimiento y registro de aceptación | Luis | 1 | Sin iniciar |
 | Nuevo | T21.2 · HU-21 | Endpoint de solicitud de eliminación y trazabilidad de su atención | Luis | 1 | Sin iniciar |
@@ -555,6 +555,7 @@ Estado inicial: **24 h asignadas; 3 h integradas, 21 h pendientes; 6 h de reserv
 | 05/11 | S3-MAPA-R / David | ✅ Revisión cerrada | #14 y #16 unidos el 04/11; #31 (3 decimales) | 0 h | 0 h |
 | 05/11 | S3-CERT-16 / David | ✅ Unida con #29; impedimento 16 cerrado | Aprobado por Renzo; 173 OK | 0 h | 0 h |
 | 05/11 | Menú por rol y diseño (fuera del backlog aprobado) / David | 🟡 PR #32 revisado por Renzo; por unir. Pendiente actualizar `GUIA_NAVEGACION.md` y `GUIA_T6.3.md` | Menú y rutas por rol, portada y tema; probado con los 4 roles | — | Por aprobar por SM/PO |
+| 12/11 | T19.1–T19.3 · HU-19 / Renzo | ✅ Contrato (#27) y lectura/validador/pantalla (#28) unidos a `main`; integrado `main` en la rama (conflictos en `App.jsx`, AVANCES y `.gitignore` resueltos); enlace «Verificar mi DNI» en el menú del prestador | 219 pruebas Django OK, lint y build OK | T19.4 (Luis), T21.1/T21.2 (Luis) y HU-8 siguen pendientes | 0 h |
 | Por registrar | Tarea / responsable | Avance, bloqueo y próximo paso | PR / prueba / evidencia | Actualizar | Registrar motivo y saldo |
 
 Los 0 h de reserva indican **sin consumo registrado**, no una medición de dedicación real. Registrar decisiones posteriores sin sobrescribir el historial.

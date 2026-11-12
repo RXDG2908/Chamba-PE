@@ -34,6 +34,8 @@ class RegistroClienteView(APIView):
         serializer = RegistroClienteSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         usuario = serializer.save()
+        from servicios.models import TokenFCM
+        TokenFCM.objects.filter(sesion=request.session.session_key).delete()
         login(request._request, usuario, backend='django.contrib.auth.backends.ModelBackend')
         return Response(UsuarioActualSerializer(usuario).data, status=status.HTTP_201_CREATED)
 
@@ -61,6 +63,8 @@ class LoginView(APIView):
                 {'detail': 'Usuario o contraseña incorrectos.'},
                 status=status.HTTP_400_BAD_REQUEST,
             )
+        from servicios.models import TokenFCM
+        TokenFCM.objects.filter(sesion=request.session.session_key).delete()
         login(request._request, usuario)
         return Response(UsuarioActualSerializer(usuario).data)
 
@@ -71,6 +75,8 @@ class LogoutView(APIView):
     authentication_classes = []
 
     def post(self, request):
+        from servicios.models import TokenFCM
+        TokenFCM.objects.filter(sesion=request.session.session_key).delete()
         logout(request._request)
         return Response(status=status.HTTP_204_NO_CONTENT)
 

@@ -9,14 +9,17 @@
     "lint": "eslint .",
     "preview": "vite preview",
     "test:hu7": "playwright test",
-    "test:hu7-local": "playwright test --config playwright.hu7-local.config.mjs"
+    "test:hu7-local": "playwright test --config playwright.hu7-local.config.mjs",
+    "test:push": "node --test tests/push-worker.test.mjs",
+    "test:hu8": "playwright test --config playwright.hu8.config.mjs"
   },
   "dependencies": {
     "leaflet": "^1.9.4",
     "react": "^19.2.8",
     "react-dom": "^19.2.8",
     "react-leaflet": "^5.0.0",
-    "react-router-dom": "^7.18.4"
+    "react-router-dom": "^7.18.4",
+    "firebase": "^13.1.0"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
@@ -29,5 +32,8 @@
     "globals": "^17.12.0",
     "vite": "^8.3.0",
     "@playwright/test": "^1.64.1"
+  },
+  "overrides": {
+    "@grpc/grpc-js": "1.13.6"
   }
 }

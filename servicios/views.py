@@ -3,6 +3,7 @@ from math import isclose
 
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
+from django.db import transaction
 from rest_framework import generics, status
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
@@ -56,6 +57,12 @@ class CrearSolicitudView(generics.CreateAPIView):
     permission_classes = [AllowAny]
     authentication_classes = []
 
+    def perform_create(self, serializer):
+        from .push import notificar_solicitud
+        with transaction.atomic():
+            solicitud = serializer.save()
+            transaction.on_commit(lambda: notificar_solicitud(solicitud.pk))
+
 
 class DetalleSolicitudView(generics.RetrieveAPIView):
     """El cliente consulta su solicitud para ver el cambio de estado."""
@@ -82,14 +89,17 @@ class ResponderSolicitudView(APIView):
 
     def post(self, request, pk):
         solicitud = get_object_or_404(Solicitud, pk=pk, prestador=request.user.prestador)
-        if solicitud.estado != Solicitud.Estado.PENDIENTE:
+        respondida = timezone.now()
+        actualizadas = Solicitud.objects.filter(pk=solicitud.pk, estado=Solicitud.Estado.PENDIENTE).update(
+            estado=self.nuevo_estado, respondida=respondida,
+        )
+        if not actualizadas:
+            solicitud.refresh_from_db()
             return Response(
                 {'estado': f'La solicitud ya fue {solicitud.get_estado_display().lower()}.'},
                 status=status.HTTP_409_CONFLICT,
             )
-        solicitud.estado = self.nuevo_estado
-        solicitud.respondida = timezone.now()
-        solicitud.save(update_fields=['estado', 'respondida'])
+        solicitud.refresh_from_db()
         return Response(SolicitudRecibidaSerializer(solicitud).data)
 
 

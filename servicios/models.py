@@ -1,7 +1,18 @@
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
+from django.conf import settings
 
 from prestadores.models import Prestador, Rubro
+
+
+class TokenFCM(models.Model):
+    usuario = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    token = models.CharField(max_length=2048, unique=True)
+    sesion = models.CharField(max_length=40)
+    actualizado = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f'Dispositivo {self.pk}'
 
 
 class Solicitud(models.Model):

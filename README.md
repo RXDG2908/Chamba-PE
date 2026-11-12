@@ -21,6 +21,8 @@ Proyecto Integrador — Diseño y Desarrollo de Software · IV ciclo · Tecsup 2
 | [docs/API_VERIFICACION_DNI.md](docs/API_VERIFICACION_DNI.md) | Contrato del escaneo y la validación del DNI (HU-19, Sprint 3): MRZ, validador intercambiable y revisión manual. T19.2 (lectura de la MRZ y API) T19.3 (validador de nombres) y T19.1 (pantalla `/verificar-dni`) implementadas en `feature/t19.2-ocr-dni`, pendientes de revisión |
 | [docs/EXPOSICION_HU19.md](docs/EXPOSICION_HU19.md) | Guía para exponer HU-19: flujo, puertos, archivos a abrir, guion, preguntas probables y límites |
 | [docs/API_AUTENTICACION.md](docs/API_AUTENTICACION.md) | Autenticación con roles (T5.1, Sprint 2): rutas, sesión y CSRF, roles y permisos para las demás apps |
+| [docs/API_CONSENTIMIENTO.md](docs/API_CONSENTIMIENTO.md) | Consentimiento DNI versionado: aceptación, revocación y bloqueo de captura. |
+| [docs/API_ELIMINACION_DNI.md](docs/API_ELIMINACION_DNI.md) | Eliminación DNI: estados, reintentos, procesador y límites; pendiente de revisión. |
 
 ---
 

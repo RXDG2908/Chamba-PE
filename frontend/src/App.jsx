@@ -14,6 +14,8 @@ import RevisionDocumentos from './RevisionDocumentos.jsx'
 import SolicitudesRecibidas from './SolicitudesRecibidas.jsx'
 import { escuchar, desactivarNotificaciones } from './notificaciones.js'
 import VerificarDni from './VerificarDni.jsx'
+import Consentimiento from './Consentimiento.jsx'
+import EliminarDatos from './EliminarDatos.jsx'
 
 // Qué ve cada quien en el menú. La API protege los datos; el menú solo evita ofrecer lo que no le toca.
 const MENU_POR_ROL = {
@@ -27,6 +29,8 @@ const MENU_POR_ROL = {
     ['/solicitudes', 'Solicitudes'],
     ['/certificaciones', 'Cargar certificado'],
     ['/verificar-dni', 'Verificar mi DNI'],
+    ['/consentimiento', 'Consentimiento DNI'],
+    ['/eliminar-datos', 'Eliminar datos DNI'],
   ],
   administrador: [['/administracion/revisiones', 'Revisión de documentos']],
 }
@@ -145,6 +149,8 @@ function App() {
         />
         {['/solicitudes', '/solicitudes/:id'].map((ruta) => <Route key={ruta} path={ruta}
           element={<RutaPrivada usuario={usuario} rol="prestador"><SolicitudesRecibidas key={ruta} usuario={usuario} alVencer={setUsuario} /></RutaPrivada>} />)}
+        <Route path="/consentimiento" element={<RutaPrivada usuario={usuario} rol="prestador"><Consentimiento /></RutaPrivada>} />
+        <Route path="/eliminar-datos" element={<RutaPrivada usuario={usuario} rol="prestador"><EliminarDatos /></RutaPrivada>} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
 

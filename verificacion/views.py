@@ -1,8 +1,10 @@
 import io
+import uuid
 
 from django.core.files.base import ContentFile
 from django.http import FileResponse, Http404
 from django.utils import timezone
+from django.db import DatabaseError
 from PIL import Image
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -13,6 +15,10 @@ from . import servicio
 from .consentimiento import tiene_consentimiento
 from .lector import obtener_lector
 from .models import IntentoDni
+from .eliminacion import (
+    CapturaBloqueada, ConsentimientoRequerido, LimiteIntentos,
+    eliminacion_pendiente, iniciar_captura, persistir_captura,
+)
 
 MAX_IMAGEN = 5 * 1024 * 1024  # 5 MB
 INTENTOS_POR_DIA = 5
@@ -82,10 +88,20 @@ class IntentoDniView(APIView):
 
     def post(self, request):
         prestador = request.user.prestador
+        if eliminacion_pendiente(prestador):
+            return Response({'detail': 'Tienes una eliminación de datos pendiente de resolver.'}, status=409)
         if not tiene_consentimiento(prestador):
             return Response(
                 {'detail': 'Antes de verificar tu DNI debes aceptar el uso de tus datos.'}, status=403,
             )
+        try:
+            generacion = iniciar_captura(prestador)
+        except CapturaBloqueada:
+            return Response({'detail': 'Tienes una eliminación de datos pendiente de resolver.'}, status=409)
+        except ConsentimientoRequerido:
+            return Response({'detail': 'Debes aceptar el consentimiento vigente.'}, status=403)
+        except DatabaseError:
+            return Response({'detail': 'No pudimos reservar la captura. Inténtalo de nuevo.'}, status=503)
         errores = {}
         for campo in ('anverso', 'reverso'):
             error = error_de_imagen(request.FILES.get(campo))
@@ -120,11 +136,27 @@ class IntentoDniView(APIView):
             intento.fecha_nacimiento = lectura.fecha_nacimiento
             intento.fecha_vencimiento = lectura.fecha_vencimiento
             intento.mrz_valida = lectura.mrz_valida
-        intento.anverso.save(f'anverso.{extension_de(anverso)}', ContentFile(anverso), save=False)
-        intento.reverso.save(f'reverso.{extension_de(reverso)}', ContentFile(reverso), save=False)
-        if foto:
-            intento.foto_titular.save('titular.jpg', ContentFile(foto), save=False)
-        intento.save()
+        operacion = uuid.uuid4().hex
+
+        def guardar():
+            # Journal privado por propietario: también permite encontrar archivos si el save falla.
+            carpeta = f'hu21/{prestador.pk}/{operacion}/'
+            intento.anverso.save(carpeta + f'anverso.{extension_de(anverso)}', ContentFile(anverso), save=False)
+            intento.reverso.save(carpeta + f'reverso.{extension_de(reverso)}', ContentFile(reverso), save=False)
+            if foto:
+                intento.foto_titular.save(carpeta + 'titular.jpg', ContentFile(foto), save=False)
+            intento.save()
+
+        try:
+            persistir_captura(prestador, generacion, guardar)
+        except CapturaBloqueada:
+            return Response({'detail': 'La captura fue invalidada por una solicitud de eliminación.'}, status=409)
+        except ConsentimientoRequerido:
+            return Response({'detail': 'Tu consentimiento ya no está vigente.'}, status=403)
+        except LimiteIntentos:
+            return Response({'detail': 'Llegaste al máximo de intentos por día.'}, status=429)
+        except Exception:
+            return Response({'detail': 'No pudimos guardar la captura. Inténtalo de nuevo.'}, status=503)
         return Response(a_json(intento), status=201)
 
     def get(self, request):

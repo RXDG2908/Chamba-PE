@@ -8,7 +8,9 @@ Lo escribió Renzo León el 29/10/2026, al inicio del Sprint 3, antes de escribi
 
 Luis prepara T19.4 (pruebas cruzadas) contra este documento, sin esperar el código. Si algo cambia al implementar, se actualiza aquí en el mismo PR.
 
-> **Cambios al implementar T19.2 (03/11):** las fotos van a `RAIZ_PRIVADA` y no a `MEDIA_ROOT/privado/` (ver sección 6). `eldni` está registrado pero responde siempre `no_disponible` (ver sección 5), así que con él todo va a revisión manual; con `simulado` un intento correcto queda `validado`. El `403` por falta de consentimiento se activa con el PR de T21.1.
+> **Cambios al implementar T19.2 (03/11):** las fotos van a `RAIZ_PRIVADA` y no a `MEDIA_ROOT/privado/` (ver sección 6). `eldni` está registrado pero responde siempre `no_disponible` (ver sección 5), así que con él todo va a revisión manual; con `simulado` un intento correcto queda `validado`. T21.1 incorpora la comprobación real de consentimiento (ver sección 8).
+>
+> **Estado local HU-21 al 07/11:** T21.2 ya incluye solicitudes persistentes, procesador recuperable y comprobación física, pendientes de revisión e integración. Las referencias posteriores a trabajo futuro describen el corte anterior. Contrato vigente local: [API_ELIMINACION_DNI.md](API_ELIMINACION_DNI.md). El método de borrado de Renzo se conserva sin cambios. La interfaz exige los booleanos explícitos de consentimiento/eliminación antes de capturar y enviar.
 
 ## Resumen
 
@@ -166,7 +168,7 @@ Modelo `verificacion.IntentoDni`:
 
 | Con | Qué | Cuándo |
 |---|---|---|
-| **Luis · HU-21** | Función `tiene_consentimiento(prestador)` en `verificacion/consentimiento.py`: Renzo la deja escrita y devuelve `True` mientras no exista T21.1; el PR de T21.1 la reemplaza con su registro de aceptación. `POST /dni/` ya responde `403` si devuelve `False`. Para la eliminación, el endpoint de Luis llama a `IntentoDni.eliminar_datos_biometricos()`, que borra las fotos y lo leído y deja `resultado`, `motivos` y `creado`. Si un archivo no se puede borrar no lanza error: devuelve la lista de campos que fallaron (`[]` si todo salió bien) y esos archivos conservan su nombre para repetir la llamada. Luis registra ese resultado (atendida o parcial, con los campos pendientes) en su solicitud de T21.2 | Antes de integrar |
+| **Luis · HU-21** | T21.1 implementa `tiene_consentimiento(prestador)` con aceptación propia, finalidad DNI, versión vigente y sin revocación. Sin aceptación válida `POST /dni/` devuelve `403` antes de procesar. [Contrato HU-21](API_CONSENTIMIENTO.md). Para T21.2 se reutilizará `IntentoDni.eliminar_datos_biometricos()`: borra fotos y datos leídos, conservando resultado, motivos y fecha; devuelve los campos de archivo fallidos (`[]` si no hubo errores de archivo) y conserva sus referencias para reintentar. La solicitud persistente, su atención y la comprobación final quedan pendientes de T21.2; no basta el retorno vacío para acreditar eliminación completa. | Antes de integrar |
 | **Luis · T19.4** | Las muestras de DNI son **ficticias** (espécimen o imágenes generadas). **No se suben DNIs reales al repositorio**. Los DNIs de prueba se agregan a la tabla del validador `simulado` | Desde hoy |
 | **David · HU-9** | Mostrar el último intento (resultado, motivos y fotos) junto a los certificados en el panel de revisión | Al tener T19.2 |
 | **HU-20** (postergada) | Usará `foto_titular` para la comparación facial | Cuando se replanifique |

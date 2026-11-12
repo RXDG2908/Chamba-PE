@@ -75,7 +75,8 @@ def a_json(intento):
 
 class IntentoDniView(APIView):
     def get_permissions(self):
-        if self.request.method == 'GET' and 'prestador' in self.request.query_params:
+        parametros = self.request.query_params
+        if self.request.method == 'GET' and ('prestador' in parametros or 'resultado' in parametros):
             return [EsAdministrador()]
         return [EsPrestador()]
 
@@ -127,6 +128,20 @@ class IntentoDniView(APIView):
         return Response(a_json(intento), status=201)
 
     def get(self, request):
+        if 'resultado' in request.query_params:
+            # Cola del administrador: intentos por resultado (p. ej. revision_manual), con quién es el prestador.
+            resultado = request.query_params['resultado']
+            if resultado not in IntentoDni.Resultado.values:
+                return Response({'resultado': ['Valor no válido.']}, status=400)
+            intentos = IntentoDni.objects.filter(resultado=resultado).select_related('prestador')
+            return Response([
+                {**a_json(i), 'prestador': {
+                    'id': i.prestador_id,
+                    'nombre': f'{i.prestador.nombres} {i.prestador.apellidos}'.strip(),
+                    'dni': i.prestador.dni,
+                }}
+                for i in intentos
+            ])
         if 'prestador' in request.query_params:
             try:
                 id_prestador = int(request.query_params['prestador'])

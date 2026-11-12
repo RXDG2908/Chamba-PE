@@ -13,6 +13,7 @@ import UploadCertificado from './UploadCertificado.jsx'
 import RevisionDocumentos from './RevisionDocumentos.jsx'
 import SolicitudesRecibidas from './SolicitudesRecibidas.jsx'
 import { escuchar, desactivarNotificaciones } from './notificaciones.js'
+import VerificarDni from './VerificarDni.jsx'
 
 // Qué ve cada quien en el menú. La API protege los datos; el menú solo evita ofrecer lo que no le toca.
 const MENU_POR_ROL = {
@@ -25,6 +26,7 @@ const MENU_POR_ROL = {
     ['/disponibilidad', 'Mi disponibilidad'],
     ['/solicitudes', 'Solicitudes'],
     ['/certificaciones', 'Cargar certificado'],
+    ['/verificar-dni', 'Verificar mi DNI'],
   ],
   administrador: [['/administracion/revisiones', 'Revisión de documentos']],
 }
@@ -128,6 +130,10 @@ function App() {
         <Route
           path="/disponibilidad"
           element={<RutaPrivada usuario={usuario} rol="prestador"><Disponibilidad /></RutaPrivada>}
+        />
+        <Route
+          path="/verificar-dni"
+          element={<RutaPrivada usuario={usuario} rol="prestador"><VerificarDni /></RutaPrivada>}
         />
         <Route
           path="/ingresar"

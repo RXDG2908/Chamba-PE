@@ -2,3 +2,5 @@ Django>=6.1
 djangorestframework>=3.16
 django-cors-headers>=4.4
 firebase-admin>=6.5,<8
+easyocr>=1.7
+Pillow>=10

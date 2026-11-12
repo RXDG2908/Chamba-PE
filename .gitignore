@@ -24,3 +24,6 @@ build/
 Thumbs.db
 # SQLite y archivos temporales exclusivos de validación HU-7
 .hu7-local/
+
+# Artefactos aislados de validación HU-21
+.hu21-local/

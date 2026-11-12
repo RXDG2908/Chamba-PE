@@ -13,6 +13,8 @@ dist/
 build/
 .env
 .env.*
+!.env.example
+**/*service-account*.json
 
 # Editores y Sistema
 .vscode/

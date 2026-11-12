@@ -11,6 +11,8 @@ import RegistroPrestador from './RegistroPrestador.jsx'
 import ResultadosPrestadores from './ResultadosPrestadores.jsx'
 import UploadCertificado from './UploadCertificado.jsx'
 import RevisionDocumentos from './RevisionDocumentos.jsx'
+import SolicitudesRecibidas from './SolicitudesRecibidas.jsx'
+import { escuchar, desactivarNotificaciones } from './notificaciones.js'
 
 // Qué ve cada quien en el menú. La API protege los datos; el menú solo evita ofrecer lo que no le toca.
 const MENU_POR_ROL = {
@@ -21,6 +23,7 @@ const MENU_POR_ROL = {
   cliente: [['/resultados', 'Buscar servicios']],
   prestador: [
     ['/disponibilidad', 'Mi disponibilidad'],
+    ['/solicitudes', 'Solicitudes'],
     ['/certificaciones', 'Cargar certificado'],
   ],
   administrador: [['/administracion/revisiones', 'Revisión de documentos']],
@@ -41,6 +44,8 @@ function App() {
   const [usuario, setUsuario] = useState(undefined)
   const [cerrando, setCerrando] = useState(false)
 
+  useEffect(() => escuchar(usuario), [usuario])
+
   useEffect(() => {
     // Primero la cookie CSRF y después quién tiene la sesión.
     fetch('/api/usuarios/csrf/')
@@ -53,7 +58,9 @@ function App() {
   const cerrarSesion = async () => {
     setCerrando(true)
     try {
-      await enviarJson('/api/usuarios/logout/', 'POST')
+      try { await desactivarNotificaciones() } catch { /* Django revoca los tokens al cerrar sesión. */ }
+      const respuesta = await enviarJson('/api/usuarios/logout/', 'POST')
+      if (!respuesta.ok) return
       setUsuario(null)
       navegar('/ingresar')
     } finally {
@@ -130,6 +137,8 @@ function App() {
           path="/crear-cuenta"
           element={<RegistroCliente usuario={usuario} alIniciar={setUsuario} />}
         />
+        {['/solicitudes', '/solicitudes/:id'].map((ruta) => <Route key={ruta} path={ruta}
+          element={<RutaPrivada usuario={usuario} rol="prestador"><SolicitudesRecibidas key={ruta} usuario={usuario} alVencer={setUsuario} /></RutaPrivada>} />)}
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
 

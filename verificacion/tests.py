@@ -83,6 +83,21 @@ class DigitoControlTests(TestCase):
         self.assertEqual(digito_control('12345678<'), digito_control('12345678'))
 
 
+class OcrPartidoTests(TestCase):
+    def test_la_mrz_partida_por_los_relleno_se_repone(self):
+        completas = hacer_mrz()
+        partidas = [completas[0][:22], completas[1][:18] + '<' * 6 + completas[1][-1], completas[2].rstrip('<')]
+        self.assertEqual(interpretar(partidas).dni, '12345678')
+
+    def test_unir_por_filas_junta_los_trozos_de_izquierda_a_derecha(self):
+        from .lector import unir_por_filas
+
+        def caja(x, y):
+            return [[x, y], [x + 50, y], [x + 50, y + 40], [x, y + 40]]
+        cajas = [(caja(200, 10), 'B', 0.9), (caja(10, 12), 'A', 0.9), (caja(10, 200), 'C', 0.9)]
+        self.assertEqual(unir_por_filas(cajas), ['AB', 'C'])
+
+
 class InterpretarMrzTests(TestCase):
     def test_lee_una_mrz_correcta(self):
         lectura = interpretar(hacer_mrz())

@@ -18,6 +18,8 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 FCM_ENABLED = os.environ.get('FCM_ENABLED', 'false').lower() == 'true'
 FIREBASE_PROJECT_ID = os.environ.get('FIREBASE_PROJECT_ID', '')
+# Proyecto de Firebase Authentication de la app móvil. Vacío = no se aceptan tokens.
+FIREBASE_AUTH_PROJECT_ID = os.environ.get('FIREBASE_AUTH_PROJECT_ID', '')
 
 
 # Quick-start development settings - unsuitable for production
@@ -81,10 +83,12 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'core.wsgi.application'
 
-# Solo sesión de Django: sin sesión las rutas privadas responden 403.
+# Sesión de Django (web) y, para la app móvil, token de Firebase de una cuenta vinculada.
+# La sesión va primero para que, sin credenciales, las rutas privadas sigan respondiendo 403.
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework.authentication.SessionAuthentication',
+        'usuarios.autenticacion.AutenticacionFirebase',
     ],
 }
 

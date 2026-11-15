@@ -207,6 +207,32 @@ await fetch('/api/usuarios/login/', {
 Después de iniciar o cerrar sesión, Django cambia el `csrftoken`; por eso se lee
 la cookie en cada petición y no se guarda en una variable.
 
+## Acceso desde la app móvil (token de Firebase)
+
+La app Android no usa la sesión de Django: inicia sesión con Firebase Authentication y envía
+su token de identidad en cada petición privada.
+
+```http
+GET /api/usuarios/disponibilidad/
+Authorization: Bearer <token de identidad de Firebase>
+```
+
+- `usuarios.autenticacion.AutenticacionFirebase` verifica el token (firma con las claves públicas
+  de Google, caducidad, proyecto y emisor) y busca la cuenta cuyo `Perfil.firebase_uid` coincide
+  con el UID del token. No necesita credenciales de servicio.
+- **El vínculo lo pone un administrador** en `/admin/` (Perfiles → «UID de Firebase»). Una cuenta
+  de Firebase sin vincular no accede a nada, aunque use el mismo correo que una cuenta de Django.
+- Un UID solo puede estar en un perfil. Después de autenticar se aplican los mismos permisos por
+  rol (`EsPrestador`, etc.).
+- Con token no se exige CSRF, porque no depende de cookies. La sesión web sigue igual.
+- Se activa con la variable `FIREBASE_AUTH_PROJECT_ID` (por ejemplo `chamba-pe-tecsup`). Vacía,
+  no se acepta ningún token.
+- Token ausente, inválido, vencido, de otro proyecto o de una cuenta sin vincular: `403`, igual
+  que una petición sin sesión.
+
+Hoy la usa la pantalla «Mi disponibilidad» de Android. Las solicitudes del móvil siguen en
+Firestore; unificarlas con las de Django es una decisión pendiente.
+
 ## Qué cambia en lo que ya existe
 
 | Ruta | Cambio | Quién |

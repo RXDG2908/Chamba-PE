@@ -22,11 +22,12 @@ con un único módulo `app` y arquitectura MVVM.
 | «Usar mi ubicación» | Permiso de ubicación aproximada + Fused Location | Semana 11 |
 | Enviar solicitud y ver su estado en vivo | Firestore `solicitudes/{id}` | Semana 11 |
 | Bandeja del prestador: aceptar / rechazar | Firestore, filtrado por `prestadorId` | Semana 11 |
+| Mi disponibilidad (Activo / Inactivo) del prestador | Retrofit a `/api/usuarios/disponibilidad/` con el token de Firebase; la búsqueda la refleja al instante | Semanas 9 y 11 |
 | Aviso «Solicitud enviada» | Notificación local con canal y permiso `POST_NOTIFICATIONS` | Semana 12 |
 | Navegación y pestañas por rol | Navigation Compose + `NavigationBar` | Semanas 5 y 6 |
 
 **No incluye todavía:** notificaciones push con FCM (necesitan un emisor en el backend),
-registro de prestadores, disponibilidad, certificados ni verificación de DNI.
+registro de prestadores, certificados ni verificación de DNI.
 
 El mapa usa las teselas públicas de OpenStreetMap, pensadas para uso moderado: la app se
 identifica con su nombre de paquete y guarda las teselas en caché. Para un uso masivo habría
@@ -84,6 +85,21 @@ adb reverse tcp:8000 tcp:8000
 Así funciona en emulador y en teléfono por USB sin cambiar `ALLOWED_HOSTS`. Para otra URL:
 `./gradlew assembleDebug -Pchambape.apiBaseUrl=https://mi-servidor/`. Solo se permite HTTP sin
 cifrar hacia `127.0.0.1`, `localhost` y `10.0.2.2`.
+
+## Rutas privadas de Django (token de Firebase)
+
+Para las funciones que viven en Django (hoy, la disponibilidad) la app envía
+`Authorization: Bearer <token de Firebase>`. Para que Django lo acepte:
+
+1. Arrancar Django con `FIREBASE_AUTH_PROJECT_ID=chamba-pe-tecsup`.
+2. En `/admin/` → Perfiles, abrir el perfil del prestador y pegar en «UID de Firebase» el UID
+   de su cuenta (se ve en Firebase → Authentication, o es el ID de su documento en `usuarios`).
+
+Sin ese vínculo la pantalla muestra «Tu cuenta de la app aún no está vinculada».
+Detalle en [`docs/API_AUTENTICACION.md`](../../docs/API_AUTENTICACION.md).
+
+Un prestador móvil necesita, por ahora, **dos vínculos manuales**: `prestadorId` en Firestore
+(para su bandeja) y «UID de Firebase» en Django (para su disponibilidad).
 
 ## Firebase
 

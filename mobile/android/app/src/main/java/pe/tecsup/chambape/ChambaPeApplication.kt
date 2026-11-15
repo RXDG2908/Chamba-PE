@@ -11,6 +11,8 @@ import pe.tecsup.chambape.data.auth.AuthRepository
 import pe.tecsup.chambape.data.auth.FirebaseAuthRepository
 import pe.tecsup.chambape.data.local.AppDatabase
 import pe.tecsup.chambape.data.remote.RetrofitClient
+import pe.tecsup.chambape.data.repository.DisponibilidadRepository
+import pe.tecsup.chambape.data.repository.DisponibilidadRepositoryImpl
 import pe.tecsup.chambape.data.repository.FirestoreSolicitudRepository
 import pe.tecsup.chambape.data.repository.PrestadorRepository
 import pe.tecsup.chambape.data.repository.PrestadorRepositoryImpl
@@ -29,13 +31,16 @@ class AppContainer(context: Context) {
     val authRepository: AuthRepository =
         FirebaseAuthRepository(FirebaseAuth.getInstance(), firestore, alcanceApp)
 
+    private val api = RetrofitClient.crear(BuildConfig.API_BASE_URL)
+
     val prestadorRepository: PrestadorRepository =
         PrestadorRepositoryImpl(
-            api = RetrofitClient.crear(BuildConfig.API_BASE_URL),
+            api = api,
             rubroDao = baseDatos.rubroDao(),
             prestadorDao = baseDatos.prestadorDao(),
         )
 
+    val disponibilidadRepository: DisponibilidadRepository = DisponibilidadRepositoryImpl(api, authRepository)
     val solicitudRepository: SolicitudRepository = FirestoreSolicitudRepository(firestore)
     val ubicacionProvider: UbicacionProvider = UbicacionFused(context)
     val notificador: Notificador = NotificadorAndroid(context)

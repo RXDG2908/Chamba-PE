@@ -20,7 +20,12 @@ data class Prestador(
 /** Dato junto con su origen: [desdeCache] es true cuando no hubo red y salió de Room. */
 data class Datos<T>(val valor: T, val desdeCache: Boolean)
 
-enum class TipoError { SIN_CONEXION, SERVIDOR, DATOS_INVALIDOS }
+enum class TipoError { SIN_CONEXION, SERVIDOR, DATOS_INVALIDOS, CUENTA_NO_VINCULADA }
+
+enum class EstadoVerificacion { VERIFICADO, PENDIENTE, RECHAZADO }
+
+/** Disponibilidad del prestador y estado de su verificación, tal como los guarda la API. */
+data class Disponibilidad(val disponible: Boolean, val estado: EstadoVerificacion)
 
 class ErrorDatos(val tipo: TipoError, causa: Throwable? = null) : Exception(tipo.name, causa)
 

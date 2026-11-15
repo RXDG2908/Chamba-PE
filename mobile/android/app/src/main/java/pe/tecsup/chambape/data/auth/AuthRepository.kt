@@ -29,6 +29,9 @@ interface AuthRepository {
     suspend fun ingresar(correo: String, clave: String)
     suspend fun registrarCliente(nombre: String, correo: String, clave: String)
     fun cerrarSesion()
+
+    /** Token de identidad de Firebase para llamar a la API Django; null si no hay sesión o red. */
+    suspend fun tokenDeAcceso(): String?
 }
 
 /**
@@ -93,6 +96,15 @@ class FirebaseAuthRepository(
         auth.signOut()
         _sesion.value = EstadoSesion.SinSesion
     }
+
+    override suspend fun tokenDeAcceso(): String? =
+        try {
+            auth.currentUser?.getIdToken(false)?.await()?.token
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: Exception) {
+            null
+        }
 
     private suspend fun leerPerfil(usuario: FirebaseUser): Sesion {
         val doc = firestore.collection(USUARIOS).document(usuario.uid).get().await()

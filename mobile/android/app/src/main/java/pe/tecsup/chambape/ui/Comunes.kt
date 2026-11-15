@@ -70,6 +70,7 @@ fun textoError(tipo: TipoError): String = stringResource(
         TipoError.SIN_CONEXION -> R.string.error_sin_conexion
         TipoError.SERVIDOR -> R.string.error_servidor
         TipoError.DATOS_INVALIDOS -> R.string.error_datos_invalidos
+        TipoError.CUENTA_NO_VINCULADA -> R.string.error_cuenta_no_vinculada
     },
 )
 

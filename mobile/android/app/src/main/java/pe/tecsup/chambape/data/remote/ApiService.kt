@@ -3,7 +3,10 @@ package pe.tecsup.chambape.data.remote
 import com.google.gson.annotations.SerializedName
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import retrofit2.http.Body
 import retrofit2.http.GET
+import retrofit2.http.Header
+import retrofit2.http.PATCH
 import retrofit2.http.Query
 
 /** Lo que responde la API Django (docs/API_BUSQUEDA.md). Todo puede venir nulo: se valida en el mapper. */
@@ -22,6 +25,13 @@ data class PrestadorDto(
     @SerializedName("distancia_km") val distanciaKm: Double?,
 )
 
+data class DisponibilidadDto(
+    @SerializedName("disponible") val disponible: Boolean?,
+    @SerializedName("estado") val estado: String?,
+)
+
+data class CambioDisponibilidadDto(@SerializedName("disponible") val disponible: Boolean)
+
 interface ApiService {
     @GET("api/prestadores/rubros/")
     suspend fun rubros(): List<RubroDto>
@@ -32,6 +42,16 @@ interface ApiService {
         @Query("latitud") latitud: Double,
         @Query("longitud") longitud: Double,
     ): List<PrestadorDto>
+
+    // Rutas privadas: la cabecera lleva "Bearer <token de Firebase>".
+    @GET("api/usuarios/disponibilidad/")
+    suspend fun disponibilidad(@Header("Authorization") autorizacion: String): DisponibilidadDto
+
+    @PATCH("api/usuarios/disponibilidad/")
+    suspend fun cambiarDisponibilidad(
+        @Header("Authorization") autorizacion: String,
+        @Body cambio: CambioDisponibilidadDto,
+    ): DisponibilidadDto
 }
 
 object RetrofitClient {

@@ -40,6 +40,7 @@
     <string name="tab_favoritos">Favoritos</string>
     <string name="tab_solicitudes">Solicitudes</string>
     <string name="tab_recibidas">Recibidas</string>
+    <string name="tab_disponibilidad">Disponibilidad</string>
     <string name="tab_perfil">Perfil</string>
 
     <!-- Búsqueda -->
@@ -94,6 +95,18 @@
     <string name="estado_rechazada">Rechazada</string>
     <string name="aceptar">Aceptar</string>
     <string name="rechazar">Rechazar</string>
+
+    <!-- Disponibilidad del prestador -->
+    <string name="disponibilidad_ayuda">Activa tu disponibilidad cuando estés listo para recibir solicitudes.</string>
+    <string name="disponibilidad_activo">Activo</string>
+    <string name="disponibilidad_inactivo">Inactivo</string>
+    <string name="disponibilidad_resumen_inactivo">No apareces en las búsquedas ni recibes solicitudes.</string>
+    <string name="disponibilidad_resumen_activo">Apareces en las búsquedas y puedes recibir solicitudes.</string>
+    <string name="disponibilidad_resumen_sin_verificar">Quedas disponible, pero aún no recibes solicitudes.</string>
+    <string name="disponibilidad_aviso_pendiente">Tu perfil está pendiente de verificación: aparecerás en las búsquedas cuando administración lo apruebe.</string>
+    <string name="disponibilidad_aviso_rechazado">Tu verificación fue rechazada: sube un nuevo documento para que administración vuelva a revisarte.</string>
+    <string name="disponibilidad_error_guardar">No se pudo guardar el cambio. Inténtalo de nuevo.</string>
+    <string name="error_cuenta_no_vinculada">Tu cuenta de la app aún no está vinculada con tu perfil de prestador. Pide al equipo de Chamba PE que la vincule.</string>
 
     <!-- Perfil -->
     <string name="rol_cliente">Cuenta de cliente</string>

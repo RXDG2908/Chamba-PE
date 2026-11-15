@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.List
+import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Search
@@ -46,6 +47,7 @@ private object Rutas {
     const val BUSCAR = "buscar"
     const val FAVORITOS = "favoritos"
     const val SOLICITUDES = "solicitudes"
+    const val DISPONIBILIDAD = "disponibilidad"
     const val PERFIL = "perfil"
     const val DETALLE = "prestador/{id}"
     fun detalle(id: Int) = "prestador/$id"
@@ -62,6 +64,7 @@ private val PestanasCliente = listOf(
 
 private val PestanasPrestador = listOf(
     Pestana(Rutas.SOLICITUDES, R.string.tab_recibidas, Icons.AutoMirrored.Filled.List),
+    Pestana(Rutas.DISPONIBILIDAD, R.string.tab_disponibilidad, Icons.Filled.CheckCircle),
     Pestana(Rutas.PERFIL, R.string.tab_perfil, Icons.Filled.Person),
 )
 
@@ -139,6 +142,9 @@ private fun NavegacionPrincipal(sesion: Sesion, onCerrarSesion: () -> Unit) {
                 composable(Rutas.DETALLE, arguments = listOf(navArgument("id") { type = NavType.IntType })) { entrada ->
                     DetalleScreen(prestadorId = entrada.arguments?.getInt("id") ?: -1, sesion = sesion)
                 }
+            }
+            if (sesion.rol == Rol.PRESTADOR) {
+                composable(Rutas.DISPONIBILIDAD) { DisponibilidadScreen() }
             }
             composable(Rutas.SOLICITUDES) { SolicitudesScreen(sesion) }
             composable(Rutas.PERFIL) { PerfilScreen(sesion, onCerrarSesion) }

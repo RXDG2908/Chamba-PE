@@ -18,15 +18,19 @@ con un único módulo `app` y arquitectura MVVM.
 | Rubros y búsqueda de prestadores | Retrofit contra la API Django (`/api/prestadores/rubros/` y `/buscar/`) | Semanas 9 y 10 |
 | Datos guardados y modo sin conexión | Room: última búsqueda por rubro y rubros | Semana 8 |
 | Favoritos | Room; se conservan al cerrar la app y al volver a buscar | Semana 8 |
+| Mapa interactivo: tocar para elegir la ubicación, marcadores numerados de prestadores con su ficha y «Ver todo» | OpenStreetMap con osmdroid (sin clave de API), equivalente al Leaflet de la web | Semanas 11 y 12 |
 | «Usar mi ubicación» | Permiso de ubicación aproximada + Fused Location | Semana 11 |
 | Enviar solicitud y ver su estado en vivo | Firestore `solicitudes/{id}` | Semana 11 |
 | Bandeja del prestador: aceptar / rechazar | Firestore, filtrado por `prestadorId` | Semana 11 |
 | Aviso «Solicitud enviada» | Notificación local con canal y permiso `POST_NOTIFICATIONS` | Semana 12 |
 | Navegación y pestañas por rol | Navigation Compose + `NavigationBar` | Semanas 5 y 6 |
 
-**No incluye todavía:** mapa (Maps Compose necesita una clave de API de Google Cloud),
-notificaciones push con FCM (necesitan un emisor en el backend), registro de prestadores,
-certificados ni verificación de DNI.
+**No incluye todavía:** notificaciones push con FCM (necesitan un emisor en el backend),
+registro de prestadores, disponibilidad, certificados ni verificación de DNI.
+
+El mapa usa las teselas públicas de OpenStreetMap, pensadas para uso moderado: la app se
+identifica con su nombre de paquete y guarda las teselas en caché. Para un uso masivo habría
+que contratar o montar un servidor de teselas.
 
 ## Estructura
 
@@ -110,6 +114,7 @@ las tareas `AND-*` y sus cambios se coordinan con el equipo.
 | Plugin de Compose / KSP | 2.4.21 / 2.3.14 |
 | Compose BOM / Firebase BOM | 2026.09.00 / 35.2.0 |
 | Room / Retrofit / Navigation | 2.8.5 / 3.0.0 / 2.10.2 |
+| osmdroid | 6.1.20 |
 | `compileSdk` / `targetSdk` / `minSdk` | 37 / 37 / 26 |
 | Paquete | `pe.tecsup.chambape` |
 

@@ -70,6 +70,9 @@ dependencies {
     implementation(libs.firebase.auth)
     implementation(libs.firebase.firestore)
 
+    // Mapa: OpenStreetMap con osmdroid (sin clave de API), igual que Leaflet en la web
+    implementation(libs.osmdroid)
+
     // Ubicación y corrutinas
     implementation(libs.play.services.location)
     implementation(libs.kotlinx.coroutines.android)

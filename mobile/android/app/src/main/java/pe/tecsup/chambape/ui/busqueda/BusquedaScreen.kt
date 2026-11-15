@@ -19,8 +19,14 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
@@ -47,6 +53,7 @@ fun BusquedaRoute(onAbrirPrestador: (Int) -> Unit) {
         onRubro = vm::seleccionarRubro,
         onLatitud = vm::cambiarLatitud,
         onLongitud = vm::cambiarLongitud,
+        onElegirEnMapa = vm::elegirUbicacion,
         onMiUbicacion = { pedirPermiso.launch(Manifest.permission.ACCESS_COARSE_LOCATION) },
         onBuscar = vm::buscar,
         onReintentarRubros = vm::cargarRubros,
@@ -61,6 +68,7 @@ fun BusquedaScreen(
     onRubro: (Int) -> Unit,
     onLatitud: (String) -> Unit,
     onLongitud: (String) -> Unit,
+    onElegirEnMapa: (Double, Double) -> Unit,
     onMiUbicacion: () -> Unit,
     onBuscar: () -> Unit,
     onReintentarRubros: () -> Unit,
@@ -68,6 +76,11 @@ fun BusquedaScreen(
     onFavorito: (Int) -> Unit,
 ) {
     val decimal = KeyboardOptions(keyboardType = KeyboardType.Text)
+    val prestadoresEnMapa = (estado.resultados as? EstadoResultados.Exito)?.prestadores.orEmpty()
+    // El mapa se vuelve a encuadrar al llegar resultados nuevos, al fijar la ubicación
+    // con el botón «Usar mi ubicación» y cuando la persona lo pide.
+    var reencuadres by rememberSaveable { mutableIntStateOf(0) }
+    val encuadre = remember(prestadoresEnMapa, estado.ubicando, reencuadres) { Any() }.hashCode()
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
         contentPadding = PaddingValues(16.dp),
@@ -98,6 +111,23 @@ fun BusquedaScreen(
             item { Text(stringResource(R.string.error_falta_rubro), color = MaterialTheme.colorScheme.error) }
         }
         item { Text(stringResource(R.string.busqueda_ubicacion), style = MaterialTheme.typography.titleMedium) }
+        item { Text(stringResource(R.string.mapa_ayuda), style = MaterialTheme.typography.bodyMedium) }
+        item {
+            MapaBusqueda(
+                ubicacion = estado.ubicacion,
+                prestadores = prestadoresEnMapa,
+                encuadre = encuadre,
+                onElegirUbicacion = onElegirEnMapa,
+            )
+        }
+        item {
+            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                Text(stringResource(R.string.mapa_leyenda), style = MaterialTheme.typography.bodySmall, modifier = Modifier.weight(1f))
+                TextButton(onClick = { reencuadres++ }, enabled = estado.ubicacion != null) {
+                    Text(stringResource(R.string.mapa_encuadrar))
+                }
+            }
+        }
         item {
             Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                 OutlinedTextField(

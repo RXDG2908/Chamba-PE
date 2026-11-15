@@ -9,11 +9,13 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import pe.tecsup.chambape.data.repository.PrestadorRepository
+import pe.tecsup.chambape.device.Coordenadas
 import pe.tecsup.chambape.device.UbicacionProvider
 import pe.tecsup.chambape.domain.model.ErrorDatos
 import pe.tecsup.chambape.domain.model.Prestador
 import pe.tecsup.chambape.domain.model.Rubro
 import pe.tecsup.chambape.domain.model.TipoError
+import java.util.Locale
 
 sealed interface EstadoRubros {
     data object Cargando : EstadoRubros
@@ -41,7 +43,18 @@ data class BusquedaUiState(
     val ubicacionNoDisponible: Boolean = false,
     val favoritos: Set<Int> = emptySet(),
     val resultados: EstadoResultados = EstadoResultados.Inicial,
-)
+) {
+    /** Ubicación elegida para el servicio, si las dos coordenadas son válidas (la que pinta el mapa). */
+    val ubicacion: Coordenadas?
+        get() {
+            val lat = coordenada(latitud, 90.0) ?: return null
+            val lon = coordenada(longitud, 180.0) ?: return null
+            return Coordenadas(lat, lon)
+        }
+}
+
+internal fun coordenada(texto: String, limite: Double): Double? =
+    texto.trim().replace(',', '.').toDoubleOrNull()?.takeIf { it.isFinite() && it >= -limite && it <= limite }
 
 class BusquedaViewModel(
     private val repository: PrestadorRepository,
@@ -90,17 +103,27 @@ class BusquedaViewModel(
                 if (actual == null) {
                     it.copy(ubicando = false, ubicacionNoDisponible = true)
                 } else {
-                    it.copy(
-                        ubicando = false,
-                        latitud = actual.latitud.toString(),
-                        longitud = actual.longitud.toString(),
-                        latitudInvalida = false,
-                        longitudInvalida = false,
-                    )
+                    it.copy(ubicando = false).conUbicacion(actual.latitud, actual.longitud)
                 }
             }
         }
     }
+
+    /** Ubicación elegida tocando el mapa. */
+    fun elegirUbicacion(latitud: Double, longitud: Double) {
+        if (latitud !in -90.0..90.0 || longitud !in -180.0..180.0) return
+        _uiState.update { it.conUbicacion(latitud, longitud).copy(ubicacionNoDisponible = false) }
+    }
+
+    private fun BusquedaUiState.conUbicacion(latitud: Double, longitud: Double) = copy(
+        latitud = formato(latitud),
+        longitud = formato(longitud),
+        latitudInvalida = false,
+        longitudInvalida = false,
+    )
+
+    /** Seis decimales, como guarda la API, y siempre con punto. */
+    private fun formato(valor: Double) = String.format(Locale.ROOT, "%.6f", valor)
 
     fun permisoUbicacionDenegado() = _uiState.update { it.copy(ubicacionNoDisponible = true) }
 
@@ -134,6 +157,4 @@ class BusquedaViewModel(
         viewModelScope.launch { repository.alternarFavorito(prestadorId) }
     }
 
-    private fun coordenada(texto: String, limite: Double): Double? =
-        texto.trim().replace(',', '.').toDoubleOrNull()?.takeIf { it.isFinite() && it >= -limite && it <= limite }
 }

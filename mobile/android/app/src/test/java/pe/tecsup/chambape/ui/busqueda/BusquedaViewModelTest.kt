@@ -159,15 +159,15 @@ class BusquedaViewModelTest {
         val vm = BusquedaViewModel(repositorio, ubicacion)
         vm.usarMiUbicacion()
         advanceUntilIdle()
-        assertEquals("-12.05", vm.uiState.value.latitud)
-        assertEquals("-77.04", vm.uiState.value.longitud)
+        assertEquals("-12.050000", vm.uiState.value.latitud)
+        assertEquals("-77.040000", vm.uiState.value.longitud)
         assertFalse(vm.uiState.value.ubicacionNoDisponible)
 
         ubicacion.valor = null
         vm.usarMiUbicacion()
         advanceUntilIdle()
         assertTrue(vm.uiState.value.ubicacionNoDisponible)
-        assertEquals("-12.05", vm.uiState.value.latitud)
+        assertEquals("-12.050000", vm.uiState.value.latitud)
     }
 
     @Test
@@ -178,5 +178,22 @@ class BusquedaViewModelTest {
         vm.alternarFavorito(7)
         advanceUntilIdle()
         assertEquals(setOf(7), vm.uiState.value.favoritos)
+    }
+
+    @Test
+    fun `tocar el mapa fija la ubicacion y un punto fuera de rango se ignora`() = runTest(dispatcher) {
+        val vm = BusquedaViewModel(repositorio, ubicacion)
+        assertEquals(null, vm.uiState.value.ubicacion)
+
+        vm.elegirUbicacion(-12.0463741, -77.0427934)
+        assertEquals("-12.046374", vm.uiState.value.latitud)
+        assertEquals("-77.042793", vm.uiState.value.longitud)
+        assertEquals(Coordenadas(-12.046374, -77.042793), vm.uiState.value.ubicacion)
+
+        vm.elegirUbicacion(95.0, 10.0)
+        assertEquals("-12.046374", vm.uiState.value.latitud)
+
+        vm.cambiarLatitud("abc")
+        assertEquals(null, vm.uiState.value.ubicacion)
     }
 }

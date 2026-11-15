@@ -46,6 +46,11 @@
     <string name="busqueda_rubro">¿Qué servicio necesitas?</string>
     <string name="busqueda_sin_rubros">Todavía no hay rubros registrados.</string>
     <string name="busqueda_ubicacion">¿Dónde lo necesitas?</string>
+    <string name="mapa_ayuda">Toca el mapa para elegir dónde necesitas el servicio, usa tu ubicación o escribe las coordenadas.</string>
+    <string name="mapa_descripcion">Mapa de prestadores y ubicación. Toca un punto para elegir dónde necesitas el servicio.</string>
+    <string name="mapa_tu_ubicacion">Tu ubicación para el servicio</string>
+    <string name="mapa_leyenda">Azul: tu ubicación. Verde numerado: prestadores (zona aproximada).</string>
+    <string name="mapa_encuadrar">Ver todo</string>
     <string name="latitud">Latitud</string>
     <string name="longitud">Longitud</string>
     <string name="error_falta_rubro">Elige un rubro.</string>

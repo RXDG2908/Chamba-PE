@@ -16,7 +16,7 @@ Proyecto Integrador — Diseño y Desarrollo de Software · IV ciclo · Tecsup 2
 | [AVANCES.md](AVANCES.md) | Estado de cada tarea, bitácora, impedimentos y burndown |
 | [TABLERO.md](TABLERO.md) | Tablero estilo Trello del sprint: Por hacer, En curso, En revisión y Terminado |
 | [docs/](docs/) | Documentos fuente: visión del producto y Lab 07 (historias, criterios y estimaciones) |
-| [docs/sprint4-reparto.md](docs/sprint4-reparto.md) | Reparto propuesto del Sprint 4 y pendientes de sprints anteriores (llega con el [PR #40](https://github.com/RXDG2908/Chamba-PE/pull/40)) |
+| [docs/sprint4-reparto.md](docs/sprint4-reparto.md) | Reparto propuesto del Sprint 4 y pendientes de sprints anteriores  |
 | [docs/android-reparto.md](docs/android-reparto.md) | App Android: qué falta del plan y reparto propuesto |
 | [docs/PLAN_DESARROLLO_ANDROID.md](docs/PLAN_DESARROLLO_ANDROID.md) | Plan de la app Android (propuesta de Luis, pendiente de aprobación) |
 | [mobile/android/README.md](mobile/android/README.md) | App Android: qué hace, cómo compilarla y cómo conectarla a Django y Firebase |
@@ -39,7 +39,7 @@ Proyecto Integrador — Diseño y Desarrollo de Software · IV ciclo · Tecsup 2
 | 1 | ✅ Cerrado: HU-1 a HU-4 completas (26 de 30 h en el sprint; el resto se unió el 18/10) |
 | 2 | ✅ Cerrado: HU-5, HU-6 y HU-9 completas (15 de 23 h); HU-7 se unió el 04/11 |
 | 3 | 🟡 Sin cierre formal: HU-19 construida (falta su prueba T19.4), HU-8 en `main` (falta la validación T8.3), HU-21 en revisión ([PR #38](https://github.com/RXDG2908/Chamba-PE/pull/38)); HU-13 y HU-20 postergadas |
-| 4 | 🟡 HU-10, HU-11 y HU-12 sin empezar; reparto propuesto en el [PR #40](https://github.com/RXDG2908/Chamba-PE/pull/40) |
+| 4 | 🟡 HU-10, HU-11 y HU-12 sin empezar; [reparto propuesto](docs/sprint4-reparto.md), por confirmar el 17/11 |
 
 | Historia | Estado |
 |---|---|
@@ -50,7 +50,7 @@ Proyecto Integrador — Diseño y Desarrollo de Software · IV ciclo · Tecsup 2
 | HU-21 Consentimiento y eliminación de datos | 🟡 Construida, en revisión (PR #38) |
 | HU-10 Recomendación · HU-11 Seguimiento · HU-12 Calificación | ⚪ Sin empezar (Sprint 4) |
 | HU-13 Suspensión y bloqueo · HU-20 Reconocimiento facial | ⚪ Postergadas, sin sprint asignado |
-| App Android | 🟡 Primera versión en revisión ([PR #39](https://github.com/RXDG2908/Chamba-PE/pull/39)); fuera del compromiso de los sprints |
+| App Android | 🟡 Primera versión en `main` ([PR #39](https://github.com/RXDG2908/Chamba-PE/pull/39), unido el 16/11 sin revisión de otro integrante); [falta](docs/android-reparto.md) probarla en teléfono físico y 10 tarjetas del plan; fuera del compromiso de los sprints |
 
 > Varias funcionalidades de las secciones siguientes describen el **producto completo**: seguimiento en tiempo real, calificaciones, recomendación con IA, reconocimiento facial, pagos y suspensión de cuentas todavía no están implementados.
 
@@ -132,7 +132,7 @@ Capacidad: 30 h por sprint (3 integrantes × 10 h) · 114 h planificadas. Detall
 |---|---|
 | Backend | API REST con Django + Django REST Framework |
 | Frontend web | React + Vite (aplicación responsiva y panel de administración) |
-| App móvil | Android nativo: Kotlin, Jetpack Compose y MVVM, con Retrofit, Room y Firebase (Auth y Firestore). En revisión (PR #39); el enfoque está pendiente de acuerdo del equipo |
+| App móvil | Android nativo: Kotlin, Jetpack Compose y MVVM, con Retrofit, Room y Firebase (Auth y Firestore). Primera versión en `main`; el enfoque está pendiente de acuerdo del equipo |
 | Tiempo real | WebSocket (Django Channels) — previsto para HU-11, aún sin implementar |
 | Notificaciones | Firebase Cloud Messaging (web, con service worker) |
 | Verificación de identidad | Hoy: lectura de la MRZ del DNI con OCR (EasyOCR) y revisión manual. Previsto: reconocimiento facial (DeepFace) y prueba de vida (MediaPipe) |

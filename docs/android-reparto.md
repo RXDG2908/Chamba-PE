@@ -4,13 +4,19 @@
 
 Compara el [plan Android](PLAN_DESARROLLO_ANDROID.md) (21 tarjetas `AND-*`, de Luis) con lo que hay en `mobile/android/` en el [PR #39](https://github.com/RXDG2908/Chamba-PE/pull/39). Detalle técnico de la app en su [README](../mobile/android/README.md).
 
+> **Actualización del 16/11 (tarde):** el PR #39 **ya está unido a `main`**. Lo unió Renzo para no frenar el trabajo, después de una revisión automática (250 pruebas de Django OK, 19 pruebas de Android OK, lint sin errores, sin secretos en el diff) y **sin revisión de Luis ni David**. La revisión de la parte A sigue pendiente, ahora sobre `main`: lo que encuentren entra como PR de corrección. La revisión automática dejó tres observaciones, ninguna bloqueante:
+>
+> 1. `registro-movil` guarda el correo del token aunque Firebase no lo haya verificado: alguien podría ocupar el correo de otra persona (no le da acceso a su cuenta).
+> 2. Dos registros simultáneos con la misma cuenta responden 500 en vez de 409.
+> 3. Cada petición con token descarga las claves públicas de Google; conviene guardarlas en caché.
+
 ---
 
 ## 1. Resumen
 
 | Dato | Valor |
 |---|---|
-| Tarjetas del plan construidas | **11 de 21**, todas por Renzo, en el PR #39 **sin revisión ni unir** |
+| Tarjetas del plan construidas | **11 de 21**, todas por Renzo; en `main` desde el 16/11 (PR #39), **sin revisión de otro integrante** |
 | Tarjetas parciales | 3: AND-02, AND-14 y AND-17 |
 | Tarjetas sin iniciar | 7: AND-08, AND-15, AND-16 y AND-18 a AND-21 |
 | Trabajo nuevo que el plan no tenía | 4 tarjetas: AND-22 a AND-25 |
@@ -28,7 +34,7 @@ Compara el [plan Android](PLAN_DESARROLLO_ANDROID.md) (21 tarjetas `AND-*`, de L
 
 ## 2. Estado de las tarjetas del plan
 
-✅ construida (en el PR #39, falta revisión) · 🟡 parcial · ☐ sin iniciar
+✅ construida (en `main`, falta la revisión de otro integrante) · 🟡 parcial · ☐ sin iniciar
 
 | ID | Tarjeta | Plan decía | Estado | Nota |
 |:---:|---|:---:|:---:|---|
@@ -62,7 +68,7 @@ Además, fuera del plan, ya está hecho el **registro de prestador** con mapa de
 
 Renzo construyó casi todo, así que **las pruebas y la revisión pasan a Luis y David** (nadie prueba lo suyo), y lo nuevo se reparte entre los tres. Las horas son una estimación para discutir.
 
-### Parte A · Para poder unir el PR #39 (ahora, sin horas de sprint)
+### Parte A · Revisión del PR #39, ya unido (ahora, sin horas de sprint)
 
 | Qué | Responsable | Detalle |
 |---|---|---|
@@ -122,7 +128,7 @@ Renzo construyó casi todo, así que **las pruebas y la revisión pasan a Luis y
 
 ## 4. Orden de trabajo
 
-1. **Revisar y decidir** (parte A): sin eso el PR #39 no se une.
+1. **Revisar y decidir** (parte A): el PR #39 se unió sin esa revisión, así que es lo primero.
 2. **Probar lo que ya existe:** AND-17 (teléfono físico), AND-08 y AND-16. No dependen de nada más.
 3. **Unificar solicitudes** (AND-23) antes de las notificaciones: AND-15 necesita saber quién emite el aviso.
 4. **Privacidad en orden:** PR #38 → AND-19 → AND-20 → AND-21. No se captura un DNI sin consentimiento.
@@ -148,13 +154,13 @@ Reglas del [plan](PLAN_DESARROLLO_ANDROID.md#11-git-colaboración-y-conservació
 
 ### Para el grupo
 
-> Equipo, sobre la app Android: ya está la primera versión en el PR #39 (ingreso, registro de cliente y prestador, búsqueda con mapa, favoritos, solicitudes, bandeja y disponibilidad). Hice 11 de las 21 tarjetas del plan de Luis, pero nadie la ha revisado y me aparté del plan en dos cosas: usa Django + Firebase en vez de Spring, y las solicitudes están en Firestore.
+> Equipo, sobre la app Android: ya está la primera versión en `main`, con el PR #39 (ingreso, registro de cliente y prestador, búsqueda con mapa, favoritos, solicitudes, bandeja y disponibilidad). Hice 11 de las 21 tarjetas del plan de Luis, pero la uní hoy sin que nadie más la revise, para no frenar el trabajo, y me aparté del plan en dos cosas: usa Django + Firebase en vez de Spring, y las solicitudes están en Firestore.
 >
-> En `docs/android-reparto.md` dejé qué falta y una propuesta de reparto (unas 29 h, 10 cada uno). No cabe en el Sprint 4, así que por ahora solo pido la revisión del #39 y que decidamos el enfoque mañana en el Daily. Si el curso de Móviles tiene fecha de entrega antes del 25/11, avisen para reordenar.
+> En `docs/android-reparto.md` dejé qué falta y una propuesta de reparto (unas 29 h, 10 cada uno). No cabe en el Sprint 4, así que por ahora solo pido que la revisen sobre `main` y que decidamos el enfoque mañana en el Daily. Si el curso de Móviles tiene fecha de entrega antes del 25/11, avisen para reordenar.
 
 ### Para Luis
 
-> Luis, de Android te pido, sin horas de sprint por ahora: revisar la parte de **backend** del PR #39 (`usuarios/autenticacion.py`, la migración `usuarios.0003` y `registro-movil`). Toca `usuarios` y `prestadores`, por eso quiero otro par de ojos antes de unir.
+> Luis, de Android te pido, sin horas de sprint por ahora: revisar la parte de **backend** del PR #39 (`usuarios/autenticacion.py`, la migración `usuarios.0003` y `registro-movil`). Ya está en `main`, pero toca `usuarios` y `prestadores` y quiero otro par de ojos; lo que encuentres lo corrijo en un PR aparte.
 >
 > Tu plan decía Spring y yo usé Django + Firebase; mañana lo decidimos juntos y actualizo el plan a v0.2 con lo que quede.
 >
@@ -162,7 +168,7 @@ Reglas del [plan](PLAN_DESARROLLO_ANDROID.md#11-git-colaboración-y-conservació
 
 ### Para David
 
-> David, de Android te pido, sin horas de sprint por ahora: revisar la **app** del PR #39 (compilar, pruebas, emulador). El plan ya te ponía como revisor mío.
+> David, de Android te pido, sin horas de sprint por ahora: revisar la **app** del PR #39, que ya está en `main` (compilar, pruebas, emulador). El plan ya te ponía como revisor mío.
 >
 > Como PO necesito que decidas mañana: Django + Firebase o Spring, solicitudes en Firestore o en Django, y si Android entra en algún sprint (hoy el Sprint 4 está en 30 h, sin espacio).
 >

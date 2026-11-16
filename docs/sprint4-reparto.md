@@ -142,7 +142,7 @@ Dependencias: **T11.1 → T12.1** (la calificación necesita el estado Finalizad
 | # | Decisión | Propuesta del Scrum Master |
 |:---:|---|---|
 | 1 | HU-13 (4 h) y HU-20 (11 h), postergadas del Sprint 3 | No caben: pasan al backlog futuro |
-| 2 | App Android ([PR #39](https://github.com/RXDG2908/Chamba-PE/pull/39)): no está en el Sprint 4 ni tiene horas; cambia `usuarios` y `prestadores` y se aparta del plan de Luis (usa Django + Firebase, no Spring) | Fuera del compromiso. Que David o Luis revisen la parte de backend antes de unir; no se une sin aprobación |
+| 2 | App Android ([PR #39](https://github.com/RXDG2908/Chamba-PE/pull/39)): no está en el Sprint 4 ni tiene horas; cambia `usuarios` y `prestadores` y se aparta del plan de Luis (usa Django + Firebase, no Spring) | Fuera del compromiso. **16/11:** Renzo lo unió a `main` para no frenar el trabajo, con revisión automática y sin la de otro integrante; David y Luis lo revisan sobre `main` ([detalle](android-reparto.md)) |
 | 3 | HU-21: texto del consentimiento, retención y responsable de atender las eliminaciones | Definirlo al revisar el #38 |
 | 4 | Validador `eldni` (hoy siempre responde «no disponible») | Dejarlo apagado: todo va a revisión manual |
 | 5 | Horas del PR #32 (menú por rol y diseño) como uso de reserva del Sprint 3 | Registrarlas contra la reserva de David (2 h); David informa las horas reales |
@@ -158,7 +158,7 @@ Dependencias: **T11.1 → T12.1** (la calificación necesita el estado Finalizad
 >
 > Renzo: HU-10 (recomendación). Luis: HU-11 (seguimiento en tiempo real) y la prueba de HU-12. David: HU-12 (calificación) y las pruebas cruzadas.
 >
-> Mañana 17/11 en el Daily lo confirmamos y cerramos el contrato de estados de HU-11, que bloquea a los demás. Dos reglas: nadie une su propio PR y AVANCES.md se actualiza cada día. Si algo no les cuadra, avisen hoy.
+> Mañana 17/11 en el Daily lo confirmamos y cerramos el contrato de estados de HU-11, que bloquea a los demás. Dos reglas: nadie une su propio PR y AVANCES.md se actualiza cada día. Lo primero también va por mí: hoy uní el #39 y el #40 sin revisión para ganar tiempo; desde mañana, con `main` protegido, ya no se puede. Si algo no les cuadra, avisen hoy.
 
 ### Para Luis
 

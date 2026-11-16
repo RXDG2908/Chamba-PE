@@ -14,6 +14,7 @@ con un único módulo `app` y arquitectura MVVM.
 | Función | Cómo | Tema del curso de Móviles |
 |---|---|---|
 | Ingreso y registro de clientes | Firebase Authentication (correo y contraseña) | Semana 11 |
+| Registro de prestador: datos, rubros y zona de cobertura en el mapa (centro y radio) | Firebase Auth + `POST /api/prestadores/registro-movil/` con el token; si Django lo rechaza, la cuenta se deshace | Semanas 9 y 11 |
 | Roles cliente / prestador | Perfil en Firestore `usuarios/{uid}`; el rol decide las pestañas | Semana 11 |
 | Rubros y búsqueda de prestadores | Retrofit contra la API Django (`/api/prestadores/rubros/` y `/buscar/`) | Semanas 9 y 10 |
 | Datos guardados y modo sin conexión | Room: última búsqueda por rubro y rubros | Semana 8 |
@@ -27,7 +28,7 @@ con un único módulo `app` y arquitectura MVVM.
 | Navegación y pestañas por rol | Navigation Compose + `NavigationBar` | Semanas 5 y 6 |
 
 **No incluye todavía:** notificaciones push con FCM (necesitan un emisor en el backend),
-registro de prestadores, certificados ni verificación de DNI.
+certificados ni verificación de DNI.
 
 El mapa usa las teselas públicas de OpenStreetMap, pensadas para uso moderado: la app se
 identifica con su nombre de paquete y guarda las teselas en caché. Para un uso masivo habría
@@ -98,15 +99,18 @@ Para las funciones que viven en Django (hoy, la disponibilidad) la app envía
 Sin ese vínculo la pantalla muestra «Tu cuenta de la app aún no está vinculada».
 Detalle en [`docs/API_AUTENTICACION.md`](../../docs/API_AUTENTICACION.md).
 
-Un prestador móvil necesita, por ahora, **dos vínculos manuales**: `prestadorId` en Firestore
-(para su bandeja) y «UID de Firebase» en Django (para su disponibilidad).
+Un prestador que se registra **desde la app** ya queda vinculado en Django. Sigue haciendo falta
+un vínculo manual: `prestadorId` en Firestore, para su bandeja. Un prestador creado **en la web**
+necesita los dos (ese y «UID de Firebase» en Django).
 
 ## Firebase
 
 - Proyecto: `chamba-pe-tecsup` (cuenta de Renzo). Auth por correo/contraseña y Firestore activos.
 - Reglas en [`firestore.rules`](firestore.rules). Tras cambiar reglas o proveedores: `firebase deploy --only firestore,auth`
   (sin desplegar `auth`, el ingreso falla con `CONFIGURATION_NOT_FOUND`).
-- Desde la app solo se registran **clientes**. Para probar un **prestador**: crear el usuario en
+- Un prestador registrado desde la app queda vinculado en Django automáticamente, pero su
+  bandeja de Firestore se activa cuando administración agrega `prestadorId` a su documento.
+- Para probar un **prestador** ya existente en Django: crear el usuario en
   Authentication y, en Firestore, el documento `usuarios/{uid}` con `nombre`, `rol: "prestador"`
   y `prestadorId` (número: el ID del prestador en la API Django).
   El nombre del campo distingue mayúsculas: `prestadorID` no funciona.

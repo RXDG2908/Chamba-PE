@@ -44,6 +44,7 @@ import pe.tecsup.chambape.ui.busqueda.BusquedaRoute
 private object Rutas {
     const val LOGIN = "login"
     const val REGISTRO = "registro"
+    const val REGISTRO_PRESTADOR = "registro-prestador"
     const val BUSCAR = "buscar"
     const val FAVORITOS = "favoritos"
     const val SOLICITUDES = "solicitudes"
@@ -87,7 +88,13 @@ fun ChambaPeApp() {
 private fun NavegacionIngreso() {
     val nav = rememberNavController()
     NavHost(navController = nav, startDestination = Rutas.LOGIN) {
-        composable(Rutas.LOGIN) { LoginScreen(onIrARegistro = { nav.navigate(Rutas.REGISTRO) }) }
+        composable(Rutas.LOGIN) {
+            LoginScreen(
+                onIrARegistro = { nav.navigate(Rutas.REGISTRO) },
+                onIrARegistroPrestador = { nav.navigate(Rutas.REGISTRO_PRESTADOR) },
+            )
+        }
+        composable(Rutas.REGISTRO_PRESTADOR) { RegistroPrestadorScreen(onVolver = { nav.popBackStack() }) }
         composable(Rutas.REGISTRO) { RegistroScreen(onVolver = { nav.popBackStack() }) }
     }
 }

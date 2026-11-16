@@ -16,6 +16,8 @@ import pe.tecsup.chambape.data.repository.DisponibilidadRepositoryImpl
 import pe.tecsup.chambape.data.repository.FirestoreSolicitudRepository
 import pe.tecsup.chambape.data.repository.PrestadorRepository
 import pe.tecsup.chambape.data.repository.PrestadorRepositoryImpl
+import pe.tecsup.chambape.data.repository.RegistroPrestadorRepository
+import pe.tecsup.chambape.data.repository.RegistroPrestadorRepositoryImpl
 import pe.tecsup.chambape.data.repository.SolicitudRepository
 import pe.tecsup.chambape.device.Notificador
 import pe.tecsup.chambape.device.NotificadorAndroid
@@ -41,6 +43,7 @@ class AppContainer(context: Context) {
         )
 
     val disponibilidadRepository: DisponibilidadRepository = DisponibilidadRepositoryImpl(api, authRepository)
+    val registroPrestadorRepository: RegistroPrestadorRepository = RegistroPrestadorRepositoryImpl(api)
     val solicitudRepository: SolicitudRepository = FirestoreSolicitudRepository(firestore)
     val ubicacionProvider: UbicacionProvider = UbicacionFused(context)
     val notificador: Notificador = NotificadorAndroid(context)

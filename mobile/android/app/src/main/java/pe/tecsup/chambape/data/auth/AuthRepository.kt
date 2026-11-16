@@ -12,6 +12,8 @@ import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.NonCancellable
+import kotlinx.coroutines.withContext
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -28,6 +30,17 @@ interface AuthRepository {
     val sesion: StateFlow<EstadoSesion>
     suspend fun ingresar(correo: String, clave: String)
     suspend fun registrarCliente(nombre: String, correo: String, clave: String)
+
+    /**
+     * Crea la cuenta y, con su token, ejecuta [registrarEnApi] (el alta del prestador en Django).
+     * Si ese alta falla, la cuenta recién creada se elimina y el error se propaga tal cual.
+     */
+    suspend fun registrarPrestador(
+        nombre: String,
+        correo: String,
+        clave: String,
+        registrarEnApi: suspend (token: String) -> Unit,
+    )
     fun cerrarSesion()
 
     /** Token de identidad de Firebase para llamar a la API Django; null si no hay sesión o red. */
@@ -89,6 +102,43 @@ class FirebaseAuthRepository(
         }
         _sesion.value = EstadoSesion.Activa(
             Sesion(usuario.uid, usuario.email.orEmpty(), nombreLimpio, Rol.CLIENTE, prestadorId = null),
+        )
+    }
+
+    override suspend fun registrarPrestador(
+        nombre: String,
+        correo: String,
+        clave: String,
+        registrarEnApi: suspend (token: String) -> Unit,
+    ) {
+        val usuario = traducir { auth.createUserWithEmailAndPassword(correo.trim(), clave).await().user }
+            ?: throw ErrorAuth(TipoErrorAuth.DESCONOCIDO)
+        try {
+            val token = traducir { usuario.getIdToken(false).await().token }
+                ?: throw ErrorAuth(TipoErrorAuth.DESCONOCIDO)
+            registrarEnApi(token)
+        } catch (e: Exception) {
+            // Sin prestador en Django no debe quedar una cuenta a medias: se deshace.
+            withContext(NonCancellable) {
+                runCatching { usuario.delete().await() }
+                auth.signOut()
+            }
+            throw e
+        }
+        // El perfil se crea como prestador sin prestadorId: la bandeja se activa cuando
+        // administración verifica el perfil y lo vincula.
+        traducir {
+            firestore.collection(USUARIOS).document(usuario.uid).set(
+                mapOf(
+                    "nombre" to nombre,
+                    "correo" to usuario.email.orEmpty(),
+                    "rol" to ROL_PRESTADOR,
+                    "creadoEn" to FieldValue.serverTimestamp(),
+                ),
+            ).await()
+        }
+        _sesion.value = EstadoSesion.Activa(
+            Sesion(usuario.uid, usuario.email.orEmpty(), nombre, Rol.PRESTADOR, prestadorId = null),
         )
     }
 

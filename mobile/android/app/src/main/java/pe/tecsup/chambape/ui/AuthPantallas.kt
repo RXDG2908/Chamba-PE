@@ -34,7 +34,7 @@ import pe.tecsup.chambape.R
 import pe.tecsup.chambape.domain.model.TipoErrorAuth
 
 @Composable
-fun LoginScreen(onIrARegistro: () -> Unit) {
+fun LoginScreen(onIrARegistro: () -> Unit, onIrARegistroPrestador: () -> Unit) {
     val vm = chambaViewModel { AuthViewModel(it.authRepository) }
     val estado by vm.uiState.collectAsStateWithLifecycle()
     FormularioAuth(titulo = stringResource(R.string.login_titulo), estado = estado) {
@@ -45,6 +45,9 @@ fun LoginScreen(onIrARegistro: () -> Unit) {
         }
         TextButton(onClick = onIrARegistro, enabled = !estado.cargando) {
             Text(stringResource(R.string.ir_a_registro))
+        }
+        TextButton(onClick = onIrARegistroPrestador, enabled = !estado.cargando) {
+            Text(stringResource(R.string.ir_a_registro_prestador))
         }
     }
 }

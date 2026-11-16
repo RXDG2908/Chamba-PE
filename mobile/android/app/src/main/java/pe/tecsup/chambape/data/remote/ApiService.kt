@@ -1,12 +1,14 @@
 package pe.tecsup.chambape.data.remote
 
 import com.google.gson.annotations.SerializedName
+import okhttp3.ResponseBody
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.Header
 import retrofit2.http.PATCH
+import retrofit2.http.POST
 import retrofit2.http.Query
 
 /** Lo que responde la API Django (docs/API_BUSQUEDA.md). Todo puede venir nulo: se valida en el mapper. */
@@ -32,6 +34,17 @@ data class DisponibilidadDto(
 
 data class CambioDisponibilidadDto(@SerializedName("disponible") val disponible: Boolean)
 
+data class RegistroPrestadorDto(
+    @SerializedName("nombres") val nombres: String,
+    @SerializedName("apellidos") val apellidos: String,
+    @SerializedName("dni") val dni: String,
+    @SerializedName("telefono") val telefono: String,
+    @SerializedName("rubros") val rubros: List<Int>,
+    @SerializedName("latitud") val latitud: String,
+    @SerializedName("longitud") val longitud: String,
+    @SerializedName("radio_cobertura_km") val radioCoberturaKm: Int,
+)
+
 interface ApiService {
     @GET("api/prestadores/rubros/")
     suspend fun rubros(): List<RubroDto>
@@ -44,6 +57,12 @@ interface ApiService {
     ): List<PrestadorDto>
 
     // Rutas privadas: la cabecera lleva "Bearer <token de Firebase>".
+    @POST("api/prestadores/registro-movil/")
+    suspend fun registrarPrestador(
+        @Header("Authorization") autorizacion: String,
+        @Body datos: RegistroPrestadorDto,
+    ): ResponseBody
+
     @GET("api/usuarios/disponibilidad/")
     suspend fun disponibilidad(@Header("Authorization") autorizacion: String): DisponibilidadDto
 

@@ -27,6 +27,20 @@ enum class EstadoVerificacion { VERIFICADO, PENDIENTE, RECHAZADO }
 /** Disponibilidad del prestador y estado de su verificación, tal como los guarda la API. */
 data class Disponibilidad(val disponible: Boolean, val estado: EstadoVerificacion)
 
+data class DatosRegistroPrestador(
+    val nombres: String,
+    val apellidos: String,
+    val dni: String,
+    val telefono: String,
+    val rubros: Set<Int>,
+    val latitud: Double,
+    val longitud: Double,
+    val radioKm: Int,
+)
+
+/** El servidor rechazó el registro: mensajes por campo (o `detail` para uno general). */
+class ErrorRegistro(val campos: Map<String, String>) : Exception("registro rechazado")
+
 class ErrorDatos(val tipo: TipoError, causa: Throwable? = null) : Exception(tipo.name, causa)
 
 enum class Rol { CLIENTE, PRESTADOR }

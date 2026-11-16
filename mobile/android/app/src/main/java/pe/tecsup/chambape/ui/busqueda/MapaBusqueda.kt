@@ -36,6 +36,7 @@ import org.osmdroid.views.MapView
 import org.osmdroid.views.overlay.CopyrightOverlay
 import org.osmdroid.views.overlay.MapEventsOverlay
 import org.osmdroid.views.overlay.Marker
+import org.osmdroid.views.overlay.Polygon
 import pe.tecsup.chambape.R
 import pe.tecsup.chambape.device.Coordenadas
 import pe.tecsup.chambape.domain.model.Prestador
@@ -61,6 +62,8 @@ fun MapaBusqueda(
     encuadre: Int,
     onElegirUbicacion: (Double, Double) -> Unit,
     modifier: Modifier = Modifier,
+    /** Si se indica, dibuja el círculo de cobertura alrededor de la ubicación (registro de prestador). */
+    radioKm: Int? = null,
 ) {
     val context = LocalContext.current
     val alElegir by rememberUpdatedState(onElegirUbicacion)
@@ -95,13 +98,28 @@ fun MapaBusqueda(
             .clip(RoundedCornerShape(12.dp))
             .semantics { contentDescription = descripcion },
         update = { vista ->
-            val estado = EstadoMapa(ubicacion, prestadores, encuadre)
+            val estado = EstadoMapa(ubicacion, prestadores, encuadre, radioKm)
             if (vista.tag == estado) return@AndroidView
             val encuadrar = (vista.tag as? EstadoMapa)?.encuadre != encuadre
             vista.tag = estado
 
             // Se conservan el receptor de toques y el aviso de derechos; se rehacen los marcadores.
-            vista.overlays.removeAll { it is Marker }
+            vista.overlays.removeAll { it is Marker || it is Polygon }
+            if (ubicacion != null && radioKm != null) {
+                val circulo = Polygon(vista).apply {
+                    points = Polygon.pointsAsCircle(GeoPoint(ubicacion.latitud, ubicacion.longitud), radioKm * 1000.0)
+                    fillPaint.color = 0x332463A6
+                    outlinePaint.color = COLOR_UBICACION
+                    outlinePaint.strokeWidth = 2 * vista.resources.displayMetrics.density
+                    // No consume el toque: dentro del círculo se puede seguir eligiendo otro centro.
+                    setOnClickListener { _, _, _ -> false }
+                }
+                vista.overlays += circulo
+                // Al mover el centro o cambiar el radio, el mapa se ajusta para mostrar toda la zona.
+                val zona = circulo.bounds
+                val margen = (16 * vista.resources.displayMetrics.density).toInt()
+                vista.post { vista.zoomToBoundingBox(zona, false, margen) }
+            }
             ubicacion?.let {
                 vista.overlays += Marker(vista).apply {
                     position = GeoPoint(it.latitud, it.longitud)
@@ -125,7 +143,12 @@ fun MapaBusqueda(
     )
 }
 
-private data class EstadoMapa(val ubicacion: Coordenadas?, val prestadores: List<Prestador>, val encuadre: Int)
+private data class EstadoMapa(
+    val ubicacion: Coordenadas?,
+    val prestadores: List<Prestador>,
+    val encuadre: Int,
+    val radioKm: Int?,
+)
 
 @SuppressLint("ClickableViewAccessibility") // el toque sigue llegando al mapa; solo se evita que la lista lo robe
 private fun crearMapa(context: Context, onToque: (Double, Double) -> Unit): MapView {

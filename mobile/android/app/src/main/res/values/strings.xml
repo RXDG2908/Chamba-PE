@@ -27,6 +27,26 @@
     <string name="crear_cuenta">Crear cuenta</string>
     <string name="registrando">Creando cuenta…</string>
     <string name="ir_a_registro">No tengo cuenta: registrarme</string>
+    <string name="ir_a_registro_prestador">Ofrezco servicios: registrarme como prestador</string>
+    <string name="registro_prestador_titulo">Regístrate como prestador</string>
+    <string name="registro_prestador_ayuda">Tu perfil quedará pendiente de verificación: aparecerás en las búsquedas cuando administración lo apruebe.</string>
+    <string name="registro_seccion_cuenta">Tu cuenta</string>
+    <string name="registro_seccion_datos">Tus datos</string>
+    <string name="registro_seccion_rubros">¿Qué servicios ofreces?</string>
+    <string name="registro_seccion_cobertura">Zona de cobertura</string>
+    <string name="registro_cobertura_ayuda">Toca el mapa para marcar el centro de tu zona y ajusta el radio.</string>
+    <string name="registro_radio">Radio de cobertura: %1$d km</string>
+    <string name="registro_prestador_boton">Registrarme como prestador</string>
+    <string name="registro_revisa_campos">Revisa los campos marcados.</string>
+    <string name="nombres">Nombres</string>
+    <string name="apellidos">Apellidos</string>
+    <string name="dni">DNI</string>
+    <string name="telefono_opcional">Teléfono (opcional)</string>
+    <string name="error_obligatorio">Este dato es obligatorio.</string>
+    <string name="error_clave_minima">Mínimo 6 caracteres.</string>
+    <string name="error_dni">El DNI debe tener 8 dígitos.</string>
+    <string name="error_rubros">Elige al menos un rubro.</string>
+    <string name="error_ubicacion_cobertura">Marca en el mapa el centro de tu zona.</string>
     <string name="ya_tengo_cuenta">Ya tengo cuenta</string>
     <string name="error_campos_vacios">Completa todos los campos.</string>
     <string name="error_clave_corta">La contraseña debe tener al menos %1$d caracteres.</string>
@@ -86,7 +106,7 @@
     <!-- Solicitudes -->
     <string name="solicitudes_vacio_cliente">Todavía no has enviado solicitudes.</string>
     <string name="solicitudes_vacio_prestador">Todavía no has recibido solicitudes.</string>
-    <string name="prestador_sin_vincular">Tu cuenta de prestador aún no está vinculada. Pide al equipo de Chamba PE que la active.</string>
+    <string name="prestador_sin_vincular">Tu bandeja se activará cuando administración verifique tu perfil de prestador.</string>
     <string name="error_solicitudes">No se pudieron cargar las solicitudes.</string>
     <string name="error_respuesta">No se pudo guardar tu respuesta. Inténtalo de nuevo.</string>
     <string name="solicitud_en">En: %1$s</string>

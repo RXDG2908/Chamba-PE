@@ -2,6 +2,7 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.password_validation import validate_password
 from django.db import transaction
 from rest_framework import serializers
+from rest_framework.validators import UniqueValidator
 
 from .models import Prestador, Rubro
 
@@ -57,4 +58,41 @@ class RegistroPrestadorSerializer(serializers.ModelSerializer):
         # lo asigna la señal de usuarios al crear el Prestador.
         prestador = Prestador.objects.create(usuario=usuario, **validated_data)
         prestador.rubros.set(rubros)
+        return prestador
+
+
+class RegistroPrestadorMovilSerializer(serializers.ModelSerializer):
+    """Registro desde la app móvil: la identidad viene del token de Firebase, no de una contraseña."""
+    rubros = serializers.PrimaryKeyRelatedField(
+        queryset=Rubro.objects.all(), many=True, allow_empty=False,
+        error_messages={'empty': 'Elige al menos un rubro.'},
+    )
+
+    class Meta:
+        model = Prestador
+        fields = [
+            'id', 'nombres', 'apellidos', 'dni', 'telefono', 'rubros',
+            'latitud', 'longitud', 'radio_cobertura_km', 'estado',
+        ]
+        read_only_fields = ['id', 'estado']
+        extra_kwargs = {
+            # Mismas reglas del modelo, con el aviso de DNI repetido en español.
+            'dni': {'validators': [
+                *Prestador._meta.get_field('dni').validators,
+                UniqueValidator(queryset=Prestador.objects.all(), message='Ya existe un prestador con ese DNI.'),
+            ]},
+        }
+
+    @transaction.atomic
+    def create(self, validated_data):
+        from usuarios.models import Perfil
+
+        uid = self.context['firebase_uid']
+        rubros = validated_data.pop('rubros')
+        # Cuenta sin contraseña utilizable: solo se entra con el token de Firebase.
+        usuario = User.objects.create_user(username=f'fb-{uid}', email=self.context['email'])
+        prestador = Prestador.objects.create(usuario=usuario, **validated_data)
+        prestador.rubros.set(rubros)
+        # La señal ya dejó el perfil con rol prestador; aquí se vincula con la cuenta de Firebase.
+        Perfil.objects.filter(usuario=usuario).update(firebase_uid=uid)
         return prestador

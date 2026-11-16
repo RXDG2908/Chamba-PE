@@ -207,6 +207,51 @@ await fetch('/api/usuarios/login/', {
 Después de iniciar o cerrar sesión, Django cambia el `csrftoken`; por eso se lee
 la cookie en cada petición y no se guarda en una variable.
 
+## Acceso desde la app móvil (token de Firebase)
+
+La app Android no usa la sesión de Django: inicia sesión con Firebase Authentication y envía
+su token de identidad en cada petición privada.
+
+```http
+GET /api/usuarios/disponibilidad/
+Authorization: Bearer <token de identidad de Firebase>
+```
+
+- `usuarios.autenticacion.AutenticacionFirebase` verifica el token (firma con las claves públicas
+  de Google, caducidad, proyecto y emisor) y busca la cuenta cuyo `Perfil.firebase_uid` coincide
+  con el UID del token. No necesita credenciales de servicio.
+- **El vínculo lo pone un administrador** en `/admin/` (Perfiles → «UID de Firebase»). Una cuenta
+  de Firebase sin vincular no accede a nada, aunque use el mismo correo que una cuenta de Django.
+- Un UID solo puede estar en un perfil. Después de autenticar se aplican los mismos permisos por
+  rol (`EsPrestador`, etc.).
+- Con token no se exige CSRF, porque no depende de cookies. La sesión web sigue igual.
+- Se activa con la variable `FIREBASE_AUTH_PROJECT_ID` (por ejemplo `chamba-pe-tecsup`). Vacía,
+  no se acepta ningún token.
+- Token ausente, inválido, vencido, de otro proyecto o de una cuenta sin vincular: `403`, igual
+  que una petición sin sesión.
+
+### Registro de prestador desde la app
+
+```http
+POST /api/prestadores/registro-movil/
+Authorization: Bearer <token de identidad de Firebase>
+
+{"nombres": "Ana", "apellidos": "Pérez", "dni": "12345678", "telefono": "",
+ "rubros": [1, 4], "latitud": "-12.046374", "longitud": "-77.042793", "radio_cobertura_km": 5}
+```
+
+- Es la única ruta que acepta el token de una cuenta **todavía sin vincular**: crea una cuenta de
+  Django nueva (sin contraseña utilizable), su prestador en estado `pendiente` y no disponible, y
+  la vincula al UID del token. Responde `201` con `id` y `estado`.
+- Nunca vincula a una cuenta existente: si el correo del token ya pertenece a una cuenta de
+  Django responde `400` en `email`; si el UID ya está registrado, `409`.
+- Valida igual que el registro web (DNI de 8 dígitos y único, al menos un rubro, coordenadas y
+  radio); los errores llegan por campo. No permite fijar `estado` ni `disponible`.
+- Sin token válido: `403`.
+
+La usan el registro de prestador y la pantalla «Mi disponibilidad» de Android. Las solicitudes del móvil siguen en
+Firestore; unificarlas con las de Django es una decisión pendiente.
+
 ## Qué cambia en lo que ya existe
 
 | Ruta | Cambio | Quién |

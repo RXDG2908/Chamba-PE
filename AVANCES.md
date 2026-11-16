@@ -3,7 +3,7 @@
 > **Regla del equipo:** este archivo se actualiza **siempre**, al terminar cada tarea o al cierre del día de trabajo, antes de dar la tarea por terminada. Ver [PLAN_EQUIPO.md](PLAN_EQUIPO.md#3-reglas-de-reparto).
 > Sirve de base para el cuadro de avances y el informe del Sprint Review.
 
-**Última actualización:** 29/10/2026 · **Sprint 1:** ✅ cerrado el 14/10/2026 (01/10 – 14/10) · **Sprint 2:** ✅ cerrado el 28/10/2026 con 15 de 23 h (HU-8 pasa al Sprint 3; T6.3 y T7.3 se unieron el 29/10) · **Meta:** el prestador se registra y el cliente lo encuentra y le envía una solicitud.
+**Última actualización:** 16/11/2026 · **Sprint 4:** 🟡 día 3 de 10, reparto propuesto en [docs/sprint4-reparto.md](docs/sprint4-reparto.md) (30 h, por confirmar el 17/11) · **Sprint 1:** ✅ cerrado el 14/10/2026 (01/10 – 14/10) · **Sprint 2:** ✅ cerrado el 28/10/2026 con 15 de 23 h (HU-8 pasa al Sprint 3; T6.3 y T7.3 se unieron el 29/10) · **Meta:** el prestador se registra y el cliente lo encuentra y le envía una solicitud.
 
 
 > **Actualización de Planning S3 (29/10):** acuerdo aprobado de David y Renzo, comunicado por el Scrum Master: 24 h de trabajo + 6 h de reserva, incluyendo las 3 h integradas de #20/#23. HU-8 sigue parcial con avance local; HU-13/HU-20 se postergan del compromiso inicial. [Seguimiento](#10-seguimiento-del-sprint-3--291011112026). Este acuerdo reemplaza la propuesta de sobrecarga de 35 h, conservada en el historial.
@@ -98,6 +98,7 @@ Una línea por entrega, la más reciente arriba.
 
 | Fecha | Quién | Qué se hizo | Tarea |
 |:---:|---|---|:---:|
+| 16/11 | Renzo León | Reparto propuesto del Sprint 4 y pendientes de sprints anteriores en [docs/sprint4-reparto.md](docs/sprint4-reparto.md), con mensajes para Luis y David. Estado comprobado contra `origin/main` `3a373b5` y GitHub: HU-10, HU-11 y HU-12 sin empezar (26 h); del Sprint 3 quedan T19.4 (sin iniciar), T8.3 (ya desbloqueada, #22 con conflictos) y HU-21 en el #38 sin revisión; #34 abierto con conflictos; HU-8 entró con el #37 unido por su autor sin revisión; `main` sigue sin protección. Total 30 h, 10 h por integrante, sin holgura. Propuesta: Renzo HU-10, Luis HU-11 + T12.3, David HU-12 + pruebas cruzadas (T19.4 pasa de Luis a David). Se confirma en el Daily del 17/11; sin horas terminadas. Burndown del Sprint 4 al 16/11: 30 h pendientes (ideal 21). | Planning S4 |
 | 12/11 | Renzo León | Panel de revisión: los intentos de DNI en revisión manual ahora se ven en `/administracion/revisiones` (sección «DNI en revisión manual», con motivos en palabras simples y enlaces a las fotos). Nuevo `GET /api/verificacion/dni/?resultado=revision_manual` solo para administradores, con prueba. Causa: el contrato dejaba este panel a David (HU-9) y no estaba hecho. 44 pruebas de `verificacion` OK, lint y build OK; verificado en el navegador como administrador. | HU-19 |
 | 12/11 | Renzo León | Índice del Sprint 3 de Renzo (HU-19) en `docs/INDICE_SPRINT3_RENZO.md`, con enlaces a documentos, código y lo que falta. | HU-19 |
 | 12/11 | Renzo León | Unió a `main` el PR #27 (contrato) y el #28 (T19.1–T19.3): integró `main` en la rama, resolvió `App.jsx` (menú por rol + enlace «Verificar mi DNI» del prestador), AVANCES y `.gitignore`. 219 pruebas Django OK, lint y build OK. Las 9 h de HU-19 de Renzo quedan integradas; falta T19.4 (Luis) y probar la cámara real en un celular. | T19.1–T19.3 |
@@ -201,7 +202,8 @@ Una línea por entrega, la más reciente arriba.
 | 19 | 19/10 | Desde T9.2, la búsqueda solo muestra prestadores Verificado. Los prestadores que hoy están en Pendiente dejan de aparecer hasta que un administrador apruebe uno de sus documentos. Hay que avisar al equipo antes de las pruebas manuales. | HU-3, HU-4 | David | 🟡 |
 | 20 | 28/10 | T8.1 (push con FCM) no se empezó y el sprint cerró el 28/10: el criterio de HU-8 «la notificación llega al móvil en < 5 s» queda sin cumplir ni probar. Decisión del PO: HU-8 completa pasa al Sprint 3. | HU-8, T8.1, T8.2, T8.3 | Luis / David | ➡️ Sprint 3 |
 | 21 | 28/10 | Con HU-8, el Sprint 3 suma 35 h para 30 h de capacidad. Se ajusta en el Sprint Planning del 29/10 (propuesta: HU-13 al Sprint 4). | Sprint 3 | Equipo | 🟡 |
-| 14 | 15/10 | El PR 4 y el PR 7 se unieron sin revisión de otro integrante. Acción: activar la protección de `main` en GitHub para exigir 1 aprobación. | Proceso | Renzo | 🟡 |
+| 23 | 16/11 | El Sprint 4 empezó el 12/11 sin Planning: 2 días sin horas y ninguna tarea de HU-10, HU-11 ni HU-12 empezada. Con T19.4 y T8.3 del Sprint 3 suma 30 h, sin holgura, para 8 días hábiles (1,25 h diarias por integrante). HU-13, HU-20 y Android no caben. Si en el Daily del 20/11 quedan más de 15 h, el PO decide qué sale. [Reparto](docs/sprint4-reparto.md). | Sprint 4 | Equipo | 🟡 |
+| 14 | 15/10 | El PR 4 y el PR 7 se unieron sin revisión de otro integrante. Acción: activar la protección de `main` en GitHub para exigir 1 aprobación. 16/11: GitHub confirma que `main` sigue sin protección y el #37 (HU-8) lo unió su autor sin revisión. | Proceso | Renzo | 🟡 |
 
 ## 8. Decisiones técnicas
 

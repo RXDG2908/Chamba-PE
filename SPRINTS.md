@@ -11,7 +11,7 @@ Reglas de reparto y flujo de trabajo en [PLAN_EQUIPO.md](PLAN_EQUIPO.md). Detall
 | [1](#sprint-1--0110--14102026) | 01/10 – 14/10/2026 | HU-1 a HU-4 | 13 | 30 h | ✅ Cerrado (26 de 30 h) |
 | [2](#sprint-2--1510--28102026) | 15/10 – 28/10/2026 | HU-5 a HU-9 | 13 | 30 h | ✅ Cerrado el 28/10: 15 de 23 h (HU-5, HU-6 y HU-9 completas) |
 | [3](#sprint-3--2910--11112026) | 29/10 – 11/11/2026 | HU-19, HU-20, HU-21, HU-13 | 13 | 28 h | ⚪ Por planificar |
-| [4](#sprint-4--1211--25112026) | 12/11 – 25/11/2026 | HU-10, HU-11, HU-12 | 12 | 26 h | ⚪ Por planificar |
+| [4](#sprint-4--1211--25112026) | 12/11 – 25/11/2026 | HU-10, HU-11, HU-12 | 12 | 26 h | 🟡 Reparto propuesto el 16/11 (30 h con pendientes del S3) |
 | [—](#backlog-futuro) | — | HU-14 a HU-18 | 11 | 30 h | 📦 Backlog futuro |
 
 
@@ -375,6 +375,8 @@ Decisión del Product Owner del 28/10: HU-8 pasa completa porque T8.1 no se empe
 # Sprint 4 · 12/11 – 25/11/2026
 
 > ⚪ **Plantilla: por planificar en el Sprint Planning.** Las tareas y horas vienen del Lab 07; los responsables se asignan en la reunión.
+
+> 🟡 **Reparto propuesto por el Scrum Master (16/11), por confirmar en el Daily del 17/11:** [docs/sprint4-reparto.md](docs/sprint4-reparto.md). Renzo HU-10 (10 h) · Luis HU-11 y T12.3 (10 h) · David HU-12 y las pruebas T10.4, T11.3, T8.3 y T19.4 (10 h). Con T19.4 y T8.3, que pasan del Sprint 3, son **30 h sin holgura**. Al 16/11 no hay ninguna tarea empezada. La plantilla de abajo se completa cuando el equipo confirme.
 
 **Meta:** Recomendación con IA, seguimiento en tiempo real y calificación del servicio.
 

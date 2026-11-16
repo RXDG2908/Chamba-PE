@@ -18,8 +18,8 @@ from .models import Perfil
 logger = logging.getLogger(__name__)
 
 
-def verificar_token(token):
-    """Devuelve el UID de Firebase del token, o None si no es válido para este proyecto.
+def datos_del_token(token):
+    """Devuelve los datos de un token de Firebase válido para este proyecto, o None.
 
     Comprueba la firma con las claves públicas de Google, la caducidad, que el token sea
     de nuestro proyecto (audiencia) y que lo haya emitido Firebase Authentication. No
@@ -29,14 +29,33 @@ def verificar_token(token):
     from google.oauth2 import id_token
 
     proyecto = settings.FIREBASE_AUTH_PROJECT_ID
+    if not proyecto:
+        return None
     try:
         datos = id_token.verify_firebase_token(token, transporte.Request(), audience=proyecto)
-        if not datos or datos.get('iss') != f'https://securetoken.google.com/{proyecto}':
-            raise ValueError('emisor inesperado')
-        return datos.get('sub') or None
+        if not datos or datos.get('iss') != f'https://securetoken.google.com/{proyecto}' or not datos.get('sub'):
+            raise ValueError('emisor o usuario inesperado')
+        return datos
     except Exception as error:  # vencido, mal firmado, de otro proyecto o sin red para validar
         # Se registra el motivo, nunca el token.
         logger.warning('Token de Firebase rechazado: %s: %s', type(error).__name__, error)
+        return None
+
+
+def verificar_token(token):
+    """UID de Firebase del token, o None si no es válido para este proyecto."""
+    datos = datos_del_token(token)
+    return datos['sub'] if datos else None
+
+
+def token_de(request):
+    """Token `Bearer` de la petición, o None si no trae uno bien formado."""
+    partes = get_authorization_header(request).split()
+    if len(partes) != 2 or partes[0].lower() != b'bearer':
+        return None
+    try:
+        return partes[1].decode('ascii')
+    except UnicodeError:
         return None
 
 

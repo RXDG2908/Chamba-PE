@@ -1,8 +1,10 @@
 # T6.3 — Guía de comprobación manual: solo los prestadores activos y verificados aparecen en la búsqueda
 
+> **Estructura del 17/11/2026:** la web está en `web-portal/` y Django en `backend/django/`. Los comandos `python manage.py ...` se ejecutan dentro de `backend/django/`, con el entorno virtual de la raíz activado.
+
 Recorrido de punta a punta en el navegador (React + Django) para comprobar que un prestador aparece en **Resultados** solo cuando está a la vez **Verificado** (T9.1/T9.2) y **Activo** (T6.1), y que desaparece en cuanto se pone Inactivo.
 
-Rama: `feature/t6.3-pruebas-disponibilidad`, que integra T9.1 + T9.2 (PR 11, ya con T5.1) y T6.1 (PR 15). Las pruebas automáticas están en [servicios/test_disponibilidad_busqueda.py](../servicios/test_disponibilidad_busqueda.py).
+Rama: `feature/t6.3-pruebas-disponibilidad`, que integra T9.1 + T9.2 (PR 11, ya con T5.1) y T6.1 (PR 15). Las pruebas automáticas están en [servicios/test_disponibilidad_busqueda.py](../backend/django/servicios/test_disponibilidad_busqueda.py).
 
 > **Sin pantalla todavía:** el inicio de sesión del prestador (T5.2) y el interruptor de disponibilidad (T6.2) aún no tienen pantalla en React. Mientras tanto, el prestador inicia sesión y cambia su disponibilidad desde la **API navegable de Django**, que se abre en el mismo navegador y pasa por el proxy de Vite. Cuando entre T6.2, el paso 4 se hace con el interruptor y el resto de la guía no cambia.
 
@@ -39,7 +41,7 @@ python manage.py runserver
 **Terminal 2: React**
 
 ```powershell
-cd frontend
+cd web-portal
 npm install
 npm run dev
 ```

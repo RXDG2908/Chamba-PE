@@ -8,6 +8,8 @@ import sys
 import tempfile
 
 ROOT = Path(__file__).resolve().parents[1]
+# Raíz del repositorio: las evidencias viven en docs/ (estructura del 17/11).
+REPO = ROOT.parents[1]
 # Permite probar el frontend preparado contra la dependencia backend sin fusionarla.
 BACKEND_ROOT = Path(os.environ.get('HU7_TEST_BACKEND_ROOT', ROOT)).resolve()
 sys.path.insert(0, str(BACKEND_ROOT))
@@ -59,7 +61,7 @@ def main():
             p.rubros.add(rubros[rubro])
             fixtures['prestadores'][nombre] = {'id': p.pk, 'username': user.username,
                 'latitud': float(p.latitud), 'longitud': float(p.longitud)}
-        destino = ROOT / 'docs/evidencias/hu7-local/fixtures.json'
+        destino = REPO / 'docs/evidencias/hu7-local/fixtures.json'
         destino.parent.mkdir(parents=True, exist_ok=True)
         destino.write_text(json.dumps(fixtures, ensure_ascii=False, indent=2), encoding='utf-8')
         print('HU7: Django aislado, 7 prestadores ficticios y SQLite temporal dentro del worktree.', flush=True)

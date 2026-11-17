@@ -29,32 +29,32 @@
 
 | Archivo | Qué hace | Tarea |
 |---|---|---|
-| [urls.py](../verificacion/urls.py) | Dos rutas: `dni/` y `dni/<id>/foto/<tipo>/` | T19.2 |
-| [views.py](../verificacion/views.py) | La API. Orden de las defensas: consentimiento → imágenes válidas → máximo 5 intentos al día → análisis → guardado | T19.2 |
-| [servicio.py](../verificacion/servicio.py) | Las reglas: junta los **motivos** (`mrz_ilegible`, `dni_distinto`, `nombres_distintos`, `fuente_no_disponible`…) y decide el resultado | T19.2 / T19.3 |
-| [mrz.py](../verificacion/mrz.py) | Interpreta las 3 líneas MRZ del reverso y verifica los dígitos de control | T19.2 |
-| [lector.py](../verificacion/lector.py) | OCR cambiable: interfaz `LectorDni` y la implementación `LectorEasyOcr` | T19.2 |
-| [validadores.py](../verificacion/validadores.py) | Validador intercambiable: `simulado` (por defecto, sin internet) y `eldni` (reservado). Compara nombres sin tildes ni mayúsculas | T19.3 |
-| [models.py](../verificacion/models.py) | `IntentoDni` y el almacenamiento privado de fotos, **fuera de `/media/`** | T19.2 |
-| [consentimiento.py](../verificacion/consentimiento.py) | Punto de enganche con HU-21 de Luis; hoy responde que sí | Contrato |
-| [tests.py](../verificacion/tests.py) | Pruebas de HU-19 (468 líneas) | T19.2 / T19.3 |
+| [urls.py](../backend/django/verificacion/urls.py) | Dos rutas: `dni/` y `dni/<id>/foto/<tipo>/` | T19.2 |
+| [views.py](../backend/django/verificacion/views.py) | La API. Orden de las defensas: consentimiento → imágenes válidas → máximo 5 intentos al día → análisis → guardado | T19.2 |
+| [servicio.py](../backend/django/verificacion/servicio.py) | Las reglas: junta los **motivos** (`mrz_ilegible`, `dni_distinto`, `nombres_distintos`, `fuente_no_disponible`…) y decide el resultado | T19.2 / T19.3 |
+| [mrz.py](../backend/django/verificacion/mrz.py) | Interpreta las 3 líneas MRZ del reverso y verifica los dígitos de control | T19.2 |
+| [lector.py](../backend/django/verificacion/lector.py) | OCR cambiable: interfaz `LectorDni` y la implementación `LectorEasyOcr` | T19.2 |
+| [validadores.py](../backend/django/verificacion/validadores.py) | Validador intercambiable: `simulado` (por defecto, sin internet) y `eldni` (reservado). Compara nombres sin tildes ni mayúsculas | T19.3 |
+| [models.py](../backend/django/verificacion/models.py) | `IntentoDni` y el almacenamiento privado de fotos, **fuera de `/media/`** | T19.2 |
+| [consentimiento.py](../backend/django/verificacion/consentimiento.py) | Punto de enganche con HU-21 de Luis; hoy responde que sí | Contrato |
+| [tests.py](../backend/django/verificacion/tests.py) | Pruebas de HU-19 (468 líneas) | T19.2 / T19.3 |
 
 ### Frontend
 
 | Archivo | Qué hace | Tarea |
 |---|---|---|
-| [VerificarDni.jsx](../frontend/src/VerificarDni.jsx) | Pantalla `/verificar-dni`: cámara trasera con marco guía, foto del frente y del reverso, «Repetir», «Validando…» y el resultado con motivos en palabras simples | T19.1 |
-| [VerificarDni.css](../frontend/src/VerificarDni.css) | Estilos de la pantalla | T19.1 |
-| [App.jsx](../frontend/src/App.jsx) | Ruta `/verificar-dni` solo para prestadores y enlace «Verificar mi DNI» en su menú | T19.1 |
+| [VerificarDni.jsx](../web-portal/src/VerificarDni.jsx) | Pantalla `/verificar-dni`: cámara trasera con marco guía, foto del frente y del reverso, «Repetir», «Validando…» y el resultado con motivos en palabras simples | T19.1 |
+| [VerificarDni.css](../web-portal/src/VerificarDni.css) | Estilos de la pantalla | T19.1 |
+| [App.jsx](../web-portal/src/App.jsx) | Ruta `/verificar-dni` solo para prestadores y enlace «Verificar mi DNI» en su menú | T19.1 |
 
 ## 4. Cómo funciona, paso a paso
 
 1. El prestador inicia sesión y entra a `/verificar-dni`.
 2. Toma la foto del frente y la del reverso. Si no hay cámara, usa el selector de archivo.
-3. La pantalla envía `POST /api/verificacion/dni/` ([views.py](../verificacion/views.py)).
+3. La pantalla envía `POST /api/verificacion/dni/` ([views.py](../backend/django/verificacion/views.py)).
 4. El servidor comprueba el consentimiento, que las imágenes sean JPG o PNG sanas de hasta 5 MB, y el límite de 5 intentos al día.
-5. [lector.py](../verificacion/lector.py) lee la MRZ y [mrz.py](../verificacion/mrz.py) valida los dígitos de control.
-6. [servicio.py](../verificacion/servicio.py) compara el DNI y los nombres con el registro del prestador y con la fuente de [validadores.py](../verificacion/validadores.py).
+5. [lector.py](../backend/django/verificacion/lector.py) lee la MRZ y [mrz.py](../backend/django/verificacion/mrz.py) valida los dígitos de control.
+6. [servicio.py](../backend/django/verificacion/servicio.py) compara el DNI y los nombres con el registro del prestador y con la fuente de [validadores.py](../backend/django/verificacion/validadores.py).
 7. Guarda un `IntentoDni` y devuelve el resultado. Si algo falla o no coincide, queda **en revisión manual**.
 
 ## 5. Cómo verificarlo

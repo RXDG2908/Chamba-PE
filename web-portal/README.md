@@ -1,5 +1,7 @@
 # ChambaPe - Frontend
 
+> **Estructura del 17/11/2026:** la web está en `web-portal/` y Django en `backend/django/`. Los comandos `python manage.py ...` se ejecutan dentro de `backend/django/`, con el entorno virtual de la raíz activado.
+
 Frontend del proyecto integrador **ChambaPe**, desarrollado con React y Vite.
 
 ## Avance Sprint 1 - T3.2
@@ -85,7 +87,7 @@ la API de búsqueda. No es la tarea T3.4.
 
 ## Verificación del 06/10/2026
 
-Ejecutados dentro de `frontend/`:
+Ejecutados dentro de `web-portal/`:
 
 ```powershell
 npm.cmd run lint
@@ -194,7 +196,7 @@ realizado ni que se hayan probado sobre el nuevo main.
 
 1. Inicia Django desde la raíz con
    `.\venv\Scripts\python.exe manage.py runserver 127.0.0.1:8000 --noreload`.
-   En otra terminal, desde `frontend/`, ejecuta
+   En otra terminal, desde `web-portal/`, ejecuta
    `npm.cmd run dev -- --host 127.0.0.1 --port 5173 --strictPort`.
    Abre `http://127.0.0.1:5173/` y pulsa **Resultados**.
 2. En escritorio (1280 × 800) y emulación móvil (360 × 800 y 390 × 844),

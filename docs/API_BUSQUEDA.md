@@ -1,5 +1,7 @@
 # Búsqueda de prestadores — T3.1, T3.3 y T7.1
 
+> **Estructura del 17/11/2026:** la web está en `web-portal/` y Django en `backend/django/`. Los comandos `python manage.py ...` se ejecutan dentro de `backend/django/`, con el entorno virtual de la raíz activado.
+
 ## Endpoint
 
 `GET /api/prestadores/buscar/`
@@ -79,7 +81,7 @@ Los resultados se ordenan por distancia ascendente (el prestador más cercano
 primero), según T3.3. Tampoco se añade un filtro por estado de verificación: T3.1 aplica
 los filtros solicitados de rubro, disponibilidad y cobertura.
 T3.2 ya está conectada a esta API en Resultados, con selector de rubros y
-ubicación Leaflet; véase [cómo probar el frontend](../frontend/README.md).
+ubicación Leaflet; véase [cómo probar el frontend](../web-portal/README.md).
 Luis confirmó manualmente la tarjeta ficticia a 0 km y respuestas HTTP 200
 vacía y positiva. Quedan pendientes la revisión visual completa y el PR.
 HU-3 continúa parcial y la verificación de rendimiento de T3.4 está pendiente.

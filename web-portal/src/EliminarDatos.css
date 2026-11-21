@@ -1,0 +1,13 @@
+.eliminacion-dni { overflow-wrap: anywhere; }
+.confirmacion-eliminacion { display: grid; gap: 1rem; margin: 1.2rem 0; }
+.confirmacion-eliminacion label { display: flex; align-items: flex-start; gap: .65rem; }
+.confirmacion-eliminacion input { flex: 0 0 auto; width: auto; margin-top: .25rem; }
+.solicitudes-eliminacion { list-style: none; padding: 0; display: grid; gap: 1rem; }
+.solicitudes-eliminacion > li { border: 1px solid #cbd5e1; border-radius: .75rem; padding: 1rem; min-width: 0; }
+.solicitudes-eliminacion .identificador { font-size: .85rem; color: #475569; }
+.solicitudes-eliminacion details { margin-top: 1rem; }
+.solicitudes-eliminacion summary { cursor: pointer; padding: .5rem 0; }
+.solicitudes-eliminacion details ol { padding-left: 1.2rem; }
+.eliminacion-dni button { max-width: 100%; white-space: normal; }
+.eliminacion-dni .acciones-consentimiento { display: flex; flex-wrap: wrap; gap: .8rem; margin-top: 1rem; }
+@media (max-width: 480px) { .eliminacion-dni .acciones-consentimiento { flex-direction: column; } }

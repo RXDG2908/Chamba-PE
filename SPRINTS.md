@@ -477,8 +477,8 @@ Los identificadores S3-MAPA-R, S3-MAPA-I y S3-CERT-16 son etiquetas de seguimien
 | Nuevo | T19.2 · HU-19 | OCR: extraer número/nombres y recortar foto | Renzo | 4 | ✅ Integrado (PR #27 y #28, 11/11) |
 | Nuevo | T19.3 · HU-19 | Validador intercambiable, consulta a fuente y revisión manual ante fallo/no coincidencia | Renzo | 2 | ✅ Integrado (PR #27 y #28, 11/11) |
 | Nuevo | T19.4 · HU-19 | Pruebas cruzadas con muestras acordadas de lectura y coincidencia | Luis | 2 | Sin iniciar |
-| Nuevo | T21.1 · HU-21 | Pantalla de consentimiento y registro de aceptación | Luis | 1 | Sin iniciar |
-| Nuevo | T21.2 · HU-21 | Endpoint de solicitud de eliminación y trazabilidad de su atención | Luis | 1 | Sin iniciar |
+| Nuevo | T21.1 · HU-21 | Pantalla de consentimiento y registro de aceptación | Luis | 1 | ✅ Integrado (PR #38, 21/11) |
+| Nuevo | T21.2 · HU-21 | Endpoint de solicitud de eliminación y trazabilidad de su atención | Luis | 1 | ✅ Integrado (PR #38, 21/11) |
 | | | **Total de trabajo asignado** | | **24** | **3 integradas + 21 pendientes** |
 
 Reparto: Renzo construye HU-19 y Luis realiza T19.4; Luis construye HU-8/HU-21 y David valida T8.3 y revisa HU-21. David corrige certificados con revisión de Renzo por su propiedad sobre prestadores/permisos. Las revisiones de HU-19/HU-21 se organizan dentro de sus tareas y, si requieren capacidad adicional, se registra el uso de reserva sin inventar horas ya consumidas.
@@ -558,6 +558,7 @@ Estado inicial: **24 h asignadas; 3 h integradas, 21 h pendientes; 6 h de reserv
 | 05/11 | S3-CERT-16 / David | ✅ Unida con #29; impedimento 16 cerrado | Aprobado por Renzo; 173 OK | 0 h | 0 h |
 | 05/11 | Menú por rol y diseño (fuera del backlog aprobado) / David | 🟡 PR #32 revisado por Renzo; por unir. Pendiente actualizar `GUIA_NAVEGACION.md` y `GUIA_T6.3.md` | Menú y rutas por rol, portada y tema; probado con los 4 roles | — | Por aprobar por SM/PO |
 | 12/11 | T19.1–T19.3 · HU-19 / Renzo | ✅ Contrato (#27) y lectura/validador/pantalla (#28) unidos a `main`; integrado `main` en la rama (conflictos en `App.jsx`, AVANCES y `.gitignore` resueltos); enlace «Verificar mi DNI» en el menú del prestador | 219 pruebas Django OK, lint y build OK | T19.4 (Luis), T21.1/T21.2 (Luis) y HU-8 siguen pendientes | 0 h |
+| 21/11 | T21.1 / T21.2 · HU-21 / Luis | ✅ #38 revisado y unido por David (choque solo en `README.md`) | 311 Django OK; Playwright HU-21 55/55, mapa 16/16 y HU-8 11/11 | T19.4 y T8.3 | 0 h |
 | Por registrar | Tarea / responsable | Avance, bloqueo y próximo paso | PR / prueba / evidencia | Actualizar | Registrar motivo y saldo |
 
 Los 0 h de reserva indican **sin consumo registrado**, no una medición de dedicación real. Registrar decisiones posteriores sin sobrescribir el historial.

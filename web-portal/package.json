@@ -11,7 +11,8 @@
     "test:hu7": "playwright test",
     "test:hu7-local": "playwright test --config playwright.hu7-local.config.mjs",
     "test:push": "node --test tests/push-worker.test.mjs",
-    "test:hu8": "playwright test --config playwright.hu8.config.mjs"
+    "test:hu8": "playwright test --config playwright.hu8.config.mjs",
+    "test:hu21": "playwright test --config playwright.hu21.config.mjs"
   },
   "dependencies": {
     "leaflet": "^1.9.4",

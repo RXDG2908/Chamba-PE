@@ -12,6 +12,11 @@ class Perfil(models.Model):
         settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='perfil',
     )
     rol = models.CharField(max_length=13, choices=Rol.choices, default=Rol.CLIENTE)
+    # Cuenta de Firebase de la app móvil. La vincula un administrador; vacío = sin acceso móvil.
+    firebase_uid = models.CharField(
+        'UID de Firebase', max_length=128, unique=True, null=True, blank=True,
+        help_text='UID de la cuenta de Firebase Authentication con la que esta persona usa la app móvil.',
+    )
 
     class Meta:
         verbose_name_plural = 'perfiles'

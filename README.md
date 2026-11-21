@@ -12,17 +12,49 @@ Proyecto Integrador — Diseño y Desarrollo de Software · IV ciclo · Tecsup 2
 | **README.md** (este archivo) | Presentación del proyecto |
 | [docs/renders/historias-usuario.html](docs/renders/historias-usuario.html) | Maqueta de pantalla de cada historia de usuario con sus criterios de aceptación |
 | [PLAN_EQUIPO.md](PLAN_EQUIPO.md) | Integrantes, capacidad, reglas de reparto, stack, Git y ceremonias Scrum |
-| [SPRINTS.md](SPRINTS.md) | Sprint 1 planificado y plantillas de los Sprints 2 a 4 |
+| [SPRINTS.md](SPRINTS.md) | Planificación, reparto y burndown de los 4 sprints |
 | [AVANCES.md](AVANCES.md) | Estado de cada tarea, bitácora, impedimentos y burndown |
 | [TABLERO.md](TABLERO.md) | Tablero estilo Trello del sprint: Por hacer, En curso, En revisión y Terminado |
 | [docs/](docs/) | Documentos fuente: visión del producto y Lab 07 (historias, criterios y estimaciones) |
-| [docs/exposicion-renzo-sprint1-2.md](docs/exposicion-renzo-sprint1-2.md) | Guía de exposición y pruebas en vivo de Renzo (HU-1, HU-4, HU-5 y HU-6) |
-| [docs/sprint2-review.md](docs/sprint2-review.md) | Cierre del Sprint 2 (15 de 23 h; HU-5, HU-6 y HU-9 completas): estado por tarea, guion de la demo y propuesta de retrospectiva |
-| [docs/API_VERIFICACION_DNI.md](docs/API_VERIFICACION_DNI.md) | Contrato del escaneo y la validación del DNI (HU-19, Sprint 3): MRZ, validador intercambiable y revisión manual. T19.2 (lectura de la MRZ y API) T19.3 (validador de nombres) y T19.1 (pantalla `/verificar-dni`) implementadas en `feature/t19.2-ocr-dni`, pendientes de revisión |
-| [docs/EXPOSICION_HU19.md](docs/EXPOSICION_HU19.md) | Guía para exponer HU-19: flujo, puertos, archivos a abrir, guion, preguntas probables y límites |
-| [docs/API_AUTENTICACION.md](docs/API_AUTENTICACION.md) | Autenticación con roles (T5.1, Sprint 2): rutas, sesión y CSRF, roles y permisos para las demás apps |
+| [docs/sprint4-reparto.md](docs/sprint4-reparto.md) | Reparto propuesto del Sprint 4 y pendientes de sprints anteriores  |
+| [docs/android-reparto.md](docs/android-reparto.md) | App Android: qué falta del plan y reparto propuesto |
+| [docs/PLAN_DESARROLLO_ANDROID.md](docs/PLAN_DESARROLLO_ANDROID.md) | Plan de la app Android (propuesta de Luis, pendiente de aprobación) |
+| [mobile/android/README.md](mobile/android/README.md) | App Android: qué hace, cómo compilarla y cómo conectarla a Django y Firebase |
+| [docs/API_AUTENTICACION.md](docs/API_AUTENTICACION.md) | Autenticación con roles (HU-5): rutas, sesión y CSRF, roles, permisos y token de Firebase para la app móvil |
+| [docs/API_BUSQUEDA.md](docs/API_BUSQUEDA.md) | Búsqueda de prestadores (HU-3 y HU-7): parámetros, respuesta y ejemplos |
+| [docs/API_VERIFICACION_DNI.md](docs/API_VERIFICACION_DNI.md) | Escaneo y validación del DNI (HU-19): MRZ, validador intercambiable y revisión manual |
 | [docs/API_CONSENTIMIENTO.md](docs/API_CONSENTIMIENTO.md) | Consentimiento DNI versionado: aceptación, revocación y bloqueo de captura. |
 | [docs/API_ELIMINACION_DNI.md](docs/API_ELIMINACION_DNI.md) | Eliminación DNI: estados, reintentos, procesador y límites; pendiente de revisión. |
+| [docs/HU8_NOTIFICACIONES.md](docs/HU8_NOTIFICACIONES.md) | Notificaciones push (HU-8): configuración de FCM y guion de la validación T8.3 |
+| [docs/GUIA_NAVEGACION.md](docs/GUIA_NAVEGACION.md) | Cómo comprobar en el navegador cada tarea terminada |
+| [docs/EXPOSICION_HU19.md](docs/EXPOSICION_HU19.md) · [docs/exposicion-renzo-sprint1-2.md](docs/exposicion-renzo-sprint1-2.md) | Guías de exposición y pruebas en vivo |
+| [docs/sprint2-review.md](docs/sprint2-review.md) | Cierre del Sprint 2: estado por tarea, guion de la demo y propuesta de retrospectiva |
+
+---
+
+## Estado del proyecto
+
+**Al 16/11/2026 · Sprint 4 en curso (12/11 – 25/11), día 3 de 10.** El detalle diario está en [AVANCES.md](AVANCES.md).
+
+| Sprint | Resultado |
+|:---:|---|
+| 1 | ✅ Cerrado: HU-1 a HU-4 completas (26 de 30 h en el sprint; el resto se unió el 18/10) |
+| 2 | ✅ Cerrado: HU-5, HU-6 y HU-9 completas (15 de 23 h); HU-7 se unió el 04/11 |
+| 3 | 🟡 Sin cierre formal: HU-19 construida (falta su prueba T19.4), HU-8 en `main` (falta la validación T8.3), HU-21 en revisión ([PR #38](https://github.com/RXDG2908/Chamba-PE/pull/38)); HU-13 y HU-20 postergadas |
+| 4 | 🟡 HU-10, HU-11 y HU-12 sin empezar; [reparto propuesto](docs/sprint4-reparto.md), por confirmar el 17/11 |
+
+| Historia | Estado |
+|---|---|
+| HU-1 Registro del prestador · HU-2 Certificaciones · HU-3 Búsqueda · HU-4 Solicitud | ✅ En `main` |
+| HU-5 Cuentas y roles · HU-6 Disponibilidad · HU-7 Mapa · HU-9 Revisión por el administrador | ✅ En `main` |
+| HU-8 Notificaciones push | 🟡 En `main`; falta validar la entrega real en menos de 5 s (T8.3) |
+| HU-19 Escaneo del DNI | 🟡 En `main`; faltan las pruebas con muestras (T19.4) y con cámara y OCR reales |
+| HU-21 Consentimiento y eliminación de datos | 🟡 Construida, en revisión (PR #38) |
+| HU-10 Recomendación · HU-11 Seguimiento · HU-12 Calificación | ⚪ Sin empezar (Sprint 4) |
+| HU-13 Suspensión y bloqueo · HU-20 Reconocimiento facial | ⚪ Postergadas, sin sprint asignado |
+| App Android | 🟡 Primera versión en `main` ([PR #39](https://github.com/RXDG2908/Chamba-PE/pull/39), unido el 16/11 sin revisión de otro integrante); [falta](docs/android-reparto.md) probarla en teléfono físico y 10 tarjetas del plan; fuera del compromiso de los sprints |
+
+> Varias funcionalidades de las secciones siguientes describen el **producto completo**: seguimiento en tiempo real, calificaciones, recomendación con IA, reconocimiento facial, pagos y suspensión de cuentas todavía no están implementados.
 
 ---
 
@@ -102,24 +134,28 @@ Capacidad: 30 h por sprint (3 integrantes × 10 h) · 114 h planificadas. Detall
 |---|---|
 | Backend | API REST con Django + Django REST Framework |
 | Frontend web | React + Vite (aplicación responsiva y panel de administración) |
-| App móvil | _por definir_ |
-| Tiempo real | WebSocket (Django Channels) |
-| Notificaciones | Firebase Cloud Messaging |
-| Verificación de identidad | OCR (EasyOCR), consulta a eldni.com, reconocimiento facial (DeepFace), prueba de vida (MediaPipe) |
-| IA | Módulo de recomendación y clasificación integrado al backend |
+| App móvil | Android nativo: Kotlin, Jetpack Compose y MVVM, con Retrofit, Room y Firebase (Auth y Firestore). Primera versión en `main`; el enfoque está pendiente de acuerdo del equipo |
+| Tiempo real | WebSocket (Django Channels) — previsto para HU-11, aún sin implementar |
+| Notificaciones | Firebase Cloud Messaging (web, con service worker) |
+| Verificación de identidad | Hoy: lectura de la MRZ del DNI con OCR (EasyOCR) y revisión manual. Previsto: reconocimiento facial (DeepFace) y prueba de vida (MediaPipe) |
+| IA | Recomendación del prestador (HU-10), aún sin implementar |
 
 ## Estructura del repositorio
 
 ```
 Chamba-PE/
 ├── core/               Configuración de Django (settings, urls)
-├── prestadores/        App Django: prestador, rubros, cobertura y API de registro (HU-1)
-├── servicios/          Búsqueda por rubro, disponibilidad y cobertura (HU-3) y solicitudes de servicio (HU-4)
-├── usuarios/           App Django: cuentas, inicio de sesión y roles cliente, prestador y administrador (HU-5)
-├── certificaciones/    App Django: carga de certificaciones PDF/JPG ≤ 5 MB (HU-2)
-├── frontend/           Frontend React + Vite: listado de prestadores (HU-3), formulario de registro (HU-1) e inicio de sesión y cuenta de cliente (HU-5) e interruptor de disponibilidad del prestador (HU-6)
-├── src/                Componente React de carga de certificaciones (HU-2)
-├── docs/               Visión del producto, Lab 07 y maquetas (docs/renders/)
+├── prestadores/        Prestador, rubros, cobertura, registro (web y móvil) y búsqueda (HU-1, HU-3)
+├── servicios/          Solicitudes de servicio y notificaciones push (HU-4, HU-7, HU-8)
+├── usuarios/           Cuentas, inicio de sesión, roles y disponibilidad (HU-5, HU-6)
+├── certificaciones/    Carga de certificaciones PDF/JPG ≤ 5 MB (HU-2)
+├── administracion/     Revisión de documentos por el administrador (HU-9)
+├── verificacion/       Escaneo y validación del DNI (HU-19)
+├── frontend/           Web React + Vite: portada, cuentas, búsqueda con mapa, solicitudes,
+│                       disponibilidad, certificados, verificación del DNI y panel de revisión
+├── mobile/android/     App Android (Kotlin + Compose)
+├── docs/               Contratos de API, guías, Lab 07 y maquetas (docs/renders/)
+├── src/                Proyecto React inicial de la raíz; la web vigente está en frontend/
 ├── manage.py
 ├── requirements.txt    Dependencias de Python
 └── package.json
@@ -154,13 +190,17 @@ La API queda en `http://127.0.0.1:8000/` y el panel de Django en `/admin/`.
 | Endpoint | Uso |
 |---|---|
 | `POST /api/prestadores/registro/` | Registro del prestador (HU-1) |
+| `POST /api/prestadores/registro-movil/` | Registro del prestador desde la app Android, con el token de Firebase |
 | `GET /api/prestadores/rubros/` | Lista de rubros |
 | `GET /api/prestadores/buscar/` | Búsqueda por rubro, disponibilidad y cobertura (T3.1); [parámetros y ejemplos](docs/API_BUSQUEDA.md) |
 | `POST /api/servicios/solicitudes/` | El cliente envía una solicitud al prestador; queda Pendiente (HU-4) |
 | `GET /api/servicios/solicitudes/<id>/` | El cliente consulta el estado de su solicitud (HU-4) |
 | `GET /api/servicios/solicitudes/recibidas/` | Bandeja del prestador; requiere sesión con rol prestador (HU-4) |
 | `POST /api/servicios/solicitudes/<id>/aceptar/` · `.../rechazar/` | El prestador responde, una sola vez (HU-4) |
-| `/api/certificaciones/` | Carga de certificaciones (HU-2) |
+| `POST /api/servicios/notificaciones/token/` | Registra el token de FCM del navegador del prestador (HU-8); [guía](docs/HU8_NOTIFICACIONES.md) |
+| `POST /api/certificaciones/upload/` | Carga de certificaciones; requiere sesión del prestador (HU-2) |
+| `/api/administracion/revisiones/` | El administrador lista, aprueba o rechaza documentos (HU-9) |
+| `POST` · `GET /api/verificacion/dni/` | El prestador envía las fotos de su DNI y consulta el resultado (HU-19); [contrato](docs/API_VERIFICACION_DNI.md) |
 | `GET /api/usuarios/csrf/` | Deja la cookie `csrftoken` para los `POST` desde React (HU-5) |
 | `POST /api/usuarios/registro/` | Registro del cliente; queda con la sesión iniciada (HU-5) |
 | `POST /api/usuarios/login/` · `.../logout/` | Inicio de sesión con usuario o correo, y cierre de sesión (HU-5) |
@@ -183,35 +223,22 @@ npm install
 npm run dev
 ```
 
-### Avance HU-3: T3.1 y T3.2
+La web queda en `http://localhost:5173/`. Para comprobar cada función paso a paso, sigue la [guía de navegación](docs/GUIA_NAVEGACION.md).
 
-La búsqueda Django filtra por rubro, disponibilidad y cobertura y devuelve
-datos públicos con distancia geográfica. En **Resultados**, React carga los
-rubros, permite elegir la ubicación en Leaflet o confirmar coordenadas y
-muestra las tarjetas de la API con estados de carga, error y sin resultados.
-Se conservan el registro y la navegación, se eliminan las calificaciones
-ficticias y se respeta el orden recibido del backend.
+**App Android** — requiere JDK 17 o superior y el SDK de Android. Dentro de `mobile/android/`:
 
-Para probar la coincidencia local, selecciona Gasfitería, introduce latitud
-`-12.046374` y longitud `-77.042793`, pulsa **Usar coordenadas** y **Buscar**.
-El prestador ficticio se prepara solo mediante el comando opcional documentado;
-la pantalla no modifica datos. Consulta los [parámetros y ejemplos de API](docs/API_BUSQUEDA.md)
-y la [guía del frontend](frontend/README.md).
+```bash
+./gradlew assembleDebug
+```
 
-Verificado el 06/10/2026: 18 pruebas backend aprobadas, lint y build correctos.
-Luis confirmó manualmente respuestas HTTP 200 vacía y positiva y la tarjeta
-Demo Gasfitero ficticio a 0 km. Quedan pendientes pruebas visuales móviles,
-errores y concurrencia en navegador, revisión del PR e integración en `main`.
-HU-3 sigue parcial: David debe integrar T3.3 con esta búsqueda y verificar
-datos/rendimiento en T3.4; su avance separado en `certificaciones` se conserva.
+Necesita `google-services.json` (no está en el repositorio) y Django corriendo; los pasos completos están en [mobile/android/README.md](mobile/android/README.md).
 
-### Avance HU-4: T4.1
+### Para tener en cuenta
 
-La API de solicitudes ya está en `main` y permite el flujo solicitar → aceptar o rechazar. Al enviar, se valida que el prestador esté disponible, ofrezca el rubro y cubra la ubicación del cliente. Solo el prestador dueño de la solicitud puede responderla, y solo mientras siga Pendiente. Mientras no exista el inicio de sesión (HU-5), la bandeja y las respuestas se prueban con autenticación básica (usuario y contraseña del registro), por ejemplo desde Postman.
-
-Verificado el 15/10/2026 en `main`, con una instalación limpia: 49 de 49 pruebas aprobadas, y en el navegador el cliente solicita el servicio desde la tarjeta del prestador y ve el cambio a Aceptada o Rechazada sin recargar. Sprint 1 cerrado con 26 de 30 h (HU-1 y HU-4 completas); T2.2 y T3.4 pasaron al Sprint 2 y se unieron el 18/10 con el PR 9 (58 de 58 pruebas OK; ver [TABLERO.md](TABLERO.md)).
-
-> `python manage.py test` marca 1 error en `certificaciones/test_reporte.py`: es un script de medición que necesita `requests` y el servidor encendido. `requirements.txt` incluye `django-cors-headers`, que usa la configuración de CORS; si ya tenías el entorno creado, vuelve a correr `pip install -r requirements.txt`. Para correr solo las pruebas del backend: `python manage.py test prestadores servicios certificaciones.tests`.
+- **Solo aparecen en la búsqueda los prestadores Verificados y Activos:** después de registrarse, el prestador sube un certificado, un administrador lo aprueba en `/administracion/revisiones` y el prestador activa su disponibilidad.
+- **El OCR del DNI necesita EasyOCR**, que es pesado y descarga modelos la primera vez. Las pruebas automáticas no lo usan (trabajan con un lector simulado).
+- **Las notificaciones push necesitan credenciales de Firebase** en variables de entorno; `.env.example` muestra cuáles. Sin ellas, el resto de la aplicación funciona igual.
+- Si ya tenías el entorno creado, vuelve a correr `pip install -r requirements.txt`: se agregaron librerías en los Sprints 2 y 3.
 
 ## Flujo de trabajo
 

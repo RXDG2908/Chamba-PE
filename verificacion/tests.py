@@ -22,7 +22,8 @@ from rest_framework.test import APIClient
 from prestadores.models import Prestador, Rubro
 
 from .lector import LectorDni
-from .models import IntentoDni
+from .models import Consentimiento, IntentoDni
+from .textos_consentimiento import FINALIDAD_DNI, TEXTO_DNI, VERSION_DNI
 from .mrz import ErrorMrz, digito_control, interpretar
 from .validadores import (
     NO_DISPONIBLE, ValidadorEldni, ValidadorSimulado, nombres_coinciden,
@@ -174,6 +175,10 @@ class ApiDniTests(TestCase):
         cls.otro = cls.crear_prestador('otro_t192', '87654321')
         cls.cliente = User.objects.create_user(username='cliente_t192', password=CLAVE)
         cls.admin = User.objects.create_user(username='admin_t192', password=CLAVE, is_staff=True)
+        # Los casos normales de HU-19 ya parten de una aceptación real vigente.
+        for prestador in (cls.prestador, cls.otro):
+            Consentimiento.objects.create(usuario=prestador.usuario, finalidad=FINALIDAD_DNI,
+                version_texto=VERSION_DNI, texto_aceptado=TEXTO_DNI)
 
     @classmethod
     def crear_prestador(cls, username, dni):

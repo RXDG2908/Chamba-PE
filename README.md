@@ -23,6 +23,8 @@ Proyecto Integrador — Diseño y Desarrollo de Software · IV ciclo · Tecsup 2
 | [docs/API_AUTENTICACION.md](docs/API_AUTENTICACION.md) | Autenticación con roles (HU-5): rutas, sesión y CSRF, roles, permisos y token de Firebase para la app móvil |
 | [docs/API_BUSQUEDA.md](docs/API_BUSQUEDA.md) | Búsqueda de prestadores (HU-3 y HU-7): parámetros, respuesta y ejemplos |
 | [docs/API_VERIFICACION_DNI.md](docs/API_VERIFICACION_DNI.md) | Escaneo y validación del DNI (HU-19): MRZ, validador intercambiable y revisión manual |
+| [docs/API_CONSENTIMIENTO.md](docs/API_CONSENTIMIENTO.md) | Consentimiento DNI versionado: aceptación, revocación y bloqueo de captura. |
+| [docs/API_ELIMINACION_DNI.md](docs/API_ELIMINACION_DNI.md) | Eliminación DNI: estados, reintentos, procesador y límites; pendiente de revisión. |
 | [docs/HU8_NOTIFICACIONES.md](docs/HU8_NOTIFICACIONES.md) | Notificaciones push (HU-8): configuración de FCM y guion de la validación T8.3 |
 | [docs/GUIA_NAVEGACION.md](docs/GUIA_NAVEGACION.md) | Cómo comprobar en el navegador cada tarea terminada |
 | [docs/EXPOSICION_HU19.md](docs/EXPOSICION_HU19.md) · [docs/exposicion-renzo-sprint1-2.md](docs/exposicion-renzo-sprint1-2.md) | Guías de exposición y pruebas en vivo |

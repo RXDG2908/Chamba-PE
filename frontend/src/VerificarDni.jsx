@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
 import { erroresPorCampo, leerCookie } from './api.js'
 import './RegistroPrestador.css'
 import './Cuenta.css'
@@ -30,6 +31,13 @@ function mensajeDeError(estado, cuerpo) {
   if (estado === 403 || estado === 429) return porCampo.detail || 'No tienes permiso para esta acción.'
   if (estado >= 500) return 'El servidor tuvo un problema. Inténtalo de nuevo en unos minutos.'
   return 'No pudimos enviar las fotos. Inténtalo de nuevo.'
+}
+
+function comprobarEstadoConsentimiento(datos) {
+  if (!datos || typeof datos.vigente !== 'boolean' || typeof datos.eliminacion_pendiente !== 'boolean') {
+    throw new Error('No pudimos comprobar el estado de tu consentimiento y eliminación. Vuelve a consultar.')
+  }
+  return datos
 }
 
 // Foto desde la cámara; si no hay cámara o permiso, se usa el selector del celular.
@@ -132,38 +140,65 @@ function Resultado({ intento, alReintentar }) {
 }
 
 function VerificarDni() {
+  const navegar = useNavigate()
+  const [revision, setRevision] = useState(0)
+  const urls = useRef(new Set())
   const [paso, setPaso] = useState('cargando') // cargando | anverso | reverso | enviar | enviando | resultado
   const [fotos, setFotos] = useState({}) // lado → { blob, url }
   const [intento, setIntento] = useState(null)
   const [error, setError] = useState('')
 
   useEffect(() => {
-    fetch('/api/verificacion/dni/')
-      .then((r) => {
-        if (r.ok) return r.json()
-        // 404 es normal: todavía no hizo ningún intento.
-        if (r.status !== 404) setError('No pudimos cargar tu último intento, pero puedes verificar tu DNI.')
-        return null
-      })
-      .then((cuerpo) => {
-        setIntento(cuerpo)
-        setPaso(cuerpo ? 'resultado' : 'anverso')
-      })
-      .catch(() => {
-        setError('No hay conexión con el servidor. Revisa tu internet.')
-        setPaso('anverso')
-      })
+    const guardadas = urls.current
+    return () => { guardadas.forEach((url) => URL.revokeObjectURL(url)); guardadas.clear() }
   }, [])
 
+  useEffect(() => {
+    const abort = new AbortController()
+    const cargar = async () => {
+      try {
+        const permiso = await fetch('/api/verificacion/consentimiento/', { signal: abort.signal })
+        if (!permiso.ok) throw new Error('No pudimos consultar tu consentimiento. Revisa tu sesión e inténtalo de nuevo.')
+        const consentimiento = comprobarEstadoConsentimiento(await permiso.json())
+        if (consentimiento.eliminacion_pendiente === true) {
+          setPaso('eliminacion')
+          return
+        }
+        if (consentimiento.vigente === false) {
+          navegar('/consentimiento', { replace: true })
+          return
+        }
+        if (revision > 0) { setPaso('anverso'); return }
+        const r = await fetch('/api/verificacion/dni/', { signal: abort.signal })
+        if (r.status === 404) { setPaso('anverso'); return }
+        if (!r.ok) throw new Error('No pudimos consultar tu último intento. Inténtalo de nuevo.')
+        setIntento(await r.json())
+        setPaso('resultado')
+      } catch (e) {
+        if (e.name !== 'AbortError') {
+          setError(e instanceof TypeError ? 'No hay conexión con el servidor. Revisa tu internet.' : e.message)
+          setPaso('error')
+        }
+      }
+    }
+    cargar()
+    return () => abort.abort()
+  }, [navegar, revision])
+
   const guardarFoto = (lado, blob) => {
+    if (!blob) { setError('No pudimos capturar la imagen. Inténtalo de nuevo.'); return }
     setError('')
-    setFotos((antes) => ({ ...antes, [lado]: { blob, url: URL.createObjectURL(blob) } }))
+    if (fotos[lado]) { URL.revokeObjectURL(fotos[lado].url); urls.current.delete(fotos[lado].url) }
+    const url = URL.createObjectURL(blob)
+    urls.current.add(url)
+    setFotos((antes) => ({ ...antes, [lado]: { blob, url } }))
     setPaso(lado === 'anverso' ? 'reverso' : 'enviar')
   }
 
   const repetir = (lado) => {
     setFotos((antes) => {
       URL.revokeObjectURL(antes[lado].url)
+      urls.current.delete(antes[lado].url)
       const resto = { ...antes }
       delete resto[lado]
       return resto
@@ -171,14 +206,21 @@ function VerificarDni() {
     setPaso(lado)
   }
 
-  const reintentar = () => {
-    Object.values(fotos).forEach((f) => URL.revokeObjectURL(f.url))
+  const limpiarFotos = () => {
+    urls.current.forEach((url) => URL.revokeObjectURL(url))
+    urls.current.clear()
     setFotos({})
+  }
+
+  const reintentar = () => {
+    limpiarFotos()
     setError('')
-    setPaso('anverso')
+    setPaso('cargando')
+    setRevision((r) => r + 1)
   }
 
   const enviar = async () => {
+    let permisoComprobado = false
     setPaso('enviando')
     setError('')
     const datos = new FormData()
@@ -186,20 +228,53 @@ function VerificarDni() {
       datos.append(lado, fotos[lado].blob, `${lado}.${fotos[lado].blob.type === 'image/png' ? 'png' : 'jpg'}`)
     }
     try {
+      const permiso = await fetch('/api/verificacion/consentimiento/')
+      if (!permiso.ok) throw new Error('No pudimos comprobar tu consentimiento.')
+      const consentimiento = comprobarEstadoConsentimiento(await permiso.json())
+      if (consentimiento.eliminacion_pendiente === true) {
+        limpiarFotos()
+        setPaso('eliminacion')
+        return
+      }
+      if (consentimiento.vigente === false) { navegar('/consentimiento', { replace: true }); return }
+      permisoComprobado = true
       const respuesta = await fetch('/api/verificacion/dni/', {
         method: 'POST',
         headers: { 'X-CSRFToken': leerCookie('csrftoken') },
         body: datos,
       })
       const cuerpo = await respuesta.json().catch(() => ({}))
+      if (respuesta.status === 409) {
+        limpiarFotos()
+        setPaso('eliminacion')
+        return
+      }
       if (respuesta.ok) {
         setIntento(cuerpo)
         setPaso('resultado')
         return
       }
+      if (respuesta.status === 403) {
+        permisoComprobado = false
+        const actual = await fetch('/api/verificacion/consentimiento/')
+        if (!actual.ok) throw new Error('No pudimos comprobar tu consentimiento.')
+        const estado = comprobarEstadoConsentimiento(await actual.json())
+        if (estado.eliminacion_pendiente === true) {
+          limpiarFotos()
+          setPaso('eliminacion')
+          return
+        }
+        if (estado.vigente === false) { navegar('/consentimiento', { replace: true }); return }
+        permisoComprobado = true
+      }
       setError(mensajeDeError(respuesta.status, cuerpo))
-    } catch {
-      setError('No hay conexión con el servidor. Inténtalo de nuevo.')
+    } catch (e) {
+      setError(e.message || 'No hay conexión con el servidor. Inténtalo de nuevo.')
+      if (!permisoComprobado) {
+        limpiarFotos()
+        setPaso('error')
+        return
+      }
     }
     setPaso('enviar')
   }
@@ -209,6 +284,14 @@ function VerificarDni() {
       <h2>Verificar mi DNI</h2>
 
       {paso === 'cargando' && <p role="status">Cargando…</p>}
+      {paso === 'eliminacion' && <div role="alert"><p>Tu captura está bloqueada por una solicitud de eliminación. No se enviarán nuevas fotografías.</p><Link to="/eliminar-datos">Consultar eliminación</Link></div>}
+      {paso === 'error' && (
+        <div>
+          <p className="error caja" role="alert">{error}</p>
+          <button type="button" onClick={reintentar}>Reintentar consulta</button>
+          <Link to="/consentimiento">Consultar consentimiento</Link>
+        </div>
+      )}
 
       {(paso === 'anverso' || paso === 'reverso') && (
         <>

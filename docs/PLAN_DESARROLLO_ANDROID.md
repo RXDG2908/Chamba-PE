@@ -8,7 +8,7 @@
 | Fecha de elaboración | 07/11/2026; no constituye una fecha de inicio de implementación |
 | Equipo revisor | David Valcarcel, Renzo León y Luis Abad |
 | Estado | **PENDIENTE DE APROBACIÓN DEL EQUIPO** |
-| Ubicación futura del proyecto | `mobile/android/` |
+| Ubicación del proyecto | `app-movil/` (antes `mobile/android/`) |
 | Alcance de esta entrega | Planificación; no crea el proyecto Android ni implementa servicios |
 
 > Este documento propone cómo desarrollar Android. No declara aprobados el reparto,

@@ -4,7 +4,8 @@ import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 
 const frontend = path.dirname(fileURLToPath(import.meta.url))
-const root = path.dirname(frontend)
+// Django vive en backend/django (estructura del 17/11).
+const root = path.resolve(frontend, '../backend/django')
 const python = process.env.HU7_TEST_PYTHON
 if (!python) throw new Error('Define HU7_TEST_PYTHON con un intérprete que tenga requirements.txt instalado.')
 

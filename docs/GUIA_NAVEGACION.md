@@ -1,5 +1,7 @@
 # Guía de navegación — comprobar las tareas hechas hasta hoy
 
+> **Estructura del 17/11/2026:** la web está en `web-portal/` y Django en `backend/django/`. Los comandos `python manage.py ...` se ejecutan dentro de `backend/django/`, con el entorno virtual de la raíz activado.
+
 Recorrido paso a paso para comprobar, en el navegador y en la terminal, cada tarea terminada del Sprint 1 y la T7.3 del Sprint 2. Cada paso indica la tarea que comprueba y el resultado esperado; marca la casilla cuando lo veas.
 
 Estado al 22/10/2026: rama `feature/t7.3-pruebas-radio`, `python manage.py test` con **70 de 70 OK**.
@@ -35,12 +37,12 @@ python manage.py runserver
 **Terminal 2: React + Vite (puerto 5173)**
 
 ```powershell
-cd frontend
+cd web-portal
 npm install
 npm run dev
 ```
 
-> La app de React está en `frontend/`. El `src/` de la raíz es una copia antigua y no se usa.
+> La app de React está en `web-portal/`.
 
 - [ ] http://127.0.0.1:8000/admin/ abre el admin de Django.
 - [ ] http://localhost:5173/ muestra el menú **Registro de prestador · Resultados · Cargar certificado**.

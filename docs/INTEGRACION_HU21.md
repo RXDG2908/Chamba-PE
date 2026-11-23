@@ -1,5 +1,7 @@
 # HU-21: preparación independiente de integración
 
+> **Estructura del 17/11/2026:** la web está en `web-portal/` y Django en `backend/django/`. Los comandos `python manage.py ...` se ejecutan dentro de `backend/django/`, con el entorno virtual de la raíz activado.
+
 Corte: 12/11/2026 (Lima). Rama feature/hu21-publicacion, worktree
 Chamba-PE-hu21-publicacion. Base origin/main: `3a373b51d70779703c73ab345b885878002f3cde`.
 Origen de los cambios: feature/hu21-consentimiento-eliminacion, HEAD `5f510c7`,
@@ -56,10 +58,11 @@ En un entorno Python aislado con requirements.txt instalado:
 ~~~powershell
 $env:PYTHONDONTWRITEBYTECODE='1'
 $env:FCM_ENABLED='false'
+cd backend/django
 python manage.py test --noinput
 python manage.py check
 python manage.py makemigrations --check --dry-run
-cd frontend
+cd ../../web-portal
 npm ci
 npx playwright install chromium
 npm run test:hu21

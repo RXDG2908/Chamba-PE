@@ -1,6 +1,9 @@
 r"""Reproduce T4.3 in an isolated archive; never merges or uses local DB/media.
 
 Run from the repository root: .\venv\Scripts\python.exe docs/pruebas_T4_3.py
+
+Histórico (Sprint 1): reproduce commits anteriores a la estructura del 17/11,
+por eso sus rutas (prestadores/, frontend/, db.sqlite3) son las de la raíz antigua.
 """
 import ast
 from hashlib import sha256

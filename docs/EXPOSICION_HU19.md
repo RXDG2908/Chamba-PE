@@ -1,5 +1,7 @@
 # Exposición de HU-19 · Escaneo y validación del DNI
 
+> **Estructura del 17/11/2026:** la web está en `web-portal/` y Django en `backend/django/`. Los comandos `python manage.py ...` se ejecutan dentro de `backend/django/`, con el entorno virtual de la raíz activado.
+
 Guía de Renzo León para exponer su parte del Sprint 3 (T19.1, T19.2 y T19.3, 9 h). Dura unos 10 minutos más preguntas.
 
 ## 1. La idea en una frase
@@ -63,7 +65,7 @@ venv/Scripts/python.exe manage.py runserver 8000
 
 ```bash
 # Terminal 2 · frontend
-npm --prefix frontend run dev -- --port 5173 --strictPort
+npm --prefix web-portal run dev -- --port 5173 --strictPort
 ```
 
 - [ ] Una cuenta de **prestador** con DNI `12345678` (o `87654321`): son los DNIs de la tabla simulada. Contraseña conocida.
@@ -121,12 +123,12 @@ Qué es la MRZ: las 3 líneas con `<<<` en el reverso del DNI (estándar ICAO 93
 - `AlmacenPrivado` (10): guarda en `privado/`, **fuera de `/media/`**. Django publica todo `/media/` en desarrollo; una subcarpeta habría quedado visible sin sesión.
 - `eliminar_datos_biometricos` (54): borra fotos y datos leídos y deja solo resultado, motivos y fecha (Ley 29733); lo usará HU-21 de Luis.
 
-### 6.7 `frontend/src/VerificarDni.jsx` — la pantalla (T19.1)
+### 6.7 `web-portal/src/VerificarDni.jsx` — la pantalla (T19.1)
 - `Camara` (36): `getUserMedia` con cámara trasera y marco guía; si no hay permiso, `<input capture="environment">`.
 - `VerificarDni` (134): pasos frente → reverso → vista previa con «Repetir» → «Enviar para validar».
 - `Resultado` (105): «DNI validado» o «En revisión manual» con los motivos en palabras simples.
 - `mensajeDeError` (21): un mensaje claro para cada error del servidor.
-- Ruta y enlace en `frontend/src/App.jsx` (líneas 64 y 92): solo se ve para el rol prestador.
+- Ruta y enlace en `web-portal/src/App.jsx` (líneas 64 y 92): solo se ve para el rol prestador.
 
 ### 6.8 `verificacion/consentimiento.py` — el enganche con Luis
 - `tiene_consentimiento(prestador)` devuelve `True` hasta que Luis (HU-21) la reemplace. Muestra cómo dos personas conectan su trabajo con un contrato.

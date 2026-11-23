@@ -1,5 +1,7 @@
 # Eliminación de datos de verificación del DNI · T21.2
 
+> **Estructura del 17/11/2026:** la web está en `web-portal/` y Django en `backend/django/`. Los comandos `python manage.py ...` se ejecutan dentro de `backend/django/`, con el entorno virtual de la raíz activado.
+
 Implementación **local para revisión**, 05/11/2026, sobre #28 `5f510c7` y T21.1 reconciliada. Sin commit, push, PR ni integración. No constituye aprobación legal del texto provisional ni cierre de HU-21.
 
 ## Alcance conservador

@@ -1,5 +1,7 @@
 # Validación local T21.2 · 05/11/2026
 
+> **Estructura del 17/11/2026:** la web está en `web-portal/` y Django en `backend/django/`. Los comandos `python manage.py ...` se ejecutan dentro de `backend/django/`, con el entorno virtual de la raíz activado.
+
 Worktree Chamba-PE-hu21-preparacion, rama feature/hu21-consentimiento-eliminacion, HEAD `5f510c7`. Conserva T21.1 reconciliada y #28; sin commit, push, merge ni PR en esta etapa. [Contrato implementado](API_ELIMINACION_DNI.md).
 
 ## Resultado final

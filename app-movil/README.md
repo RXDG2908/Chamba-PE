@@ -7,7 +7,7 @@ con un único módulo `app` y arquitectura MVVM.
 > del **prestador** se probaron en un emulador (API 36) contra Django local y el proyecto Firebase
 > real. **No se probó** en un teléfono físico ni la lectura real de la ubicación (el emulador no la
 > entregó). El enfoque (API Django + Firebase, en lugar del backend Spring del
-> [plan Android](../../docs/PLAN_DESARROLLO_ANDROID.md)) está **pendiente de acuerdo con el equipo**.
+> [plan Android](../docs/PLAN_DESARROLLO_ANDROID.md)) está **pendiente de acuerdo con el equipo**.
 
 ## Qué hace
 
@@ -65,7 +65,7 @@ Los ViewModel dependen de las interfaces, no de Retrofit ni de Firebase; por eso
 
 ## Comandos
 
-Desde `mobile/android/`:
+Desde `app-movil/`:
 
 ```bash
 ./gradlew assembleDebug        # compila el APK de depuración
@@ -97,7 +97,7 @@ Para las funciones que viven en Django (hoy, la disponibilidad) la app envía
    de su cuenta (se ve en Firebase → Authentication, o es el ID de su documento en `usuarios`).
 
 Sin ese vínculo la pantalla muestra «Tu cuenta de la app aún no está vinculada».
-Detalle en [`docs/API_AUTENTICACION.md`](../../docs/API_AUTENTICACION.md).
+Detalle en [`docs/API_AUTENTICACION.md`](../docs/API_AUTENTICACION.md).
 
 Un prestador que se registra **desde la app** ya queda vinculado en Django. Sigue haciendo falta
 un vínculo manual: `prestadorId` en Firestore, para su bandeja. Un prestador creado **en la web**

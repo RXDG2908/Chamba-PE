@@ -2,7 +2,7 @@
 
 **Preparado por:** Renzo León (Scrum Master) el 16/11/2026 · **Estado:** 🟡 propuesta, se confirma con el equipo en el Daily del 17/11.
 
-Compara el [plan Android](PLAN_DESARROLLO_ANDROID.md) (21 tarjetas `AND-*`, de Luis) con lo que hay en `mobile/android/` en el [PR #39](https://github.com/RXDG2908/Chamba-PE/pull/39). Detalle técnico de la app en su [README](../mobile/android/README.md).
+Compara el [plan Android](PLAN_DESARROLLO_ANDROID.md) (21 tarjetas `AND-*`, de Luis) con lo que hay en `app-movil/` (antes `mobile/android/`) en el [PR #39](https://github.com/RXDG2908/Chamba-PE/pull/39). Detalle técnico de la app en su [README](../app-movil/README.md).
 
 > **Actualización del 16/11 (tarde):** el PR #39 **ya está unido a `main`**. Lo unió Renzo para no frenar el trabajo, después de una revisión automática (250 pruebas de Django OK, 19 pruebas de Android OK, lint sin errores, sin secretos en el diff) y **sin revisión de Luis ni David**. La revisión de la parte A sigue pendiente, ahora sobre `main`: lo que encuentren entra como PR de corrección. La revisión automática dejó tres observaciones, ninguna bloqueante:
 >

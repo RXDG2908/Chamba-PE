@@ -19,7 +19,8 @@ Proyecto Integrador — Diseño y Desarrollo de Software · IV ciclo · Tecsup 2
 | [docs/sprint4-reparto.md](docs/sprint4-reparto.md) | Reparto propuesto del Sprint 4 y pendientes de sprints anteriores  |
 | [docs/android-reparto.md](docs/android-reparto.md) | App Android: qué falta del plan y reparto propuesto |
 | [docs/PLAN_DESARROLLO_ANDROID.md](docs/PLAN_DESARROLLO_ANDROID.md) | Plan de la app Android (propuesta de Luis, pendiente de aprobación) |
-| [mobile/android/README.md](mobile/android/README.md) | App Android: qué hace, cómo compilarla y cómo conectarla a Django y Firebase |
+| [app-movil/README.md](app-movil/README.md) | App Android: qué hace, cómo compilarla y cómo conectarla al backend y a Firebase |
+| [backend/spring/README.md](backend/spring/README.md) | Backend de usuario con Spring Boot: alcance y cómo se conecta a la base compartida |
 | [docs/API_AUTENTICACION.md](docs/API_AUTENTICACION.md) | Autenticación con roles (HU-5): rutas, sesión y CSRF, roles, permisos y token de Firebase para la app móvil |
 | [docs/API_BUSQUEDA.md](docs/API_BUSQUEDA.md) | Búsqueda de prestadores (HU-3 y HU-7): parámetros, respuesta y ejemplos |
 | [docs/API_VERIFICACION_DNI.md](docs/API_VERIFICACION_DNI.md) | Escaneo y validación del DNI (HU-19): MRZ, validador intercambiable y revisión manual |
@@ -34,13 +35,13 @@ Proyecto Integrador — Diseño y Desarrollo de Software · IV ciclo · Tecsup 2
 
 ## Estado del proyecto
 
-**Al 16/11/2026 · Sprint 4 en curso (12/11 – 25/11), día 3 de 10.** El detalle diario está en [AVANCES.md](AVANCES.md).
+**Al 21/11/2026 · Sprint 4 en curso (12/11 – 25/11), día 7 de 10.** El detalle diario está en [AVANCES.md](AVANCES.md).
 
 | Sprint | Resultado |
 |:---:|---|
 | 1 | ✅ Cerrado: HU-1 a HU-4 completas (26 de 30 h en el sprint; el resto se unió el 18/10) |
 | 2 | ✅ Cerrado: HU-5, HU-6 y HU-9 completas (15 de 23 h); HU-7 se unió el 04/11 |
-| 3 | 🟡 Sin cierre formal: HU-19 construida (falta su prueba T19.4), HU-8 en `main` (falta la validación T8.3), HU-21 en revisión ([PR #38](https://github.com/RXDG2908/Chamba-PE/pull/38)); HU-13 y HU-20 postergadas |
+| 3 | 🟡 Sin cierre formal: HU-19 construida (falta su prueba T19.4), HU-8 en `main` (falta la validación T8.3), HU-21 en `main` ([PR #38](https://github.com/RXDG2908/Chamba-PE/pull/38), unido el 21/11); HU-13 y HU-20 postergadas |
 | 4 | 🟡 HU-10, HU-11 y HU-12 sin empezar; [reparto propuesto](docs/sprint4-reparto.md), por confirmar el 17/11 |
 
 | Historia | Estado |
@@ -49,7 +50,7 @@ Proyecto Integrador — Diseño y Desarrollo de Software · IV ciclo · Tecsup 2
 | HU-5 Cuentas y roles · HU-6 Disponibilidad · HU-7 Mapa · HU-9 Revisión por el administrador | ✅ En `main` |
 | HU-8 Notificaciones push | 🟡 En `main`; falta validar la entrega real en menos de 5 s (T8.3) |
 | HU-19 Escaneo del DNI | 🟡 En `main`; faltan las pruebas con muestras (T19.4) y con cámara y OCR reales |
-| HU-21 Consentimiento y eliminación de datos | 🟡 Construida, en revisión (PR #38) |
+| HU-21 Consentimiento y eliminación de datos | 🟡 En `main` (PR #38, 21/11); la eliminación se atiende con el comando manual `procesar_eliminaciones_dni` |
 | HU-10 Recomendación · HU-11 Seguimiento · HU-12 Calificación | ⚪ Sin empezar (Sprint 4) |
 | HU-13 Suspensión y bloqueo · HU-20 Reconocimiento facial | ⚪ Postergadas, sin sprint asignado |
 | App Android | 🟡 Primera versión en `main` ([PR #39](https://github.com/RXDG2908/Chamba-PE/pull/39), unido el 16/11 sin revisión de otro integrante); [falta](docs/android-reparto.md) probarla en teléfono físico y 10 tarjetas del plan; fuera del compromiso de los sprints |
@@ -130,9 +131,20 @@ Capacidad: 30 h por sprint (3 integrantes × 10 h) · 114 h planificadas. Detall
 
 ## Arquitectura
 
+Dos módulos que comparten una sola base de datos:
+
+| Módulo | Front end | Back end | Carpeta |
+|---|---|---|---|
+| **Administración** | Web React | Django | `web-portal/` · `backend/django/` |
+| **Usuario** (cliente y prestador) | Móvil Kotlin y web React | Spring Boot | `app-movil/` · `web-portal/` · `backend/spring/` |
+| **Base de datos** | — | PostgreSQL compartido (pendiente; hoy Django usa SQLite local): Django será el dueño de las tablas (migraciones) y Spring Boot solo las usará | configuración por variables de entorno |
+
+El web de administración y el de usuario son una sola aplicación React (`web-portal/`) con menú y rutas según el rol.
+
 | Capa | Tecnología |
 |---|---|
-| Backend | API REST con Django + Django REST Framework |
+| Backend de administración | API REST con Django + Django REST Framework (`backend/django/`) |
+| Backend de usuario | Spring Boot (`backend/spring/`), en construcción |
 | Frontend web | React + Vite (aplicación responsiva y panel de administración) |
 | App móvil | Android nativo: Kotlin, Jetpack Compose y MVVM, con Retrofit, Room y Firebase (Auth y Firestore). Primera versión en `main`; el enfoque está pendiente de acuerdo del equipo |
 | Tiempo real | WebSocket (Django Channels) — previsto para HU-11, aún sin implementar |
@@ -144,26 +156,41 @@ Capacidad: 30 h por sprint (3 integrantes × 10 h) · 114 h planificadas. Detall
 
 ```
 Chamba-PE/
-├── core/               Configuración de Django (settings, urls)
-├── prestadores/        Prestador, rubros, cobertura, registro (web y móvil) y búsqueda (HU-1, HU-3)
-├── servicios/          Solicitudes de servicio y notificaciones push (HU-4, HU-7, HU-8)
-├── usuarios/           Cuentas, inicio de sesión, roles y disponibilidad (HU-5, HU-6)
-├── certificaciones/    Carga de certificaciones PDF/JPG ≤ 5 MB (HU-2)
-├── administracion/     Revisión de documentos por el administrador (HU-9)
-├── verificacion/       Escaneo y validación del DNI (HU-19)
-├── frontend/           Web React + Vite: portada, cuentas, búsqueda con mapa, solicitudes,
-│                       disponibilidad, certificados, verificación del DNI y panel de revisión
-├── mobile/android/     App Android (Kotlin + Compose)
-├── docs/               Contratos de API, guías, Lab 07 y maquetas (docs/renders/)
-├── src/                Proyecto React inicial de la raíz; la web vigente está en frontend/
-├── manage.py
-├── requirements.txt    Dependencias de Python
-└── package.json
+├── app-movil/              App Android (Kotlin + Compose)                   → Front End Móvil
+├── web-portal/             Web React + Vite: portada, cuentas, búsqueda con mapa, solicitudes,
+│                           disponibilidad, certificados, verificación del DNI y panel de revisión
+│                                                                            → Front End Web
+├── backend/
+│   ├── django/             Back End de administración (y API actual)        → Back End Django
+│   │   ├── core/               Configuración de Django (settings, urls)
+│   │   ├── prestadores/        Prestador, rubros, cobertura, registro y búsqueda (HU-1, HU-3)
+│   │   ├── servicios/          Solicitudes y notificaciones push (HU-4, HU-7, HU-8)
+│   │   ├── usuarios/           Cuentas, inicio de sesión, roles y disponibilidad (HU-5, HU-6)
+│   │   ├── certificaciones/    Carga de certificaciones PDF/JPG ≤ 5 MB (HU-2)
+│   │   ├── administracion/     Revisión de documentos por el administrador (HU-9)
+│   │   ├── verificacion/       Escaneo del DNI, consentimiento y eliminación de datos (HU-19, HU-21)
+│   │   ├── tools/              Scripts de apoyo a las pruebas
+│   │   ├── manage.py
+│   │   └── requirements.txt    Dependencias de Python
+│   └── spring/             Back End de usuario                              → Back End Spring Boot
+├── docs/                   Contratos de API, guías, evidencias, Lab 07 y maquetas (docs/renders/)
+├── .github/CODEOWNERS      Revisor automático de cada carpeta
+└── AVANCES.md · SPRINTS.md · TABLERO.md · PLAN_EQUIPO.md · README.md
 ```
+
+**Estructura desde el 17/11/2026.** Los registros anteriores (AVANCES, informes de pruebas y guías de sprints pasados) conservan las rutas de entonces:
+
+| Ruta anterior | Ruta actual |
+|---|---|
+| `core/`, `prestadores/`, `servicios/`, `usuarios/`, `certificaciones/`, `administracion/`, `verificacion/`, `tools/`, `manage.py`, `requirements.txt`, `.env.example` | `backend/django/...` |
+| `frontend/` | `web-portal/` |
+| `mobile/android/` | `app-movil/` |
+| `evidencia_rendimiento.txt` | `docs/evidencia_rendimiento.txt` |
+| `src/`, `public/`, `index.html`, `package.json`, `vite.config.js` (React inicial de la raíz) | Eliminados: la web vigente es `web-portal/` |
 
 ## Cómo ejecutarlo
 
-**Backend (Django)** — requiere Python 3.10 o superior:
+**Backend (Django)** — requiere Python 3.10 o superior. El entorno virtual se crea en la raíz del repositorio y los comandos de Django se ejecutan dentro de `backend/django/`:
 
 ```bash
 python -m venv venv
@@ -171,6 +198,10 @@ python -m venv venv
 
 ```bash
 venv\Scripts\activate
+```
+
+```bash
+cd backend/django
 ```
 
 ```bash
@@ -201,6 +232,8 @@ La API queda en `http://127.0.0.1:8000/` y el panel de Django en `/admin/`.
 | `POST /api/certificaciones/upload/` | Carga de certificaciones; requiere sesión del prestador (HU-2) |
 | `/api/administracion/revisiones/` | El administrador lista, aprueba o rechaza documentos (HU-9) |
 | `POST` · `GET /api/verificacion/dni/` | El prestador envía las fotos de su DNI y consulta el resultado (HU-19); [contrato](docs/API_VERIFICACION_DNI.md) |
+| `GET` · `POST /api/verificacion/consentimiento/` · `POST .../consentimiento/revocar/` | El prestador consulta, acepta o revoca su consentimiento; sin él no se captura el DNI (HU-21); [contrato](docs/API_CONSENTIMIENTO.md) |
+| `GET` · `POST /api/verificacion/eliminaciones/` · `.../<uuid>/` · `.../<uuid>/reintentar/` | El prestador solicita, consulta y reintenta la eliminación de sus datos del DNI (HU-21); [contrato](docs/API_ELIMINACION_DNI.md) |
 | `GET /api/usuarios/csrf/` | Deja la cookie `csrftoken` para los `POST` desde React (HU-5) |
 | `POST /api/usuarios/registro/` | Registro del cliente; queda con la sesión iniciada (HU-5) |
 | `POST /api/usuarios/login/` · `.../logout/` | Inicio de sesión con usuario o correo, y cierre de sesión (HU-5) |
@@ -213,7 +246,7 @@ Pruebas del backend:
 python manage.py test
 ```
 
-**Frontend (React + Vite)** — requiere Node.js 20 o superior. Dentro de `frontend/` (con Django corriendo; Vite redirige `/api` al puerto 8000):
+**Frontend (React + Vite)** — requiere Node.js 20 o superior. Dentro de `web-portal/` (con Django corriendo; Vite redirige `/api` al puerto 8000):
 
 ```bash
 npm install
@@ -225,13 +258,15 @@ npm run dev
 
 La web queda en `http://localhost:5173/`. Para comprobar cada función paso a paso, sigue la [guía de navegación](docs/GUIA_NAVEGACION.md).
 
-**App Android** — requiere JDK 17 o superior y el SDK de Android. Dentro de `mobile/android/`:
+**App Android** — requiere JDK 17 o superior y el SDK de Android. Dentro de `app-movil/`:
 
 ```bash
 ./gradlew assembleDebug
 ```
 
-Necesita `google-services.json` (no está en el repositorio) y Django corriendo; los pasos completos están en [mobile/android/README.md](mobile/android/README.md).
+Necesita `google-services.json` (no está en el repositorio) y el backend corriendo; los pasos completos están en [app-movil/README.md](app-movil/README.md).
+
+**Backend de usuario (Spring Boot)** — en construcción; ver [backend/spring/README.md](backend/spring/README.md).
 
 ### Para tener en cuenta
 

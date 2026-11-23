@@ -1,5 +1,7 @@
 # HU-8: entrega independiente para validación T8.3
 
+> **Estructura del 17/11/2026:** la web está en `web-portal/` y Django en `backend/django/`. Los comandos `python manage.py ...` se ejecutan dentro de `backend/django/`, con el entorno virtual de la raíz activado.
+
 Fecha: 12/11/2026 (Lima). Rama local: feature/hu8-publicacion.
 Base verificada por API GitHub y fetch: origin/main
 `ecd633438719b88bba13fe54407dd7c2f3bcc177`. Sin commits propios, push ni PR.
@@ -67,7 +69,7 @@ $env:FCM_ENABLED='false'
 .\venv\Scripts\python.exe manage.py showmigrations servicios
 .\venv\Scripts\python.exe manage.py test --noinput
 .\venv\Scripts\python.exe -m pip check
-cd frontend
+cd web-portal
 npm ci
 npx playwright install chromium
 npm run test:push
@@ -122,7 +124,7 @@ de prueba de nueve dígitos. No emplear DNI, fotos o datos personales reales.
 
 1. Acordar el proyecto de pruebas autorizado. Registrar/usar app web y configuración
    pública Firebase; habilitar FCM HTTP v1 y FCM Registration API según ese proyecto.
-2. Crear frontend/.env.local a partir de frontend/.env.example, sin sobrescribir
+2. Crear web-portal/.env.local a partir de web-portal/.env.example, sin sobrescribir
    uno existente. Completar API key/configuración web y clave VAPID **pública**.
    Todas las variables VITE_* terminan en el bundle: nunca poner claves privadas.
 3. El backend usa Application Default Credentials. Obtener acceso autorizado de
@@ -137,7 +139,7 @@ $env:GOOGLE_APPLICATION_CREDENTIALS='C:/credenciales/chamba-pruebas/firebase-ser
 .\venv\Scripts\python.exe manage.py runserver
 ~~~
 
-En otra terminal, frontend/: npm run dev. Usar http://localhost:5173 de manera
+En otra terminal, web-portal/: npm run dev. Usar http://localhost:5173 de manera
 consistente para cookies/permiso. Django no carga .env automáticamente: .env.example
 es una plantilla de variables de proceso. Reiniciar backend/Vite tras configurar.
 Backend, app web y VAPID deben corresponder al mismo proyecto. No hace falta Firebase

@@ -1,5 +1,7 @@
 # Validación local T21.1 · 03/11/2026
 
+> **Estructura del 17/11/2026:** la web está en `web-portal/` y Django en `backend/django/`. Los comandos `python manage.py ...` se ejecutan dentro de `backend/django/`, con el entorno virtual de la raíz activado.
+
 Rama feature/hu21-consentimiento-eliminacion, worktree independiente, base a6147de. Sin commit, push, merge ni PR. T21.2 no implementada.
 
 | Comprobación | Resultado |

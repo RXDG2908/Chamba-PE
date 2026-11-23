@@ -1,5 +1,7 @@
 # Diseño de T21.2: eliminación de datos de verificación del DNI
 
+> **Estructura del 17/11/2026:** la web está en `web-portal/` y Django en `backend/django/`. Los comandos `python manage.py ...` se ejecutan dentro de `backend/django/`, con el entorno virtual de la raíz activado.
+
 Fecha: 05/11/2026. Este documento conserva el diseño previo sobre PR #28 `5f510c7`. **Actualización:** T21.2 está implementada localmente para revisión, sin publicación; el [contrato actual](API_ELIMINACION_DNI.md) detalla la realización, las decisiones provisionales y sus límites. El historial por ejecución se registra en eventos y contador/token de la solicitud, sin una tabla separada de ejecuciones. Este documento no autoriza commit, publicación ni integración.
 
 ## 1. Alcance acordado

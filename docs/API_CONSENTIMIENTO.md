@@ -1,5 +1,7 @@
 # Consentimiento para verificación del DNI · T21.1
 
+> **Estructura del 17/11/2026:** la web está en `web-portal/` y Django en `backend/django/`. Los comandos `python manage.py ...` se ejecutan dentro de `backend/django/`, con el entorno virtual de la raíz activado.
+
 Implementación local de HU-21 sobre HU-19, base a6147de (#28, que contiene #27 actualizado).
 Texto de demostración provisional, pendiente de aprobación del PO: no acredita un consentimiento legal definitivo.
 

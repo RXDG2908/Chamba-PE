@@ -78,6 +78,7 @@ class BusquedaPrestadoresTests(TestCase):
         resultado = self.buscar().json()[0]
         self.assertEqual(set(resultado), {
             'id', 'nombres', 'apellidos', 'rubros', 'latitud', 'longitud', 'distancia_km',
+            'calificacion_promedio', 'calificaciones_total',  # HU-12: públicos, ayudan a decidir
         })
         self.assertEqual(resultado['rubros'], [{'id': self.rubro.id, 'nombre': self.rubro.nombre}])
         self.assertEqual(resultado['distancia_km'], 0)

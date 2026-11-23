@@ -55,10 +55,15 @@ class PrestadorBusquedaSerializer(serializers.ModelSerializer):
     latitud = serializers.FloatField(read_only=True)
     longitud = serializers.FloatField(read_only=True)
     distancia_km = serializers.FloatField(read_only=True)
+    # HU-12: null mientras no tenga calificaciones.
+    calificacion_promedio = serializers.FloatField(read_only=True, allow_null=True)
 
     class Meta:
         model = Prestador
-        fields = ['id', 'nombres', 'apellidos', 'rubros', 'latitud', 'longitud', 'distancia_km']
+        fields = [
+            'id', 'nombres', 'apellidos', 'rubros', 'latitud', 'longitud', 'distancia_km',
+            'calificacion_promedio', 'calificaciones_total',
+        ]
 
     def to_representation(self, instance):
         datos = super().to_representation(instance)

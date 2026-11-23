@@ -18,5 +18,6 @@
 /backend/django/servicios/          @Itssmann
 /backend/django/certificaciones/    @Davish-pxl
 /backend/django/administracion/     @Davish-pxl
+/backend/django/calificaciones/     @Davish-pxl
 /backend/django/core/               @RXDG2908 @Itssmann @Davish-pxl
 /backend/django/requirements.txt    @RXDG2908 @Itssmann @Davish-pxl

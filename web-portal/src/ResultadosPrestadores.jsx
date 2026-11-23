@@ -7,6 +7,15 @@ import SolicitudServicio from './SolicitudServicio.jsx'
 
 const LIMA = [-12.046374, -77.042793]
 const formatoDistancia = new Intl.NumberFormat('es-PE', { maximumFractionDigits: 2 })
+const formatoPromedio = new Intl.NumberFormat('es-PE', { minimumFractionDigits: 1, maximumFractionDigits: 1 })
+
+// HU-12: promedio y total de calificaciones; sin datos válidos se mantiene «Sin calificaciones».
+function textoCalificacion(prestador) {
+  const total = prestador.calificaciones_total
+  const promedio = prestador.calificacion_promedio
+  if (!Number.isInteger(total) || total < 1 || !Number.isFinite(promedio)) return 'Sin calificaciones'
+  return `★ ${formatoPromedio.format(promedio)} · ${total} ${total === 1 ? 'calificación' : 'calificaciones'}`
+}
 
 // Validar el contrato antes de renderizar tarjetas y marcadores con los mismos datos.
 function prestadorValido(prestador) {
@@ -82,7 +91,7 @@ function MarcadoresPrestadores({ prestadores }) {
                 <strong>{persona.nombres} {persona.apellidos}</strong>
                 <p>{persona.rubros.map((r) => r.nombre).join(' · ')}</p>
                 <p>{formatoDistancia.format(persona.distancia_km)} km</p>
-                <p>Sin calificaciones</p>
+                <p>{textoCalificacion(persona)}</p>
               </article>
             ))}
           </div>
@@ -294,7 +303,7 @@ function ResultadosPrestadores() {
                 <div className="perfil">
                   <h4>{prestador.nombres} {prestador.apellidos}</h4>
                   <p className="rubros-tarjeta">{prestador.rubros.map((especialidad) => especialidad.nombre).join(' · ')}</p>
-                  <p className="rubros-tarjeta">Sin calificaciones</p>
+                  <p className="rubros-tarjeta">{textoCalificacion(prestador)}</p>
                 </div>
                 <dl className="detalles">
                   <div><dt>Distancia</dt><dd>{formatoDistancia.format(prestador.distancia_km)} km</dd></div>

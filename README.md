@@ -144,7 +144,7 @@ El web de administración y el de usuario son una sola aplicación React (`web-p
 | Capa | Tecnología |
 |---|---|
 | Backend de administración | API REST con Django + Django REST Framework (`backend/django/`) |
-| Backend de usuario | Spring Boot (`backend/spring/`), en construcción |
+| Backend de usuario | Spring Boot 4.1 + Java 21 (`backend/spring/`), en construcción: rubros y búsqueda listos |
 | Frontend web | React + Vite (aplicación responsiva y panel de administración) |
 | App móvil | Android nativo: Kotlin, Jetpack Compose y MVVM, con Retrofit, Room y Firebase (Auth y Firestore). Primera versión en `main`; el enfoque está pendiente de acuerdo del equipo |
 | Tiempo real | WebSocket (Django Channels) — previsto para HU-11, aún sin implementar |
@@ -266,7 +266,7 @@ La web queda en `http://localhost:5173/`. Para comprobar cada función paso a pa
 
 Necesita `google-services.json` (no está en el repositorio) y el backend corriendo; los pasos completos están en [app-movil/README.md](app-movil/README.md).
 
-**Backend de usuario (Spring Boot)** — en construcción; ver [backend/spring/README.md](backend/spring/README.md).
+**Backend de usuario (Spring Boot)** — en construcción; ya responden rubros y búsqueda. Con Java 21: `cd backend/spring` y `.\mvnw spring-boot:run` (puerto 8080, lee la base de Django en solo lectura). Detalles en [backend/spring/README.md](backend/spring/README.md).
 
 ### Para tener en cuenta
 

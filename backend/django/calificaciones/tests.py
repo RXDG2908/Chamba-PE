@@ -1,5 +1,6 @@
 """Pruebas de HU-12: solo el cliente dueño califica, una vez, y solo con el servicio Finalizado."""
 from decimal import Decimal
+from unittest.mock import patch
 
 from django.contrib.auth import get_user_model
 from django.test import Client, TestCase
@@ -8,6 +9,7 @@ from django.urls import reverse
 from prestadores.models import Prestador, Rubro
 from servicios.models import Solicitud
 
+from . import servicio
 from .models import Calificacion
 from .servicio import actualizar_promedio
 
@@ -245,3 +247,79 @@ class PromedioTests(BaseCalificacion):
         self.prestador.refresh_from_db()
         self.assertIsNone(self.prestador.calificacion_promedio)
         self.assertEqual(self.prestador.calificaciones_total, 0)
+
+
+class PromedioConcurrenteTests(BaseCalificacion):
+    """Revisión de Luis en #42: dos clientes califican a la vez al mismo prestador."""
+
+    def test_bloquea_la_fila_del_prestador_antes_de_contar(self):
+        from django.db.models.query import QuerySet
+        original = QuerySet.select_for_update
+        bloqueados = []
+
+        def espiar(queryset, *args, **kwargs):
+            bloqueados.append(queryset.model)
+            return original(queryset, *args, **kwargs)
+
+        with patch.object(QuerySet, 'select_for_update', autospec=True, side_effect=espiar):
+            self.assertEqual(self.calificar(self.crear_solicitud().id, 4).status_code, 201)
+        self.assertIn(Prestador, bloqueados)
+
+    def test_cuenta_la_calificacion_que_otro_guardo_mientras_tanto(self):
+        # Simula el cruce: justo antes de recalcular, otra transacción ya guardó la suya.
+        otra = self.crear_solicitud(cliente=get_user_model().objects.create_user('beatriz'))
+        guardar = servicio._guardar_promedio
+
+        def con_otra_calificacion(prestador_id):
+            if not Calificacion.objects.filter(solicitud=otra).exists():
+                Calificacion.objects.create(solicitud=otra, prestador=self.prestador,
+                                            cliente=otra.cliente, estrellas=2)
+            guardar(prestador_id)
+
+        with patch.object(servicio, '_guardar_promedio', side_effect=con_otra_calificacion):
+            self.assertEqual(self.calificar(self.crear_solicitud().id, 5).status_code, 201)
+        self.prestador.refresh_from_db()
+        self.assertEqual((self.prestador.calificacion_promedio, self.prestador.calificaciones_total),
+                         (Decimal('3.50'), 2))
+
+
+class PromedioAlEliminarTests(BaseCalificacion):
+    """Revisión de Luis en #42: el promedio no queda viejo si una calificación se va en cascada."""
+
+    def setUp(self):
+        super().setUp()
+        self.otro_cliente = get_user_model().objects.create_user('beatriz')
+        self.calificar(self.crear_solicitud().id, 5)
+        self.solicitud_baja = self.crear_solicitud(cliente=self.otro_cliente)
+        self.calificar(self.solicitud_baja.id, 2, usuario=self.otro_cliente)
+        self.assertPromedio(Decimal('3.50'), 2)
+
+    def assertPromedio(self, promedio, total):
+        self.prestador.refresh_from_db()
+        self.assertEqual((self.prestador.calificacion_promedio, self.prestador.calificaciones_total),
+                         (promedio, total))
+
+    def test_al_eliminar_la_solicitud(self):
+        self.solicitud_baja.delete()
+        self.assertPromedio(Decimal('5.00'), 1)
+
+    def test_al_eliminar_el_usuario_del_cliente(self):
+        self.otro_cliente.delete()
+        self.assertPromedio(Decimal('5.00'), 1)
+
+    def test_al_eliminar_todas_queda_vacio(self):
+        Calificacion.objects.all().delete()
+        self.assertPromedio(None, 0)
+
+    def test_desde_el_admin(self):
+        admin = get_user_model().objects.create_superuser('admin_hu12', password=None)
+        self.client.force_login(admin)
+        calificacion = self.solicitud_baja.calificacion
+        r = self.client.post(reverse('admin:calificaciones_calificacion_delete', args=[calificacion.id]),
+                             {'post': 'yes'})
+        self.assertEqual(r.status_code, 302)
+        self.assertPromedio(Decimal('5.00'), 1)
+
+    def test_eliminar_al_prestador_no_falla(self):
+        self.prestador.delete()
+        self.assertFalse(Calificacion.objects.exists())

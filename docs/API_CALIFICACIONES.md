@@ -16,7 +16,7 @@ Implementación de T12.1 (API) y T12.2 (pantalla), David Valcarcel, 23/11/2026. 
 ## Cambios en modelos
 
 - `servicios.Solicitud`: nuevo `cliente` (FK a la cuenta, opcional) y el estado `finalizada` (migración `servicios.0003`).
-- `prestadores.Prestador`: `calificacion_promedio` (2 decimales, `null` sin calificaciones) y `calificaciones_total` (migración `prestadores.0003`). Se recalculan en la misma transacción en que se guarda cada calificación.
+- `prestadores.Prestador`: `calificacion_promedio` (2 decimales, `null` sin calificaciones) y `calificaciones_total` (migración `prestadores.0003`). Se recalculan en la misma transacción en que se guarda cada calificación, con la fila del prestador bloqueada: si dos clientes califican a la vez al mismo prestador, el segundo espera y cuenta también la del primero (PostgreSQL; en SQLite las escrituras ya van de una en una).
 - `calificaciones.Calificacion`: solicitud (única: una calificación por servicio), prestador, cliente, estrellas (1 a 5, también como restricción de la base) y comentario (hasta 500 caracteres, opcional).
 
 ## Endpoints
@@ -85,4 +85,4 @@ Las pruebas de `calificaciones/tests.py` (22) ya cubren las reglas del servidor;
 ## Límites
 
 - No hay pantalla pública con los comentarios: se guardan y se ven en `/admin/`, y la búsqueda muestra solo promedio y total.
-- El cliente no puede editar ni borrar su calificación. Si administración borra una desde `/admin/`, el promedio se recalcula.
+- El cliente no puede editar ni borrar su calificación. Si una calificación se elimina por cualquier vía (desde `/admin/`, o en cascada al eliminar la solicitud, el cliente o su usuario), el promedio se recalcula en la misma transacción (`calificaciones/senales.py`). Un borrado con SQL directo en la base, fuera de Django, no lo recalcula.

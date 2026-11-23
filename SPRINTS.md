@@ -11,7 +11,7 @@ Reglas de reparto y flujo de trabajo en [PLAN_EQUIPO.md](PLAN_EQUIPO.md). Detall
 | [1](#sprint-1--0110--14102026) | 01/10 – 14/10/2026 | HU-1 a HU-4 | 13 | 30 h | ✅ Cerrado (26 de 30 h) |
 | [2](#sprint-2--1510--28102026) | 15/10 – 28/10/2026 | HU-5 a HU-9 | 13 | 30 h | ✅ Cerrado el 28/10: 15 de 23 h (HU-5, HU-6 y HU-9 completas) |
 | [3](#sprint-3--2910--11112026) | 29/10 – 11/11/2026 | HU-19, HU-20, HU-21, HU-13 | 13 | 28 h | ⚪ Por planificar |
-| [4](#sprint-4--1211--25112026) | 12/11 – 25/11/2026 | HU-10, HU-11, HU-12 | 12 | 26 h | ⚪ Por planificar |
+| [4](#sprint-4--1211--25112026) | 12/11 – 25/11/2026 | HU-10, HU-11, HU-12 | 12 | 26 h | 🟡 Reparto propuesto el 16/11 (30 h con pendientes del S3) |
 | [—](#backlog-futuro) | — | HU-14 a HU-18 | 11 | 30 h | 📦 Backlog futuro |
 
 
@@ -376,6 +376,8 @@ Decisión del Product Owner del 28/10: HU-8 pasa completa porque T8.1 no se empe
 
 > ⚪ **Plantilla: por planificar en el Sprint Planning.** Las tareas y horas vienen del Lab 07; los responsables se asignan en la reunión.
 
+> 🟡 **Reparto propuesto por el Scrum Master (16/11), por confirmar en el Daily del 17/11:** [docs/sprint4-reparto.md](docs/sprint4-reparto.md). Renzo HU-10 (10 h) · Luis HU-11 y T12.3 (10 h) · David HU-12 y las pruebas T10.4, T11.3, T8.3 y T19.4 (10 h). Con T19.4 y T8.3, que pasan del Sprint 3, son **30 h sin holgura**. Al 16/11 no hay ninguna tarea empezada. La plantilla de abajo se completa cuando el equipo confirme.
+
 **Meta:** Recomendación con IA, seguimiento en tiempo real y calificación del servicio.
 
 | Story points | Horas | Capacidad | Holgura |
@@ -471,12 +473,12 @@ Los identificadores S3-MAPA-R, S3-MAPA-I y S3-CERT-16 son etiquetas de seguimien
 | Heredado con avance local | T8.1 + T8.2 · HU-8 | Completar escenarios, revisión y preparación de integración del backend push y frontend responsive existentes | Luis | 2 | 🟡 Local/parcial |
 | Heredado parcial | T8.3 · HU-8 | Validación cruzada de push real, repetición de medidas y evidencia; revisar base #22 | David | 2 | 🟡 Base de bandeja; push pendiente de validación |
 | Deuda heredada | S3-CERT-16 | Corregir carga de certificados: sesión, rol, propiedad desde el usuario, CSRF y regresiones; retirar expectedFailure cuando corresponda | David | 2 | Pendiente |
-| Nuevo | T19.1 · HU-19 | Pantalla de escaneo del DNI con cámara en React responsive | Renzo | 3 | Sin iniciar |
-| Nuevo | T19.2 · HU-19 | OCR: extraer número/nombres y recortar foto | Renzo | 4 | Sin iniciar |
-| Nuevo | T19.3 · HU-19 | Validador intercambiable, consulta a fuente y revisión manual ante fallo/no coincidencia | Renzo | 2 | Sin iniciar |
+| Nuevo | T19.1 · HU-19 | Pantalla de escaneo del DNI con cámara en React responsive | Renzo | 3 | ✅ Integrado (PR #27 y #28, 11/11) |
+| Nuevo | T19.2 · HU-19 | OCR: extraer número/nombres y recortar foto | Renzo | 4 | ✅ Integrado (PR #27 y #28, 11/11) |
+| Nuevo | T19.3 · HU-19 | Validador intercambiable, consulta a fuente y revisión manual ante fallo/no coincidencia | Renzo | 2 | ✅ Integrado (PR #27 y #28, 11/11) |
 | Nuevo | T19.4 · HU-19 | Pruebas cruzadas con muestras acordadas de lectura y coincidencia | Luis | 2 | Sin iniciar |
-| Nuevo | T21.1 · HU-21 | Pantalla de consentimiento y registro de aceptación | Luis | 1 | Sin iniciar |
-| Nuevo | T21.2 · HU-21 | Endpoint de solicitud de eliminación y trazabilidad de su atención | Luis | 1 | Sin iniciar |
+| Nuevo | T21.1 · HU-21 | Pantalla de consentimiento y registro de aceptación | Luis | 1 | ✅ Integrado (PR #38, 21/11) |
+| Nuevo | T21.2 · HU-21 | Endpoint de solicitud de eliminación y trazabilidad de su atención | Luis | 1 | ✅ Integrado (PR #38, 21/11) |
 | | | **Total de trabajo asignado** | | **24** | **3 integradas + 21 pendientes** |
 
 Reparto: Renzo construye HU-19 y Luis realiza T19.4; Luis construye HU-8/HU-21 y David valida T8.3 y revisa HU-21. David corrige certificados con revisión de Renzo por su propiedad sobre prestadores/permisos. Las revisiones de HU-19/HU-21 se organizan dentro de sus tareas y, si requieren capacidad adicional, se registra el uso de reserva sin inventar horas ya consumidas.
@@ -549,6 +551,14 @@ Estado inicial: **24 h asignadas; 3 h integradas, 21 h pendientes; 6 h de reserv
 | 29/10 | T7.3 / David | Integrado | PR #23 | 0 h | 0 h |
 | 29/10 | HU-8 / Luis y David | Local/parcial; validación cruzada e integración pendientes | Guía HU-8 y video; 1 ensayo ≈1,3 s | 4 h (2 + 2) | 0 h |
 | 29/10 | Resto del backlog | Planificado; sin cierre adicional registrado | Aprobación comunicada por Scrum Master | 17 h | 0 h |
+| 03/11 | S3-MAPA-R / David | Revisión de #14 → #16 hecha; comentarios por publicar; sigue S3-MAPA-I de Luis | 168 pruebas OK sobre `main` + #14 + #16; mapa probado en el navegador | 1 h hasta publicar la revisión | 0 h |
+| 03/11 | S3-CERT-16 / David | Corrección lista; PR por abrir y revisión de Renzo | `feature/s3-cert-16-carga-certificados`: 172 OK, sin `expectedFailure` | 2 h hasta unirse a `main` | 0 h |
+| 03/11 | T8.3 / David | 🔴 Bloqueada: rama de HU-8 sin publicar | — | 2 h | 0 h |
+| 05/11 | S3-MAPA-R / David | ✅ Revisión cerrada | #14 y #16 unidos el 04/11; #31 (3 decimales) | 0 h | 0 h |
+| 05/11 | S3-CERT-16 / David | ✅ Unida con #29; impedimento 16 cerrado | Aprobado por Renzo; 173 OK | 0 h | 0 h |
+| 05/11 | Menú por rol y diseño (fuera del backlog aprobado) / David | 🟡 PR #32 revisado por Renzo; por unir. Pendiente actualizar `GUIA_NAVEGACION.md` y `GUIA_T6.3.md` | Menú y rutas por rol, portada y tema; probado con los 4 roles | — | Por aprobar por SM/PO |
+| 12/11 | T19.1–T19.3 · HU-19 / Renzo | ✅ Contrato (#27) y lectura/validador/pantalla (#28) unidos a `main`; integrado `main` en la rama (conflictos en `App.jsx`, AVANCES y `.gitignore` resueltos); enlace «Verificar mi DNI» en el menú del prestador | 219 pruebas Django OK, lint y build OK | T19.4 (Luis), T21.1/T21.2 (Luis) y HU-8 siguen pendientes | 0 h |
+| 21/11 | T21.1 / T21.2 · HU-21 / Luis | ✅ #38 revisado y unido por David (choque solo en `README.md`) | 311 Django OK; Playwright HU-21 55/55, mapa 16/16 y HU-8 11/11 | T19.4 y T8.3 | 0 h |
 | Por registrar | Tarea / responsable | Avance, bloqueo y próximo paso | PR / prueba / evidencia | Actualizar | Registrar motivo y saldo |
 
 Los 0 h de reserva indican **sin consumo registrado**, no una medición de dedicación real. Registrar decisiones posteriores sin sobrescribir el historial.
@@ -563,7 +573,7 @@ La línea ideal es referencia de planificación para 24 h en 10 días hábiles; 
 | 1 · 29/10 | 21,6 | 21 | 3 | 6 |
 | 2 · 30/10 | 19,2 | — | — | — |
 | 3 · 02/11 | 16,8 | — | — | — |
-| 4 · 03/11 | 14,4 | — | — | — |
+| 4 · 03/11 | 14,4 | 21 | 3 | 6 |
 | 5 · 04/11 | 12 | — | — | — |
 | 6 · 05/11 | 9,6 | — | — | — |
 | 7 · 06/11 | 7,2 | — | — | — |

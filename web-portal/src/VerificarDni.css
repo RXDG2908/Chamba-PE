@@ -1,0 +1,19 @@
+.verificar-dni .visor { position: relative; width: 100%; aspect-ratio: 4 / 3; background: #20352a; border-radius: 12px; overflow: hidden; }
+.verificar-dni .visor video { width: 100%; height: 100%; object-fit: cover; }
+.marco-dni { position: absolute; inset: 12% 6%; border: 3px dashed #fff; border-radius: 10px; box-shadow: 0 0 0 999px #0005; pointer-events: none; }
+.verificar-dni .camara { display: grid; gap: 12px; margin-top: 12px; }
+.boton-principal { padding: 12px 18px; border: 0; border-radius: 999px; background: #16734f; color: #fff; font: inherit; font-weight: 700; cursor: pointer; }
+.boton-principal:disabled { opacity: 0.6; cursor: wait; }
+.boton-archivo { display: inline-block; padding: 12px 18px; border-radius: 999px; background: #16734f; color: #fff; font-weight: 700; cursor: pointer; }
+.boton-archivo input { position: absolute; opacity: 0; width: 1px; height: 1px; }
+.boton-archivo:focus-within { outline: 3px solid #16734f; outline-offset: 3px; }
+.vistas { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin: 12px 0; }
+.vistas figure { margin: 0; text-align: center; }
+.vistas img { width: 100%; border-radius: 8px; border: 1px solid #cbded3; }
+.vistas button, .resultado button:not(.boton-principal) { padding: 4px 12px; border: 1px solid #cbded3; border-radius: 999px; background: #fff; color: #20352a; font: inherit; cursor: pointer; }
+.resultado h3.ok { color: #16734f; }
+.resultado h3.revision { color: #8a6a10; }
+.lectura { display: grid; grid-template-columns: auto 1fr; gap: 4px 12px; margin: 12px 0; text-align: left; }
+.lectura dt { color: #58675f; }
+.lectura dd { margin: 0; font-weight: 600; }
+.motivos { text-align: left; color: #6b5413; }

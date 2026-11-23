@@ -1,0 +1,58 @@
+rules_version = '2';
+
+// Reglas de Chamba PE Android.
+// - usuarios/{uid}: cada persona lee y crea solo su propio perfil. El rol se fija al crear
+//   (cliente o prestador) y no se puede cambiar desde la app.
+// - solicitudes/{id}: la crea un cliente autenticado a su nombre; la leen el cliente que la
+//   creó y el prestador destinatario (por su ID de la API). Solo el prestador cambia el estado.
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function autenticado() {
+      return request.auth != null;
+    }
+
+    function perfil() {
+      return get(/databases/$(database)/documents/usuarios/$(request.auth.uid)).data;
+    }
+
+    match /usuarios/{uid} {
+      allow read: if autenticado() && request.auth.uid == uid;
+      allow create: if autenticado() && request.auth.uid == uid
+        && request.resource.data.rol in ['cliente', 'prestador']
+        // El vínculo con el prestador de la API (prestadorId) solo lo pone un administrador
+        // desde la consola: así nadie se atribuye las solicitudes de otro prestador.
+        && !('prestadorId' in request.resource.data)
+        && request.resource.data.nombre is string
+        && request.resource.data.nombre.size() > 0
+        && request.resource.data.nombre.size() <= 80;
+      allow update: if autenticado() && request.auth.uid == uid
+        && request.resource.data.rol == resource.data.rol
+        && request.resource.data.get('prestadorId', null) == resource.data.get('prestadorId', null);
+      allow delete: if false;
+    }
+
+    match /solicitudes/{id} {
+      allow create: if autenticado()
+        && request.resource.data.clienteUid == request.auth.uid
+        && perfil().rol == 'cliente'
+        && request.resource.data.estado == 'pendiente'
+        && request.resource.data.prestadorId is int
+        && request.resource.data.descripcion is string
+        && request.resource.data.descripcion.size() >= 10
+        && request.resource.data.descripcion.size() <= 500;
+      allow read: if autenticado() && (
+        resource.data.clienteUid == request.auth.uid
+        || (perfil().rol == 'prestador'
+            && perfil().get('prestadorId', null) == resource.data.prestadorId)
+      );
+      allow update: if autenticado()
+        && perfil().rol == 'prestador'
+        && perfil().get('prestadorId', null) == resource.data.prestadorId
+        && resource.data.estado == 'pendiente'
+        && request.resource.data.estado in ['aceptada', 'rechazada']
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['estado', 'respondidaEn']);
+      allow delete: if false;
+    }
+  }
+}

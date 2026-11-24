@@ -18,9 +18,11 @@ class TokenFCM(models.Model):
 class Solicitud(models.Model):
     class Estado(models.TextChoices):
         PENDIENTE = 'pendiente', 'Pendiente'
-        ACEPTADA = 'aceptada', 'Aceptada'
+        # HU-11: «aceptada» se muestra como «Confirmado», la primera etapa del seguimiento.
+        ACEPTADA = 'aceptada', 'Confirmado'
         RECHAZADA = 'rechazada', 'Rechazada'
-        # HU-12 solo necesita el estado final; HU-11 agrega los intermedios y quién los cambia.
+        EN_CAMINO = 'en_camino', 'En camino'
+        EN_SERVICIO = 'en_servicio', 'En servicio'
         FINALIZADA = 'finalizada', 'Finalizada'
 
     prestador = models.ForeignKey(Prestador, on_delete=models.CASCADE, related_name='solicitudes')
@@ -43,7 +45,7 @@ class Solicitud(models.Model):
         max_digits=9, decimal_places=6,
         validators=[MinValueValidator(-180), MaxValueValidator(180)],
     )
-    estado = models.CharField(max_length=10, choices=Estado.choices, default=Estado.PENDIENTE)
+    estado = models.CharField(max_length=20, choices=Estado.choices, default=Estado.PENDIENTE)
     creada = models.DateTimeField(auto_now_add=True)
     respondida = models.DateTimeField(null=True, blank=True)
 
@@ -53,3 +55,31 @@ class Solicitud(models.Model):
 
     def __str__(self):
         return f'Solicitud {self.id} a {self.prestador} ({self.get_estado_display()})'
+
+    # HU-11: el prestador asignado avanza el servicio solo en este orden, sin saltar ni retroceder.
+    # «rechazada» y «finalizada» son finales; «pendiente» se responde con aceptar/rechazar (HU-4).
+    SEGUIMIENTO = {
+        Estado.ACEPTADA: Estado.EN_CAMINO,
+        Estado.EN_CAMINO: Estado.EN_SERVICIO,
+        Estado.EN_SERVICIO: Estado.FINALIZADA,
+    }
+
+    @property
+    def siguiente_estado(self):
+        """Estado al que el prestador puede pasar la solicitud ahora, o None si no puede avanzarla."""
+        return self.SEGUIMIENTO.get(self.estado)
+
+
+class CambioEstado(models.Model):
+    """Historial de la solicitud (HU-11): cada cambio de estado con su fecha y hora."""
+    solicitud = models.ForeignKey(Solicitud, on_delete=models.CASCADE, related_name='historial')
+    estado = models.CharField(max_length=20, choices=Solicitud.Estado.choices)
+    fecha = models.DateTimeField()
+
+    class Meta:
+        ordering = ['fecha', 'id']
+        verbose_name = 'cambio de estado'
+        verbose_name_plural = 'cambios de estado'
+
+    def __str__(self):
+        return f'Solicitud {self.solicitud_id}: {self.get_estado_display()}'

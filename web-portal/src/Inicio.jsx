@@ -5,7 +5,7 @@ import './Inicio.css'
 // Botones de la portada según quién entra; coinciden con el menú de App.jsx.
 const ACCIONES_POR_ROL = {
   visitante: [['/resultados', 'Buscar un servicio'], ['/registro-prestador', 'Quiero ofrecer mis servicios']],
-  cliente: [['/resultados', 'Buscar un servicio']],
+  cliente: [['/resultados', 'Buscar un servicio'], ['/mis-servicios', 'Mis servicios']],
   prestador: [['/disponibilidad', 'Ver mi disponibilidad'], ['/certificaciones', 'Cargar un certificado']],
   administrador: [['/administracion/revisiones', 'Revisar documentos']],
 }

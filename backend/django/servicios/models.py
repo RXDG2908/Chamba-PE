@@ -20,10 +20,17 @@ class Solicitud(models.Model):
         PENDIENTE = 'pendiente', 'Pendiente'
         ACEPTADA = 'aceptada', 'Aceptada'
         RECHAZADA = 'rechazada', 'Rechazada'
+        # HU-12 solo necesita el estado final; HU-11 agrega los intermedios y quién los cambia.
+        FINALIZADA = 'finalizada', 'Finalizada'
 
     prestador = models.ForeignKey(Prestador, on_delete=models.CASCADE, related_name='solicitudes')
     rubro = models.ForeignKey(Rubro, on_delete=models.PROTECT, related_name='solicitudes')
-    # Datos de contacto del cliente; con el inicio de sesión (HU-5) se enlazará a su cuenta.
+    # Cuenta del cliente si envió la solicitud con sesión (HU-12: solo él puede calificarla).
+    cliente = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True,
+        related_name='solicitudes_enviadas',
+    )
+    # Datos de contacto del cliente, con o sin cuenta.
     cliente_nombre = models.CharField(max_length=100)
     cliente_telefono = models.CharField(max_length=20)
     descripcion = models.CharField(max_length=500)

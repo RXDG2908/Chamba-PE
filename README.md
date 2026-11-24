@@ -26,6 +26,7 @@ Proyecto Integrador — Diseño y Desarrollo de Software · IV ciclo · Tecsup 2
 | [docs/API_VERIFICACION_DNI.md](docs/API_VERIFICACION_DNI.md) | Escaneo y validación del DNI (HU-19): MRZ, validador intercambiable y revisión manual |
 | [docs/API_CONSENTIMIENTO.md](docs/API_CONSENTIMIENTO.md) | Consentimiento DNI versionado: aceptación, revocación y bloqueo de captura. |
 | [docs/API_ELIMINACION_DNI.md](docs/API_ELIMINACION_DNI.md) | Eliminación DNI: estados, reintentos, procesador y límites; pendiente de revisión. |
+| [docs/API_CALIFICACIONES.md](docs/API_CALIFICACIONES.md) | Calificación del servicio (HU-12): reglas, endpoints, promedio del prestador y cómo probarla |
 | [docs/HU8_NOTIFICACIONES.md](docs/HU8_NOTIFICACIONES.md) | Notificaciones push (HU-8): configuración de FCM y guion de la validación T8.3 |
 | [docs/GUIA_NAVEGACION.md](docs/GUIA_NAVEGACION.md) | Cómo comprobar en el navegador cada tarea terminada |
 | [docs/EXPOSICION_HU19.md](docs/EXPOSICION_HU19.md) · [docs/exposicion-renzo-sprint1-2.md](docs/exposicion-renzo-sprint1-2.md) | Guías de exposición y pruebas en vivo |
@@ -35,14 +36,14 @@ Proyecto Integrador — Diseño y Desarrollo de Software · IV ciclo · Tecsup 2
 
 ## Estado del proyecto
 
-**Al 21/11/2026 · Sprint 4 en curso (12/11 – 25/11), día 7 de 10.** El detalle diario está en [AVANCES.md](AVANCES.md).
+**Al 23/11/2026 · Sprint 4 en curso (12/11 – 25/11), día 8 de 10.** El detalle diario está en [AVANCES.md](AVANCES.md).
 
 | Sprint | Resultado |
 |:---:|---|
 | 1 | ✅ Cerrado: HU-1 a HU-4 completas (26 de 30 h en el sprint; el resto se unió el 18/10) |
 | 2 | ✅ Cerrado: HU-5, HU-6 y HU-9 completas (15 de 23 h); HU-7 se unió el 04/11 |
 | 3 | 🟡 Sin cierre formal: HU-19 construida (falta su prueba T19.4), HU-8 en `main` (falta la validación T8.3), HU-21 en `main` ([PR #38](https://github.com/RXDG2908/Chamba-PE/pull/38), unido el 21/11); HU-13 y HU-20 postergadas |
-| 4 | 🟡 HU-10, HU-11 y HU-12 sin empezar; [reparto propuesto](docs/sprint4-reparto.md), por confirmar el 17/11 |
+| 4 | 🟡 HU-12 construida (en revisión); HU-10 y HU-11 sin empezar; [reparto propuesto](docs/sprint4-reparto.md) |
 
 | Historia | Estado |
 |---|---|
@@ -51,7 +52,8 @@ Proyecto Integrador — Diseño y Desarrollo de Software · IV ciclo · Tecsup 2
 | HU-8 Notificaciones push | 🟡 En `main`; falta validar la entrega real en menos de 5 s (T8.3) |
 | HU-19 Escaneo del DNI | 🟡 En `main`; faltan las pruebas con muestras (T19.4) y con cámara y OCR reales |
 | HU-21 Consentimiento y eliminación de datos | 🟡 En `main` (PR #38, 21/11); la eliminación se atiende con el comando manual `procesar_eliminaciones_dni` |
-| HU-10 Recomendación · HU-11 Seguimiento · HU-12 Calificación | ⚪ Sin empezar (Sprint 4) |
+| HU-12 Calificación | 🟡 Construida, en revisión: el cliente con sesión califica de 1 a 5 estrellas cuando el servicio está Finalizado ([contrato](docs/API_CALIFICACIONES.md)) |
+| HU-10 Recomendación · HU-11 Seguimiento | ⚪ Sin empezar (Sprint 4) |
 | HU-13 Suspensión y bloqueo · HU-20 Reconocimiento facial | ⚪ Postergadas, sin sprint asignado |
 | App Android | 🟡 Primera versión en `main` ([PR #39](https://github.com/RXDG2908/Chamba-PE/pull/39), unido el 16/11 sin revisión de otro integrante); [falta](docs/android-reparto.md) probarla en teléfono físico y 10 tarjetas del plan; fuera del compromiso de los sprints |
 
@@ -169,6 +171,7 @@ Chamba-PE/
 │   │   ├── certificaciones/    Carga de certificaciones PDF/JPG ≤ 5 MB (HU-2)
 │   │   ├── administracion/     Revisión de documentos por el administrador (HU-9)
 │   │   ├── verificacion/       Escaneo del DNI, consentimiento y eliminación de datos (HU-19, HU-21)
+│   │   ├── calificaciones/     Calificación del servicio y promedio del prestador (HU-12)
 │   │   ├── tools/              Scripts de apoyo a las pruebas
 │   │   ├── manage.py
 │   │   └── requirements.txt    Dependencias de Python
@@ -234,6 +237,7 @@ La API queda en `http://127.0.0.1:8000/` y el panel de Django en `/admin/`.
 | `POST` · `GET /api/verificacion/dni/` | El prestador envía las fotos de su DNI y consulta el resultado (HU-19); [contrato](docs/API_VERIFICACION_DNI.md) |
 | `GET` · `POST /api/verificacion/consentimiento/` · `POST .../consentimiento/revocar/` | El prestador consulta, acepta o revoca su consentimiento; sin él no se captura el DNI (HU-21); [contrato](docs/API_CONSENTIMIENTO.md) |
 | `GET` · `POST /api/verificacion/eliminaciones/` · `.../<uuid>/` · `.../<uuid>/reintentar/` | El prestador solicita, consulta y reintenta la eliminación de sus datos del DNI (HU-21); [contrato](docs/API_ELIMINACION_DNI.md) |
+| `POST /api/calificaciones/` · `GET .../mis-servicios/` | El cliente califica su servicio Finalizado y ve sus solicitudes (HU-12); [contrato](docs/API_CALIFICACIONES.md) |
 | `GET /api/usuarios/csrf/` | Deja la cookie `csrftoken` para los `POST` desde React (HU-5) |
 | `POST /api/usuarios/registro/` | Registro del cliente; queda con la sesión iniciada (HU-5) |
 | `POST /api/usuarios/login/` · `.../logout/` | Inicio de sesión con usuario o correo, y cierre de sesión (HU-5) |

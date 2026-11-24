@@ -5,6 +5,7 @@ import './Cuenta.css'
 import { enviarJson, NOMBRE_ROL } from './api.js'
 import Disponibilidad from './Disponibilidad.jsx'
 import IniciarSesion from './IniciarSesion.jsx'
+import MisServicios from './MisServicios.jsx'
 import Inicio from './Inicio.jsx'
 import RegistroCliente from './RegistroCliente.jsx'
 import RegistroPrestador from './RegistroPrestador.jsx'
@@ -23,7 +24,10 @@ const MENU_POR_ROL = {
     ['/resultados', 'Buscar servicios'],
     ['/registro-prestador', 'Ofrecer mis servicios'],
   ],
-  cliente: [['/resultados', 'Buscar servicios']],
+  cliente: [
+    ['/resultados', 'Buscar servicios'],
+    ['/mis-servicios', 'Mis servicios'],
+  ],
   prestador: [
     ['/disponibilidad', 'Mi disponibilidad'],
     ['/solicitudes', 'Solicitudes'],
@@ -121,6 +125,10 @@ function App() {
           element={usuario ? <Navigate to="/" replace /> : <RegistroPrestador />}
         />
         <Route path="/resultados" element={<ResultadosPrestadores />} />
+        <Route
+          path="/mis-servicios"
+          element={<RutaPrivada usuario={usuario} rol="cliente"><MisServicios /></RutaPrivada>}
+        />
         <Route
           path="/certificaciones"
           element={<RutaPrivada usuario={usuario} rol="prestador"><UploadCertificado /></RutaPrivada>}

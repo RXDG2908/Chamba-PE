@@ -1,0 +1,75 @@
+{
+  "data": [
+    {
+      "id": 1,
+      "nombres": "Ficticio",
+      "apellidos": "Centro",
+      "rubros": [
+        {
+          "id": 1,
+          "nombre": "Gasfitería"
+        }
+      ],
+      "latitud": -12.046374,
+      "longitud": -77.042793,
+      "distancia_km": 0
+    },
+    {
+      "id": 7,
+      "nombres": "Ficticio",
+      "apellidos": "Compartido",
+      "rubros": [
+        {
+          "id": 1,
+          "nombre": "Gasfitería"
+        }
+      ],
+      "latitud": -12.046374,
+      "longitud": -77.042793,
+      "distancia_km": 0
+    },
+    {
+      "id": 2,
+      "nombres": "Ficticio",
+      "apellidos": "Noreste",
+      "rubros": [
+        {
+          "id": 1,
+          "nombre": "Gasfitería"
+        }
+      ],
+      "latitud": -12.031374,
+      "longitud": -77.027793,
+      "distancia_km": 2.333008663109215
+    }
+  ],
+  "electrico": [
+    {
+      "id": 6,
+      "nombres": "Ficticio",
+      "apellidos": "Electricidad",
+      "rubros": [
+        {
+          "id": 2,
+          "nombre": "Electricidad"
+        }
+      ],
+      "latitud": -12.046374,
+      "longitud": -77.042793,
+      "distancia_km": 0
+    }
+  ],
+  "distancias": [
+    {
+      "km": 4.9,
+      "ids": [
+        1,
+        7
+      ]
+    },
+    {
+      "km": 5.1,
+      "ids": []
+    }
+  ]
+}

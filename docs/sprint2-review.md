@@ -77,3 +77,29 @@ Son puntos que salen de los hechos del sprint. El equipo los confirma o cambia e
 | Las pruebas cruzadas encontraron problemas a tiempo (cambio a `EsAdministrador`, la carga de certificados sin sesión). | El sprint empezó tarde: el 15/10 y el 16/10 pasaron sin horas y no quedó registrada la decisión de recorte del Daily del 23/10. | Planificar el último día del sprint anterior (29/10 para el Sprint 3) y hacer el recorte en el Daily de la mitad del sprint. |
 | Todo junto funciona: 116 de 116 pruebas OK con los PRs unidos. | Los PRs encadenados (#13 → #15 → #17 → #18) acumulan riesgo si el primero no se revisa. | Activar la protección de `main` con 1 aprobación (impedimento 14) y unir apenas haya aprobación. |
 | | HU-8 (notificaciones) no avanzó: no hubo rama de T8.1 ni T8.2. | Avisar en el Daily cuando una tarea no arranca, para repartirla. |
+
+## 5. Transición al Sprint 3 · actualización del 29/10/2026
+
+Esta sección complementa el cierre histórico de las secciones 1–4; no cambia sus resultados. El cierre permanece en **15 de 23 h terminadas (65 %)**. La unidad es horas, no «15 de 23 tareas».
+
+### Cambios posteriores al cierre
+
+- #20 (T6.3, 1 h) y #23 (T7.3, 2 h) se integraron el 29/10. Estas 3 h se contabilizan una sola vez al inicio de S3; ya no están pendientes aunque la tabla histórica las muestre en revisión al cierre.
+- #14 (T7.1) y #16 (T7.2) siguen abiertos según la consulta del 29/10. David asume revisión y Luis los ajustes/integración; sus estimaciones originales de 5 h no se vuelven a añadir.
+- #22 permanece abierto como base parcial T8.3: las pruebas de bandeja no prueban entrega FCM.
+- HU-8 cuenta ahora con implementación y evidencia local conservadas, sin commit/PR. Hay recepción real y un ensayo grabado ≈1,3 s, pendiente de repetición y validación cruzada. La frase «No hay T8.1 ni T8.2» de la demo describe el corte histórico, no este avance posterior. HU-8 sigue abierta.
+
+### Acuerdo de Planning aprobado
+
+El Scrum Master comunica que David (PO) y Renzo aprobaron la propuesta. Sprint 3: **29/10–11/11/2026, 30 h**. Sprint Goal: cerrar HU-7/HU-8, corregir permisos/propiedad de certificados y avanzar HU-19/HU-21.
+
+| Integrante | Trabajo asignado | Reserva | Total |
+|---|---:|---:|---:|
+| Luis | 7 h | 3 h | 10 h |
+| David | 8 h (incluye 3 h ya integradas el 29/10) | 2 h | 10 h |
+| Renzo | 9 h | 1 h | 10 h |
+| **Total** | **24 h** | **6 h** | **30 h** |
+
+HU-13 y HU-20 se postergan del compromiso inicial, sin trasladarlas automáticamente al Sprint 4. Las reservas no son entregables ni horas terminadas. Se mantienen separadas las estimaciones históricas y el esfuerzo restante aprobado.
+
+El backlog detallado, criterios, dependencias, PR y burndown están en [SPRINTS.md](../SPRINTS.md#plan-aprobado-del-sprint-3); el registro diario y los bloqueos, en [AVANCES.md](../AVANCES.md#10-seguimiento-del-sprint-3--291011112026). La preparación documental no realizó merge, cambio de rama, commit, push ni PR.

@@ -1,0 +1,151 @@
+/*
+ * Tema visual de ChambaPE. Se carga después de los estilos de cada pantalla (main.jsx),
+ * así que aquí solo se ajustan colores, cabecera, botones, tarjetas y campos comunes.
+ */
+:root {
+  --verde: #16734f;
+  --verde-intenso: #0f5c3f;
+  --verde-oscuro: #0b3a29;
+  --verde-claro: #eaf4ee;
+  --acento: #f29f3d;
+  --acento-claro: #fff3e3;
+  --texto: #1c2b23;
+  --texto-suave: #5a6b62;
+  --borde: #dfe7e2;
+  --fondo: #f5f8f6;
+  --sombra: 0 1px 2px #173b2612, 0 8px 24px #173b2614;
+  --sombra-alta: 0 2px 4px #173b2614, 0 16px 40px #173b261f;
+  --radio: 18px;
+
+  color: var(--texto);
+  background: var(--fondo);
+  font-family: 'Segoe UI Variable', 'Segoe UI', system-ui, -apple-system, Roboto, sans-serif;
+}
+
+body { background: var(--fondo); }
+#root { display: flex; flex-direction: column; }
+#root > main, #root > form, #root > section { flex: 1 0 auto; }
+a { color: var(--verde); }
+
+/* Cabecera fija con marca, menú y sesión en una fila */
+.cabecera {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  padding: 0;
+  background: #ffffffe6;
+  border-bottom: 1px solid var(--borde);
+  backdrop-filter: saturate(180%) blur(10px);
+}
+.contenedor { width: min(1080px, calc(100% - 40px)); }
+.cabecera-fila { display: flex; align-items: center; gap: 12px 24px; min-height: 68px; padding-block: 10px; }
+.marca { display: inline-flex; align-items: center; gap: 10px; color: var(--texto); text-decoration: none; flex-shrink: 0; }
+.marca-icono {
+  display: grid; place-items: center; width: 38px; height: 38px; border-radius: 12px;
+  background: linear-gradient(135deg, var(--verde) 0%, #1f9a6a 100%); color: #fff;
+  font-size: 20px; font-weight: 800; box-shadow: 0 4px 12px #16734f40;
+}
+.marca-texto { font-size: 22px; font-weight: 800; letter-spacing: -0.6px; }
+.marca-texto span, .pie strong span { color: var(--verde); }
+
+.menu { display: flex; flex: 1; flex-wrap: nowrap; gap: 4px; margin: 0; overflow-x: auto; scrollbar-width: none; }
+.menu::-webkit-scrollbar { display: none; }
+.menu a {
+  flex-shrink: 0; padding: 8px 14px; border: 0; border-radius: 999px; background: transparent;
+  color: var(--texto-suave); font-size: 15px; font-weight: 600; white-space: nowrap; transition: background 0.15s, color 0.15s;
+}
+.menu a:hover { background: var(--verde-claro); color: var(--verde-intenso); }
+.menu a[aria-current='page'] { background: var(--verde-claro); color: var(--verde-intenso); border: 0; }
+
+.sesion { display: flex; flex-shrink: 0; align-items: center; gap: 10px; margin: 0; font-size: 14px; color: var(--texto-suave); }
+.sesion-usuario { display: inline-flex; align-items: center; gap: 8px; line-height: 1.2; }
+.sesion-usuario small { display: block; color: var(--texto-suave); font-size: 12px; }
+.sesion-avatar {
+  display: grid; place-items: center; width: 34px; height: 34px; border-radius: 50%;
+  background: var(--acento-claro); color: #9a5a12; font-weight: 800;
+}
+.sesion button, .enlace-sesion, .boton-cabecera {
+  padding: 8px 14px; border: 1px solid var(--borde); border-radius: 999px; background: #fff;
+  color: var(--texto); font: inherit; font-size: 14px; font-weight: 600; text-decoration: none; cursor: pointer;
+  white-space: nowrap; transition: border-color 0.15s, background 0.15s;
+}
+.enlace-sesion { border-color: transparent; background: transparent; }
+.sesion button:hover, .enlace-sesion:hover { border-color: var(--verde); }
+.boton-cabecera { border-color: var(--verde); background: var(--verde); color: #fff; }
+.boton-cabecera:hover { background: var(--verde-intenso); }
+
+/* Botones principales de todas las pantallas */
+.boton, .busqueda .boton-buscar, .solicitud-servicio button, .form-certificacion button,
+.revision .boton-aprobar, .boton-principal {
+  border: 0; border-radius: 12px; background: linear-gradient(135deg, var(--verde) 0%, #1c8a5f 100%); color: #fff;
+  font-weight: 700; box-shadow: 0 6px 16px #16734f33; transition: transform 0.15s, box-shadow 0.15s, filter 0.15s;
+}
+.boton:hover:not(:disabled), .busqueda .boton-buscar:hover:not(:disabled), .solicitud-servicio button:hover:not(:disabled),
+.form-certificacion button:hover:not(:disabled), .revision .boton-aprobar:hover:not(:disabled), .boton-principal:hover {
+  transform: translateY(-1px); box-shadow: 0 10px 22px #16734f40; filter: brightness(1.05);
+}
+
+/* Tarjetas y formularios */
+.registro, .container-certificacion, .busqueda, .tarjeta, .revision-tarjeta {
+  border-color: var(--borde); border-radius: var(--radio); box-shadow: var(--sombra);
+}
+.registro { margin-block: 40px; padding: clamp(20px, 4vw, 36px); }
+.registro h2, .container-certificacion h2 { font-size: clamp(24px, 4vw, 30px); letter-spacing: -0.6px; }
+.tarjeta { transition: transform 0.15s, box-shadow 0.15s; }
+.tarjeta:hover { transform: translateY(-2px); box-shadow: var(--sombra-alta); }
+.avatar { border-radius: 18px; }
+
+.campo input:not([type='range']), .campo-busqueda input, .campo-busqueda select, .solicitud-servicio input,
+.solicitud-servicio textarea, .form-certificacion input, .revision-rechazo textarea {
+  border-color: var(--borde); border-radius: 12px; background: #fbfcfb; transition: border-color 0.15s, box-shadow 0.15s;
+}
+.campo input:not([type='range']):focus, .campo-busqueda input:focus, .campo-busqueda select:focus,
+.solicitud-servicio input:focus, .solicitud-servicio textarea:focus, .form-certificacion input:focus,
+.revision-rechazo textarea:focus {
+  outline: none; border-color: var(--verde); background: #fff; box-shadow: 0 0 0 4px #16734f1f;
+}
+input[type='range'] { accent-color: var(--verde); }
+.rubro { background: #fff; transition: border-color 0.15s, background 0.15s; }
+.rubro:hover { border-color: var(--verde); }
+.registro legend, .busqueda legend { font-size: 15px; }
+
+/* Encabezados de página */
+.resultados, .revision { padding-top: 48px; }
+.etiqueta { color: var(--verde); letter-spacing: 1.6px; }
+.introduccion h2, .revision-titulo h2 { letter-spacing: -1px; }
+.aviso, .revision-aviso { border-color: #cfe3d7; border-radius: 14px; background: var(--verde-claro); }
+.mapa-busqueda, .mapa { border: 1px solid var(--borde); border-radius: 14px; }
+
+/* Pie de página */
+.pie { margin-top: 56px; padding: 28px 0; border-top: 1px solid var(--borde); background: #fff; color: var(--texto-suave); font-size: 14px; }
+.pie-fila { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px 24px; }
+.pie strong { color: var(--texto); }
+
+@media (max-width: 760px) {
+  .cabecera-fila { flex-wrap: wrap; gap: 8px 12px; }
+  .menu { order: 3; flex-basis: 100%; margin-inline: -4px; }
+  .sesion { margin-left: auto; }
+  .sesion-usuario > span:last-child { display: none; }
+}
+
+@media (max-width: 600px) {
+  .contenedor { width: calc(100% - 32px); }
+  .marca-texto { font-size: 20px; }
+  .resultados, .revision { padding-top: 28px; }
+}
+
+/* Teléfonos: marca y sesión en una sola fila, el menú debajo */
+@media (max-width: 480px) {
+  .cabecera-fila { min-height: 0; column-gap: 8px; }
+  .marca { gap: 8px; }
+  .marca-icono { width: 32px; height: 32px; border-radius: 10px; font-size: 17px; }
+  .marca-texto { font-size: 18px; }
+  .sesion { gap: 4px; }
+  .sesion button, .enlace-sesion, .boton-cabecera { padding: 6px 10px; font-size: 13px; }
+  .sesion-avatar { width: 30px; height: 30px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * { transition: none !important; }
+  .tarjeta:hover, .boton-principal:hover { transform: none; }
+}

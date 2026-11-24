@@ -1,0 +1,54 @@
+{
+  "centro": {
+    "latitud": -12.046374,
+    "longitud": -77.042793
+  },
+  "rubros": {
+    "Gasfitería": 1,
+    "Electricidad": 2
+  },
+  "prestadores": {
+    "Centro": {
+      "id": 1,
+      "username": "hu7_ficticio_1",
+      "latitud": -12.046374,
+      "longitud": -77.042793
+    },
+    "Noreste": {
+      "id": 2,
+      "username": "hu7_ficticio_2",
+      "latitud": -12.031374,
+      "longitud": -77.027793
+    },
+    "Fuera": {
+      "id": 3,
+      "username": "hu7_ficticio_3",
+      "latitud": -11.992415,
+      "longitud": -77.042793
+    },
+    "Inactivo": {
+      "id": 4,
+      "username": "hu7_ficticio_4",
+      "latitud": -12.046374,
+      "longitud": -77.042793
+    },
+    "Pendiente": {
+      "id": 5,
+      "username": "hu7_ficticio_5",
+      "latitud": -12.046374,
+      "longitud": -77.042793
+    },
+    "Electricidad": {
+      "id": 6,
+      "username": "hu7_ficticio_6",
+      "latitud": -12.046374,
+      "longitud": -77.042793
+    },
+    "Compartido": {
+      "id": 7,
+      "username": "hu7_ficticio_7",
+      "latitud": -12.046374,
+      "longitud": -77.042793
+    }
+  }
+}

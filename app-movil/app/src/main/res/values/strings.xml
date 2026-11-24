@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Chamba PE</string>
+
+    <!-- Comunes -->
+    <string name="cargando">Cargando…</string>
+    <string name="reintentar">Reintentar</string>
+    <string name="volver">Volver</string>
+    <string name="error_sin_conexion">No hay conexión. Revisa tu internet e inténtalo de nuevo.</string>
+    <string name="error_servidor">El servidor no pudo atender la consulta. Inténtalo más tarde.</string>
+    <string name="error_datos_invalidos">La respuesta del servidor no se pudo leer.</string>
+    <string name="error_desconocido">Ocurrió un error. Inténtalo de nuevo.</string>
+    <string name="aviso_cache">Sin conexión: se muestran los datos guardados en el celular.</string>
+    <string name="distancia_km">A %1$.1f km</string>
+    <string name="agregar_favorito">Agregar a %1$s a favoritos</string>
+    <string name="quitar_favorito">Quitar a %1$s de favoritos</string>
+
+    <!-- Ingreso y registro -->
+    <string name="login_titulo">Ingresa a tu cuenta</string>
+    <string name="registro_titulo">Crea tu cuenta de cliente</string>
+    <string name="registro_ayuda">Las cuentas de prestador las registra y verifica el equipo de Chamba PE.</string>
+    <string name="nombre">Nombre</string>
+    <string name="correo">Correo</string>
+    <string name="clave">Contraseña</string>
+    <string name="ingresar">Ingresar</string>
+    <string name="ingresando">Ingresando…</string>
+    <string name="crear_cuenta">Crear cuenta</string>
+    <string name="registrando">Creando cuenta…</string>
+    <string name="ir_a_registro">No tengo cuenta: registrarme</string>
+    <string name="ir_a_registro_prestador">Ofrezco servicios: registrarme como prestador</string>
+    <string name="registro_prestador_titulo">Regístrate como prestador</string>
+    <string name="registro_prestador_ayuda">Tu perfil quedará pendiente de verificación: aparecerás en las búsquedas cuando administración lo apruebe.</string>
+    <string name="registro_seccion_cuenta">Tu cuenta</string>
+    <string name="registro_seccion_datos">Tus datos</string>
+    <string name="registro_seccion_rubros">¿Qué servicios ofreces?</string>
+    <string name="registro_seccion_cobertura">Zona de cobertura</string>
+    <string name="registro_cobertura_ayuda">Toca el mapa para marcar el centro de tu zona y ajusta el radio.</string>
+    <string name="registro_radio">Radio de cobertura: %1$d km</string>
+    <string name="registro_prestador_boton">Registrarme como prestador</string>
+    <string name="registro_revisa_campos">Revisa los campos marcados.</string>
+    <string name="nombres">Nombres</string>
+    <string name="apellidos">Apellidos</string>
+    <string name="dni">DNI</string>
+    <string name="telefono_opcional">Teléfono (opcional)</string>
+    <string name="error_obligatorio">Este dato es obligatorio.</string>
+    <string name="error_clave_minima">Mínimo 6 caracteres.</string>
+    <string name="error_dni">El DNI debe tener 8 dígitos.</string>
+    <string name="error_rubros">Elige al menos un rubro.</string>
+    <string name="error_ubicacion_cobertura">Marca en el mapa el centro de tu zona.</string>
+    <string name="ya_tengo_cuenta">Ya tengo cuenta</string>
+    <string name="error_campos_vacios">Completa todos los campos.</string>
+    <string name="error_clave_corta">La contraseña debe tener al menos %1$d caracteres.</string>
+    <string name="error_credenciales">Correo o contraseña incorrectos.</string>
+    <string name="error_correo_en_uso">Ya existe una cuenta con ese correo.</string>
+    <string name="error_clave_debil">La contraseña es muy débil.</string>
+    <string name="error_correo_invalido">El correo no es válido.</string>
+
+    <!-- Pestañas -->
+    <string name="tab_buscar">Buscar</string>
+    <string name="tab_favoritos">Favoritos</string>
+    <string name="tab_solicitudes">Solicitudes</string>
+    <string name="tab_recibidas">Recibidas</string>
+    <string name="tab_disponibilidad">Disponibilidad</string>
+    <string name="tab_perfil">Perfil</string>
+
+    <!-- Búsqueda -->
+    <string name="busqueda_rubro">¿Qué servicio necesitas?</string>
+    <string name="busqueda_sin_rubros">Todavía no hay rubros registrados.</string>
+    <string name="busqueda_ubicacion">¿Dónde lo necesitas?</string>
+    <string name="mapa_ayuda">Toca el mapa para elegir dónde necesitas el servicio, usa tu ubicación o escribe las coordenadas.</string>
+    <string name="mapa_descripcion">Mapa de prestadores y ubicación. Toca un punto para elegir dónde necesitas el servicio.</string>
+    <string name="mapa_tu_ubicacion">Tu ubicación para el servicio</string>
+    <string name="mapa_leyenda">Azul: tu ubicación. Verde numerado: prestadores (zona aproximada).</string>
+    <string name="mapa_encuadrar">Ver todo</string>
+    <string name="latitud">Latitud</string>
+    <string name="longitud">Longitud</string>
+    <string name="error_falta_rubro">Elige un rubro.</string>
+    <string name="error_latitud">Entre -90 y 90</string>
+    <string name="error_longitud">Entre -180 y 180</string>
+    <string name="usar_mi_ubicacion">Usar mi ubicación</string>
+    <string name="ubicando">Ubicando…</string>
+    <string name="ubicacion_no_disponible">No se pudo obtener tu ubicación. Puedes escribir las coordenadas.</string>
+    <string name="buscar">Buscar</string>
+    <string name="busqueda_inicial">Elige un rubro y una ubicación para ver prestadores cercanos.</string>
+    <string name="busqueda_vacia">No hay prestadores disponibles para ese rubro en tu zona.</string>
+
+    <!-- Detalle y solicitud -->
+    <string name="detalle_titulo">Prestador</string>
+    <string name="detalle_no_encontrado">No se encontró al prestador. Vuelve a buscarlo.</string>
+    <string name="detalle_zona">Zona de atención aproximada: %1$.3f, %2$.3f</string>
+    <string name="sin_calificaciones">Sin calificaciones</string>
+    <string name="guardar_en_favoritos">Guardar en favoritos</string>
+    <string name="quitar_de_favoritos">Quitar de favoritos</string>
+    <string name="solicitud_titulo">Enviar solicitud</string>
+    <string name="solicitud_descripcion">¿Qué necesitas?</string>
+    <string name="solicitud_direccion">Dirección o referencia (opcional)</string>
+    <string name="error_descripcion_corta">Describe lo que necesitas (mínimo %1$d caracteres).</string>
+    <string name="enviar_solicitud">Enviar solicitud</string>
+    <string name="enviando">Enviando…</string>
+    <string name="error_envio_solicitud">No se pudo enviar la solicitud. Inténtalo de nuevo.</string>
+    <string name="solicitud_enviada">Solicitud enviada a %1$s. Sigue su estado en la pestaña Solicitudes.</string>
+
+    <!-- Favoritos -->
+    <string name="favoritos_vacio">Aún no tienes favoritos. Márcalos desde la búsqueda.</string>
+
+    <!-- Solicitudes -->
+    <string name="solicitudes_vacio_cliente">Todavía no has enviado solicitudes.</string>
+    <string name="solicitudes_vacio_prestador">Todavía no has recibido solicitudes.</string>
+    <string name="prestador_sin_vincular">Tu bandeja se activará cuando administración verifique tu perfil de prestador.</string>
+    <string name="error_solicitudes">No se pudieron cargar las solicitudes.</string>
+    <string name="error_respuesta">No se pudo guardar tu respuesta. Inténtalo de nuevo.</string>
+    <string name="solicitud_en">En: %1$s</string>
+    <string name="estado_pendiente">Pendiente</string>
+    <string name="estado_aceptada">Aceptada</string>
+    <string name="estado_rechazada">Rechazada</string>
+    <string name="aceptar">Aceptar</string>
+    <string name="rechazar">Rechazar</string>
+
+    <!-- Disponibilidad del prestador -->
+    <string name="disponibilidad_ayuda">Activa tu disponibilidad cuando estés listo para recibir solicitudes.</string>
+    <string name="disponibilidad_activo">Activo</string>
+    <string name="disponibilidad_inactivo">Inactivo</string>
+    <string name="disponibilidad_resumen_inactivo">No apareces en las búsquedas ni recibes solicitudes.</string>
+    <string name="disponibilidad_resumen_activo">Apareces en las búsquedas y puedes recibir solicitudes.</string>
+    <string name="disponibilidad_resumen_sin_verificar">Quedas disponible, pero aún no recibes solicitudes.</string>
+    <string name="disponibilidad_aviso_pendiente">Tu perfil está pendiente de verificación: aparecerás en las búsquedas cuando administración lo apruebe.</string>
+    <string name="disponibilidad_aviso_rechazado">Tu verificación fue rechazada: sube un nuevo documento para que administración vuelva a revisarte.</string>
+    <string name="disponibilidad_error_guardar">No se pudo guardar el cambio. Inténtalo de nuevo.</string>
+    <string name="error_cuenta_no_vinculada">Tu cuenta de la app aún no está vinculada con tu perfil de prestador. Pide al equipo de Chamba PE que la vincule.</string>
+
+    <!-- Perfil -->
+    <string name="rol_cliente">Cuenta de cliente</string>
+    <string name="rol_prestador">Cuenta de prestador</string>
+    <string name="cerrar_sesion">Cerrar sesión</string>
+
+    <!-- Notificaciones -->
+    <string name="canal_solicitudes_nombre">Solicitudes</string>
+    <string name="canal_solicitudes_descripcion">Avisos sobre las solicitudes que envías</string>
+    <string name="notificacion_solicitud_titulo">Solicitud enviada</string>
+    <string name="notificacion_solicitud_texto">%1$s ya puede ver tu solicitud.</string>
+</resources>

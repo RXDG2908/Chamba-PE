@@ -1,0 +1,23 @@
+# Revisor automático por carpeta (estructura del 17/11/2026).
+# GitHub pide la revisión a estas cuentas al abrir un PR que toque la carpeta;
+# nadie une su propio PR.
+
+# Back End de usuario
+/backend/spring/                    @Davish-pxl
+
+# Front End móvil
+/app-movil/                         @RXDG2908
+
+# Front End web
+/web-portal/                        @Itssmann @Davish-pxl
+
+# Back End de administración: cada app con quien la construyó
+/backend/django/usuarios/           @RXDG2908
+/backend/django/prestadores/        @RXDG2908
+/backend/django/verificacion/       @RXDG2908
+/backend/django/servicios/          @Itssmann
+/backend/django/certificaciones/    @Davish-pxl
+/backend/django/administracion/     @Davish-pxl
+/backend/django/calificaciones/     @Davish-pxl
+/backend/django/core/               @RXDG2908 @Itssmann @Davish-pxl
+/backend/django/requirements.txt    @RXDG2908 @Itssmann @Davish-pxl

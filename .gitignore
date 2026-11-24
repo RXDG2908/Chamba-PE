@@ -6,6 +6,7 @@ __pycache__/
 *.pyc
 db.sqlite3
 media/
+privado/
 
 # Node / Frontend
 node_modules/
@@ -13,9 +14,19 @@ dist/
 build/
 .env
 .env.*
+!.env.example
+**/*service-account*.json
 
 # Editores y Sistema
 .vscode/
 .idea/
 .DS_Store
 Thumbs.db
+# SQLite y archivos temporales exclusivos de validación HU-7
+.hu7-local/
+
+# Artefactos aislados de validación HU-21
+.hu21-local/
+
+# Artefactos de las pruebas de navegador de HU-12
+.hu12-local/

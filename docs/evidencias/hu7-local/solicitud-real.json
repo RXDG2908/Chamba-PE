@@ -1,0 +1,6 @@
+{
+  "id": 1,
+  "prestador": 1,
+  "estado": "pendiente",
+  "entorno": "Base SQLite temporal ficticia, sin Firebase."
+}

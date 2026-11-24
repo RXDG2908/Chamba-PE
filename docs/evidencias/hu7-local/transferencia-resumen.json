@@ -1,0 +1,28 @@
+{
+  "fecha": "2026-11-02 America/Lima",
+  "destino": {
+    "rama": "prepare/hu7-t72-pr16",
+    "head": "485edb4"
+  },
+  "suitePropia": {
+    "aprobados": 16,
+    "fallidos": 0,
+    "segundos": 22.4,
+    "api": "simulada",
+    "teselas": "simuladas"
+  },
+  "integracion": {
+    "startTime": "2026-11-03T04:46:01.824Z",
+    "duration": 27773.611,
+    "expected": 14,
+    "skipped": 0,
+    "unexpected": 0,
+    "flaky": 0,
+    "frontend": "worktree preparación T7.2",
+    "backend": "worktree validación HU-7, base 8c887ae; dependencia sin fusionar",
+    "base": "SQLite nueva con siete prestadores ficticios, dentro del worktree destino",
+    "teselas": "OSM reales",
+    "red": "desconexión emulada; demora/cancelación de respuestas reales"
+  },
+  "publicado": false
+}

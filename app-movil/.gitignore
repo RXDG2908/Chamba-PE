@@ -1,0 +1,20 @@
+# Gradle y compilación
+.gradle/
+.kotlin/
+build/
+captures/
+.externalNativeBuild/
+.cxx/
+
+# Configuración local (ruta del SDK); cada integrante genera la suya
+local.properties
+
+# Android Studio
+*.iml
+.idea/
+
+# Firmas y secretos: nunca se versionan
+*.jks
+*.keystore
+keystore.properties
+google-services.json

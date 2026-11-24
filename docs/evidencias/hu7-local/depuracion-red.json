@@ -1,0 +1,89 @@
+{
+  "fecha": "2026-11-03 America/Lima",
+  "antes": {
+    "stats": {
+      "startTime": "2026-11-03T04:59:55.073Z",
+      "duration": 63048.128000000004,
+      "expected": 8,
+      "skipped": 0,
+      "unexpected": 2,
+      "flaky": 0
+    },
+    "fallos": [
+      {
+        "status": "failed",
+        "error": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoHaveCount\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator:  locator('.lista-prestadores > li')\nExpected: \u001b[32m2\u001b[39m\nReceived: \u001b[31m0\u001b[39m\nTimeout:  5000ms\n\nCall log:\n\u001b[2m  - Expect \"toHaveCount\" locator('.lista-prestadores > li') with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('.lista-prestadores > li')\u001b[22m\n\u001b[2m    14 × locator resolved to 0 elements\u001b[22m\n\u001b[2m       - unexpected value \"0\"\u001b[22m\n",
+        "network": {
+          "eventos": [
+            {
+              "evento": "request",
+              "url": "http://127.0.0.1:5187/api/prestadores/rubros/",
+              "tiempo": 1793682000326
+            },
+            {
+              "evento": "request",
+              "url": "http://127.0.0.1:5187/api/usuarios/csrf/",
+              "tiempo": 1793682000335
+            },
+            {
+              "evento": "response",
+              "url": "http://127.0.0.1:5187/api/prestadores/rubros/",
+              "estado": 200,
+              "tiempo": 1793682000382
+            },
+            {
+              "evento": "requestfinished",
+              "url": "http://127.0.0.1:5187/api/prestadores/rubros/",
+              "tiempo": 1793682000383
+            }
+          ],
+          "estado": [],
+          "tarjetas": 0
+        }
+      },
+      {
+        "status": "timedOut",
+        "error": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m",
+        "network": {
+          "eventos": [],
+          "estado": [],
+          "tarjetas": 0
+        }
+      }
+    ]
+  },
+  "despues": {
+    "repeticiones": {
+      "startTime": "2026-11-03T05:02:43.833Z",
+      "duration": 22665.952999999998,
+      "expected": 10,
+      "skipped": 0,
+      "unexpected": 0,
+      "flaky": 0
+    },
+    "suite16": {
+      "startTime": "2026-11-03T05:03:34.259Z",
+      "duration": 19502.768,
+      "expected": 16,
+      "skipped": 0,
+      "unexpected": 0,
+      "flaky": 0
+    },
+    "integracion14": {
+      "startTime": "2026-11-03T05:04:18.446Z",
+      "duration": 25585.624,
+      "expected": 14,
+      "skipped": 0,
+      "unexpected": 0,
+      "flaky": 0
+    },
+    "backend": "propio del worktree; HU7_TEST_BACKEND_ROOT ausente",
+    "django": {
+      "total": 168,
+      "aprobados": 165,
+      "expectedFailures": 3,
+      "segundos": 25.697
+    }
+  },
+  "limite": "Bloqueo observado de entrega de mocks con page.route; no se afirma haber identificado el defecto interno del navegador."
+}

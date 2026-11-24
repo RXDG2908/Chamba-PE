@@ -25,7 +25,7 @@ Resumen: **7 terminadas · 4 en revisión · 0 en curso · 0 por hacer · 3 pasa
 |---|:---:|---|:---:|---|
 | **T8.1** Notificaciones push (FCM) | HU-8 | Luis Abad | 3 | No se empezó en el Sprint 2 |
 | **T8.2** Recepción y aceptar/rechazar desde la notificación | HU-8 | Luis Abad | 2 | Depende de T8.1 |
-| **T8.3** Pruebas de entrega (< 5 s) | HU-8 | David Valcarcel | 2 | Base parcial en [#22](https://github.com/RXDG2908/Chamba-PE/pull/22): 7 pruebas de la bandeja. Falta la prueba del push |
+| **T8.3** Pruebas de entrega (< 5 s) | HU-8 | David Valcarcel | 2 | Base parcial en [#22](https://github.com/RXDG2908/Chamba-PE/pull/22): 7 pruebas de la bandeja, con `main` integrado el 29/10 (152 OK). Falta la prueba del push |
 
 ### ✅ Terminado (9)
 

@@ -191,9 +191,9 @@ Cada uno construye las historias de la app de Django de la que es dueño ([PLAN_
 | Tarea | Descripción | Tipo | Horas | ✔ |
 |:---:|---|:---:|:---:|:---:|
 | T7.1 | Consulta de prestadores por coordenadas dentro del radio | Backend | 2 | ✅ |
-| T8.1 | Integrar notificaciones push (Firebase Cloud Messaging) | Backend | 3 | ➡️ S3 |
+| T8.1 | Integrar notificaciones push (Firebase Cloud Messaging) | Backend | 3 | ➡️ S3 · ✅ #37 (12/11) |
 | T7.2 | Integrar el mapa con marcadores (móvil y web) | Frontend | 3 | ✅ |
-| T8.2 | Recepción de la notificación y pantalla aceptar/rechazar | Frontend | 2 | ➡️ S3 |
+| T8.2 | Recepción de la notificación y pantalla aceptar/rechazar | Frontend | 2 | ➡️ S3 · ✅ #37 (12/11) |
 | | **Subtotal** | | **10** | |
 
 ### David Valcarcel — 10 h · app `administracion`
@@ -469,8 +469,8 @@ Los identificadores S3-MAPA-R, S3-MAPA-I y S3-CERT-16 son etiquetas de seguimien
 | Heredado integrado | T6.3 · HU-6 | Pruebas de disponibilidad, PR #20 integrado el 29/10 | David | 1 | ✅ Integrado |
 | Heredado integrado | T7.3 · HU-7 | Pruebas de cobertura, PR #23 integrado el 29/10 | David | 2 | ✅ Integrado |
 | Heredado pendiente | S3-MAPA-R · T7.1/T7.2 | Revisar #14/#16 y regresiones con roles, disponibilidad y verificación | David | 1 | Pendiente |
-| Heredado pendiente | S3-MAPA-I · T7.1/T7.2 | Ajustes de revisión e integración del mapa, sin reconstruir lo implementado | Luis | 1 | Pendiente |
-| Heredado con avance local | T8.1 + T8.2 · HU-8 | Completar escenarios, revisión y preparación de integración del backend push y frontend responsive existentes | Luis | 2 | 🟡 Local/parcial |
+| Heredado pendiente | S3-MAPA-I · T7.1/T7.2 | Ajustes de revisión e integración del mapa, sin reconstruir lo implementado | Luis | 1 | ✅ #14/#16 (04/11) y #33 (05/11) |
+| Heredado con avance local | T8.1 + T8.2 · HU-8 | Completar escenarios, revisión y preparación de integración del backend push y frontend responsive existentes | Luis | 2 | ✅ #37 unido (12/11) |
 | Heredado parcial | T8.3 · HU-8 | Validación cruzada de push real, repetición de medidas y evidencia; revisar base #22 | David | 2 | 🟡 Base de bandeja; push pendiente de validación |
 | Deuda heredada | S3-CERT-16 | Corregir carga de certificados: sesión, rol, propiedad desde el usuario, CSRF y regresiones; retirar expectedFailure cuando corresponda | David | 2 | Pendiente |
 | Nuevo | T19.1 · HU-19 | Pantalla de escaneo del DNI con cámara en React responsive | Renzo | 3 | ✅ Integrado (PR #27 y #28, 11/11) |

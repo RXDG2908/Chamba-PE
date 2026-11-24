@@ -59,7 +59,7 @@ solo cambien la dirección del servidor:
 La búsqueda incluye también `calificacion_promedio` (`null` sin calificaciones) y `calificaciones_total`
 de HU-12; Spring solo los lee, los mantiene Django.
 
-Comparado con Django real sobre la misma base (23/11 y, ya con HU-12, 24/11): 59 consultas (rubros,
+Comparado con Django real sobre la misma base (23/11, antes y después de unirse HU-12): 59 consultas (rubros,
 filtros, distancias, redondeo, calificaciones y todos los mensajes de error), sin diferencias.
 
 El inicio de sesión de la app usa Firebase Authentication: Spring Boot valida el token y

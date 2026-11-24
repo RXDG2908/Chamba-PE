@@ -1,0 +1,10 @@
+.seguimiento { list-style: none; margin: 14px 0 0; padding: 0; display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
+.seguimiento .seg-etapa { display: grid; justify-items: center; gap: 4px; text-align: center; font-size: 13px; color: var(--texto-suave, #5a6b62); position: relative; }
+.seguimiento .seg-etapa:not(:first-child)::before { content: ''; position: absolute; top: 13px; right: 50%; width: 100%; height: 3px; background: var(--borde, #dfe7e2); z-index: 0; }
+.seguimiento .seg-etapa.hecha:not(:first-child)::before, .seguimiento .seg-etapa.actual:not(:first-child)::before { background: var(--verde, #16734f); }
+.seguimiento .seg-punto { position: relative; z-index: 1; width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center; font-weight: 700; background: #fff; border: 2px solid var(--borde, #dfe7e2); }
+.seguimiento .hecha .seg-punto { background: var(--verde, #16734f); border-color: var(--verde, #16734f); color: #fff; }
+.seguimiento .actual .seg-punto { border-color: var(--verde, #16734f); color: var(--verde, #16734f); box-shadow: 0 0 0 4px var(--verde-claro, #eaf4ee); }
+.seguimiento .actual .seg-nombre { font-weight: 700; color: var(--texto, #1c2b23); }
+.seguimiento .seg-hora { font-size: 12px; }
+@media (max-width: 420px) { .seguimiento { font-size: 12px; } .seguimiento .seg-etapa { font-size: 12px; } }

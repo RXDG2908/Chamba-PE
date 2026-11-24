@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { enviarJson } from './api.js'
+import Seguimiento from './Seguimiento.jsx'
+import { ESTADOS_FINALES } from './etapasSeguimiento.js'
 import './RegistroPrestador.css'
 import './Cuenta.css'
 import './MisServicios.css'
@@ -88,6 +90,8 @@ function MisServicios() {
   const [servicios, setServicios] = useState([])
   const [estado, setEstado] = useState('cargando') // cargando | listo | fallo
 
+  const enCurso = servicios.some((s) => !ESTADOS_FINALES.includes(s.estado))
+
   useEffect(() => {
     fetch('/api/calificaciones/mis-servicios/')
       .then((r) => (r.ok ? r.json() : Promise.reject()))
@@ -98,6 +102,25 @@ function MisServicios() {
       })
       .catch(() => setEstado('fallo'))
   }, [])
+
+  // HU-11: mientras algún servicio siga en curso, se consulta su estado cada 5 segundos.
+  useEffect(() => {
+    if (estado !== 'listo' || !enCurso) return undefined
+    const controlador = new AbortController()
+    const temporizador = setInterval(() => {
+      fetch('/api/calificaciones/mis-servicios/', { signal: controlador.signal, cache: 'no-store' })
+        .then((r) => (r.ok ? r.json() : Promise.reject()))
+        .then((cuerpo) => {
+          // Una consulta fallida no borra lo que ya se ve; se reintenta en la siguiente vuelta.
+          if (Array.isArray(cuerpo) && cuerpo.every(servicioValido)) setServicios(cuerpo)
+        })
+        .catch(() => {})
+    }, 5000)
+    return () => {
+      controlador.abort()
+      clearInterval(temporizador)
+    }
+  }, [estado, enCurso])
 
   const registrarCalificacion = (id, calificacion) => {
     setServicios((actuales) => actuales.map((s) => (
@@ -114,7 +137,8 @@ function MisServicios() {
     <section className="registro cuenta mis-servicios">
       <h2>Mis servicios</h2>
       <p className="ayuda">
-        Aquí ves las solicitudes que enviaste con tu cuenta. Cuando un servicio queda Finalizado puedes calificarlo
+        Aquí ves las solicitudes que enviaste con tu cuenta y en qué etapa va cada servicio (se actualiza
+        sola cada 5 segundos). Cuando un servicio queda Finalizado puedes calificarlo
         una sola vez, de 1 a 5 estrellas.
       </p>
       {servicios.length === 0 && (
@@ -136,6 +160,7 @@ function MisServicios() {
               <span className={`etiqueta-estado estado-${s.estado}`}>{s.estado_display}</span>
             </div>
             {s.descripcion && <p className="servicio-descripcion">{s.descripcion}</p>}
+            <Seguimiento estado={s.estado} historial={s.historial} />
             {s.calificacion && (
               <div className="calificacion-dada">
                 <p><strong>Tu calificación:</strong> <Estrellas cantidad={s.calificacion.estrellas} /></p>

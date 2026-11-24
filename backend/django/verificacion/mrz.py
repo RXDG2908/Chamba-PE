@@ -1,4 +1,5 @@
 """Lectura de la MRZ del reverso del DNI (formato TD1 del estándar ICAO 9303)."""
+import re
 from dataclasses import dataclass
 from datetime import date
 
@@ -44,9 +45,22 @@ def limpiar_linea(texto):
     return texto.upper().replace(' ', '')
 
 
+def completar(linea):
+    """Repone los '<' de relleno que el OCR pierde al partir la fila (la línea debe medir 30)."""
+    if len(linea) >= 30 or len(linea) < 20:
+        return linea
+    if linea[:2] in ('ID', 'I<'):
+        return linea.ljust(30, '<')
+    if re.match(r'^[0-9OISZB]{7}[MFX<][0-9OISZB]{7}[A-Z]{3}', linea):
+        return linea[:18] + '<' * (30 - len(linea)) + linea[18:]  # el relleno va antes del último dígito
+    if '<<' in linea:
+        return linea.ljust(30, '<')
+    return linea
+
+
 def buscar_lineas(textos):
     """Devuelve las 3 líneas de 30 caracteres de la MRZ, o falla si no están."""
-    lineas = [limpiar_linea(t) for t in textos]
+    lineas = [completar(limpiar_linea(t)) for t in textos]
     lineas = [t for t in lineas if len(t) == 30]
     for i, linea in enumerate(lineas):
         if linea[:2] in ('ID', 'I<') and linea[2:5] == 'PER' and len(lineas) - i >= 3:

@@ -10,7 +10,7 @@ Implementación de T12.1 (API) y T12.2 (pantalla), David Valcarcel, 23/11/2026. 
 
 | Tema | Decisión |
 |---|---|
-| Estado Finalizado | Se agrega solo el valor `finalizada` a `Solicitud.Estado`. Los estados intermedios de HU-11 (en camino, en servicio) y quién marca cada uno los define Luis en T11.1. Mientras no exista esa pantalla, administración puede marcar `Finalizada` desde `/admin/` (lista de solicitudes, columna Estado). |
+| Estado Finalizado | Se agrega solo el valor `finalizada` a `Solicitud.Estado`. Los estados intermedios de HU-11 (en camino, en servicio) y quién marca cada uno los define Luis en T11.1. **Actualizado con HU-11 (24/11):** el prestador asignado lleva la solicitud de Confirmado a En camino, En servicio y Finalizada desde su bandeja; el estado ya no se edita en `/admin/` ([seguimiento](API_SEGUIMIENTO.md)). |
 | Quién califica | El **cliente con sesión iniciada**. Si envía la solicitud con su sesión, la solicitud guarda su cuenta (`Solicitud.cliente`) y solo él puede calificarla. Las solicitudes enviadas sin cuenta se siguen aceptando, pero no se califican. |
 
 ## Cambios en modelos
@@ -64,7 +64,7 @@ Cada prestador incluye ahora `calificacion_promedio` (número o `null`) y `calif
 ## Cómo probarlo
 
 1. Inicia sesión como **cliente** y envía una solicitud desde **Buscar servicios**.
-2. Como administrador, en `/admin/` → Solicitudes, cambia su estado a **Finalizada** y guarda.
+2. Como el prestador, en `/solicitudes` acepta la solicitud y pulsa **Voy en camino**, **Empecé el servicio** y **Finalizar servicio** (HU-11).
 3. Como el cliente, entra a **Mis servicios**, elige las estrellas, escribe un comentario y envía.
 4. Vuelve a buscar ese rubro: la tarjeta del prestador muestra el promedio.
 

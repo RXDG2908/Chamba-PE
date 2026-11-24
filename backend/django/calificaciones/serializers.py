@@ -1,6 +1,7 @@
 from rest_framework import serializers
 
 from servicios.models import Solicitud
+from servicios.serializers import CambioEstadoSerializer
 
 from .models import Calificacion
 
@@ -44,12 +45,14 @@ class MiServicioSerializer(serializers.ModelSerializer):
     estado_display = serializers.CharField(source='get_estado_display', read_only=True)
     calificacion = serializers.SerializerMethodField()
     puede_calificar = serializers.SerializerMethodField()
+    # HU-11: la línea de etapas de «Mis servicios» muestra la hora de cada una (hallado en T11.3).
+    historial = CambioEstadoSerializer(many=True, read_only=True)
 
     class Meta:
         model = Solicitud
         fields = [
             'id', 'prestador', 'rubro', 'descripcion', 'estado', 'estado_display',
-            'creada', 'calificacion', 'puede_calificar',
+            'creada', 'calificacion', 'puede_calificar', 'historial',
         ]
 
     def get_prestador(self, solicitud):

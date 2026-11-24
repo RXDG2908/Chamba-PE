@@ -27,3 +27,6 @@ Thumbs.db
 
 # Artefactos aislados de validación HU-21
 .hu21-local/
+
+# Artefactos de las pruebas de navegador de HU-12
+.hu12-local/

@@ -51,6 +51,7 @@ INSTALLED_APPS = [
     'administracion',
     'usuarios',
     'verificacion',
+    'calificaciones',
 ]
 
 MIDDLEWARE = [

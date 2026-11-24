@@ -44,7 +44,10 @@ public class BusquedaService {
     public record PrestadorDto(
         long id, String nombres, String apellidos, List<RubroDto> rubros,
         double latitud, double longitud,
-        @com.fasterxml.jackson.annotation.JsonProperty("distancia_km") double distanciaKm) {
+        @com.fasterxml.jackson.annotation.JsonProperty("distancia_km") double distanciaKm,
+        // HU-12: null mientras no tenga calificaciones, igual que Django.
+        @com.fasterxml.jackson.annotation.JsonProperty("calificacion_promedio") Double calificacionPromedio,
+        @com.fasterxml.jackson.annotation.JsonProperty("calificaciones_total") int calificacionesTotal) {
     }
 
     private record Parametros(long rubro, double latitud, double longitud) {
@@ -74,7 +77,9 @@ public class BusquedaService {
                     // Solo la salida pública se redondea; el cálculo usa las coordenadas originales.
                     redondear3(prestador.getLatitud().doubleValue()),
                     redondear3(prestador.getLongitud().doubleValue()),
-                    distancia));
+                    distancia,
+                    prestador.getCalificacionPromedio() == null ? null : prestador.getCalificacionPromedio().doubleValue(),
+                    prestador.getCalificacionesTotal()));
             }
         }
         // Orden estable del más cercano al más lejano (T3.3).

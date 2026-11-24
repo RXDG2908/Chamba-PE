@@ -84,8 +84,8 @@ class BusquedaApiTest {
         jdbc.update("insert into auth_user (id, username) values (?, ?)", id, "usuario" + id);
         jdbc.update("""
             insert into prestadores_prestador (id, nombres, apellidos, dni, telefono, latitud, longitud,
-              radio_cobertura_km, disponible, estado, creado, usuario_id)
-            values (?, ?, 'Prueba', ?, '', ?, ?, ?, ?, ?, '2026-11-23 10:00:00', ?)""",
+              radio_cobertura_km, disponible, estado, creado, usuario_id, calificaciones_total)
+            values (?, ?, 'Prueba', ?, '', ?, ?, ?, ?, ?, '2026-11-23 10:00:00', ?, 0)""",
             id, nombre, String.format("%08d", id), Double.parseDouble(latitud), Double.parseDouble(longitud),
             radio, disponible ? 1 : 0, estado, id);
         for (long rubro : rubros) {
@@ -127,6 +127,19 @@ class BusquedaApiTest {
             .andExpect(jsonPath("$[0].telefono").doesNotExist())
             .andExpect(jsonPath("$[0].estado").doesNotExist())
             .andExpect(jsonPath("$[0].disponible").doesNotExist());
+    }
+
+    @Test
+    void muestraPromedioYTotalDeCalificaciones() throws Exception {
+        // Así lo deja Django (HU-12) al guardar calificaciones de 5, 4 y 4.
+        jdbc.update("update prestadores_prestador set calificacion_promedio = 4.33, calificaciones_total = 3 where id = 1");
+        buscar("rubro=1&latitud=-12.044861&longitud=-77.026582")
+            .andExpect(jsonPath("$[0].calificacion_promedio").value(4.33))
+            .andExpect(jsonPath("$[0].calificaciones_total").value(3))
+            // Sin calificaciones: promedio null (no 0) y total 0.
+            .andExpect(jsonPath("$[1].nombres").value("Eva"))
+            .andExpect(jsonPath("$[1].calificacion_promedio").value(org.hamcrest.Matchers.nullValue()))
+            .andExpect(jsonPath("$[1].calificaciones_total").value(0));
     }
 
     @Test

@@ -56,9 +56,11 @@ solo cambien la dirección del servidor:
 | `GET /api/servicios/solicitudes/recibidas/` · `POST .../{id}/aceptar/` · `.../rechazar/` | Bandeja del prestador y respuesta | Pendiente |
 | `GET` · `PATCH /api/usuarios/disponibilidad/` | Disponibilidad del prestador | Pendiente |
 
-Comparado con Django real el 23/11 sobre la misma base: 59 consultas (rubros, filtros, distancias,
-redondeo y todos los mensajes de error), sin diferencias. Cuando se una HU-12 (#42), la búsqueda
-también tendrá que devolver `calificacion_promedio` y `calificaciones_total`.
+La búsqueda incluye también `calificacion_promedio` (`null` sin calificaciones) y `calificaciones_total`
+de HU-12; Spring solo los lee, los mantiene Django.
+
+Comparado con Django real sobre la misma base (23/11 y, ya con HU-12, 24/11): 59 consultas (rubros,
+filtros, distancias, redondeo, calificaciones y todos los mensajes de error), sin diferencias.
 
 El inicio de sesión de la app usa Firebase Authentication: Spring Boot valida el token y
 busca al usuario por `firebase_uid` (campo de `usuarios.Perfil`).

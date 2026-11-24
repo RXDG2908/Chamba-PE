@@ -44,6 +44,13 @@ public class Prestador {
 
     private String estado;
 
+    // HU-12: los mantiene Django al guardar o borrar calificaciones. Promedio nulo = sin calificaciones.
+    @Column(name = "calificacion_promedio")
+    private BigDecimal calificacionPromedio;
+
+    @Column(name = "calificaciones_total")
+    private Integer calificacionesTotal;
+
     @ManyToMany
     @JoinTable(
         name = "prestadores_prestador_rubros",
@@ -85,6 +92,14 @@ public class Prestador {
 
     public String getEstado() {
         return estado;
+    }
+
+    public BigDecimal getCalificacionPromedio() {
+        return calificacionPromedio;
+    }
+
+    public Integer getCalificacionesTotal() {
+        return calificacionesTotal;
     }
 
     public List<Rubro> getRubros() {

@@ -1,9 +1,11 @@
 import { useEffect, useState } from 'react'
+import { enviarJson } from './api.js'
 
 const ESTADOS = {
   pendiente: 'Pendiente de respuesta',
   aceptada: 'El prestador aceptó tu solicitud.',
   rechazada: 'El prestador rechazó tu solicitud.',
+  finalizada: 'El servicio terminó. Puedes calificarlo en «Mis servicios».',
 }
 
 function mensajeError(datos, alternativa) {
@@ -81,16 +83,13 @@ function SolicitudServicio({ prestador, rubro, ubicacion }) {
     setEnviando(true)
     setError('')
     try {
-      const respuesta = await fetch('/api/servicios/solicitudes/', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          ...datosCliente,
-          prestador: prestador.id,
-          rubro: Number(rubro),
-          latitud: ubicacion[0].toFixed(6),
-          longitud: ubicacion[1].toFixed(6),
-        }),
+      // Con CSRF: si el cliente tiene sesión, la solicitud queda a su nombre y podrá calificarla (HU-12).
+      const respuesta = await enviarJson('/api/servicios/solicitudes/', 'POST', {
+        ...datosCliente,
+        prestador: prestador.id,
+        rubro: Number(rubro),
+        latitud: ubicacion[0].toFixed(6),
+        longitud: ubicacion[1].toFixed(6),
       })
       const resultado = await respuesta.json()
       if (!respuesta.ok) {

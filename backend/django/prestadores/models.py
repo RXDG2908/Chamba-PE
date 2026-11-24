@@ -45,6 +45,9 @@ class Prestador(models.Model):
     disponible = models.BooleanField(default=False)
     estado = models.CharField(max_length=12, choices=Estado.choices, default=Estado.PENDIENTE)
     creado = models.DateTimeField(auto_now_add=True)
+    # HU-12: se recalculan cada vez que un cliente califica; sin calificaciones queda vacío.
+    calificacion_promedio = models.DecimalField(max_digits=3, decimal_places=2, null=True, blank=True)
+    calificaciones_total = models.PositiveIntegerField(default=0)
 
     class Meta:
         verbose_name_plural = 'prestadores'

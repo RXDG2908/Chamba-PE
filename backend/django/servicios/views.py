@@ -10,6 +10,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from prestadores.models import Prestador
+from usuarios.models import Perfil, rol_de
 from usuarios.permisos import EsPrestador
 
 from .distancias import distancia_km
@@ -54,13 +55,15 @@ class BuscarPrestadoresView(APIView):
 class CrearSolicitudView(generics.CreateAPIView):
     """El cliente envía una solicitud a un prestador; queda Pendiente."""
     serializer_class = SolicitudSerializer
+    # Sigue abierta a visitantes; con sesión de cliente (y su CSRF) la solicitud queda a su nombre.
     permission_classes = [AllowAny]
-    authentication_classes = []
 
     def perform_create(self, serializer):
         from .push import notificar_solicitud
+        usuario = self.request.user
+        cliente = usuario if usuario.is_authenticated and rol_de(usuario) == Perfil.Rol.CLIENTE else None
         with transaction.atomic():
-            solicitud = serializer.save()
+            solicitud = serializer.save(cliente=cliente)
             transaction.on_commit(lambda: notificar_solicitud(solicitud.pk))
 
 

@@ -394,12 +394,12 @@ Decisión del Product Owner del 28/10: HU-8 pasa completa porque T8.1 no se empe
 | | T10.2 | Implementar el servicio de recomendación y ranking | Backend | 5 | |
 | | T10.3 | Mostrar el prestador recomendado con motivo y tiempo estimado | Frontend | 3 | |
 | | T10.4 | Pruebas de la recomendación con datos de ejemplo | Pruebas | 1 | |
-| HU-11 · Seguimiento en tiempo real | T11.1 | Modelo de estados y comunicación en tiempo real (WebSocket) | Backend | 4 | |
-| | T11.2 | Pantalla de seguimiento en tiempo real (móvil y web) | Frontend | 5 | |
+| HU-11 · Seguimiento en tiempo real | T11.1 | Modelo de estados y comunicación en tiempo real (WebSocket) | Backend | 4 | 🟡 Construida, en revisión (24/11): consulta cada 5 s en lugar de WebSocket |
+| | T11.2 | Pantalla de seguimiento en tiempo real (móvil y web) | Frontend | 5 | 🟡 Construida, en revisión (24/11), web responsive |
 | | T11.3 | Pruebas de transición de estados | Pruebas | 2 | |
-| HU-12 · Calificación del servicio | T12.1 | API para registrar calificaciones | Backend | 1 | 🟡 Construida, en revisión (23/11) |
-| | T12.2 | Pantalla de calificación (1 a 5 estrellas y comentario) | Frontend | 2 | 🟡 Construida, en revisión (23/11) |
-| | T12.3 | Pruebas: solo se califica con el servicio Finalizado | Pruebas | 1 | |
+| HU-12 · Calificación del servicio | T12.1 | API para registrar calificaciones | Backend | 1 | ✅ PR #42 unido (23/11) |
+| | T12.2 | Pantalla de calificación (1 a 5 estrellas y comentario) | Frontend | 2 | ✅ PR #42 unido (23/11) |
+| | T12.3 | Pruebas: solo se califica con el servicio Finalizado | Pruebas | 1 | 🟡 Suites HU-12 OK (22/11 y 23/11) y prueba integrada con HU-11 escrita; se cierra al unir HU-11 |
 | | | **Total** | | **26** | |
 
 ## Carga por integrante

@@ -8,7 +8,7 @@ from prestadores.models import Prestador, Rubro
 from prestadores.serializers import RubroSerializer
 
 from .distancias import distancia_km
-from .models import Solicitud
+from .models import CambioEstado, Solicitud
 
 
 class CoordenadaField(serializers.FloatField):
@@ -134,28 +134,43 @@ class SolicitudSerializer(serializers.ModelSerializer):
         return datos
 
 
+class CambioEstadoSerializer(serializers.ModelSerializer):
+    """Una etapa del historial (HU-11)."""
+    estado_display = serializers.CharField(source='get_estado_display', read_only=True)
+
+    class Meta:
+        model = CambioEstado
+        fields = ['estado', 'estado_display', 'fecha']
+
+
 class EstadoSolicitudSerializer(serializers.ModelSerializer):
     """Lo que ve el cliente al consultar su solicitud; sin datos de contacto."""
     prestador_nombres = serializers.CharField(source='prestador.nombres', read_only=True)
     prestador_apellidos = serializers.CharField(source='prestador.apellidos', read_only=True)
     rubro = serializers.StringRelatedField()
     estado_display = serializers.CharField(source='get_estado_display', read_only=True)
+    historial = CambioEstadoSerializer(many=True, read_only=True)
 
     class Meta:
         model = Solicitud
         fields = [
             'id', 'prestador', 'prestador_nombres', 'prestador_apellidos', 'rubro',
-            'estado', 'estado_display', 'creada', 'respondida',
+            'estado', 'estado_display', 'creada', 'respondida', 'historial',
         ]
 
 
 class SolicitudRecibidaSerializer(serializers.ModelSerializer):
     """Lo que ve el prestador: incluye el contacto del cliente para atenderlo."""
     rubro = serializers.StringRelatedField()
+    estado_display = serializers.CharField(source='get_estado_display', read_only=True)
+    # HU-11: a qué estado puede pasarla ahora el prestador (null si no puede avanzarla).
+    siguiente_estado = serializers.CharField(read_only=True, allow_null=True)
+    historial = CambioEstadoSerializer(many=True, read_only=True)
 
     class Meta:
         model = Solicitud
         fields = [
             'id', 'rubro', 'cliente_nombre', 'cliente_telefono', 'descripcion',
-            'latitud', 'longitud', 'estado', 'creada', 'respondida',
+            'latitud', 'longitud', 'estado', 'estado_display', 'siguiente_estado', 'historial',
+            'creada', 'respondida',
         ]

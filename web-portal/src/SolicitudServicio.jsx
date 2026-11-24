@@ -1,10 +1,14 @@
 import { useEffect, useState } from 'react'
 import { enviarJson } from './api.js'
+import Seguimiento from './Seguimiento.jsx'
+import { ESTADOS_FINALES } from './etapasSeguimiento.js'
 
 const ESTADOS = {
   pendiente: 'Pendiente de respuesta',
-  aceptada: 'El prestador aceptó tu solicitud.',
+  aceptada: 'El prestador confirmó tu solicitud.',
   rechazada: 'El prestador rechazó tu solicitud.',
+  en_camino: 'El prestador está en camino.',
+  en_servicio: 'El prestador está realizando el servicio.',
   finalizada: 'El servicio terminó. Puedes calificarlo en «Mis servicios».',
 }
 
@@ -27,7 +31,8 @@ function SolicitudServicio({ prestador, rubro, ubicacion }) {
   const [error, setError] = useState('')
 
   useEffect(() => {
-    if (!solicitud?.id || solicitud.estado !== 'pendiente') return undefined
+    // HU-11: se sigue consultando hasta que el servicio termine o sea rechazado.
+    if (!solicitud?.id || ESTADOS_FINALES.includes(solicitud.estado)) return undefined
 
     const controlador = new AbortController()
     let temporizador
@@ -45,7 +50,7 @@ function SolicitudServicio({ prestador, rubro, ubicacion }) {
         }
         setSolicitud(resultado)
         setError('')
-        if (resultado.estado === 'pendiente') {
+        if (!ESTADOS_FINALES.includes(resultado.estado)) {
           temporizador = setTimeout(consultarEstado, 5000)
         }
       } catch (fallo) {
@@ -152,9 +157,10 @@ function SolicitudServicio({ prestador, rubro, ubicacion }) {
         <div aria-live="polite" role="status">
           <h5>Solicitud #{solicitud.id}</h5>
           <p className={`estado-solicitud estado-${solicitud.estado}`}>
-            {solicitud.estado_display || ESTADOS[solicitud.estado] || solicitud.estado}
+            {ESTADOS[solicitud.estado] || solicitud.estado_display || solicitud.estado}
           </p>
-          {solicitud.estado === 'pendiente' && <p>Consultaremos el estado automáticamente cada 5 segundos.</p>}
+          <Seguimiento estado={solicitud.estado} historial={solicitud.historial} />
+          {!ESTADOS_FINALES.includes(solicitud.estado) && <p>Consultaremos el estado automáticamente cada 5 segundos.</p>}
           {error && <p className="error-solicitud" role="alert">{error}</p>}
         </div>
       )}

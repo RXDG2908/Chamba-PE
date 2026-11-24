@@ -2,7 +2,7 @@ from django.urls import path
 from .notificaciones import TokenFCMView, SolicitudPrivadaView
 
 from .views import (
-    AceptarSolicitudView, CrearSolicitudView, DetalleSolicitudView,
+    AceptarSolicitudView, AvanzarSolicitudView, CrearSolicitudView, DetalleSolicitudView,
     RechazarSolicitudView, SolicitudesRecibidasView,
 )
 
@@ -14,4 +14,5 @@ urlpatterns = [
     path('solicitudes/<int:pk>/', DetalleSolicitudView.as_view(), name='detalle_solicitud'),
     path('solicitudes/<int:pk>/aceptar/', AceptarSolicitudView.as_view(), name='aceptar_solicitud'),
     path('solicitudes/<int:pk>/rechazar/', RechazarSolicitudView.as_view(), name='rechazar_solicitud'),
+    path('solicitudes/<int:pk>/avanzar/', AvanzarSolicitudView.as_view(), name='avanzar_solicitud'),
 ]

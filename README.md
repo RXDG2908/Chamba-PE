@@ -27,6 +27,7 @@ Proyecto Integrador — Diseño y Desarrollo de Software · IV ciclo · Tecsup 2
 | [docs/API_CONSENTIMIENTO.md](docs/API_CONSENTIMIENTO.md) | Consentimiento DNI versionado: aceptación, revocación y bloqueo de captura. |
 | [docs/API_ELIMINACION_DNI.md](docs/API_ELIMINACION_DNI.md) | Eliminación DNI: estados, reintentos, procesador y límites; pendiente de revisión. |
 | [docs/API_CALIFICACIONES.md](docs/API_CALIFICACIONES.md) | Calificación del servicio (HU-12): reglas, endpoints, promedio del prestador y cómo probarla |
+| [docs/API_SEGUIMIENTO.md](docs/API_SEGUIMIENTO.md) | Seguimiento del servicio (HU-11): estados, orden, endpoint para avanzar y cómo probarlo |
 | [docs/HU8_NOTIFICACIONES.md](docs/HU8_NOTIFICACIONES.md) | Notificaciones push (HU-8): configuración de FCM y guion de la validación T8.3 |
 | [docs/GUIA_NAVEGACION.md](docs/GUIA_NAVEGACION.md) | Cómo comprobar en el navegador cada tarea terminada |
 | [docs/EXPOSICION_HU19.md](docs/EXPOSICION_HU19.md) · [docs/exposicion-renzo-sprint1-2.md](docs/exposicion-renzo-sprint1-2.md) | Guías de exposición y pruebas en vivo |
@@ -53,7 +54,8 @@ Proyecto Integrador — Diseño y Desarrollo de Software · IV ciclo · Tecsup 2
 | HU-19 Escaneo del DNI | 🟡 En `main`; faltan las pruebas con muestras (T19.4) y con cámara y OCR reales |
 | HU-21 Consentimiento y eliminación de datos | 🟡 En `main` (PR #38, 21/11); la eliminación se atiende con el comando manual `procesar_eliminaciones_dni` |
 | HU-12 Calificación | 🟡 Construida, en revisión: el cliente con sesión califica de 1 a 5 estrellas cuando el servicio está Finalizado ([contrato](docs/API_CALIFICACIONES.md)) |
-| HU-10 Recomendación · HU-11 Seguimiento | ⚪ Sin empezar (Sprint 4) |
+| HU-11 Seguimiento | 🟡 Construida, en revisión: el prestador asignado avanza Confirmado → En camino → En servicio → Finalizada y el cliente lo ve cada 5 s ([contrato](docs/API_SEGUIMIENTO.md)) |
+| HU-10 Recomendación | ⚪ Sin empezar (Sprint 4) |
 | HU-13 Suspensión y bloqueo · HU-20 Reconocimiento facial | ⚪ Postergadas, sin sprint asignado |
 | App Android | 🟡 Primera versión en `main` ([PR #39](https://github.com/RXDG2908/Chamba-PE/pull/39), unido el 16/11 sin revisión de otro integrante); [falta](docs/android-reparto.md) probarla en teléfono físico y 10 tarjetas del plan; fuera del compromiso de los sprints |
 
@@ -149,7 +151,7 @@ El web de administración y el de usuario son una sola aplicación React (`web-p
 | Backend de usuario | Spring Boot (`backend/spring/`), en construcción |
 | Frontend web | React + Vite (aplicación responsiva y panel de administración) |
 | App móvil | Android nativo: Kotlin, Jetpack Compose y MVVM, con Retrofit, Room y Firebase (Auth y Firestore). Primera versión en `main`; el enfoque está pendiente de acuerdo del equipo |
-| Tiempo real | WebSocket (Django Channels) — previsto para HU-11, aún sin implementar |
+| Tiempo real | Consulta automática cada 5 s (HU-11); WebSocket (Django Channels) queda como mejora posterior |
 | Notificaciones | Firebase Cloud Messaging (web, con service worker) |
 | Verificación de identidad | Hoy: lectura de la MRZ del DNI con OCR (EasyOCR) y revisión manual. Previsto: reconocimiento facial (DeepFace) y prueba de vida (MediaPipe) |
 | IA | Recomendación del prestador (HU-10), aún sin implementar |
@@ -237,6 +239,7 @@ La API queda en `http://127.0.0.1:8000/` y el panel de Django en `/admin/`.
 | `POST` · `GET /api/verificacion/dni/` | El prestador envía las fotos de su DNI y consulta el resultado (HU-19); [contrato](docs/API_VERIFICACION_DNI.md) |
 | `GET` · `POST /api/verificacion/consentimiento/` · `POST .../consentimiento/revocar/` | El prestador consulta, acepta o revoca su consentimiento; sin él no se captura el DNI (HU-21); [contrato](docs/API_CONSENTIMIENTO.md) |
 | `GET` · `POST /api/verificacion/eliminaciones/` · `.../<uuid>/` · `.../<uuid>/reintentar/` | El prestador solicita, consulta y reintenta la eliminación de sus datos del DNI (HU-21); [contrato](docs/API_ELIMINACION_DNI.md) |
+| `POST /api/servicios/solicitudes/<id>/avanzar/` | El prestador asignado avanza el servicio: Confirmado → En camino → En servicio → Finalizada (HU-11); [contrato](docs/API_SEGUIMIENTO.md) |
 | `POST /api/calificaciones/` · `GET .../mis-servicios/` | El cliente califica su servicio Finalizado y ve sus solicitudes (HU-12); [contrato](docs/API_CALIFICACIONES.md) |
 | `GET /api/usuarios/csrf/` | Deja la cookie `csrftoken` para los `POST` desde React (HU-5) |
 | `POST /api/usuarios/registro/` | Registro del cliente; queda con la sesión iniciada (HU-5) |

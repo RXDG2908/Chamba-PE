@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { enviarJson } from './api.js'
 import { activarNotificaciones, desactivarNotificaciones } from './notificaciones.js'
+import Seguimiento from './Seguimiento.jsx'
+import { ACCION_SIGUIENTE } from './etapasSeguimiento.js'
 
 export default function SolicitudesRecibidas({ usuario, alVencer }) {
   const { id } = useParams()
@@ -36,23 +38,26 @@ export default function SolicitudesRecibidas({ usuario, alVencer }) {
     setErrorCarga(null)
     setRevision((r) => r + 1)
   }
-  async function responder(solicitud, accion) {
+  async function responder(solicitud, accion, cuerpo) {
     setOcupado(true)
     try {
-      const r = await enviarJson(`/api/servicios/solicitudes/${solicitud.id}/${accion}/`, 'POST')
+      const r = await enviarJson(`/api/servicios/solicitudes/${solicitud.id}/${accion}/`, 'POST', cuerpo)
       if (r.status === 403) { alVencer(null); return }
       if (r.status === 409) {
-        setMensaje('La solicitud ya fue respondida. Consultando su estado actualizado.')
+        setMensaje(accion === 'avanzar'
+          ? 'La solicitud cambió de estado en otra pestaña. Consultando su estado actualizado.'
+          : 'La solicitud ya fue respondida. Consultando su estado actualizado.')
         // Retirar inmediatamente las acciones obsoletas, también si la recarga falla.
         recargar()
         return
       }
-      if (!r.ok) throw new Error('No se pudo responder la solicitud.')
+      if (!r.ok) throw new Error(accion === 'avanzar'
+        ? 'No se pudo actualizar el estado del servicio.' : 'No se pudo responder la solicitud.')
       const dato = await r.json()
       setVista((anterior) => anterior?.clave === clave
         ? { ...anterior, solicitudes: anterior.solicitudes.map((s) => s.id === dato.id ? dato : s) }
         : anterior)
-      setMensaje('Respuesta guardada.')
+      setMensaje(accion === 'avanzar' ? `Estado actualizado: ${dato.estado_display || dato.estado}.` : 'Respuesta guardada.')
     } catch (e) { setMensaje(e.message) } finally { setOcupado(false) }
   }
   async function configurar(activar) {
@@ -74,11 +79,16 @@ export default function SolicitudesRecibidas({ usuario, alVencer }) {
     {solicitudes?.map((s) => <article key={s.id} className="caja">
       <h3><Link to={`/solicitudes/${s.id}`}>Solicitud #{s.id} · {s.rubro}</Link></h3>
       <p>{s.descripcion}</p><p>{s.cliente_nombre} · {s.cliente_telefono}</p>
-      <p>Estado: {s.estado}</p>
+      <p>Estado: {s.estado_display || s.estado}</p>
+      <Seguimiento estado={s.estado} historial={s.historial} />
       {s.estado === 'pendiente' ? <>
         <button disabled={ocupado} onClick={() => responder(s, 'aceptar')}>Aceptar</button>{' '}
         <button disabled={ocupado} onClick={() => responder(s, 'rechazar')}>Rechazar</button>
-      </> : <p>Esta solicitud ya fue respondida.</p>}
+      </> : ACCION_SIGUIENTE[s.siguiente_estado]
+        ? <button disabled={ocupado} onClick={() => responder(s, 'avanzar', { estado: s.siguiente_estado })}>
+          {ACCION_SIGUIENTE[s.siguiente_estado]}
+        </button>
+        : <p>{s.estado === 'finalizada' ? 'Servicio finalizado.' : 'Esta solicitud ya fue respondida.'}</p>}
     </article>)}
     {id && <Link to="/solicitudes">Volver a la bandeja</Link>}
   </main>

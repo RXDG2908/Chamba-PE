@@ -14,7 +14,7 @@ from usuarios.models import Perfil, rol_de
 from usuarios.permisos import EsPrestador
 
 from .distancias import distancia_km
-from .models import Solicitud
+from .models import CambioEstado, Solicitud
 from .serializers import (
     BusquedaPrestadorSerializer, EstadoSolicitudSerializer, PrestadorBusquedaSerializer,
     SolicitudRecibidaSerializer, SolicitudSerializer,
@@ -69,7 +69,7 @@ class CrearSolicitudView(generics.CreateAPIView):
 
 class DetalleSolicitudView(generics.RetrieveAPIView):
     """El cliente consulta su solicitud para ver el cambio de estado."""
-    queryset = Solicitud.objects.select_related('prestador', 'rubro')
+    queryset = Solicitud.objects.select_related('prestador', 'rubro').prefetch_related('historial')
     serializer_class = EstadoSolicitudSerializer
     permission_classes = [AllowAny]
     authentication_classes = []
@@ -82,7 +82,7 @@ class SolicitudesRecibidasView(generics.ListAPIView):
     pagination_class = None
 
     def get_queryset(self):
-        return self.request.user.prestador.solicitudes.select_related('rubro')
+        return self.request.user.prestador.solicitudes.select_related('rubro').prefetch_related('historial')
 
 
 class ResponderSolicitudView(APIView):
@@ -93,9 +93,12 @@ class ResponderSolicitudView(APIView):
     def post(self, request, pk):
         solicitud = get_object_or_404(Solicitud, pk=pk, prestador=request.user.prestador)
         respondida = timezone.now()
-        actualizadas = Solicitud.objects.filter(pk=solicitud.pk, estado=Solicitud.Estado.PENDIENTE).update(
-            estado=self.nuevo_estado, respondida=respondida,
-        )
+        with transaction.atomic():
+            actualizadas = Solicitud.objects.filter(pk=solicitud.pk, estado=Solicitud.Estado.PENDIENTE).update(
+                estado=self.nuevo_estado, respondida=respondida,
+            )
+            if actualizadas:
+                CambioEstado.objects.create(solicitud=solicitud, estado=self.nuevo_estado, fecha=respondida)
         if not actualizadas:
             solicitud.refresh_from_db()
             return Response(
@@ -112,3 +115,43 @@ class AceptarSolicitudView(ResponderSolicitudView):
 
 class RechazarSolicitudView(ResponderSolicitudView):
     nuevo_estado = Solicitud.Estado.RECHAZADA
+
+class AvanzarSolicitudView(APIView):
+    """HU-11: el prestador asignado avanza el servicio un paso (Confirmado → En camino → En servicio → Finalizada).
+
+    El cuerpo indica a qué estado pasa ({"estado": "en_camino"}); si no es el siguiente en el orden
+    (salto, retroceso, estado final o un doble clic que ya avanzó), responde 409 sin cambiar nada.
+    Otro prestador recibe 404, igual que al aceptar o rechazar.
+    """
+    permission_classes = [EsPrestador]
+
+    def post(self, request, pk):
+        solicitud = get_object_or_404(Solicitud, pk=pk, prestador=request.user.prestador)
+        destino = request.data.get('estado') if hasattr(request.data, 'get') else None
+        if destino not in Solicitud.Estado.values:
+            return Response({'estado': 'Indica un estado válido.'}, status=status.HTTP_400_BAD_REQUEST)
+        actual = solicitud.estado
+        if Solicitud.SEGUIMIENTO.get(actual) != destino:
+            return self.conflicto(solicitud)
+        ahora = timezone.now()
+        with transaction.atomic():
+            # Solo cambia si nadie la movió mientras tanto (dos pestañas o doble clic).
+            actualizadas = Solicitud.objects.filter(pk=solicitud.pk, estado=actual).update(estado=destino)
+            if actualizadas:
+                CambioEstado.objects.create(solicitud=solicitud, estado=destino, fecha=ahora)
+        solicitud.refresh_from_db()
+        if not actualizadas:
+            return self.conflicto(solicitud)
+        return Response(SolicitudRecibidaSerializer(solicitud).data)
+
+    @staticmethod
+    def conflicto(solicitud):
+        siguiente = solicitud.siguiente_estado
+        if solicitud.estado == Solicitud.Estado.PENDIENTE:
+            detalle = 'Primero acepta la solicitud para empezar el seguimiento.'
+        elif siguiente:
+            detalle = (f'La solicitud está «{solicitud.get_estado_display()}»; '
+                       f'solo puede pasar a «{Solicitud.Estado(siguiente).label}».')
+        else:
+            detalle = f'La solicitud está «{solicitud.get_estado_display()}» y ya no se puede avanzar.'
+        return Response({'estado': detalle, 'estado_actual': solicitud.estado}, status=status.HTTP_409_CONFLICT)

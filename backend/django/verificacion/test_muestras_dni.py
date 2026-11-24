@@ -168,7 +168,7 @@ class MuestrasConOcrRealTests(BaseMuestras):
         self.assertEqual(IntentoDni.objects.get().dni_leido, '')
 
     def test_fotos_imperfectas_se_leen_bien_o_van_a_revision_nunca_con_datos_errados(self):
-        # Como saldría la muestra válida con un celular. El 24/11 solo la JPEG muy comprimida se
+        # Como saldría la muestra válida con un celular. El 23/11 solo la JPEG muy comprimida se
         # leyó; las demás fueron a revisión manual (ver docs/pruebas-T19.4.md). Lo que no puede
         # pasar es que se valide con un DNI o nombres mal leídos.
         anverso, reverso = self.muestra('1-valido')

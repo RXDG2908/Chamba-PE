@@ -13,7 +13,8 @@
     "test:push": "node --test tests/push-worker.test.mjs",
     "test:hu8": "playwright test --config playwright.hu8.config.mjs",
     "test:hu21": "playwright test --config playwright.hu21.config.mjs",
-    "test:hu12": "playwright test --config playwright.hu12.config.mjs"
+    "test:hu12": "playwright test --config playwright.hu12.config.mjs",
+    "test:hu11": "playwright test --config playwright.hu11.config.mjs"
   },
   "dependencies": {
     "leaflet": "^1.9.4",

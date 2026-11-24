@@ -31,3 +31,4 @@
 .comentario-dado { margin-top: 6px !important; font-style: italic; }
 .estrellas-fijas { color: #c9d3ce; letter-spacing: 1px; }
 .estrellas-fijas .llena { color: var(--acento, #f29f3d); }
+.estado-en_camino, .estado-en_servicio { background: #e8f0fb; color: #1f5fa8; }

@@ -1,4 +1,4 @@
-# Pruebas de T19.4 · HU-19 con DNIs de muestra · 24/11/2026
+# Pruebas de T19.4 · HU-19 con DNIs de muestra · 23/11/2026
 
 > Prueba cruzada: la hace David, no quien construyó HU-19 (Renzo). Todos los DNIs son **ficticios** (`docs/muestras-dni/`); no se usaron documentos ni fotos de personas reales.
 

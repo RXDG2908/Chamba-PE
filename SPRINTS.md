@@ -390,10 +390,10 @@ Decisión del Product Owner del 28/10: HU-8 pasa completa porque T8.1 no se empe
 
 | HU | Tarea | Descripción | Tipo | Horas | Responsable |
 |:---:|:---:|---|:---:|:---:|:---:|
-| HU-10 · Recomendación con IA | T10.1 | Definir la fórmula de puntaje (distancia, calificación y disponibilidad) | Backend | 2 | |
-| | T10.2 | Implementar el servicio de recomendación y ranking | Backend | 5 | |
-| | T10.3 | Mostrar el prestador recomendado con motivo y tiempo estimado | Frontend | 3 | |
-| | T10.4 | Pruebas de la recomendación con datos de ejemplo | Pruebas | 1 | |
+| HU-10 · Recomendación con IA | T10.1 | Definir la fórmula de puntaje (distancia, calificación y disponibilidad) | Backend | 2 | Renzo · 👀 En revisión (25/11): [fórmula](docs/API_RECOMENDACION.md) |
+| | T10.2 | Implementar el servicio de recomendación y ranking | Backend | 5 | Renzo · 👀 En revisión (25/11): `GET /api/ia/recomendacion/`, 13 pruebas |
+| | T10.3 | Mostrar el prestador recomendado con motivo y tiempo estimado | Frontend | 3 | Renzo · 👀 En revisión (25/11): «Recomendado para ti» en `/resultados` |
+| | T10.4 | Pruebas de la recomendación con datos de ejemplo | Pruebas | 1 | David · 👀 En revisión (24/11): 7 pruebas cruzadas y muestra de 300 prestadores ([informe](docs/pruebas-T10.4.md)) |
 | HU-11 · Seguimiento en tiempo real | T11.1 | Modelo de estados y comunicación en tiempo real (WebSocket) | Backend | 4 | Luis · ✅ PR #44 unido (23/11): consulta cada 5 s en lugar de WebSocket, aceptado por el PO |
 | | T11.2 | Pantalla de seguimiento en tiempo real (móvil y web) | Frontend | 5 | Luis · ✅ PR #44 unido (23/11), web responsive. La app Android aún no tiene los estados nuevos: se decide en la Review |
 | | T11.3 | Pruebas de transición de estados | Pruebas | 2 | David · ✅ PR #49 unido (24/11): 4 pruebas de punta a punta con Django real ([informe](docs/pruebas-T11.3.md)) |

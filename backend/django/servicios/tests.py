@@ -178,7 +178,7 @@ class BusquedaPrestadoresTests(TestCase):
 
     def test_comparacion_no_redondea_distancia(self):
         self.crear_prestador()
-        with patch('servicios.views.distancia_km', return_value=5.000001):
+        with patch('servicios.busqueda.distancia_km', return_value=5.000001):
             self.assertEqual(self.buscar().json(), [])
 
     def test_parametros_faltantes(self):

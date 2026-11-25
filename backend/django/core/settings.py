@@ -71,6 +71,7 @@ INSTALLED_APPS = [
     'usuarios',
     'verificacion',
     'calificaciones',
+    'ia',
 ]
 
 MIDDLEWARE = [

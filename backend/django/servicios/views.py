@@ -1,5 +1,4 @@
 import time
-from math import isclose
 
 from django.http import Http404
 from django.shortcuts import get_object_or_404
@@ -10,12 +9,11 @@ from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from prestadores.models import Prestador
 from usuarios.models import Perfil, rol_de
 from usuarios.permisos import EsPrestador
 
+from .busqueda import prestadores_en_cobertura
 from .codigo_seguimiento import puede_ver
-from .distancias import distancia_km
 from .models import CambioEstado, Solicitud
 from .serializers import (
     BusquedaPrestadorSerializer, EstadoSolicitudSerializer, PrestadorBusquedaSerializer,
@@ -32,23 +30,7 @@ class BuscarPrestadoresView(APIView):
         parametros = BusquedaPrestadorSerializer(data=request.query_params)
         parametros.is_valid(raise_exception=True)
         datos = parametros.validated_data
-        candidatos = Prestador.objects.filter(
-            disponible=True, estado=Prestador.Estado.VERIFICADO, rubros__id=datos['rubro'],
-        ).prefetch_related('rubros')
-        resultados = []
-        for prestador in candidatos:
-            distancia = distancia_km(
-                prestador.latitud, prestador.longitud, datos['latitud'], datos['longitud'],
-            )
-            radio = prestador.radio_cobertura_km
-            # El límite es inclusivo; tolerancia de 1 micrómetro para redondeo flotante.
-            if distancia <= radio or isclose(distancia, radio, rel_tol=0, abs_tol=1e-9):
-                prestador.distancia_km = distancia
-                resultados.append(prestador)
-        
-        # --- TAREA T3.3: ORDENAR POR DISTANCIA (del más cercano al más lejano) ---
-        resultados.sort(key=lambda x: x.distancia_km)
-
+        resultados = prestadores_en_cobertura(datos['rubro'], datos['latitud'], datos['longitud'])
         respuesta = Response(PrestadorBusquedaSerializer(resultados, many=True).data)
         respuesta['X-Execution-Time-Ms'] = f'{(time.perf_counter() - inicio) * 1000:.3f}'
         return respuesta

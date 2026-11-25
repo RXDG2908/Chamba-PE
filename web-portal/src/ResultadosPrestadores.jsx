@@ -26,6 +26,28 @@ function prestadorValido(prestador) {
       rubro && Number.isSafeInteger(rubro.id) && rubro.id > 0 && typeof rubro.nombre === 'string')
 }
 
+// HU-10: la recomendación solo se muestra si es coherente con los resultados de la búsqueda.
+function recomendacionValida(datos, prestadores) {
+  const r = datos?.recomendado
+  return prestadorValido(r) && typeof r.motivo === 'string' && r.motivo.length > 0
+    && Number.isInteger(r.tiempo_estimado_min) && r.tiempo_estimado_min >= 0
+    && prestadores.some((p) => p.id === r.id)
+}
+
+function Recomendado({ prestador }) {
+  return (
+    <aside className="recomendado" aria-labelledby="titulo-recomendado">
+      <p className="etiqueta-recomendado">✨ Recomendado para ti</p>
+      <h4 id="titulo-recomendado">{prestador.nombres} {prestador.apellidos}</h4>
+      <p className="motivo-recomendado">{prestador.motivo}</p>
+      <p className="tiempo-recomendado">
+        Llegada estimada: <strong>≈ {prestador.tiempo_estimado_min} min</strong>
+      </p>
+      <a href={`#prestador-${prestador.id}`}>Ver y solicitar</a>
+    </aside>
+  )
+}
+
 function UbicacionCliente({ ubicacion, onElegir }) {
   useMapEvents({
     click: ({ latlng, originalEvent }) => {
@@ -113,6 +135,7 @@ function ResultadosPrestadores() {
   const [prestadores, setPrestadores] = useState([])
   const [estado, setEstado] = useState('inicial')
   const [error, setError] = useState('')
+  const [recomendado, setRecomendado] = useState(null)
   const peticion = useRef(null)
 
   useEffect(() => {
@@ -141,6 +164,7 @@ function ResultadosPrestadores() {
   function limpiarBusqueda() {
     peticion.current?.abort()
     setPrestadores([])
+    setRecomendado(null)
     setEstado('inicial')
     setError('')
   }
@@ -169,6 +193,19 @@ function ResultadosPrestadores() {
       return
     }
     elegirUbicacion([latitud, longitud])
+  }
+
+  // HU-10: si la recomendación falla, la búsqueda se muestra igual, solo sin el recuadro.
+  async function cargarRecomendacion(parametros, controlador, datos) {
+    try {
+      const respuesta = await fetch(`/api/ia/recomendacion/?${parametros}`, { signal: controlador.signal })
+      const cuerpo = respuesta.ok ? await respuesta.json() : null
+      if (!controlador.signal.aborted && peticion.current === controlador && recomendacionValida(cuerpo, datos)) {
+        setRecomendado(cuerpo.recomendado)
+      }
+    } catch {
+      // Sin recomendación: la lista de la búsqueda sigue siendo útil.
+    }
   }
 
   async function buscar(evento) {
@@ -204,6 +241,7 @@ function ResultadosPrestadores() {
       if (!controlador.signal.aborted && peticion.current === controlador) {
         setPrestadores(datos)
         setEstado(datos.length ? 'listo' : 'vacio')
+        if (datos.length) cargarRecomendacion(parametros, controlador, datos)
       }
     } catch (fallo) {
       if (!controlador.signal.aborted && peticion.current === controlador) {
@@ -292,16 +330,21 @@ function ResultadosPrestadores() {
           {estado === 'listo' && <p className="resultado-anuncio">Búsqueda completada: {prestadores.length} {prestadores.length === 1 ? 'prestador encontrado' : 'prestadores encontrados'}.</p>}
         </div>
         {estado === 'error' && <p className="error-busqueda" role="alert">{error}</p>}
+        {estado === 'listo' && recomendado && <Recomendado prestador={recomendado} />}
         {estado === 'listo' && (
           <ul className="lista-prestadores">
             {prestadores.map((prestador, indice) => (
-              <li key={prestador.id} className="tarjeta">
+              <li key={prestador.id} id={`prestador-${prestador.id}`}
+                className={`tarjeta${recomendado?.id === prestador.id ? ' tarjeta-recomendada' : ''}`}>
                 <div className="cabecera-prestador">
                 <div className={`avatar ${['verde', 'azul', 'naranja'][indice % 3]}`} aria-hidden="true">
                   {prestador.nombres.charAt(0)}{prestador.apellidos.charAt(0)}
                 </div>
                 <div className="perfil">
-                  <h4>{prestador.nombres} {prestador.apellidos}</h4>
+                  <h4>
+                    {prestador.nombres} {prestador.apellidos}
+                    {recomendado?.id === prestador.id && <span className="insignia-recomendado"> ✨ Recomendado</span>}
+                  </h4>
                   <p className="rubros-tarjeta">{prestador.rubros.map((especialidad) => especialidad.nombre).join(' · ')}</p>
                   <p className="rubros-tarjeta">{textoCalificacion(prestador)}</p>
                 </div>

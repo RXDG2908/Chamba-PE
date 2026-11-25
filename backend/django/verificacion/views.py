@@ -25,6 +25,7 @@ INTENTOS_POR_DIA = 5
 FIRMAS = {b'\xff\xd8\xff': 'jpg', b'\x89PNG\r\n\x1a\n': 'png'}
 TIPOS = {'jpg': 'image/jpeg', 'png': 'image/png'}
 FOTOS = ('anverso', 'reverso', 'titular')
+SIN_RESOLVER = ('pendiente', 'procesando', 'parcial', 'fallida')
 
 
 def extension_de(cabecera):
@@ -165,7 +166,12 @@ class IntentoDniView(APIView):
             resultado = request.query_params['resultado']
             if resultado not in IntentoDni.Resultado.values:
                 return Response({'resultado': ['Valor no válido.']}, status=400)
-            intentos = IntentoDni.objects.filter(resultado=resultado).select_related('prestador')
+            # HU-21: no se muestran intentos cuyos datos ya se borraron ni los de un prestador con una
+            # eliminación sin resolver (sus fotos se están borrando y no hay nada que revisar).
+            intentos = (IntentoDni.objects.filter(resultado=resultado)
+                        .exclude(anverso='', reverso='', foto_titular='')
+                        .exclude(prestador__eliminaciones_dni__estado__in=SIN_RESOLVER)
+                        .select_related('prestador'))
             return Response([
                 {**a_json(i), 'prestador': {
                     'id': i.prestador_id,

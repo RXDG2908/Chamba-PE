@@ -1,3 +1,6 @@
+import logging
+
+from django.conf import settings
 from django.db import DatabaseError
 from django.shortcuts import get_object_or_404
 from rest_framework import serializers
@@ -6,8 +9,31 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from usuarios.permisos import EsPrestador
-from .eliminacion import SolicitudAbierta, reintentar_eliminacion, solicitar_eliminacion
+from .eliminacion import (
+    SolicitudAbierta, procesar_eliminacion, reintentar_eliminacion, solicitar_eliminacion,
+)
 from .models import SolicitudEliminacionDni
+
+logger = logging.getLogger(__name__)
+
+
+def atender_ahora(solicitud):
+    """Atiende la solicitud en la misma petición, sin esperar al comando manual.
+
+    `procesar_eliminacion` ya deja la solicitud en parcial/fallida si algo sale mal; si ni
+    siquiera se pudo empezar (p. ej. base ocupada), queda pendiente y la recoge el comando
+    `procesar_eliminaciones_dni`, que se mantiene como respaldo.
+    """
+    if not getattr(settings, 'ELIMINACION_DNI_AUTOMATICA', True) or solicitud.estado != 'pendiente':
+        return solicitud
+    try:
+        return procesar_eliminacion(solicitud.pk)
+    except Exception as e:
+        # Sin traza: podría incluir rutas privadas de las fotos.
+        logger.warning('No se pudo atender la eliminación DNI %s (%s); queda pendiente para el comando.',
+                       solicitud.pk, type(e).__name__)
+        solicitud.refresh_from_db()
+        return solicitud
 
 
 class PeticionEliminacionSerializer(serializers.Serializer):
@@ -58,6 +84,8 @@ class EliminacionesDniView(APIView):
                              'solicitud': solicitud_json(e.solicitud)}, status=409)
         except DatabaseError:
             return Response({'detail': 'No pudimos registrar la solicitud. Repite con la misma clave.'}, status=503)
+        if creada:
+            solicitud = atender_ahora(solicitud)
         return Response(solicitud_json(solicitud), status=202 if creada else 200)
 
 
@@ -82,4 +110,5 @@ class ReintentarEliminacionDniView(APIView):
             solicitud = reintentar_eliminacion(request.user.prestador, identificador)
         except DatabaseError:
             return Response({'detail': 'No pudimos registrar el reintento. Puedes repetirlo.'}, status=503)
+        solicitud = atender_ahora(solicitud)
         return Response(solicitud_json(solicitud), status=200 if solicitud.estado == 'atendida' else 202)

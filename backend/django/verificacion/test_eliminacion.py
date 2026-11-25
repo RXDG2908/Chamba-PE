@@ -25,7 +25,7 @@ from .eliminacion import (
     _inventariar, _borrar_y_verificar,
 )
 from .models import AlmacenPrivado, Consentimiento, IntentoDni, SolicitudEliminacionDni
-from .textos_consentimiento import TEXTO_DNI_V1, VERSION_DNI
+from .textos_consentimiento import TEXTO_DNI, TEXTO_DNI_V1, TEXTO_DNI_V2, VERSION_DNI
 from .tests import JPG
 from .vistas_eliminacion import solicitud_json
 
@@ -182,6 +182,7 @@ class EliminacionTests(TestCase):
         self.assertNotEqual(s.token_ejecucion, token)
         self.assertIn('recuperacion', s.eventos.values_list('codigo', flat=True))
 
+    @override_settings(ELIMINACION_DNI_AUTOMATICA=False)
     def test_idempotencia_repetida_y_nueva_solicitud_tras_atender(self):
         c = self.sesion(self.a.usuario)
         payload = {'clave_idempotencia': str(uuid.uuid4()), 'confirmo': True}
@@ -396,3 +397,77 @@ class EliminacionTests(TestCase):
         self.assertTrue(AlmacenPrivado().exists(nombre))
         ajeno.refresh_from_db()
         self.assertEqual(ajeno.anverso.name, nombre)
+
+    # --- Observaciones de la revisión del 12/11 (cerradas el 25/11) ---
+
+    def test_api_atiende_la_solicitud_sin_comando_manual(self):
+        i = self.intento()
+        rutas = [getattr(i, c).path for c in CAMPOS_FOTO]
+        r = self.sesion(self.a.usuario).post(reverse('eliminaciones_dni'),
+            {'clave_idempotencia': str(uuid.uuid4()), 'confirmo': True}, format='json')
+        self.assertEqual(r.status_code, 202)
+        self.assertEqual(r.json()['estado'], 'atendida')
+        self.assertFalse(any(Path(ruta).exists() for ruta in rutas))
+        i.refresh_from_db()
+        self.assertEqual(i.dni_leido, '')
+        # El comando sigue de respaldo y no vuelve a procesarla.
+        call_command('procesar_eliminaciones_dni', stdout=StringIO())
+        self.assertEqual(SolicitudEliminacionDni.objects.get().ejecuciones, 1)
+
+    def test_reintento_por_api_tambien_se_atiende_al_momento(self):
+        self.intento()
+        s = self.pedir()
+        with mock.patch.object(AlmacenPrivado, 'delete', side_effect=PermissionError('bloqueado')):
+            s = procesar_eliminacion(s.pk)
+        self.assertIn(s.estado, (ESTADO.PARCIAL, ESTADO.FALLIDA))
+        r = self.sesion(self.a.usuario).post(reverse('reintentar_eliminacion_dni', args=[s.pk]))
+        self.assertEqual((r.status_code, r.json()['estado']), (200, 'atendida'))
+
+    def test_si_no_se_puede_atender_queda_pendiente_para_el_comando(self):
+        self.intento()
+        with mock.patch('verificacion.vistas_eliminacion.procesar_eliminacion', side_effect=OperationalError('ocupada')), \
+                self.assertLogs('verificacion.vistas_eliminacion', 'WARNING'):
+            r = self.sesion(self.a.usuario).post(reverse('eliminaciones_dni'),
+                {'clave_idempotencia': str(uuid.uuid4()), 'confirmo': True}, format='json')
+        self.assertEqual((r.status_code, r.json()['estado']), (202, 'pendiente'))
+        self.assertNotIn('ocupada', str(r.json()))
+        call_command('procesar_eliminaciones_dni', stdout=StringIO())
+        self.assertEqual(SolicitudEliminacionDni.objects.get().estado, ESTADO.ATENDIDA)
+
+    def test_los_fallos_del_borrado_quedan_registrados_sin_datos_privados(self):
+        i = self.intento()
+        with mock.patch.object(AlmacenPrivado, 'delete', side_effect=PermissionError('DATOS-SENSIBLES')), \
+                self.assertLogs('verificacion.eliminacion', 'WARNING') as registro:
+            procesar_eliminacion(self.pedir().pk)
+        texto = '\n'.join(registro.output)
+        self.assertIn('no se borraron anverso, reverso, foto_titular', texto)
+        for dato in ['DATOS-SENSIBLES', '12345678', self.temp.name, i.anverso.name]:
+            self.assertNotIn(dato, texto)
+
+    def test_cola_del_admin_no_muestra_intentos_borrados_ni_en_eliminacion(self):
+        borrado = self.intento()
+        IntentoDni.objects.filter(pk=borrado.pk).update(resultado='revision_manual')
+        procesar_eliminacion(self.pedir().pk)
+        en_curso = self.intento(self.b)
+        IntentoDni.objects.filter(pk=en_curso.pk).update(resultado='revision_manual')
+        url = f"{reverse('verificacion_dni')}?resultado=revision_manual"
+        admin = self.sesion(self.admin)
+        self.assertEqual(admin.get(url).json()[0]['id'], en_curso.pk)
+        self.assertEqual(len(admin.get(url).json()), 1)
+        self.pedir(self.b)
+        self.assertEqual(admin.get(url).json(), [])
+
+    def test_texto_vigente_sin_errata_y_v2_queda_desactualizada(self):
+        self.assertTrue(TEXTO_DNI.startswith('DEMOSTRACIÓN:'))
+        self.assertNotIn('DEMONSTRACIÓN', TEXTO_DNI)
+        self.assertEqual(TEXTO_DNI.replace('DEMOSTRACIÓN:', 'DEMONSTRACIÓN:'), TEXTO_DNI_V2)
+        self.assertEqual(VERSION_DNI, 'demo-dni-v3')
+        revocar_consentimiento(self.a.usuario)
+        Consentimiento.objects.create(usuario=self.a.usuario, finalidad='verificacion_dni',
+            version_texto='demo-dni-v2', texto_aceptado=TEXTO_DNI_V2)
+        estado = self.sesion(self.a.usuario).get(reverse('consentimiento')).json()
+        self.assertEqual((estado['vigente'], estado['estado']), (False, 'desactualizado'))
+        self.assertNotIn('DEMONSTRACIÓN', estado['texto'])
+
+
+CAMPOS_FOTO = ('anverso', 'reverso', 'foto_titular')

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { enviarJson } from './api.js'
 import Seguimiento from './Seguimiento.jsx'
 import { ESTADOS_FINALES } from './etapasSeguimiento.js'
@@ -29,6 +29,8 @@ function SolicitudServicio({ prestador, rubro, ubicacion }) {
   const [solicitud, setSolicitud] = useState(null)
   const [enviando, setEnviando] = useState(false)
   const [error, setError] = useState('')
+  // HU-11: el detalle solo lo ven el cliente y el prestador; sin cuenta, el código lo identifica.
+  const codigo = useRef('')
 
   useEffect(() => {
     // HU-11: se sigue consultando hasta que el servicio termine o sea rechazado.
@@ -38,7 +40,8 @@ function SolicitudServicio({ prestador, rubro, ubicacion }) {
     let temporizador
     async function consultarEstado() {
       try {
-        const respuesta = await fetch(`/api/servicios/solicitudes/${solicitud.id}/`, {
+        const consulta = codigo.current ? `?codigo=${encodeURIComponent(codigo.current)}` : ''
+        const respuesta = await fetch(`/api/servicios/solicitudes/${solicitud.id}/${consulta}`, {
           signal: controlador.signal,
         })
         const resultado = await respuesta.json()
@@ -103,6 +106,7 @@ function SolicitudServicio({ prestador, rubro, ubicacion }) {
       if (!resultado || !resultado.id || typeof resultado.estado !== 'string') {
         throw new Error('El servidor devolvió una solicitud inválida.')
       }
+      codigo.current = typeof resultado.codigo_seguimiento === 'string' ? resultado.codigo_seguimiento : ''
       setSolicitud(resultado)
     } catch (fallo) {
       setError(fallo instanceof TypeError || fallo instanceof SyntaxError

@@ -344,11 +344,12 @@ class SolicitudTests(TestCase):
         self.assertEqual(self.client.get(reverse('solicitudes_recibidas')).status_code, 403)
 
     def test_aceptar_y_el_cliente_ve_el_cambio(self):
-        solicitud_id = self.enviar().json()['id']
+        enviada = self.enviar().json()
+        solicitud_id = enviada['id']
         r = self.responder('aceptar', solicitud_id)
         self.assertEqual(r.status_code, 200)
         self.client.logout()
-        r = self.client.get(reverse('detalle_solicitud', args=[solicitud_id]))
+        r = self.client.get(reverse('detalle_solicitud', args=[solicitud_id]), {'codigo': enviada['codigo_seguimiento']})
         self.assertEqual(r.json()['estado'], 'aceptada')
         self.assertIsNotNone(r.json()['respondida'])
         self.assertNotIn('cliente_telefono', r.json())

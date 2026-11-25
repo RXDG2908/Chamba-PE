@@ -204,7 +204,7 @@ test('solicitud desde tarjeta se guarda realmente solo en la BD ficticia', async
   expect(solicitud.prestador).toBe(data[0].id)
   expect(solicitud.estado).toBe('pendiente')
   await expect(card.getByText('Solicitud #' + solicitud.id)).toBeVisible()
-  const persisted = await (await page.request.get('/api/servicios/solicitudes/' + solicitud.id + '/')).json()
+  const persisted = await (await page.request.get('/api/servicios/solicitudes/' + solicitud.id + '/', { params: { codigo: solicitud.codigo_seguimiento } })).json()
   expect(persisted.id).toBe(solicitud.id)
   expect(persisted.estado).toBe('pendiente')
   save('solicitud-real', { id: solicitud.id, prestador: solicitud.prestador, estado: persisted.estado,

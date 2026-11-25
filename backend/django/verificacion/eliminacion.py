@@ -1,4 +1,5 @@
 """Solicitudes duraderas, barrera de captura e inventario privado de archivos DNI."""
+import logging
 import uuid
 from pathlib import Path, PurePosixPath
 
@@ -17,6 +18,7 @@ ESTADO = SolicitudEliminacionDni.Estado
 CAMPOS = ('anverso', 'reverso', 'foto_titular')
 VERSION_ALCANCE = 'verificacion_dni-v1'
 ALCANCE = ['fotografias_dni', 'fotografia_titular', 'datos_leidos', 'fechas_leidas', 'indicadores_y_fuente']
+logger = logging.getLogger(__name__)
 CODIGOS = {'', 'solicitada', 'reintento', 'recuperacion', 'almacenamiento', 'inventario', 'persistencia', 'verificacion'}
 
 
@@ -207,13 +209,18 @@ def _borrar_y_verificar(solicitud, token, prestador):
                 for item in actual.archivos.filter(intento=intento):
                     if not getattr(intento, item.campo) and storage.exists(item.nombre_privado):
                         setattr(intento, item.campo, item.nombre_privado)
-                if intento.eliminar_datos_biometricos():
+                fallidos = intento.eliminar_datos_biometricos()
+                if fallidos:
+                    logger.warning('Eliminación DNI %s: no se borraron %s del intento %s.',
+                                   actual.pk, ', '.join(fallidos), intento.pk)
                     error = 'almacenamiento'
             intento.refresh_from_db()
             progreso = progreso or (antes and _derivados_vacios(intento))
         except DatabaseError:
+            logger.warning('Eliminación DNI %s: error de BD en el intento %s.', actual.pk, intento.pk)
             error = 'persistencia'
-        except Exception:
+        except Exception as e:
+            logger.warning('Eliminación DNI %s: fallo al borrar el intento %s (%s).', actual.pk, intento.pk, type(e).__name__)
             error = 'verificacion'
     pendientes = 0
     for item in actual.archivos.all():
@@ -222,7 +229,8 @@ def _borrar_y_verificar(solicitud, token, prestador):
             if item.intento_id is None and storage.exists(item.nombre_privado):
                 storage.delete(item.nombre_privado)
             item.verificado = not storage.exists(item.nombre_privado)
-        except Exception:
+        except Exception as e:
+            logger.warning('Eliminación DNI %s: no se pudo borrar un archivo (%s).', actual.pk, type(e).__name__)
             item.verificado = False
             error = 'almacenamiento'
         item.save(update_fields=['verificado'])
@@ -235,7 +243,8 @@ def _borrar_y_verificar(solicitud, token, prestador):
     try:
         extras = set(_archivos_propios(prestador)) - conocidos
         pendientes += len(extras)
-    except Exception:
+    except Exception as e:
+        logger.warning('Eliminación DNI %s: no se pudo inventariar (%s).', actual.pk, type(e).__name__)
         pendientes += 1
         error = 'inventario'
     if pendientes or error:
@@ -267,6 +276,7 @@ def procesar_eliminacion(identificador, recuperar=False):
         solicitud.refresh_from_db()
         return solicitud
     except Exception as error:
+        logger.warning('Eliminación DNI %s: ejecución fallida (%s).', identificador, type(error).__name__)
         codigo = 'persistencia' if isinstance(error, DatabaseError) else ('verificacion' if inventariado else 'inventario')
         with transaction.atomic():
             control_propietario(prestador)

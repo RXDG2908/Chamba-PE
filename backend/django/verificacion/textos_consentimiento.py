@@ -1,6 +1,7 @@
 """Texto de demostración: el PO debe aprobarlo antes de un uso real."""
 FINALIDAD_DNI = 'verificacion_dni'
-VERSION_DNI = 'demo-dni-v2'
+VERSION_DNI = 'demo-dni-v3'
+# v1 y v2 se guardan tal cual se aceptaron (con la errata «DEMONSTRACIÓN»); no se reescriben.
 TEXTO_DNI_V1 = (
     'DEMONSTRACIÓN: texto provisional pendiente de aprobación del Product Owner. '
     'No es un consentimiento legal definitivo.\n\n'
@@ -13,7 +14,7 @@ TEXTO_DNI_V1 = (
     'Revocar no elimina las fotografías ya guardadas: la solicitud de eliminación '
     'todavía no está disponible en esta demostración.'
 )
-TEXTO_DNI = TEXTO_DNI_V1.replace(
+TEXTO_DNI_V2 = TEXTO_DNI_V1.replace(
     'Revocar no elimina las fotografías ya guardadas: la solicitud de eliminación '
     'todavía no está disponible en esta demostración.',
     'Revocar no elimina las fotografías ya guardadas. Puedo solicitar por separado '
@@ -21,3 +22,5 @@ TEXTO_DNI = TEXTO_DNI_V1.replace(
     'La solicitud conserva mi cuenta y el DNI registrado, y no se considera atendida '
     'hasta comprobar el borrado. Se mantiene un historial mínimo sin fotografías ni datos leídos.',
 )
+# v3 (25/11): corrige la errata «DEMONSTRACIÓN» → «DEMOSTRACIÓN». Las aceptaciones v2 quedan desactualizadas.
+TEXTO_DNI = TEXTO_DNI_V2.replace('DEMONSTRACIÓN:', 'DEMOSTRACIÓN:', 1)

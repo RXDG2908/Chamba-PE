@@ -41,7 +41,7 @@ Estados: ausente, vigente, revocado y desactualizado. La consulta no crea regist
 JSON:
 
 ```json
-{"acepto": true, "version_texto": "demo-dni-v2"}
+{"acepto": true, "version_texto": "demo-dni-v3"}
 ```
 
 201 al crear aceptación; 200 al repetir una aceptación vigente, sin cambiar su fecha ni duplicarla.
@@ -99,5 +99,7 @@ El alcance y la coordinación de eliminación quedan especificados en el [diseñ
 El párrafo anterior conserva el corte de diseño previo. Ahora existen solicitudes, atención recuperable e interfaz de eliminación en la rama local, sin publicación: [contrato actual](API_ELIMINACION_DNI.md).
 
 La versión provisional vigente pasa a demo-dni-v2 para describir la eliminación disponible; el texto v1 se conserva como referencia y en cada aceptación histórica, sin reescribirla. Una aceptación v1 queda desactualizada y requiere aceptación explícita de v2 para procesar de nuevo. La eliminación no exige esa aceptación ni la cambia automáticamente. No se autoriza reconocimiento facial.
+
+El 25/11 la versión vigente pasa a demo-dni-v3: corrige la errata «DEMONSTRACIÓN» → «DEMOSTRACIÓN» del encabezado. v1 y v2 se guardan tal como se aceptaron y quedan desactualizadas; el prestador acepta v3 explícitamente.
 
 El estado del consentimiento agrega `eliminacion_pendiente`. Una solicitud pendiente/procesando/parcial/fallida bloquea captura y persistencia aunque el consentimiento sea vigente. La aceptación/revocación usan una primera escritura del propietario compatible con SQLite; revocar invalida la generación de una captura anterior. El backend vuelve a comprobar permiso y generación antes de guardar archivos/IntentoDni. No se considera select_for_update una garantía de exclusión en SQLite.

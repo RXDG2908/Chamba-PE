@@ -303,9 +303,11 @@ class RutasPublicasTests(AccesoPorRolBase):
                     reverse('crear_solicitud'), datos, format='json',
                 )
                 self.assertEqual(r.status_code, 201)
-                # El cliente sigue el estado sin sesión (T4.2).
-                detalle = APIClient().get(reverse('detalle_solicitud', args=[r.json()['id']]))
+                # El cliente sigue el estado sin sesión (T4.2) con su código de seguimiento (HU-11).
+                url = reverse('detalle_solicitud', args=[r.json()['id']])
+                detalle = APIClient().get(url, {'codigo': r.json()['codigo_seguimiento']})
                 self.assertEqual(detalle.status_code, 200)
+                self.assertEqual(APIClient().get(url).status_code, 404)
 
     def test_rutas_publicas_ignoran_una_sesion_invalida(self):
         cliente = APIClient()

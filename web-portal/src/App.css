@@ -106,4 +106,4 @@
 .etiqueta-recomendado { font-size: 13px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; color: #16734f; }
 .motivo-recomendado { color: #33443b; }
 .tarjeta-recomendada { border: 2px solid #16734f; scroll-margin-top: 90px; }
-.insignia-recomendado { font-size: 13px; font-weight: 600; color: #16734f; white-space: nowrap; }
+.insignia-recomendado { margin: 2px 0 4px; font-size: 13px; font-weight: 600; color: #16734f; white-space: nowrap; }

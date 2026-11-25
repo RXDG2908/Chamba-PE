@@ -53,7 +53,10 @@ test('API real: rubro, estados, cobertura, coordenadas y entradas inválidas', a
     expect(p.longitud).toBe(Number(fixture.longitud.toFixed(3)))
     expect(String(p.latitud)).toMatch(/^-?\d+(\.\d{1,3})?$/)
     expect(String(p.longitud)).toMatch(/^-?\d+(\.\d{1,3})?$/)
-    expect(Object.keys(p).sort()).toEqual(['id', 'nombres', 'apellidos', 'rubros', 'latitud', 'longitud', 'distancia_km'].sort())
+    // HU-12 agregó el promedio y el total de calificaciones (sin calificaciones: null y 0).
+    expect(Object.keys(p).sort()).toEqual(['id', 'nombres', 'apellidos', 'rubros', 'latitud', 'longitud', 'distancia_km',
+      'calificacion_promedio', 'calificaciones_total'].sort())
+    expect([p.calificacion_promedio, p.calificaciones_total]).toEqual([null, 0])
   }
   const electrico = await (await request.get(urlBusqueda(fixtures.rubros.Electricidad))).json()
   expect(electrico.map((p) => p.id)).toEqual([fixtures.prestadores.Electricidad.id])

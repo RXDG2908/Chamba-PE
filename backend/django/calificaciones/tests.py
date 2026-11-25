@@ -177,6 +177,32 @@ class MisServiciosTests(BaseCalificacion):
         self.assertEqual(servicio['calificacion']['estrellas'], 3)
         self.assertEqual(servicio['calificacion']['comentario'], 'Llegó tarde.')
 
+    def test_incluye_el_historial_con_la_hora_de_cada_etapa(self):
+        # T11.3: sin el historial, la línea de etapas de «Mis servicios» no mostraba las horas.
+        from django.db import connection
+        from django.test.utils import CaptureQueriesContext
+        from django.utils import timezone
+
+        from servicios.models import CambioEstado
+
+        def en_camino():
+            solicitud = self.crear_solicitud(Solicitud.Estado.EN_CAMINO)
+            for estado in (Solicitud.Estado.ACEPTADA, Solicitud.Estado.EN_CAMINO):
+                CambioEstado.objects.create(solicitud=solicitud, estado=estado, fecha=timezone.now())
+            return solicitud
+
+        solicitud = en_camino()
+        self.client.force_login(self.cliente)
+        with CaptureQueriesContext(connection) as una:
+            servicios = self.client.get(reverse('mis_servicios')).json()
+        en_camino(), en_camino()
+        with CaptureQueriesContext(connection) as tres:
+            self.client.get(reverse('mis_servicios'))
+        self.assertEqual(len(tres), len(una))  # sin una consulta de historial por cada servicio
+        por_id = {s['id']: s for s in servicios}
+        self.assertEqual([h['estado'] for h in por_id[solicitud.id]['historial']], ['aceptada', 'en_camino'])
+        self.assertEqual(set(por_id[solicitud.id]['historial'][0]), {'estado', 'estado_display', 'fecha'})
+
     def test_prestador_no_ve_mis_servicios(self):
         self.client.force_login(self.prestador.usuario)
         self.assertEqual(self.client.get(reverse('mis_servicios')).status_code, 403)

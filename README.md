@@ -217,6 +217,12 @@ pip install -r requirements.txt
 python manage.py migrate
 ```
 
+Para desarrollar, activar el modo debug en la misma terminal (PowerShell). Sin esto Django arranca con DEBUG apagado: no sirve `/media/` ni el CSS del panel y avisa que falta `DJANGO_SECRET_KEY`. Las variables de seguridad están en `backend/django/.env.example`.
+
+```powershell
+$env:DJANGO_DEBUG="true"
+```
+
 ```bash
 python manage.py runserver
 ```

@@ -22,16 +22,35 @@ FIREBASE_PROJECT_ID = os.environ.get('FIREBASE_PROJECT_ID', '')
 FIREBASE_AUTH_PROJECT_ID = os.environ.get('FIREBASE_AUTH_PROJECT_ID', '')
 
 
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/6.1/howto/deployment/checklist/
+# Seguridad: clave, modo debug y hosts salen de variables de entorno (ver .env.example).
+# Por defecto Django arranca con DEBUG apagado; para desarrollar se activa con DJANGO_DEBUG=true.
+# https://docs.djangoproject.com/en/6.1/howto/deployment/checklist/
+DEBUG = os.environ.get('DJANGO_DEBUG', 'false').lower() == 'true'
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-n_-2xf#&#ohqj7qx=5h@67s)lovos=@j=ghc@)^b=b$ro3#ok='
+SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', '')
+if not SECRET_KEY:
+    if DEBUG:
+        # Solo para desarrollo local: nunca se usa con DEBUG apagado.
+        SECRET_KEY = 'django-insecure-solo-desarrollo-local-no-usar-en-produccion'
+    else:
+        # Sin clave definida se genera una temporal en cada arranque (las sesiones se pierden
+        # al reiniciar). Para una instalación real hay que definir DJANGO_SECRET_KEY.
+        import warnings
+        from django.core.management.utils import get_random_secret_key
 
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+        SECRET_KEY = get_random_secret_key()
+        warnings.warn(
+            'DJANGO_SECRET_KEY no está definida: se usa una clave temporal. '
+            'Para desarrollo local define DJANGO_DEBUG=true (ver backend/django/.env.example).',
+            RuntimeWarning,
+        )
 
-ALLOWED_HOSTS = []
+# Lista separada por comas; p. ej. agregar la IP de la PC para probar desde el celular.
+ALLOWED_HOSTS = [
+    host.strip()
+    for host in os.environ.get('DJANGO_ALLOWED_HOSTS', 'localhost,127.0.0.1,[::1]').split(',')
+    if host.strip()
+]
 
 
 # Application definition
@@ -52,6 +71,7 @@ INSTALLED_APPS = [
     'usuarios',
     'verificacion',
     'calificaciones',
+    'ia',
 ]
 
 MIDDLEWARE = [

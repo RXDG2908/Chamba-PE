@@ -20,6 +20,7 @@ class MisServiciosView(generics.ListAPIView):
         return (
             Solicitud.objects.filter(cliente=self.request.user)
             .select_related('prestador', 'rubro', 'calificacion')
+            .prefetch_related('historial')
         )
 
 

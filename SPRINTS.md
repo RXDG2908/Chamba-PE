@@ -394,12 +394,12 @@ Decisión del Product Owner del 28/10: HU-8 pasa completa porque T8.1 no se empe
 | | T10.2 | Implementar el servicio de recomendación y ranking | Backend | 5 | |
 | | T10.3 | Mostrar el prestador recomendado con motivo y tiempo estimado | Frontend | 3 | |
 | | T10.4 | Pruebas de la recomendación con datos de ejemplo | Pruebas | 1 | |
-| HU-11 · Seguimiento en tiempo real | T11.1 | Modelo de estados y comunicación en tiempo real (WebSocket) | Backend | 4 | 🟡 Construida, en revisión (24/11): consulta cada 5 s en lugar de WebSocket |
-| | T11.2 | Pantalla de seguimiento en tiempo real (móvil y web) | Frontend | 5 | 🟡 Construida, en revisión (24/11), web responsive |
-| | T11.3 | Pruebas de transición de estados | Pruebas | 2 | David · 🟡 Construida, en revisión (23/11): 4 pruebas de punta a punta con Django real ([informe](docs/pruebas-T11.3.md)) |
+| HU-11 · Seguimiento en tiempo real | T11.1 | Modelo de estados y comunicación en tiempo real (WebSocket) | Backend | 4 | Luis · ✅ PR #44 unido (23/11): consulta cada 5 s en lugar de WebSocket, aceptado por el PO |
+| | T11.2 | Pantalla de seguimiento en tiempo real (móvil y web) | Frontend | 5 | Luis · ✅ PR #44 unido (23/11), web responsive. La app Android aún no tiene los estados nuevos: se decide en la Review |
+| | T11.3 | Pruebas de transición de estados | Pruebas | 2 | David · ✅ PR #49 unido (25/11): 4 pruebas de punta a punta con Django real ([informe](docs/pruebas-T11.3.md)) |
 | HU-12 · Calificación del servicio | T12.1 | API para registrar calificaciones | Backend | 1 | ✅ PR #42 unido (23/11) |
 | | T12.2 | Pantalla de calificación (1 a 5 estrellas y comentario) | Frontend | 2 | ✅ PR #42 unido (23/11) |
-| | T12.3 | Pruebas: solo se califica con el servicio Finalizado | Pruebas | 1 | 🟡 Suites HU-12 OK (22/11 y 23/11) y prueba integrada con HU-11 escrita; se cierra al unir HU-11 |
+| | T12.3 | Pruebas: solo se califica con el servicio Finalizado | Pruebas | 1 | Luis · ✅ Cerrada con el PR #44 (23/11): prueba integrada con HU-11 |
 | | | **Total** | | **26** | |
 
 ## Carga por integrante
@@ -415,7 +415,9 @@ Decisión del Product Owner del 28/10: HU-8 pasa completa porque T8.1 no se empe
 | Día | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 |
 |---|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
 | **Ideal (h)** | 23.4 | 20.8 | 18.2 | 15.6 | 13 | 10.4 | 7.8 | 5.2 | 2.6 | 0 |
-| **Real (h)** | | | | | | | | | | |
+| **Real (h)** | 26 | 26 | 26 | 26 | 26 | 26 | 26 | 13 | 13 | 11 |
+
+> Días hábiles: 1 = 12/11, 2 = 13/11, 3 = 16/11 … 8 = 23/11, 9 = 24/11, 10 = 25/11. Real = horas de las 26 del sprint que aún no están en `main`. Hasta el 20/11 no se unió ninguna tarea; el 23/11 entran HU-12 (#42, 3 h) y HU-11 con T12.3 (#44, 10 h). El 25/11 entra T11.3 (#49, 2 h). Quedan 11 h: HU-10 completa (Renzo).
 
 ## Retrospectiva
 

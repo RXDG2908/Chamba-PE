@@ -17,6 +17,8 @@ os.environ['DJANGO_SETTINGS_MODULE'] = 'core.settings'
 # Esta ejecución no usa Firebase ni credenciales del entorno del usuario.
 os.environ.pop('GOOGLE_APPLICATION_CREDENTIALS', None)
 os.environ['FCM_ENABLED'] = 'false'
+# Igual que antes de pasar DEBUG a variable de entorno: el Django de prueba sirve /media/.
+os.environ['DJANGO_DEBUG'] = 'true'
 import django
 from django.conf import settings
 from django.core.management import call_command

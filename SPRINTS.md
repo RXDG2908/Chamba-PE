@@ -191,9 +191,9 @@ Cada uno construye las historias de la app de Django de la que es dueño ([PLAN_
 | Tarea | Descripción | Tipo | Horas | ✔ |
 |:---:|---|:---:|:---:|:---:|
 | T7.1 | Consulta de prestadores por coordenadas dentro del radio | Backend | 2 | ✅ |
-| T8.1 | Integrar notificaciones push (Firebase Cloud Messaging) | Backend | 3 | ➡️ S3 |
+| T8.1 | Integrar notificaciones push (Firebase Cloud Messaging) | Backend | 3 | ➡️ S3 · ✅ #37 (12/11) |
 | T7.2 | Integrar el mapa con marcadores (móvil y web) | Frontend | 3 | ✅ |
-| T8.2 | Recepción de la notificación y pantalla aceptar/rechazar | Frontend | 2 | ➡️ S3 |
+| T8.2 | Recepción de la notificación y pantalla aceptar/rechazar | Frontend | 2 | ➡️ S3 · ✅ #37 (12/11) |
 | | **Subtotal** | | **10** | |
 
 ### David Valcarcel — 10 h · app `administracion`
@@ -396,7 +396,7 @@ Decisión del Product Owner del 28/10: HU-8 pasa completa porque T8.1 no se empe
 | | T10.4 | Pruebas de la recomendación con datos de ejemplo | Pruebas | 1 | |
 | HU-11 · Seguimiento en tiempo real | T11.1 | Modelo de estados y comunicación en tiempo real (WebSocket) | Backend | 4 | Luis · ✅ PR #44 unido (23/11): consulta cada 5 s en lugar de WebSocket, aceptado por el PO |
 | | T11.2 | Pantalla de seguimiento en tiempo real (móvil y web) | Frontend | 5 | Luis · ✅ PR #44 unido (23/11), web responsive. La app Android aún no tiene los estados nuevos: se decide en la Review |
-| | T11.3 | Pruebas de transición de estados | Pruebas | 2 | David · pendiente: prueba de punta a punta con el Django real |
+| | T11.3 | Pruebas de transición de estados | Pruebas | 2 | David · ✅ PR #49 unido (24/11): 4 pruebas de punta a punta con Django real ([informe](docs/pruebas-T11.3.md)) |
 | HU-12 · Calificación del servicio | T12.1 | API para registrar calificaciones | Backend | 1 | ✅ PR #42 unido (23/11) |
 | | T12.2 | Pantalla de calificación (1 a 5 estrellas y comentario) | Frontend | 2 | ✅ PR #42 unido (23/11) |
 | | T12.3 | Pruebas: solo se califica con el servicio Finalizado | Pruebas | 1 | Luis · ✅ Cerrada con el PR #44 (23/11): prueba integrada con HU-11 |
@@ -471,14 +471,14 @@ Los identificadores S3-MAPA-R, S3-MAPA-I y S3-CERT-16 son etiquetas de seguimien
 | Heredado integrado | T6.3 · HU-6 | Pruebas de disponibilidad, PR #20 integrado el 29/10 | David | 1 | ✅ Integrado |
 | Heredado integrado | T7.3 · HU-7 | Pruebas de cobertura, PR #23 integrado el 29/10 | David | 2 | ✅ Integrado |
 | Heredado pendiente | S3-MAPA-R · T7.1/T7.2 | Revisar #14/#16 y regresiones con roles, disponibilidad y verificación | David | 1 | Pendiente |
-| Heredado pendiente | S3-MAPA-I · T7.1/T7.2 | Ajustes de revisión e integración del mapa, sin reconstruir lo implementado | Luis | 1 | Pendiente |
-| Heredado con avance local | T8.1 + T8.2 · HU-8 | Completar escenarios, revisión y preparación de integración del backend push y frontend responsive existentes | Luis | 2 | 🟡 Local/parcial |
+| Heredado pendiente | S3-MAPA-I · T7.1/T7.2 | Ajustes de revisión e integración del mapa, sin reconstruir lo implementado | Luis | 1 | ✅ #14/#16 (04/11) y #33 (05/11) |
+| Heredado con avance local | T8.1 + T8.2 · HU-8 | Completar escenarios, revisión y preparación de integración del backend push y frontend responsive existentes | Luis | 2 | ✅ #37 unido (12/11) |
 | Heredado parcial | T8.3 · HU-8 | Validación cruzada de push real, repetición de medidas y evidencia; revisar base #22 | David | 2 | 🟡 Base de bandeja; push pendiente de validación |
 | Deuda heredada | S3-CERT-16 | Corregir carga de certificados: sesión, rol, propiedad desde el usuario, CSRF y regresiones; retirar expectedFailure cuando corresponda | David | 2 | Pendiente |
 | Nuevo | T19.1 · HU-19 | Pantalla de escaneo del DNI con cámara en React responsive | Renzo | 3 | ✅ Integrado (PR #27 y #28, 11/11) |
 | Nuevo | T19.2 · HU-19 | OCR: extraer número/nombres y recortar foto | Renzo | 4 | ✅ Integrado (PR #27 y #28, 11/11) |
 | Nuevo | T19.3 · HU-19 | Validador intercambiable, consulta a fuente y revisión manual ante fallo/no coincidencia | Renzo | 2 | ✅ Integrado (PR #27 y #28, 11/11) |
-| Nuevo | T19.4 · HU-19 | Pruebas cruzadas con muestras acordadas de lectura y coincidencia | Luis | 2 | Sin iniciar |
+| Nuevo | T19.4 · HU-19 | Pruebas cruzadas con muestras acordadas de lectura y coincidencia | David (pasa de Luis el 23/11, decisión del PO) | 2 | 🟡 Construida, en revisión (23/11): 11 pruebas, 361 Django OK con EasyOCR real ([informe](docs/pruebas-T19.4.md)) |
 | Nuevo | T21.1 · HU-21 | Pantalla de consentimiento y registro de aceptación | Luis | 1 | ✅ Integrado (PR #38, 21/11) |
 | Nuevo | T21.2 · HU-21 | Endpoint de solicitud de eliminación y trazabilidad de su atención | Luis | 1 | ✅ Integrado (PR #38, 21/11) |
 | | | **Total de trabajo asignado** | | **24** | **3 integradas + 21 pendientes** |

@@ -1,6 +1,7 @@
 import time
 from math import isclose
 
+from django.http import Http404
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
 from django.db import transaction
@@ -13,6 +14,7 @@ from prestadores.models import Prestador
 from usuarios.models import Perfil, rol_de
 from usuarios.permisos import EsPrestador
 
+from .codigo_seguimiento import puede_ver
 from .distancias import distancia_km
 from .models import CambioEstado, Solicitud
 from .serializers import (
@@ -68,11 +70,25 @@ class CrearSolicitudView(generics.CreateAPIView):
 
 
 class DetalleSolicitudView(generics.RetrieveAPIView):
-    """El cliente consulta su solicitud para ver el cambio de estado."""
+    """El cliente consulta su solicitud para ver el cambio de estado.
+
+    Solo la ven el cliente dueño (con su sesión o, si la envió sin cuenta, con su código de
+    seguimiento) y el prestador asignado. Para cualquier otro es 404, como si no existiera.
+    """
     queryset = Solicitud.objects.select_related('prestador', 'rubro').prefetch_related('historial')
     serializer_class = EstadoSolicitudSerializer
     permission_classes = [AllowAny]
-    authentication_classes = []
+
+    def get_object(self):
+        solicitud = super().get_object()
+        if not puede_ver(solicitud, self.request):
+            raise Http404
+        return solicitud
+
+    def finalize_response(self, request, response, *args, **kwargs):
+        response = super().finalize_response(request, response, *args, **kwargs)
+        response['Cache-Control'] = 'private, no-store'
+        return response
 
 
 class SolicitudesRecibidasView(generics.ListAPIView):

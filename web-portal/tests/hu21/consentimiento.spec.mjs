@@ -6,7 +6,7 @@ const foto = { name: 'ficticia.png', mimeType: 'image/png', buffer: png }
 
 async function preparar(page, cambios = {}) {
   const estado = {
-    vigente: false, estado: 'ausente', version_texto: 'demo-dni-v2', eliminacion_pendiente: false,
+    vigente: false, estado: 'ausente', version_texto: 'demo-dni-v3', eliminacion_pendiente: false,
     falloConsulta: false, falloIntento: false, falloRedIntento: false, falloVersion: false,
     revocarAlEnviar: false, usuario: { id: 1, rol: 'prestador', nombres: 'Ficticio', prestador_id: 1 },
     escrituras: [], consultas: 0, ...cambios,
@@ -147,7 +147,7 @@ test('acepta con CSRF, confirma y permite continuar a la captura', async ({ page
   await page.getByRole('checkbox').check()
   await page.getByRole('button', { name: 'Aceptar consentimiento' }).click()
   await expect(page.getByRole('status')).toHaveText('Consentimiento registrado correctamente.')
-  expect(estado.escrituras[0].datos).toEqual({ acepto: true, version_texto: 'demo-dni-v2' })
+  expect(estado.escrituras[0].datos).toEqual({ acepto: true, version_texto: 'demo-dni-v3' })
   expect(estado.escrituras[0].csrf).toBe('token-ficticio')
   await page.getByRole('link', { name: 'Continuar a verificar mi DNI' }).click()
   await expect(page.locator('input[type=file]')).toBeVisible()
@@ -229,9 +229,9 @@ test('rechazo por versión cambiada muestra error y permite consultar el texto v
   await page.getByRole('button', { name: 'Aceptar consentimiento' }).click()
   await expect(page.getByRole('alert')).toContainText('El texto cambió')
   estado.falloVersion = false
-  estado.version_texto = 'demo-dni-v2'
+  estado.version_texto = 'demo-dni-v3'
   await page.getByRole('button', { name: 'Consultar estado actual' }).click()
-  await expect(page.getByText('demo-dni-v2', { exact: true })).toBeVisible()
+  await expect(page.getByText('demo-dni-v3', { exact: true })).toBeVisible()
   await expect(page.getByRole('checkbox')).not.toBeChecked()
 })
 

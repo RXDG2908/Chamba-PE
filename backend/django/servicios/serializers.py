@@ -7,6 +7,7 @@ from rest_framework import serializers
 from prestadores.models import Prestador, Rubro
 from prestadores.serializers import RubroSerializer
 
+from .codigo_seguimiento import codigo_de
 from .distancias import distancia_km
 from .models import CambioEstado, Solicitud
 
@@ -80,9 +81,15 @@ class SolicitudSerializer(serializers.ModelSerializer):
         model = Solicitud
         fields = [
             'id', 'prestador', 'rubro', 'cliente_nombre', 'cliente_telefono',
-            'descripcion', 'latitud', 'longitud', 'estado', 'creada',
+            'descripcion', 'latitud', 'longitud', 'estado', 'creada', 'codigo_seguimiento',
         ]
         read_only_fields = ['id', 'estado', 'creada']
+
+    # HU-11: solo se entrega a quien crea la solicitud; con él sigue el estado sin cuenta.
+    codigo_seguimiento = serializers.SerializerMethodField()
+
+    def get_codigo_seguimiento(self, solicitud):
+        return codigo_de(solicitud.pk)
 
     cliente_nombre = serializers.CharField(max_length=100, trim_whitespace=False, error_messages={
         'blank': 'Ingresa un nombre con al menos una letra.',

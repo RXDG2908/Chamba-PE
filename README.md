@@ -52,7 +52,7 @@ Proyecto Integrador — Diseño y Desarrollo de Software · IV ciclo · Tecsup 2
 | HU-5 Cuentas y roles · HU-6 Disponibilidad · HU-7 Mapa · HU-9 Revisión por el administrador | ✅ En `main` |
 | HU-8 Notificaciones push | 🟡 En `main`; falta validar la entrega real en menos de 5 s (T8.3) |
 | HU-19 Escaneo del DNI | 🟡 En `main`; faltan las pruebas con muestras (T19.4) y con cámara y OCR reales |
-| HU-21 Consentimiento y eliminación de datos | 🟡 En `main` (PR #38, 21/11); la eliminación se atiende con el comando manual `procesar_eliminaciones_dni` |
+| HU-21 Consentimiento y eliminación de datos | ✅ En `main` (PR #38, 21/11); desde el 25/11 la eliminación se atiende sola al pedirla (`procesar_eliminaciones_dni` queda de respaldo) |
 | HU-12 Calificación | 🟡 Construida, en revisión: el cliente con sesión califica de 1 a 5 estrellas cuando el servicio está Finalizado ([contrato](docs/API_CALIFICACIONES.md)) |
 | HU-11 Seguimiento | 🟡 Construida, en revisión: el prestador asignado avanza Confirmado → En camino → En servicio → Finalizada y el cliente lo ve cada 5 s ([contrato](docs/API_SEGUIMIENTO.md)) |
 | HU-10 Recomendación | ⚪ Sin empezar (Sprint 4) |

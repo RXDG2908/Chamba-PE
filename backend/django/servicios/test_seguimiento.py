@@ -7,6 +7,7 @@ from django.urls import reverse
 
 from prestadores.models import Prestador, Rubro
 
+from .codigo_seguimiento import codigo_de
 from .models import CambioEstado, Solicitud
 
 E = Solicitud.Estado
@@ -69,7 +70,8 @@ class SeguimientoTests(TestCase):
                          [E.ACEPTADA, E.EN_CAMINO, E.EN_SERVICIO])
         # El cliente lo ve en la consulta de su solicitud, con la etiqueta «Confirmado».
         self.client.logout()
-        datos = self.client.get(reverse('detalle_solicitud', args=[self.solicitud.id])).json()
+        datos = self.client.get(reverse('detalle_solicitud', args=[self.solicitud.id]),
+                                {'codigo': codigo_de(self.solicitud.id)}).json()
         self.assertEqual(datos['estado_display'], 'En servicio')
         self.assertEqual([h['estado_display'] for h in datos['historial']],
                          ['Confirmado', 'En camino', 'En servicio'])
@@ -194,3 +196,62 @@ class SeguimientoTests(TestCase):
         r = self.client.post(reverse('calificar'), {'solicitud': self.solicitud.id, 'estrellas': 5},
                              content_type='application/json')
         self.assertEqual(r.status_code, 201)
+
+
+class DetalleProtegidoTests(TestCase):
+    """HU-11 (25/11): el detalle con las horas del seguimiento solo lo ven el cliente y el prestador."""
+
+    def setUp(self):
+        crear = get_user_model().objects.create_user
+        rubro = Rubro.objects.create(nombre='Electricidad de prueba')
+        self.ana = Prestador.objects.create(
+            usuario=crear(username='ana_detalle'), dni='11111111', nombres='Ana', apellidos='Pérez',
+            latitud=0, longitud=0, radio_cobertura_km=5, disponible=True, estado=Prestador.Estado.VERIFICADO)
+        self.ana.rubros.set([rubro])
+        self.beto = Prestador.objects.create(
+            usuario=crear(username='beto_detalle'), dni='22222222', nombres='Beto', apellidos='Ruiz',
+            latitud=0, longitud=0, radio_cobertura_km=5)
+        self.cliente = crear(username='cliente_detalle')
+        self.otro_cliente = crear(username='otro_cliente_detalle')
+        datos = dict(prestador=self.ana, rubro=rubro, cliente_nombre='Carlos', cliente_telefono='999888777',
+                     descripcion='Corto.', latitud=0, longitud=0)
+        self.con_cuenta = Solicitud.objects.create(cliente=self.cliente, **datos)
+        self.sin_cuenta = Solicitud.objects.create(**datos)
+
+    def ver(self, solicitud, usuario=None, **params):
+        self.client.logout()
+        if usuario:
+            self.client.force_login(usuario)
+        return self.client.get(reverse('detalle_solicitud', args=[solicitud.id]), params)
+
+    def test_lo_ven_el_cliente_dueno_y_el_prestador_asignado(self):
+        for usuario in (self.cliente, self.ana.usuario):
+            with self.subTest(usuario=usuario.username):
+                r = self.ver(self.con_cuenta, usuario)
+                self.assertEqual(r.status_code, 200)
+                self.assertIn('historial', r.json())
+                self.assertIn('no-store', r['Cache-Control'])
+        self.assertEqual(self.ver(self.sin_cuenta, self.ana.usuario).status_code, 200)
+
+    def test_nadie_mas_lo_ve_y_recibe_404(self):
+        for usuario in (None, self.otro_cliente, self.beto.usuario):
+            with self.subTest(usuario=getattr(usuario, 'username', 'anonimo')):
+                self.assertEqual(self.ver(self.con_cuenta, usuario).status_code, 404)
+                self.assertEqual(self.ver(self.sin_cuenta, usuario).status_code, 404)
+
+    def test_el_visitante_lo_sigue_solo_con_su_codigo(self):
+        codigo = codigo_de(self.sin_cuenta.id)
+        self.assertEqual(self.ver(self.sin_cuenta, codigo=codigo).status_code, 200)
+        # El código de otra solicitud, uno alterado o vacío no sirven.
+        self.assertEqual(self.ver(self.con_cuenta, codigo=codigo).status_code, 404)
+        self.assertEqual(self.ver(self.sin_cuenta, codigo=codigo[:-1] + ('A' if codigo[-1] != 'A' else 'B')).status_code, 404)
+        self.assertEqual(self.ver(self.sin_cuenta, codigo='').status_code, 404)
+
+    def test_al_crear_se_entrega_el_codigo_y_la_bandeja_no_lo_muestra(self):
+        r = self.client.post(reverse('crear_solicitud'), {
+            'prestador': self.ana.id, 'rubro': self.con_cuenta.rubro_id, 'cliente_nombre': 'Carla',
+            'cliente_telefono': '999888777', 'descripcion': 'Corto.', 'latitud': '0.000000', 'longitud': '0.000000',
+        }, content_type='application/json')
+        self.assertEqual(r.status_code, 201, r.content)
+        self.assertEqual(r.json()['codigo_seguimiento'], codigo_de(r.json()['id']))
+        self.assertNotIn('codigo_seguimiento', self.ver(self.sin_cuenta, self.ana.usuario).json())

@@ -12,7 +12,7 @@ Se conservan cuenta, DNI/nombres/contacto registrados del prestador, certificado
 
 Los archivos nuevos se guardan bajo `dni/hu21/<propietario>/<operación-UUID>/`. Ese directorio privado permite recuperar archivos de una escritura que falló antes de guardar IntentoDni. El procesador inventaría únicamente ese espacio propio y las referencias de los intentos del propietario. Los huérfanos identificados se limpian mediante el almacenamiento; el borrado normal de los intentos sigue delegado al método de Renzo. Las referencias compartidas entre prestadores o fuera de la raíz se rechazan sin borrarlas.
 
-Eliminar y revocar son operaciones distintas. No se revoca automáticamente ni se habilita reconocimiento facial. Durante una eliminación sin resolver se bloquea la captura aunque el consentimiento siga vigente o se acepte de nuevo. Después de atender, una captura nueva requiere la versión vigente del consentimiento. El texto provisional pasa a `demo-dni-v2` para describir la eliminación disponible: las aceptaciones v1 conservan su texto y quedan desactualizadas, sin aceptación masiva.
+Eliminar y revocar son operaciones distintas. No se revoca automáticamente ni se habilita reconocimiento facial. Durante una eliminación sin resolver se bloquea la captura aunque el consentimiento siga vigente o se acepte de nuevo. Después de atender, una captura nueva requiere la versión vigente del consentimiento. El texto provisional pasa a `demo-dni-v2` para describir la eliminación disponible: las aceptaciones v1 conservan su texto y quedan desactualizadas, sin aceptación masiva. El 25/11 pasa a `demo-dni-v3`, que solo corrige la errata «DEMONSTRACIÓN» → «DEMOSTRACIÓN»; las aceptaciones v2 también conservan su texto y quedan desactualizadas.
 
 ## Persistencia y privacidad
 
@@ -71,7 +71,9 @@ Cuerpo vacío. Parcial/fallida se reencola como pendiente, conservando el mismo 
 
 La pantalla `/eliminar-datos` registra, consulta y reintenta; nunca presenta un 202 como atención completa. La consulta es explícita mediante «Consultar estado». No se instala un scheduler, cola externa, servicio de fondo ni notificación Firebase.
 
-Después de revisar/aplicar las migraciones en un entorno autorizado, un operador atiende solicitudes mediante:
+**Desde el 25/11 la atención es automática:** al registrar la solicitud (`POST /api/verificacion/eliminaciones/`) o pedir el reintento, la API la atiende en la misma petición y responde con el estado final (`atendida`, `parcial` o `fallida`). Si no se pudo ni empezar (por ejemplo, base ocupada), queda `pendiente` y se registra un aviso en el log sin datos personales. Cada fallo del borrado también queda en el log (`verificacion.eliminacion`) con el UUID de la solicitud y el tipo de error, sin rutas ni datos leídos. Para pruebas, `ELIMINACION_DNI_AUTOMATICA = False` desactiva la atención automática.
+
+El comando queda de respaldo para lo que quedó pendiente o interrumpido:
 
 ```text
 python manage.py procesar_eliminaciones_dni
@@ -86,7 +88,7 @@ python manage.py procesar_eliminaciones_dni --solicitud <UUID> --recuperar
 
 La recuperación registra otra ejecución y otro token. Un procesador antiguo no puede confirmar o borrar con el token sustituido. Si no puede guardarse el resultado de una ejecución, la solicitud permanece recuperable y bloqueada; no se anuncia éxito. El comando imprime únicamente UUID, estado, conteo y código, sin rutas ni datos personales.
 
-**Limitación operativa:** aún debe acordarse quién ejecutará/programará la atención y con qué frecuencia. Sin ejecutar el procesador, las solicitudes quedan pendientes y las capturas bloqueadas. Esta etapa no programó tareas ni migró una base real.
+**Respaldo operativo:** solo las solicitudes que la API no pudo atender quedan pendientes (y las capturas bloqueadas) hasta correr el comando. El panel del administrador (`?resultado=revision_manual`) ya no muestra intentos cuyos datos se borraron ni los de un prestador con una eliminación sin resolver.
 
 ## Exclusión y SQLite
 

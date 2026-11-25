@@ -341,10 +341,9 @@ function ResultadosPrestadores() {
                   {prestador.nombres.charAt(0)}{prestador.apellidos.charAt(0)}
                 </div>
                 <div className="perfil">
-                  <h4>
-                    {prestador.nombres} {prestador.apellidos}
-                    {recomendado?.id === prestador.id && <span className="insignia-recomendado"> ✨ Recomendado</span>}
-                  </h4>
+                  <h4>{prestador.nombres} {prestador.apellidos}</h4>
+                  {/* La insignia va fuera del título: el título es solo el nombre (lectores de pantalla y pruebas). */}
+                  {recomendado?.id === prestador.id && <p className="insignia-recomendado">✨ Recomendado</p>}
                   <p className="rubros-tarjeta">{prestador.rubros.map((especialidad) => especialidad.nombre).join(' · ')}</p>
                   <p className="rubros-tarjeta">{textoCalificacion(prestador)}</p>
                 </div>

@@ -415,9 +415,9 @@ Decisión del Product Owner del 28/10: HU-8 pasa completa porque T8.1 no se empe
 | Día | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 |
 |---|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
 | **Ideal (h)** | 23.4 | 20.8 | 18.2 | 15.6 | 13 | 10.4 | 7.8 | 5.2 | 2.6 | 0 |
-| **Real (h)** | 26 | 26 | 26 | 26 | 26 | 26 | 26 | 13 | | |
+| **Real (h)** | 26 | 26 | 26 | 26 | 26 | 26 | 26 | 13 | 13 | 11 |
 
-> Días hábiles: 1 = 12/11, 2 = 13/11, 3 = 16/11 … 8 = 23/11, 9 = 24/11, 10 = 25/11. Real = horas de las 26 del sprint que aún no están en `main`. Hasta el 20/11 no se unió ninguna tarea; el 23/11 entran HU-12 (#42, 3 h) y HU-11 con T12.3 (#44, 10 h). Quedan 13 h: HU-10 completa (11 h, Renzo) y T11.3 (2 h, David).
+> Días hábiles: 1 = 12/11, 2 = 13/11, 3 = 16/11 … 8 = 23/11, 9 = 24/11, 10 = 25/11. Real = horas de las 26 del sprint que aún no están en `main`. Hasta el 20/11 no se unió ninguna tarea; el 23/11 entran HU-12 (#42, 3 h) y HU-11 con T12.3 (#44, 10 h). El 25/11 entra T11.3 (#49, 2 h). Quedan 11 h: HU-10 completa (Renzo).
 
 ## Retrospectiva
 

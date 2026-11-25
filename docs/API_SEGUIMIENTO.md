@@ -45,12 +45,13 @@ El cambio es condicional (`UPDATE ... WHERE estado = <actual>`): si dos pestaña
 
 - Bandeja del prestador (`/api/servicios/solicitudes/recibidas/` y `.../recibidas/<id>/`): suma `estado_display`, `siguiente_estado` (o `null`) e `historial`.
 - Consulta del cliente (`GET /api/servicios/solicitudes/<id>/`): suma `historial` con `estado`, `estado_display` y `fecha`.
-- «Mis servicios» (HU-12) ya muestra `estado_display`, así que «En camino» y «En servicio» aparecen sin cambiar `calificaciones`.
+- «Mis servicios» (HU-12) ya muestra `estado_display`, así que «En camino» y «En servicio» aparecen sin cambiar `calificaciones`. Desde T11.3 también recibe el `historial`, para mostrar la hora de cada etapa.
 
 ## Pruebas
 
 - Django: `python manage.py test servicios.test_seguimiento` (17): flujo completo, historial, sin saltos ni retrocesos, doble paso, `pendiente`, finales, 404 de otro prestador, 403, 400, longitud de la columna, bandeja sin consultas de más e integración con HU-12 (solo se califica después de que el prestador finaliza).
 - Navegador: `npm run test:hu11` (5, con la API simulada): botones del prestador en orden, línea de etapas, 409 que recarga, rechazada sin botones y el cliente que ve el avance solo y deja de consultar al finalizar.
+- De punta a punta (T11.3): `npm run test:hu11-local` (4, navegador y Django reales, sin nada simulado): flujo completo hasta calificar, reglas de transición, avances simultáneos y calificar solo al final. Detalle en [pruebas-T11.3.md](pruebas-T11.3.md).
 
 ## Cómo probarla a mano
 

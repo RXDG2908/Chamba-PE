@@ -476,7 +476,7 @@ Los identificadores S3-MAPA-R, S3-MAPA-I y S3-CERT-16 son etiquetas de seguimien
 | Nuevo | T19.1 · HU-19 | Pantalla de escaneo del DNI con cámara en React responsive | Renzo | 3 | ✅ Integrado (PR #27 y #28, 11/11) |
 | Nuevo | T19.2 · HU-19 | OCR: extraer número/nombres y recortar foto | Renzo | 4 | ✅ Integrado (PR #27 y #28, 11/11) |
 | Nuevo | T19.3 · HU-19 | Validador intercambiable, consulta a fuente y revisión manual ante fallo/no coincidencia | Renzo | 2 | ✅ Integrado (PR #27 y #28, 11/11) |
-| Nuevo | T19.4 · HU-19 | Pruebas cruzadas con muestras acordadas de lectura y coincidencia | Luis | 2 | Sin iniciar |
+| Nuevo | T19.4 · HU-19 | Pruebas cruzadas con muestras acordadas de lectura y coincidencia | David (pasa de Luis el 23/11, decisión del PO) | 2 | 🟡 Construida, en revisión (23/11): 11 pruebas, 361 Django OK con EasyOCR real ([informe](docs/pruebas-T19.4.md)) |
 | Nuevo | T21.1 · HU-21 | Pantalla de consentimiento y registro de aceptación | Luis | 1 | ✅ Integrado (PR #38, 21/11) |
 | Nuevo | T21.2 · HU-21 | Endpoint de solicitud de eliminación y trazabilidad de su atención | Luis | 1 | ✅ Integrado (PR #38, 21/11) |
 | | | **Total de trabajo asignado** | | **24** | **3 integradas + 21 pendientes** |

@@ -103,7 +103,7 @@ public class BusquedaService {
         BigInteger valor = null;
         if (texto == null) {
             error = "El parámetro rubro es obligatorio.";
-        } else if (texto.length() > MAXIMO_TEXTO) {
+        } else if (largo(texto) > MAXIMO_TEXTO) {
             error = "El ID del rubro es demasiado largo.";
         } else if ((valor = NumerosComoPython.entero(texto)) == null) {
             error = "El rubro debe ser un ID entero válido.";
@@ -123,7 +123,7 @@ public class BusquedaService {
         Double valor = null;
         if (texto == null) {
             error = "Este parámetro es obligatorio.";
-        } else if (texto.length() > MAXIMO_TEXTO) {
+        } else if (largo(texto) > MAXIMO_TEXTO) {
             error = "String value too large.";
         } else if ((valor = NumerosComoPython.real(texto)) == null || !Double.isFinite(valor)) {
             // FloatField de DRF ya rechaza nan e inf como «inválido», antes del chequeo de «finita».
@@ -135,6 +135,11 @@ public class BusquedaService {
         }
         errores.put(campo, List.of(error));
         return null;
+    }
+
+    // Como len() de Python: cuenta caracteres, no unidades UTF-16 (un emoji vale 1, no 2).
+    private static int largo(String texto) {
+        return texto.codePointCount(0, texto.length());
     }
 
     /** Como {@code round(valor, 3)} de Python: sobre el valor binario exacto, mitad al par. */

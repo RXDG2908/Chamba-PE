@@ -1,97 +1,42 @@
 package pe.tecsup.chambape.prestadores;
 
 import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.matchesPattern;
+import static org.hamcrest.Matchers.not;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import java.io.IOException;
-import java.io.UncheckedIOException;
 import java.net.URI;
-import java.nio.file.Files;
-import java.nio.file.Path;
 
-import org.junit.jupiter.api.BeforeEach;
+import jakarta.persistence.EntityManagerFactory;
+import jakarta.servlet.RequestDispatcher;
+import org.hibernate.SessionFactory;
+import org.hibernate.stat.Statistics;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
-import org.springframework.core.io.ClassPathResource;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.datasource.SingleConnectionDataSource;
-import org.springframework.jdbc.datasource.init.ScriptUtils;
-import org.springframework.test.context.DynamicPropertyRegistry;
-import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
 /** La búsqueda de Spring responde igual que la de Django (servicios/tests.py, BusquedaPrestadoresTests). */
-@SpringBootTest
+@SpringBootTest(properties = "spring.jpa.properties.hibernate.generate_statistics=true")
 @AutoConfigureMockMvc
-class BusquedaApiTest {
-
-    // Punto a exactamente 5 km al norte de (0, 0): prueba el borde inclusivo del radio.
-    private static final double LATITUD_5_KM = Math.toDegrees(5 / Distancias.RADIO_TIERRA_KM);
-
-    private static final Path BASE = baseTemporal();
-
-    // La aplicación abre la base en solo lectura, como con la db.sqlite3 real de Django;
-    // las pruebas escriben los datos por una conexión aparte.
-    private final JdbcTemplate jdbc = new JdbcTemplate(
-        new SingleConnectionDataSource("jdbc:sqlite:" + BASE.toAbsolutePath(), true));
-
-    private static Path baseTemporal() {
-        try {
-            Path base = Files.createTempFile("chambape-spring-", ".sqlite3");
-            base.toFile().deleteOnExit();
-            return base;
-        } catch (IOException e) {
-            throw new UncheckedIOException(e);
-        }
-    }
-
-    @DynamicPropertySource
-    static void baseSoloLectura(DynamicPropertyRegistry registro) {
-        registro.add("spring.datasource.url", () -> "jdbc:sqlite:" + BASE.toAbsolutePath() + "?open_mode=1");
-    }
+class BusquedaApiTest extends PruebaConBase {
 
     @Autowired
     private MockMvc mvc;
 
-    @BeforeEach
-    void preparar() {
-        jdbc.execute((java.sql.Connection conexion) -> {
-            ScriptUtils.executeSqlScript(conexion, new ClassPathResource("esquema-django.sql"));
-            return null;
-        });
-        jdbc.update("insert into prestadores_rubro (id, nombre) values (1, 'Gasfitería'), (2, 'Electricidad'), (3, 'Albañilería')");
-        prestador(1, "Ana", "-12.044861", "-77.026582", 5, true, "verificado", 1, 3);
-        prestador(2, "Beto", "-12.044861", "-77.026582", 5, true, "pendiente", 1);
-        prestador(3, "Carla", "-12.044861", "-77.026582", 5, false, "verificado", 1);
-        prestador(4, "Dino", "-12.044861", "-77.026582", 5, true, "verificado", 2);
-        prestador(5, "Eva", "-12.064861", "-77.026582", 5, true, "verificado", 1);
-        prestador(6, "Félix", "-11.000000", "-77.026582", 5, true, "rechazado", 1);
-        prestador(7, "Gina", "-11.000000", "-76.000000", 5, true, "verificado", 1);
-        prestador(8, "Hugo", String.valueOf(LATITUD_5_KM), "0", 5, true, "verificado", 1);
-    }
-
-    private void prestador(long id, String nombre, String latitud, String longitud, int radio,
-                           boolean disponible, String estado, long... rubros) {
-        jdbc.update("insert into auth_user (id, username) values (?, ?)", id, "usuario" + id);
-        jdbc.update("""
-            insert into prestadores_prestador (id, nombres, apellidos, dni, telefono, latitud, longitud,
-              radio_cobertura_km, disponible, estado, creado, usuario_id, calificaciones_total)
-            values (?, ?, 'Prueba', ?, '', ?, ?, ?, ?, ?, '2026-11-23 10:00:00', ?, 0)""",
-            id, nombre, String.format("%08d", id), Double.parseDouble(latitud), Double.parseDouble(longitud),
-            radio, disponible ? 1 : 0, estado, id);
-        for (long rubro : rubros) {
-            jdbc.update("insert into prestadores_prestador_rubros (prestador_id, rubro_id) values (?, ?)", id, rubro);
-        }
-    }
+    @Autowired
+    private EntityManagerFactory fabrica;
 
     private ResultActions buscar(String consulta) throws Exception {
         // URI.create para que MockMvc no vuelva a codificar los «%» de la consulta.
@@ -209,7 +154,81 @@ class BusquedaApiTest {
     }
 
     @Test
-    void soloLectura() throws Exception {
-        mvc.perform(post("/api/prestadores/buscar/")).andExpect(status().isMethodNotAllowed());
+    void soloLecturaConElMensajeDeDrf() throws Exception {
+        mvc.perform(post("/api/prestadores/buscar/"))
+            .andExpect(status().isMethodNotAllowed())
+            .andExpect(header().string("Allow", containsString("GET")))
+            .andExpect(jsonPath("$.detail").value("Method \"POST\" not allowed."));
+    }
+
+    @Test
+    void rutaInexistenteDaJsonNoHtml() throws Exception {
+        mvc.perform(get("/api/no-existe/"))
+            .andExpect(status().isNotFound())
+            .andExpect(jsonPath("$.detail").value("Not found."));
+    }
+
+    @Test
+    void erroresDeTomcatTambienSalenComoDetail() throws Exception {
+        // Lo que Tomcat rechaza antes de llegar a Spring (URL mal formada) pasa por /error.
+        mvc.perform(get("/error").requestAttr(RequestDispatcher.ERROR_STATUS_CODE, 400))
+            .andExpect(status().isBadRequest())
+            .andExpect(jsonPath("$.detail").value("Malformed request."))
+            .andExpect(jsonPath("$.timestamp").doesNotExist())
+            .andExpect(jsonPath("$.path").doesNotExist());
+    }
+
+    @Test
+    void rubrosDeCadaPrestadorEnLaMismaConsulta() throws Exception {
+        Statistics estadisticas = fabrica.unwrap(SessionFactory.class).getStatistics();
+        estadisticas.clear();
+        buscar("rubro=1&latitud=-12.044861&longitud=-77.026582").andExpect(jsonPath("$", hasSize(2)));
+        long conDos = estadisticas.getPrepareStatementCount();
+
+        for (long id = 20; id < 30; id++) {
+            prestador(id, "Extra" + id, "-12.044861", "-77.026582", 5, true, "verificado", 1, 2, 3);
+        }
+        estadisticas.clear();
+        buscar("rubro=1&latitud=-12.044861&longitud=-77.026582").andExpect(jsonPath("$", hasSize(12)));
+        // Igual número de consultas con 2 que con 12 resultados: no hay una por prestador.
+        assertEquals(conDos, estadisticas.getPrepareStatementCount());
+        assertTrue(conDos <= 2, "consultas: " + conDos);
+    }
+
+    @Test
+    void aIgualDistanciaOrdenaPorId() throws Exception {
+        // Se insertan al revés para que el orden no dependa de cómo los guardó SQLite.
+        prestador(10, "Zoe", "-12.044861", "-77.026582", 5, true, "verificado", 1);
+        prestador(9, "Iván", "-12.044861", "-77.026582", 5, true, "verificado", 1);
+        buscar("rubro=1&latitud=-12.044861&longitud=-77.026582")
+            .andExpect(jsonPath("$[*].nombres", contains("Ana", "Iván", "Zoe", "Eva")));
+    }
+
+    @Test
+    void digitosYEspaciosUnicodeComoPython() throws Exception {
+        // «١» es el 1 arábigo; U+00A0 y U+3000 son espacios para Python.
+        buscar("rubro=%D9%A1&latitud=%C2%A0-12.044861%E3%80%80&longitud=-77.026582")
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$[0].nombres").value("Ana"));
+        // U+200B no es espacio para Python: coordenada inválida.
+        buscar("rubro=1&latitud=-12.044861%E2%80%8B&longitud=-77.026582")
+            .andExpect(jsonPath("$.latitud[0]").value("Ingresa una coordenada numérica válida."));
+    }
+
+    @Test
+    void elLargoSeCuentaEnCaracteresComoPython() throws Exception {
+        // Un emoji son 2 unidades UTF-16 en Java pero 1 carácter en Python.
+        String mil = "%F0%9F%98%80".repeat(1000);
+        buscar("rubro=" + mil + "&latitud=0&longitud=0")
+            .andExpect(jsonPath("$.rubro[0]").value("El rubro debe ser un ID entero válido."));
+        buscar("rubro=" + mil + "%F0%9F%98%80&latitud=0&longitud=0")
+            .andExpect(jsonPath("$.rubro[0]").value("El ID del rubro es demasiado largo."));
+    }
+
+    @Test
+    void corsAbiertoParaLecturasComoDjango() throws Exception {
+        mvc.perform(get(URI.create("/api/prestadores/rubros/")).header("Origin", "http://otro.example"))
+            .andExpect(header().string("Access-Control-Allow-Origin", "*"))
+            .andExpect(content().string(not(containsString("timestamp"))));
     }
 }

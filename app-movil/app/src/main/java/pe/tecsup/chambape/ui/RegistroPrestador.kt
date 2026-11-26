@@ -1,36 +1,58 @@
 package pe.tecsup.chambape.ui
 
 import androidx.annotation.StringRes
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
-import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.safeDrawingPadding
-import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Button
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.ErrorOutline
+import androidx.compose.material.icons.outlined.AccountCircle
+import androidx.compose.material.icons.outlined.Badge
+import androidx.compose.material.icons.outlined.Edit
+import androidx.compose.material.icons.outlined.Email
+import androidx.compose.material.icons.outlined.FactCheck
+import androidx.compose.material.icons.outlined.Handyman
+import androidx.compose.material.icons.outlined.Lock
+import androidx.compose.material.icons.outlined.Map
+import androidx.compose.material.icons.outlined.Person
+import androidx.compose.material.icons.outlined.Phone
+import androidx.compose.material.icons.outlined.TouchApp
 import androidx.compose.material3.FilterChip
+import androidx.compose.material3.FilterChipDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Slider
+import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.semantics.LiveRegionMode
-import androidx.compose.ui.semantics.liveRegion
-import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.input.PasswordVisualTransformation
-import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -53,6 +75,7 @@ import pe.tecsup.chambape.domain.model.Rubro
 import pe.tecsup.chambape.domain.model.TipoError
 import pe.tecsup.chambape.domain.model.TipoErrorAuth
 import pe.tecsup.chambape.ui.busqueda.MapaBusqueda
+import kotlin.math.roundToInt
 
 /** Mensaje de error de un campo: validado en la app (recurso) o devuelto por el servidor (texto). */
 sealed interface MensajeCampo {
@@ -90,6 +113,8 @@ data class RegistroPrestadorUiState(
     val errores: Map<String, MensajeCampo> = emptyMap(),
     val enviando: Boolean = false,
     val errorGeneral: MensajeCampo? = null,
+    /** Paso del asistente que se ve (ver [RegistroPrestadorViewModel.PASOS]). */
+    val paso: Int = 0,
 )
 
 class RegistroPrestadorViewModel(
@@ -124,7 +149,7 @@ class RegistroPrestadorViewModel(
             Campo.NOMBRES -> it.copy(nombres = valor)
             Campo.APELLIDOS -> it.copy(apellidos = valor)
             Campo.DNI -> it.copy(dni = valor.filter(Char::isDigit).take(8))
-            Campo.TELEFONO -> it.copy(telefono = valor.take(20))
+            Campo.TELEFONO -> it.copy(telefono = valor.filter(Char::isDigit).take(TELEFONO_DIGITOS))
             else -> it
         }.copy(errores = it.errores - campo, errorGeneral = null)
     }
@@ -142,14 +167,39 @@ class RegistroPrestadorViewModel(
 
     fun cambiarRadio(km: Int) = _uiState.update { it.copy(radioKm = km.coerceIn(RADIO_MINIMO, RADIO_MAXIMO)) }
 
+    /** Valida solo el paso actual y avanza; en el último, envía el registro. */
+    fun siguiente() {
+        val s = _uiState.value
+        if (s.enviando) return
+        if (s.paso >= PASO_REVISAR) return registrar()
+        val errores = validar(s).filterKeys { pasoDe(it) == s.paso }
+        _uiState.update {
+            if (errores.isEmpty()) it.copy(paso = it.paso + 1, errores = emptyMap(), errorGeneral = null)
+            else it.copy(errores = errores)
+        }
+    }
+
+    /** Retrocede un paso sin perder lo escrito; devuelve false si ya está en el primero. */
+    fun atras(): Boolean {
+        val s = _uiState.value
+        if (s.enviando || s.paso == 0) return false
+        _uiState.update { it.copy(paso = it.paso - 1, errorGeneral = null) }
+        return true
+    }
+
+    /** Desde la revisión, vuelve al paso que se quiere corregir. */
+    fun irAPaso(paso: Int) = _uiState.update {
+        if (it.enviando) it else it.copy(paso = paso.coerceIn(0, PASO_REVISAR), errorGeneral = null)
+    }
+
     fun registrar() {
         val s = _uiState.value
         if (s.enviando) return
         val errores = validar(s)
         val ubicacion = s.ubicacion
         if (errores.isNotEmpty() || ubicacion == null) {
-            // Con datos inválidos no se crea ninguna cuenta.
-            _uiState.update { it.copy(errores = errores, errorGeneral = REVISA_CAMPOS) }
+            // Con datos inválidos no se crea ninguna cuenta: se vuelve al primer paso con errores.
+            _uiState.update { it.copy(errores = errores, errorGeneral = REVISA_CAMPOS, paso = primerPaso(errores, it.paso)) }
             return
         }
         val datos = DatosRegistroPrestador(
@@ -180,17 +230,20 @@ class RegistroPrestadorViewModel(
                 }
                 if (errores2.isNotEmpty()) general = REVISA_CAMPOS
             }
-            _uiState.update { it.copy(enviando = false, errores = errores2, errorGeneral = general) }
+            _uiState.update {
+                it.copy(enviando = false, errores = errores2, errorGeneral = general, paso = primerPaso(errores2, it.paso))
+            }
         }
     }
 
     private fun validar(s: RegistroPrestadorUiState): Map<String, MensajeCampo> = buildMap {
         fun error(campo: String, @StringRes id: Int) = put(campo, MensajeCampo.Recurso(id))
-        if (s.correo.isBlank()) error(Campo.CORREO, R.string.error_obligatorio)
+        AuthViewModel.errorDeCorreo(s.correo)?.let { error(Campo.CORREO, it) }
         if (s.clave.length < AuthViewModel.CLAVE_MINIMA) error(Campo.CLAVE, R.string.error_clave_minima)
         if (s.nombres.isBlank()) error(Campo.NOMBRES, R.string.error_obligatorio)
         if (s.apellidos.isBlank()) error(Campo.APELLIDOS, R.string.error_obligatorio)
         if (s.dni.length != 8) error(Campo.DNI, R.string.error_dni)
+        if (s.telefono.isNotEmpty() && s.telefono.length != TELEFONO_DIGITOS) error(Campo.TELEFONO, R.string.error_telefono)
         if (s.rubros.isEmpty()) error(Campo.RUBROS, R.string.error_rubros)
         if (s.ubicacion == null) error(Campo.UBICACION, R.string.error_ubicacion_cobertura)
     }
@@ -203,6 +256,25 @@ class RegistroPrestadorViewModel(
     }
 
     companion object {
+        const val PASO_CUENTA = 0
+        const val PASO_DATOS = 1
+        const val PASO_RUBROS = 2
+        const val PASO_COBERTURA = 3
+        const val PASO_REVISAR = 4
+        const val TELEFONO_DIGITOS = 9
+
+        /** En qué paso se corrige cada campo (también los que devuelve el servidor). */
+        fun pasoDe(campo: String): Int = when (campo) {
+            Campo.CORREO, Campo.CLAVE -> PASO_CUENTA
+            Campo.NOMBRES, Campo.APELLIDOS, Campo.DNI, Campo.TELEFONO -> PASO_DATOS
+            Campo.RUBROS -> PASO_RUBROS
+            Campo.UBICACION, Campo.LONGITUD, Campo.RADIO -> PASO_COBERTURA
+            else -> PASO_REVISAR
+        }
+
+        private fun primerPaso(errores: Map<String, MensajeCampo>, actual: Int) =
+            errores.keys.minOfOrNull(::pasoDe) ?: actual
+
         const val RADIO_MINIMO = 1
         const val RADIO_MAXIMO = 50
         private val REVISA_CAMPOS = MensajeCampo.Recurso(R.string.registro_revisa_campos)
@@ -215,37 +287,14 @@ private fun MensajeCampo.texto(): String = when (this) {
     is MensajeCampo.Texto -> texto
 }
 
-@Composable
-private fun CampoTexto(
-    estado: RegistroPrestadorUiState,
-    campo: String,
-    valor: String,
-    @StringRes etiqueta: Int,
-    onCambio: (String, String) -> Unit,
-    teclado: KeyboardOptions = KeyboardOptions.Default,
-    oculto: Boolean = false,
-) {
-    val error = estado.errores[campo]
-    OutlinedTextField(
-        value = valor,
-        onValueChange = { onCambio(campo, it) },
-        label = { Text(stringResource(etiqueta)) },
-        isError = error != null,
-        supportingText = if (error != null) ({ Text(error.texto()) }) else null,
-        singleLine = true,
-        enabled = !estado.enviando,
-        keyboardOptions = teclado,
-        visualTransformation = if (oculto) PasswordVisualTransformation() else VisualTransformation.None,
-        modifier = Modifier.fillMaxWidth(),
-    )
-}
+private val PASOS_PRESTADOR = listOf(
+    Paso(R.string.paso_cuenta, R.string.paso_cuenta_ayuda, Icons.Outlined.AccountCircle),
+    Paso(R.string.paso_datos, R.string.paso_datos_ayuda, Icons.Outlined.Badge),
+    Paso(R.string.paso_rubros, R.string.paso_rubros_ayuda, Icons.Outlined.Handyman),
+    Paso(R.string.paso_cobertura, R.string.paso_cobertura_ayuda, Icons.Outlined.Map),
+    Paso(R.string.paso_revisar, R.string.paso_revisar_ayuda, Icons.Outlined.FactCheck),
+)
 
-@Composable
-private fun ErrorDe(estado: RegistroPrestadorUiState, campo: String) {
-    estado.errores[campo]?.let { Text(it.texto(), color = MaterialTheme.colorScheme.error) }
-}
-
-@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun RegistroPrestadorScreen(onVolver: () -> Unit) {
     val vm = chambaViewModel {
@@ -253,83 +302,196 @@ fun RegistroPrestadorScreen(onVolver: () -> Unit) {
     }
     val estado by vm.uiState.collectAsStateWithLifecycle()
     val habilitado = !estado.enviando
-    val palabras = KeyboardOptions(capitalization = KeyboardCapitalization.Words)
+    val ultimo = estado.paso == RegistroPrestadorViewModel.PASO_REVISAR
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .safeDrawingPadding()
-            .imePadding()
-            .verticalScroll(rememberScrollState())
-            .padding(16.dp),
-        verticalArrangement = Arrangement.spacedBy(12.dp),
-    ) {
-        Text(stringResource(R.string.registro_prestador_titulo), style = MaterialTheme.typography.headlineSmall)
-        Text(stringResource(R.string.registro_prestador_ayuda), style = MaterialTheme.typography.bodyMedium)
-
-        Text(stringResource(R.string.registro_seccion_cuenta), style = MaterialTheme.typography.titleMedium)
-        CampoTexto(estado, Campo.CORREO, estado.correo, R.string.correo, vm::cambiar, KeyboardOptions(keyboardType = KeyboardType.Email))
-        CampoTexto(estado, Campo.CLAVE, estado.clave, R.string.clave, vm::cambiar, KeyboardOptions(keyboardType = KeyboardType.Password), oculto = true)
-
-        Text(stringResource(R.string.registro_seccion_datos), style = MaterialTheme.typography.titleMedium)
-        CampoTexto(estado, Campo.NOMBRES, estado.nombres, R.string.nombres, vm::cambiar, palabras)
-        CampoTexto(estado, Campo.APELLIDOS, estado.apellidos, R.string.apellidos, vm::cambiar, palabras)
-        CampoTexto(estado, Campo.DNI, estado.dni, R.string.dni, vm::cambiar, KeyboardOptions(keyboardType = KeyboardType.Number))
-        CampoTexto(estado, Campo.TELEFONO, estado.telefono, R.string.telefono_opcional, vm::cambiar, KeyboardOptions(keyboardType = KeyboardType.Phone))
-
-        Text(stringResource(R.string.registro_seccion_rubros), style = MaterialTheme.typography.titleMedium)
-        val rubros = estado.rubrosDisponibles
-        val errorRubros = estado.errorRubros
-        when {
-            rubros != null -> FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                rubros.forEach { rubro ->
-                    FilterChip(
-                        selected = rubro.id in estado.rubros,
-                        onClick = { vm.alternarRubro(rubro.id) },
-                        enabled = habilitado,
-                        label = { Text(rubro.nombre) },
-                    )
+    Asistente(
+        titulo = R.string.registro_prestador_titulo,
+        pasos = PASOS_PRESTADOR,
+        actual = estado.paso,
+        onAtras = { if (!vm.atras()) onVolver() },
+        onSiguiente = vm::siguiente,
+        textoSiguiente = if (ultimo) R.string.registro_prestador_boton else R.string.siguiente,
+        ocupado = estado.enviando,
+        error = estado.errorGeneral?.texto(),
+        pie = {
+            if (estado.paso == 0) {
+                TextButton(onClick = onVolver, enabled = habilitado, modifier = Modifier.align(Alignment.CenterHorizontally)) {
+                    Text(stringResource(R.string.ya_tengo_cuenta))
                 }
             }
-            errorRubros != null -> Mensaje(
-                textoError(errorRubros),
-                textoBoton = stringResource(R.string.reintentar),
-                onBoton = vm::cargarRubros,
-            )
-            else -> Cargando()
+        },
+    ) { paso ->
+        when (paso) {
+            RegistroPrestadorViewModel.PASO_CUENTA -> {
+                CampoFormulario(
+                    estado.correo, { vm.cambiar(Campo.CORREO, it) }, R.string.correo, Icons.Outlined.Email,
+                    error = estado.errores[Campo.CORREO]?.texto(), habilitado = habilitado, enfocar = true,
+                    teclado = KeyboardOptions(keyboardType = KeyboardType.Email),
+                )
+                CampoFormulario(
+                    estado.clave, { vm.cambiar(Campo.CLAVE, it) }, R.string.clave, Icons.Outlined.Lock,
+                    error = estado.errores[Campo.CLAVE]?.texto(), ayuda = R.string.clave_ayuda, habilitado = habilitado,
+                    teclado = KeyboardOptions(keyboardType = KeyboardType.Password), clave = true, alConfirmar = vm::siguiente,
+                )
+            }
+            RegistroPrestadorViewModel.PASO_DATOS -> {
+                val palabras = KeyboardOptions(capitalization = KeyboardCapitalization.Words)
+                CampoFormulario(
+                    estado.nombres, { vm.cambiar(Campo.NOMBRES, it) }, R.string.nombres, Icons.Outlined.Person,
+                    error = estado.errores[Campo.NOMBRES]?.texto(), habilitado = habilitado, teclado = palabras, enfocar = true,
+                )
+                CampoFormulario(
+                    estado.apellidos, { vm.cambiar(Campo.APELLIDOS, it) }, R.string.apellidos, Icons.Outlined.Person,
+                    error = estado.errores[Campo.APELLIDOS]?.texto(), habilitado = habilitado, teclado = palabras,
+                )
+                CampoFormulario(
+                    estado.dni, { vm.cambiar(Campo.DNI, it) }, R.string.dni, Icons.Outlined.Badge,
+                    error = estado.errores[Campo.DNI]?.texto(), ayuda = R.string.dni_ayuda, habilitado = habilitado,
+                    teclado = KeyboardOptions(keyboardType = KeyboardType.NumberPassword),
+                )
+                CampoFormulario(
+                    estado.telefono, { vm.cambiar(Campo.TELEFONO, it) }, R.string.telefono_opcional, Icons.Outlined.Phone,
+                    error = estado.errores[Campo.TELEFONO]?.texto(), habilitado = habilitado,
+                    teclado = KeyboardOptions(keyboardType = KeyboardType.Phone), alConfirmar = vm::siguiente,
+                )
+            }
+            RegistroPrestadorViewModel.PASO_RUBROS -> PasoRubros(estado, vm)
+            RegistroPrestadorViewModel.PASO_COBERTURA -> PasoCobertura(estado, vm)
+            else -> PasoRevisar(estado, vm::irAPaso)
         }
-        ErrorDe(estado, Campo.RUBROS)
+    }
+}
 
-        Text(stringResource(R.string.registro_seccion_cobertura), style = MaterialTheme.typography.titleMedium)
-        Text(stringResource(R.string.registro_cobertura_ayuda), style = MaterialTheme.typography.bodyMedium)
-        MapaBusqueda(
-            ubicacion = estado.ubicacion,
-            prestadores = emptyList(),
-            encuadre = 0,
-            onElegirUbicacion = vm::elegirUbicacion,
-            radioKm = estado.radioKm,
+@OptIn(ExperimentalLayoutApi::class)
+@Composable
+private fun PasoRubros(estado: RegistroPrestadorUiState, vm: RegistroPrestadorViewModel) {
+    val rubros = estado.rubrosDisponibles
+    val errorRubros = estado.errorRubros
+    when {
+        rubros != null -> FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+            rubros.forEach { rubro ->
+                val elegido = rubro.id in estado.rubros
+                FilterChip(
+                    selected = elegido,
+                    onClick = { vm.alternarRubro(rubro.id) },
+                    enabled = !estado.enviando,
+                    label = { Text(rubro.nombre) },
+                    leadingIcon = {
+                        AnimatedVisibility(elegido, enter = scaleIn() + fadeIn(), exit = scaleOut() + fadeOut()) {
+                            Icon(Icons.Filled.Check, contentDescription = null, modifier = Modifier.size(FilterChipDefaults.IconSize))
+                        }
+                    },
+                )
+            }
+        }
+        errorRubros != null -> Mensaje(textoError(errorRubros), textoBoton = stringResource(R.string.reintentar), onBoton = vm::cargarRubros)
+        else -> Cargando()
+    }
+    if (estado.rubros.isNotEmpty()) {
+        Text(
+            pluralStringResource(R.plurals.rubros_elegidos, estado.rubros.size, estado.rubros.size),
+            style = MaterialTheme.typography.labelLarge,
+            color = MaterialTheme.colorScheme.primary,
         )
-        ErrorDe(estado, Campo.UBICACION)
-        ErrorDe(estado, Campo.LONGITUD)
-        Text(stringResource(R.string.registro_radio, estado.radioKm))
-        Slider(
-            value = estado.radioKm.toFloat(),
-            onValueChange = { vm.cambiarRadio(it.toInt()) },
-            valueRange = RegistroPrestadorViewModel.RADIO_MINIMO.toFloat()..RegistroPrestadorViewModel.RADIO_MAXIMO.toFloat(),
-            enabled = habilitado,
-        )
-        ErrorDe(estado, Campo.RADIO)
+    }
+    ErrorCampo(estado.errores[Campo.RUBROS])
+}
 
-        estado.errorGeneral?.let {
-            Text(
-                it.texto(),
-                color = MaterialTheme.colorScheme.error,
-                modifier = Modifier.semantics { liveRegion = LiveRegionMode.Assertive },
-            )
+@Composable
+private fun PasoCobertura(estado: RegistroPrestadorUiState, vm: RegistroPrestadorViewModel) {
+    MapaBusqueda(
+        ubicacion = estado.ubicacion,
+        prestadores = emptyList(),
+        encuadre = 0,
+        onElegirUbicacion = vm::elegirUbicacion,
+        radioKm = estado.radioKm,
+    )
+    val marcada = estado.ubicacion != null
+    Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+        Icon(
+            if (marcada) Icons.Filled.CheckCircle else Icons.Outlined.TouchApp,
+            contentDescription = null,
+            tint = if (marcada) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+        Text(
+            stringResource(if (marcada) R.string.cobertura_marcada else R.string.cobertura_toca_mapa),
+            style = MaterialTheme.typography.bodyMedium,
+        )
+    }
+    ErrorCampo(estado.errores[Campo.UBICACION] ?: estado.errores[Campo.LONGITUD])
+    Row(verticalAlignment = Alignment.CenterVertically) {
+        Text(stringResource(R.string.radio_cobertura), style = MaterialTheme.typography.titleSmall, modifier = Modifier.weight(1f))
+        Text(
+            stringResource(R.string.registro_radio, estado.radioKm),
+            style = MaterialTheme.typography.titleMedium,
+            color = MaterialTheme.colorScheme.primary,
+        )
+    }
+    Slider(
+        value = estado.radioKm.toFloat(),
+        onValueChange = { vm.cambiarRadio(it.roundToInt()) },
+        valueRange = RegistroPrestadorViewModel.RADIO_MINIMO.toFloat()..RegistroPrestadorViewModel.RADIO_MAXIMO.toFloat(),
+        enabled = !estado.enviando,
+        colors = SliderDefaults.colors(inactiveTrackColor = MaterialTheme.colorScheme.surfaceVariant),
+    )
+    ErrorCampo(estado.errores[Campo.RADIO])
+}
+
+/** Resumen antes de enviar (form-design: revisión en formularios con consecuencias). */
+@Composable
+private fun PasoRevisar(estado: RegistroPrestadorUiState, onEditar: (Int) -> Unit) {
+    val habilitado = !estado.enviando
+    val nombresRubros = estado.rubrosDisponibles.orEmpty().filter { it.id in estado.rubros }.joinToString(" · ") { it.nombre }
+    FilaResumen(R.string.paso_cuenta, estado.correo.trim(), RegistroPrestadorViewModel.PASO_CUENTA, onEditar, habilitado)
+    FilaResumen(
+        R.string.paso_datos,
+        listOfNotNull(
+            "${estado.nombres.trim()} ${estado.apellidos.trim()}",
+            stringResource(R.string.resumen_dni, estado.dni),
+            estado.telefono.takeIf { it.isNotEmpty() }?.let { stringResource(R.string.solicitud_contacto, it) },
+        ).joinToString("\n"),
+        RegistroPrestadorViewModel.PASO_DATOS, onEditar, habilitado,
+    )
+    FilaResumen(R.string.paso_rubros, nombresRubros, RegistroPrestadorViewModel.PASO_RUBROS, onEditar, habilitado)
+    FilaResumen(
+        R.string.paso_cobertura,
+        stringResource(R.string.resumen_cobertura, estado.radioKm),
+        RegistroPrestadorViewModel.PASO_COBERTURA, onEditar, habilitado,
+    )
+    Text(
+        stringResource(R.string.registro_prestador_ayuda),
+        style = MaterialTheme.typography.bodySmall,
+        color = MaterialTheme.colorScheme.onSurfaceVariant,
+    )
+}
+
+@Composable
+private fun FilaResumen(@StringRes titulo: Int, valor: String, paso: Int, onEditar: (Int) -> Unit, habilitado: Boolean) {
+    val descripcion = stringResource(R.string.editar_seccion, stringResource(titulo))
+    OutlinedCard(modifier = Modifier.fillMaxWidth()) {
+        Row(
+            modifier = Modifier.padding(start = 16.dp, top = 12.dp, bottom = 12.dp, end = 4.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Column(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                Text(stringResource(titulo), style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                Text(valor, style = MaterialTheme.typography.bodyLarge)
+            }
+            IconButton(onClick = { onEditar(paso) }, enabled = habilitado) {
+                Icon(Icons.Outlined.Edit, contentDescription = descripcion)
+            }
         }
-        Button(onClick = vm::registrar, enabled = habilitado, modifier = Modifier.fillMaxWidth()) {
-            Text(stringResource(if (estado.enviando) R.string.registrando else R.string.registro_prestador_boton))
+    }
+}
+
+@Composable
+private fun ErrorCampo(mensaje: MensajeCampo?) {
+    var ultimo by remember { mutableStateOf(mensaje) }
+    if (mensaje != null) ultimo = mensaje
+    AnimatedVisibility(mensaje != null, enter = fadeIn() + expandVertically(), exit = fadeOut() + shrinkVertically()) {
+        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+            Icon(Icons.Filled.ErrorOutline, contentDescription = null, tint = MaterialTheme.colorScheme.error, modifier = Modifier.size(18.dp))
+            Text(ultimo?.texto().orEmpty(), color = MaterialTheme.colorScheme.error, style = MaterialTheme.typography.bodyMedium)
         }
-        TextButton(onClick = onVolver, enabled = habilitado) { Text(stringResource(R.string.ya_tengo_cuenta)) }
     }
 }

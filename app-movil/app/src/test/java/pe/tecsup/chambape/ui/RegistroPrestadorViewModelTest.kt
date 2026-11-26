@@ -182,4 +182,58 @@ class RegistroPrestadorViewModelTest {
         vm.alternarRubro(1)
         assertEquals(setOf(2), vm.uiState.value.rubros)
     }
+
+    @Test
+    fun `cada paso valida solo sus campos y atras conserva lo escrito`() = runTest(dispatcher) {
+        val vm = RegistroPrestadorViewModel(auth, registro, RubrosFalsos())
+        vm.cambiar(Campo.CORREO, "ana@")
+        vm.siguiente()
+        assertEquals(RegistroPrestadorViewModel.PASO_CUENTA, vm.uiState.value.paso)
+        assertEquals(setOf(Campo.CORREO, Campo.CLAVE), vm.uiState.value.errores.keys)
+        assertEquals(MensajeCampo.Recurso(R.string.error_correo_formato), vm.uiState.value.errores[Campo.CORREO])
+
+        vm.cambiar(Campo.CORREO, "ana@example.com")
+        vm.cambiar(Campo.CLAVE, "secreta1")
+        vm.siguiente()
+        assertEquals(RegistroPrestadorViewModel.PASO_DATOS, vm.uiState.value.paso)
+        assertTrue(vm.uiState.value.errores.isEmpty()) // los datos personales aún no se marcan
+
+        vm.cambiar(Campo.TELEFONO, "98 765")
+        vm.siguiente()
+        assertEquals(setOf(Campo.NOMBRES, Campo.APELLIDOS, Campo.DNI, Campo.TELEFONO), vm.uiState.value.errores.keys)
+
+        assertTrue(vm.atras())
+        assertEquals(RegistroPrestadorViewModel.PASO_CUENTA, vm.uiState.value.paso)
+        assertEquals("ana@example.com", vm.uiState.value.correo)
+        assertEquals("98765", vm.uiState.value.telefono)
+        assertFalse(vm.atras()) // en el primer paso, la pantalla sale del asistente
+    }
+
+    @Test
+    fun `recorre los cinco pasos y envia desde la revision`() = runTest(dispatcher) {
+        val vm = viewModelCompleto()
+        repeat(RegistroPrestadorViewModel.PASO_REVISAR) { vm.siguiente() }
+        assertEquals(RegistroPrestadorViewModel.PASO_REVISAR, vm.uiState.value.paso)
+        assertTrue(auth.cuentasCreadas.isEmpty())
+
+        vm.siguiente()
+        advanceUntilIdle()
+        assertEquals(listOf("ana@example.com"), auth.cuentasCreadas)
+    }
+
+    @Test
+    fun `un error del servidor lleva al paso donde se corrige`() = runTest(dispatcher) {
+        registro.rechazo = mapOf("dni" to "Ya existe un prestador con este DNI.")
+        val vm = viewModelCompleto()
+        vm.irAPaso(RegistroPrestadorViewModel.PASO_REVISAR)
+        vm.siguiente()
+        advanceUntilIdle()
+        assertEquals(RegistroPrestadorViewModel.PASO_DATOS, vm.uiState.value.paso)
+
+        auth.errorAlCrearCuenta = TipoErrorAuth.CORREO_EN_USO
+        vm.irAPaso(RegistroPrestadorViewModel.PASO_REVISAR)
+        vm.siguiente()
+        advanceUntilIdle()
+        assertEquals(RegistroPrestadorViewModel.PASO_CUENTA, vm.uiState.value.paso)
+    }
 }

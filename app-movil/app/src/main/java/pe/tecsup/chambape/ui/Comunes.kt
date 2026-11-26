@@ -1,34 +1,62 @@
 package pe.tecsup.chambape.ui
 
-import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.spring
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.togetherWith
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
-import androidx.compose.material3.Button
+import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.outlined.CloudOff
+import androidx.compose.material.icons.outlined.ErrorOutline
+import androidx.compose.material.icons.outlined.LinkOff
+import androidx.compose.material.icons.outlined.NearMe
+import androidx.compose.material.icons.outlined.WifiOff
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.darkColorScheme
-import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.LiveRegionMode
+import androidx.compose.ui.semantics.clearAndSetSemantics
+import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.liveRegion
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -39,23 +67,7 @@ import pe.tecsup.chambape.ChambaPeApplication
 import pe.tecsup.chambape.R
 import pe.tecsup.chambape.domain.model.Prestador
 import pe.tecsup.chambape.domain.model.TipoError
-
-// Tema provisional; el sistema visual definitivo corresponde a AND-02.
-private val ColoresClaros = lightColorScheme(
-    primary = Color(0xFF0B6E4F),
-    secondary = Color(0xFF8A5A00),
-    tertiary = Color(0xFF1F5F8B),
-)
-private val ColoresOscuros = darkColorScheme(
-    primary = Color(0xFF7FD8B5),
-    secondary = Color(0xFFF2BE6B),
-    tertiary = Color(0xFF9CCBF0),
-)
-
-@Composable
-fun ChambaPeTheme(content: @Composable () -> Unit) {
-    MaterialTheme(colorScheme = if (isSystemInDarkTheme()) ColoresOscuros else ColoresClaros, content = content)
-}
+import pe.tecsup.chambape.ui.busqueda.textoCalificacion
 
 /** Crea un ViewModel con las dependencias del [AppContainer]. */
 @Composable
@@ -74,6 +86,14 @@ fun textoError(tipo: TipoError): String = stringResource(
     },
 )
 
+/** Icono que acompaña a cada tipo de error: dice de un vistazo si es la red, el servidor o la cuenta. */
+fun iconoError(tipo: TipoError): ImageVector = when (tipo) {
+    TipoError.SIN_CONEXION -> Icons.Outlined.WifiOff
+    TipoError.SERVIDOR -> Icons.Outlined.CloudOff
+    TipoError.DATOS_INVALIDOS -> Icons.Outlined.ErrorOutline
+    TipoError.CUENTA_NO_VINCULADA -> Icons.Outlined.LinkOff
+}
+
 @Composable
 fun Cargando(modifier: Modifier = Modifier) {
     val descripcion = stringResource(R.string.cargando)
@@ -83,41 +103,116 @@ fun Cargando(modifier: Modifier = Modifier) {
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
         CircularProgressIndicator()
-        Text(descripcion, modifier = Modifier.semantics { liveRegion = LiveRegionMode.Polite })
+        Text(descripcion, color = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.semantics { liveRegion = LiveRegionMode.Polite })
     }
 }
 
-/** Estado vacío o de error, con un botón opcional (por ejemplo, Reintentar). */
+/** Estado vacío o de error: icono, texto y, si hay, una acción para salir de ahí (por ejemplo, Reintentar). */
 @Composable
 fun Mensaje(
     texto: String,
     modifier: Modifier = Modifier,
     textoBoton: String? = null,
+    icono: ImageVector? = null,
     onBoton: () -> Unit = {},
 ) {
     Column(
         modifier = modifier.fillMaxWidth().padding(24.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(12.dp),
+        verticalArrangement = Arrangement.spacedBy(14.dp),
     ) {
+        if (icono != null) {
+            Box(
+                modifier = Modifier.size(72.dp).clip(CircleShape).background(MaterialTheme.colorScheme.secondaryContainer),
+                contentAlignment = Alignment.Center,
+            ) {
+                Icon(icono, contentDescription = null, tint = MaterialTheme.colorScheme.onSecondaryContainer, modifier = Modifier.size(34.dp))
+            }
+        }
         Text(
             texto,
             textAlign = TextAlign.Center,
             style = MaterialTheme.typography.bodyLarge,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
             modifier = Modifier.semantics { liveRegion = LiveRegionMode.Polite },
         )
-        if (textoBoton != null) Button(onClick = onBoton) { Text(textoBoton) }
+        if (textoBoton != null) FilledTonalButton(onClick = onBoton) { Text(textoBoton) }
     }
 }
 
 @Composable
 fun AvisoSinConexion(modifier: Modifier = Modifier) {
-    Text(
-        stringResource(R.string.aviso_cache),
-        modifier = modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp),
-        color = MaterialTheme.colorScheme.secondary,
-        style = MaterialTheme.typography.bodyMedium,
-    )
+    Surface(color = MaterialTheme.colorScheme.secondaryContainer, shape = MaterialTheme.shapes.small, modifier = modifier.fillMaxWidth()) {
+        Row(
+            modifier = Modifier.padding(horizontal = 14.dp, vertical = 10.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(10.dp),
+        ) {
+            Icon(Icons.Outlined.WifiOff, contentDescription = null, tint = MaterialTheme.colorScheme.onSecondaryContainer)
+            Text(stringResource(R.string.aviso_cache), color = MaterialTheme.colorScheme.onSecondaryContainer, style = MaterialTheme.typography.bodyMedium)
+        }
+    }
+}
+
+/** Círculo con las iniciales: identifica a la persona sin pedir una foto. */
+@Composable
+fun Iniciales(nombre: String, modifier: Modifier = Modifier, tamano: Dp = 44.dp) {
+    val iniciales = nombre.split(' ').filter { it.isNotBlank() }.take(2).joinToString("") { it.first().uppercase() }
+    Box(
+        modifier = modifier.size(tamano).clip(CircleShape).background(MaterialTheme.colorScheme.primaryContainer),
+        contentAlignment = Alignment.Center,
+    ) {
+        Text(
+            iniciales.ifEmpty { "?" },
+            style = if (tamano >= 64.dp) MaterialTheme.typography.headlineSmall else MaterialTheme.typography.titleMedium,
+            color = MaterialTheme.colorScheme.onPrimaryContainer,
+        )
+    }
+}
+
+/** Promedio con una estrella dibujada (no un carácter): «4,8 · 23 calificaciones». */
+@Composable
+fun Calificacion(prestador: Prestador, modifier: Modifier = Modifier) {
+    val texto = textoCalificacion(prestador)
+    Row(
+        modifier = modifier.clearAndSetSemantics { contentDescription = texto },
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(4.dp),
+    ) {
+        if (prestador.tieneCalificaciones) {
+            Icon(Icons.Filled.Star, contentDescription = null, tint = MaterialTheme.colorScheme.secondary, modifier = Modifier.size(18.dp))
+        }
+        Text(texto, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+    }
+}
+
+/** Corazón de favorito: al marcarlo late una vez (rebote corto); al quitarlo solo cambia. */
+@Composable
+fun BotonFavorito(favorito: Boolean, descripcion: String, onClick: () -> Unit, modifier: Modifier = Modifier) {
+    val escala = remember { Animatable(1f) }
+    // Solo late al pasar de no marcado a marcado, no al aparecer en pantalla ya marcado.
+    var previo by remember { mutableStateOf(favorito) }
+    LaunchedEffect(favorito) {
+        if (favorito && !previo) {
+            escala.animateTo(1.3f, tween(Movimiento.CORTA, easing = Movimiento.Desacelerada))
+            escala.animateTo(1f, spring(dampingRatio = Spring.DampingRatioMediumBouncy))
+        }
+        previo = favorito
+    }
+    IconButton(onClick = onClick, modifier = modifier) {
+        AnimatedContent(
+            targetState = favorito,
+            transitionSpec = { (scaleIn(initialScale = 0.6f) + fadeIn()) togetherWith fadeOut(tween(Movimiento.CORTA)) },
+            label = "favorito",
+        ) { marcado ->
+            Icon(
+                imageVector = if (marcado) Icons.Filled.Favorite else Icons.Filled.FavoriteBorder,
+                contentDescription = descripcion,
+                tint = if (marcado) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.graphicsLayer { scaleX = escala.value; scaleY = escala.value },
+            )
+        }
+    }
 }
 
 @Composable
@@ -128,27 +223,41 @@ fun PrestadorCard(
     onFavorito: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    Card(onClick = onAbrir, modifier = modifier.fillMaxWidth()) {
-        Row(modifier = Modifier.padding(start = 16.dp, top = 8.dp, bottom = 8.dp), verticalAlignment = Alignment.CenterVertically) {
-            Column(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) {
+    Card(
+        onClick = onAbrir,
+        modifier = modifier.fillMaxWidth(),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerLowest),
+        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp, pressedElevation = 4.dp),
+    ) {
+        Row(
+            modifier = Modifier.padding(start = 16.dp, top = 14.dp, bottom = 14.dp, end = 4.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(14.dp),
+        ) {
+            Iniciales(prestador.nombreCompleto)
+            Column(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(3.dp)) {
                 Text(prestador.nombreCompleto, style = MaterialTheme.typography.titleMedium)
                 if (prestador.rubros.isNotEmpty()) {
-                    Text(prestador.rubros.joinToString(" · "), style = MaterialTheme.typography.bodyMedium)
+                    Text(prestador.rubros.joinToString(" · "), style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.primary)
                 }
-                prestador.distanciaKm?.let {
-                    Text(stringResource(R.string.distancia_km, it), style = MaterialTheme.typography.bodySmall)
+                Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                    prestador.distanciaKm?.let {
+                        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(2.dp)) {
+                            Icon(Icons.Outlined.NearMe, contentDescription = null, modifier = Modifier.size(16.dp), tint = MaterialTheme.colorScheme.onSurfaceVariant)
+                            Text(stringResource(R.string.distancia_km, it), style = MaterialTheme.typography.bodySmall)
+                        }
+                    }
+                    Calificacion(prestador)
                 }
             }
-            IconButton(onClick = onFavorito) {
-                Icon(
-                    imageVector = if (favorito) Icons.Filled.Favorite else Icons.Filled.FavoriteBorder,
-                    contentDescription = stringResource(
-                        if (favorito) R.string.quitar_favorito else R.string.agregar_favorito,
-                        prestador.nombreCompleto,
-                    ),
-                    tint = if (favorito) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,
-                )
-            }
+            BotonFavorito(
+                favorito = favorito,
+                descripcion = stringResource(
+                    if (favorito) R.string.quitar_favorito else R.string.agregar_favorito,
+                    prestador.nombreCompleto,
+                ),
+                onClick = onFavorito,
+            )
         }
     }
 }

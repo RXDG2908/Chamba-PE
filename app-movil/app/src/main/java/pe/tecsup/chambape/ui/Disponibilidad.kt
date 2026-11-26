@@ -37,6 +37,25 @@ import pe.tecsup.chambape.domain.model.Disponibilidad
 import pe.tecsup.chambape.domain.model.ErrorDatos
 import pe.tecsup.chambape.domain.model.EstadoVerificacion
 import pe.tecsup.chambape.domain.model.TipoError
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.graphics.Color
+import androidx.compose.material3.SwitchDefaults
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Icon
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material.icons.outlined.VerifiedUser
+import androidx.compose.material.icons.outlined.ToggleOn
+import androidx.compose.material.icons.outlined.HourglassTop
+import androidx.compose.material.icons.outlined.GppBad
+import androidx.compose.material.icons.outlined.DoNotDisturbOn
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.Icons
+import androidx.compose.foundation.layout.size
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.AnimatedContent
 
 data class DisponibilidadUiState(
     val cargando: Boolean = true,
@@ -85,6 +104,20 @@ class DisponibilidadViewModel(private val repository: DisponibilidadRepository) 
 }
 
 @Composable
+private fun Aviso(icono: ImageVector, texto: String, fondo: Color, contenido: Color) {
+    Surface(color = fondo, shape = MaterialTheme.shapes.small, modifier = Modifier.fillMaxWidth()) {
+        Row(
+            modifier = Modifier.padding(14.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
+        ) {
+            Icon(icono, contentDescription = null, tint = contenido)
+            Text(texto, color = contenido, style = MaterialTheme.typography.bodyMedium)
+        }
+    }
+}
+
+@Composable
 fun DisponibilidadScreen() {
     val vm = chambaViewModel { DisponibilidadViewModel(it.disponibilidadRepository) }
     val estado by vm.uiState.collectAsStateWithLifecycle()
@@ -92,9 +125,11 @@ fun DisponibilidadScreen() {
     when {
         estado.cargando -> PantallaCentrada { Cargando() }
         datos == null -> PantallaCentrada {
+            val tipo = estado.errorCarga ?: TipoError.SERVIDOR
             Mensaje(
-                textoError(estado.errorCarga ?: TipoError.SERVIDOR),
+                textoError(tipo),
                 textoBoton = stringResource(R.string.reintentar),
+                icono = iconoError(tipo),
                 onBoton = vm::cargar,
             )
         }
@@ -102,8 +137,18 @@ fun DisponibilidadScreen() {
             modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
-            Text(stringResource(R.string.disponibilidad_ayuda), style = MaterialTheme.typography.bodyLarge)
-            Card(modifier = Modifier.fillMaxWidth()) {
+            Text(
+                stringResource(R.string.disponibilidad_ayuda),
+                style = MaterialTheme.typography.bodyLarge,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+            // La tarjeta toma el color del estado: verde cuando recibe solicitudes, neutra cuando no.
+            val fondo by animateColorAsState(
+                if (datos.disponible) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surfaceContainerHigh,
+                tween(Movimiento.MEDIA),
+                label = "fondo",
+            )
+            Card(modifier = Modifier.fillMaxWidth(), colors = CardDefaults.cardColors(containerColor = fondo)) {
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -115,13 +160,35 @@ fun DisponibilidadScreen() {
                         )
                         .padding(16.dp),
                     verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(14.dp),
                 ) {
+                    AnimatedContent(datos.disponible, label = "icono") { activo ->
+                        Icon(
+                            if (activo) Icons.Outlined.ToggleOn else Icons.Outlined.DoNotDisturbOn,
+                            contentDescription = null,
+                            modifier = Modifier.size(32.dp),
+                        )
+                    }
                     Text(
                         stringResource(if (datos.disponible) R.string.disponibilidad_activo else R.string.disponibilidad_inactivo),
                         style = MaterialTheme.typography.titleLarge,
                         modifier = Modifier.weight(1f),
                     )
-                    Switch(checked = datos.disponible, onCheckedChange = null, enabled = !estado.guardando)
+                    if (estado.guardando) {
+                        CircularProgressIndicator(modifier = Modifier.size(20.dp), strokeWidth = 2.dp)
+                    }
+                    Switch(
+                        checked = datos.disponible,
+                        onCheckedChange = null,
+                        enabled = !estado.guardando,
+                        thumbContent = {
+                            Icon(
+                                if (datos.disponible) Icons.Filled.Check else Icons.Filled.Close,
+                                contentDescription = null,
+                                modifier = Modifier.size(SwitchDefaults.IconSize),
+                            )
+                        },
+                    )
                 }
             }
             Text(
@@ -135,17 +202,20 @@ fun DisponibilidadScreen() {
                 modifier = Modifier.semantics { liveRegion = LiveRegionMode.Polite },
             )
             when (datos.estado) {
-                EstadoVerificacion.PENDIENTE -> Text(stringResource(R.string.disponibilidad_aviso_pendiente), color = MaterialTheme.colorScheme.secondary)
-                EstadoVerificacion.RECHAZADO -> Text(stringResource(R.string.disponibilidad_aviso_rechazado), color = MaterialTheme.colorScheme.error)
-                EstadoVerificacion.VERIFICADO -> Unit
-            }
-            if (estado.errorGuardado) {
-                Text(
-                    stringResource(R.string.disponibilidad_error_guardar),
-                    color = MaterialTheme.colorScheme.error,
-                    modifier = Modifier.semantics { liveRegion = LiveRegionMode.Assertive },
+                EstadoVerificacion.PENDIENTE -> Aviso(
+                    Icons.Outlined.HourglassTop, stringResource(R.string.disponibilidad_aviso_pendiente),
+                    MaterialTheme.colorScheme.secondaryContainer, MaterialTheme.colorScheme.onSecondaryContainer,
+                )
+                EstadoVerificacion.RECHAZADO -> Aviso(
+                    Icons.Outlined.GppBad, stringResource(R.string.disponibilidad_aviso_rechazado),
+                    MaterialTheme.colorScheme.errorContainer, MaterialTheme.colorScheme.onErrorContainer,
+                )
+                EstadoVerificacion.VERIFICADO -> Aviso(
+                    Icons.Outlined.VerifiedUser, stringResource(R.string.disponibilidad_verificado),
+                    MaterialTheme.colorScheme.tertiaryContainer, MaterialTheme.colorScheme.onTertiaryContainer,
                 )
             }
+            AvisoError(if (estado.errorGuardado) stringResource(R.string.disponibilidad_error_guardar) else null)
         }
     }
 }

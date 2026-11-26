@@ -4,6 +4,8 @@ from django.db import transaction
 from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
 
+from usuarios.validadores import nombre_de_persona, telefono_peruano
+
 from .models import Prestador, Rubro
 
 User = get_user_model()
@@ -15,8 +17,21 @@ class RubroSerializer(serializers.ModelSerializer):
         fields = ['id', 'nombre']
 
 
-class RegistroPrestadorSerializer(serializers.ModelSerializer):
-    username = serializers.CharField(write_only=True, max_length=150)
+class DatosPersonalesMixin:
+    """Nombres, apellidos y teléfono con las mismas reglas en el registro web y en el de la app."""
+
+    def validate_nombres(self, valor):
+        return nombre_de_persona(valor)
+
+    def validate_apellidos(self, valor):
+        return nombre_de_persona(valor)
+
+    def validate_telefono(self, valor):
+        return telefono_peruano(valor)
+
+
+class RegistroPrestadorSerializer(DatosPersonalesMixin, serializers.ModelSerializer):
+    username = serializers.CharField(write_only=True, max_length=150, validators=[User.username_validator])
     email = serializers.EmailField(write_only=True)
     password = serializers.CharField(write_only=True, style={'input_type': 'password'})
     rubros = serializers.PrimaryKeyRelatedField(
@@ -61,7 +76,7 @@ class RegistroPrestadorSerializer(serializers.ModelSerializer):
         return prestador
 
 
-class RegistroPrestadorMovilSerializer(serializers.ModelSerializer):
+class RegistroPrestadorMovilSerializer(DatosPersonalesMixin, serializers.ModelSerializer):
     """Registro desde la app móvil: la identidad viene del token de Firebase, no de una contraseña."""
     rubros = serializers.PrimaryKeyRelatedField(
         queryset=Rubro.objects.all(), many=True, allow_empty=False,

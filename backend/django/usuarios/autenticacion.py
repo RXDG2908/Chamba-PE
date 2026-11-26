@@ -79,11 +79,15 @@ class AutenticacionFirebase(BaseAuthentication):
 
         perfil = Perfil.objects.select_related('usuario').filter(firebase_uid=uid).first()
         if perfil is None or not perfil.usuario.is_active:
-            raise AuthenticationFailed('Esta cuenta de la app aún no está vinculada.')
+            # `codigo` estable: la app distingue «crear la cuenta de cliente» de una sanción sin
+            # depender del texto del mensaje.
+            raise AuthenticationFailed({
+                'detail': 'Esta cuenta de la app aún no está vinculada.', 'codigo': 'cuenta_no_vinculada',
+            })
         # HU-13: una cuenta suspendida o bloqueada tampoco entra desde la app.
         from administracion.models import sancion_vigente
         from administracion.sanciones import mensaje_para_la_cuenta
         sancion = sancion_vigente(perfil.usuario_id)
         if sancion is not None:
-            raise AuthenticationFailed(mensaje_para_la_cuenta(sancion))
+            raise AuthenticationFailed({'detail': mensaje_para_la_cuenta(sancion), 'codigo': 'cuenta_sancionada'})
         return (perfil.usuario, None)

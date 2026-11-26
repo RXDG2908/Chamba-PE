@@ -157,13 +157,13 @@ fun AvisoSinConexion(modifier: Modifier = Modifier) {
 /** Círculo con las iniciales: identifica a la persona sin pedir una foto. */
 @Composable
 fun Iniciales(nombre: String, modifier: Modifier = Modifier, tamano: Dp = 44.dp) {
-    val iniciales = nombre.split(' ').filter { it.isNotBlank() }.take(2).joinToString("") { it.first().uppercase() }
+    val iniciales = inicialesDe(nombre)
     Box(
         modifier = modifier.size(tamano).clip(CircleShape).background(MaterialTheme.colorScheme.primaryContainer),
         contentAlignment = Alignment.Center,
     ) {
         Text(
-            iniciales.ifEmpty { "?" },
+            iniciales,
             style = if (tamano >= 64.dp) MaterialTheme.typography.headlineSmall else MaterialTheme.typography.titleMedium,
             color = MaterialTheme.colorScheme.onPrimaryContainer,
         )

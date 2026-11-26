@@ -18,7 +18,7 @@
 .panel-tarjeta:hover { border-color: #b9d6c5; box-shadow: var(--sombra-alta); }
 @media (hover: hover) and (pointer: fine) { .panel-tarjeta:hover { transform: translateY(-2px); } }
 .panel-tarjeta:active { transform: scale(0.98); }
-.panel-dato { font-size: 40px; font-weight: 800; line-height: 1; letter-spacing: -1px; font-variant-numeric: tabular-nums; color: var(--verde-intenso); }
+.panel-dato { overflow-wrap: normal; font-size: 40px; font-weight: 800; line-height: 1; letter-spacing: -1px; font-variant-numeric: tabular-nums; color: var(--verde-intenso); }
 .panel-titulo { font-weight: 700; }
 .panel-detalle { color: var(--texto-suave); font-size: 14px; }
 

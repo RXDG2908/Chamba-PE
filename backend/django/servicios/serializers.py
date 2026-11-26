@@ -1,11 +1,11 @@
 from math import isfinite
 import re
-import unicodedata
 
 from rest_framework import serializers
 
 from prestadores.models import Prestador, Rubro
 from prestadores.serializers import RubroSerializer
+from usuarios.validadores import nombre_de_persona
 
 from .codigo_seguimiento import codigo_de
 from .distancias import distancia_km
@@ -107,14 +107,7 @@ class SolicitudSerializer(serializers.ModelSerializer):
         return valor
 
     def validate_cliente_nombre(self, valor):
-        nombre = unicodedata.normalize('NFC', valor)
-        if not any(c.isalpha() for c in nombre) or not all(
-            c.isalpha() or c in " -'’" for c in nombre
-        ):
-            raise serializers.ValidationError(
-                'Ingresa un nombre con al menos una letra; solo letras, espacios, guiones y apóstrofes.'
-            )
-        return nombre
+        return nombre_de_persona(valor)
 
     def validate_descripcion(self, valor):
         if not valor.strip():

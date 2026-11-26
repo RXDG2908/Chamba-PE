@@ -5,6 +5,7 @@ import './RevisionDocumentos.css'
 import './GestionCuentas.css'
 import { Ban, RotateCcw, Search, UserCheck, UserX, Users, X } from 'lucide-react'
 import Cargando from '../../componentes/Cargando.jsx'
+import { formatoEntero } from '../../nucleo/formatos.js'
 
 const API = '/api/administracion/cuentas/'
 const FILTROS = [['', 'Todas'], ['activa', 'Activas'], ['suspendida', 'Suspendidas'], ['bloqueada', 'Bloqueadas']]
@@ -231,7 +232,7 @@ export default function GestionCuentas() {
       {estado === 'listo' && cuentas.length === 0 && <p className="revision-aviso">No hay cuentas con ese filtro.</p>}
       {estado === 'listo' && cuentas.length > 0 && (
         <>
-          <p className="revision-resumen">{cuentas.length} {cuentas.length === 1 ? 'cuenta' : 'cuentas'}</p>
+          <p className="revision-resumen">{formatoEntero.format(cuentas.length)} {cuentas.length === 1 ? 'cuenta' : 'cuentas'}</p>
           <ul className="revision-lista">
             {cuentas.map((cuenta) => <TarjetaCuenta key={cuenta.id} cuenta={cuenta} onCambio={actualizar} />)}
           </ul>

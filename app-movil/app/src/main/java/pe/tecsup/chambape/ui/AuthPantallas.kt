@@ -205,6 +205,7 @@ private fun textoErrorAuth(tipo: TipoErrorAuth): String = stringResource(
         TipoErrorAuth.CLAVE_DEBIL -> R.string.error_clave_debil
         TipoErrorAuth.CORREO_INVALIDO -> R.string.error_correo_invalido
         TipoErrorAuth.SIN_CONEXION -> R.string.error_sin_conexion
+        TipoErrorAuth.CUENTA_SANCIONADA -> R.string.error_cuenta_sancionada
         TipoErrorAuth.DESCONOCIDO -> R.string.error_desconocido
     },
 )

@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom'
 import useConsultas from '../../nucleo/useConsultas.js'
 import '../../estilos/Paneles.css'
 import { Inbox, ShieldCheck, ToggleRight } from 'lucide-react'
+import { formatoEntero } from '../../nucleo/formatos.js'
 
 const EN_CURSO = ['aceptada', 'en_camino', 'en_servicio']
 
@@ -48,7 +49,7 @@ export default function PanelPrestador({ usuario }) {
       <section className="panel-tarjetas" aria-label="Resumen">
         <Link to="/solicitudes" className="panel-tarjeta">
           <span className="panel-tarjeta-icono" aria-hidden="true"><Inbox size={20} /></span>
-          <span className="panel-dato">{cargando ? '—' : pendientes}</span>
+          <span className="panel-dato">{cargando ? '—' : formatoEntero.format(pendientes)}</span>
           <span className="panel-titulo">Solicitudes por responder</span>
           <span className="panel-detalle">{enCurso ? `${enCurso} en curso` : 'Ninguna en curso'}</span>
         </Link>

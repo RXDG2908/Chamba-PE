@@ -3,6 +3,7 @@ import './RevisionDocumentos.css'
 import { MOTIVOS_FACIALES } from '../../nucleo/textosFaciales.js'
 import { Check, CircleX, FileCheck2, IdCard, RefreshCw, RotateCcw, ScanFace, UserCheck, UserX, X } from 'lucide-react'
 import Cargando from '../../componentes/Cargando.jsx'
+import { formatoEntero } from '../../nucleo/formatos.js'
 
 const API = '/api/administracion/revisiones/'
 const RUTA_PANEL = '/administracion/revisiones'
@@ -116,6 +117,7 @@ function TarjetaRevision({ revision, onResuelta }) {
               <textarea
                 id={`motivo-${revision.id}`}
                 rows="3"
+                maxLength={500}
                 required
                 autoFocus
                 value={comentario}
@@ -397,7 +399,7 @@ export default function RevisionDocumentos() {
       {estado === 'listo' && (
         <>
           <p className="revision-resumen" aria-live="polite">
-            {pendientes === 1 ? '1 documento pendiente' : `${pendientes} documentos pendientes`}
+            {pendientes === 1 ? '1 documento pendiente' : `${formatoEntero.format(pendientes)} documentos pendientes`}
           </p>
           {revisiones.length === 0 ? (
             <p className="revision-aviso">No hay documentos por revisar.</p>

@@ -3,10 +3,11 @@ package pe.tecsup.chambape
 import android.app.Application
 import android.content.Context
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
+import pe.tecsup.chambape.data.auth.AlmacenPerfilPreferencias
+import pe.tecsup.chambape.data.auth.ApiPerfiles
 import pe.tecsup.chambape.data.auth.AuthRepository
 import pe.tecsup.chambape.data.auth.FirebaseAuthRepository
 import pe.tecsup.chambape.data.local.AppDatabase
@@ -29,12 +30,12 @@ import pe.tecsup.chambape.device.UbicacionProvider
 class AppContainer(context: Context) {
     private val alcanceApp = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
     private val baseDatos = AppDatabase.crear(context)
-    private val firestore = FirebaseFirestore.getInstance()
-
-    val authRepository: AuthRepository =
-        FirebaseAuthRepository(FirebaseAuth.getInstance(), firestore, alcanceApp)
-
     private val api = RetrofitClient.crear(BuildConfig.API_BASE_URL)
+
+    // Firebase solo para la identidad; el rol y el prestador salen de Django (GET /api/usuarios/yo/).
+    val authRepository: AuthRepository = FirebaseAuthRepository(
+        FirebaseAuth.getInstance(), ApiPerfiles(api), AlmacenPerfilPreferencias(context), alcanceApp,
+    )
 
     val prestadorRepository: PrestadorRepository =
         PrestadorRepositoryImpl(

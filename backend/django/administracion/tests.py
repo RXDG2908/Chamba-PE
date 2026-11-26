@@ -137,6 +137,17 @@ class RevisionDocumentoTests(TestCase):
         self.assertEqual(self.revision.estado, 'rechazado')
         self.assertEqual(self.revision.comentario, 'Documento ilegible')
 
+    def test_comentario_de_rechazo_tiene_tope_de_500(self):
+        respuesta = self.client.patch(
+            self.url_detalle, {'estado': 'rechazado', 'comentario': 'x' * 501}, format='json',
+        )
+        self.assertEqual(respuesta.status_code, 400)
+        self.assertIn('comentario', respuesta.data)
+        respuesta = self.client.patch(
+            self.url_detalle, {'estado': 'rechazado', 'comentario': 'x' * 500}, format='json',
+        )
+        self.assertEqual(respuesta.status_code, 200)
+
     def test_rechazar_sin_comentario_devuelve_400(self):
         respuesta = self.client.patch(
             self.url_detalle, {'estado': 'rechazado', 'comentario': '   '}, format='json',

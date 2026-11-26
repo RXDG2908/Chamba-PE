@@ -61,7 +61,8 @@ class DecisionRevisionSerializer(serializers.ModelSerializer):
     class Meta:
         model = RevisionDocumento
         fields = ['estado', 'comentario']
-        extra_kwargs = {'comentario': {'required': False}}
+        extra_kwargs = {'comentario': {'required': False, 'max_length': 500, 'error_messages': {
+            'max_length': 'El comentario puede tener hasta 500 caracteres.'}}}
 
     def validate(self, attrs):
         comentario = attrs.get('comentario', '').strip()

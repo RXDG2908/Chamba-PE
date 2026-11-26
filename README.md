@@ -59,9 +59,9 @@ Proyecto Integrador — Diseño y Desarrollo de Software · IV ciclo · Tecsup 2
 | HU-20 Reconocimiento facial | 🟡 En `main` (OpenCV SFace); falta calibrar el umbral con fotos del equipo (T20.4) |
 | HU-19 Escaneo del DNI | 🟡 En `main` con sus pruebas (T19.4); con OCR real muchas fotos pasan a revisión manual ([impedimento 24](AVANCES.md)) |
 | HU-8 Notificaciones push | 🟡 En `main`; falta medir la entrega real en menos de 5 s (T8.3) |
-| App Android | 🟡 Búsqueda con Google Maps, registro por pasos y solicitudes por la API de Django (las mismas de la web); falta probar el ingreso con el `google-services.json` real y en teléfono físico ([pendientes](docs/android-reparto.md)) |
+| App Android | 🟡 Búsqueda con Google Maps, registro por pasos, y solicitudes y perfil en la API de Django (lo mismo que ve la web): Firebase queda solo para la identidad, con el proyecto real `chamba-pe-tecsup`. Falta recorrer el alta con una cuenta real y probar en teléfono físico ([pendientes](docs/android-reparto.md)) |
 
-<p align="center"><img src="docs/graficos/pruebas-automatizadas.svg" alt="Pruebas automatizadas: Django 465, Playwright 115, Spring Boot 46 y Android 30, todas pasan" width="720"></p>
+<p align="center"><img src="docs/graficos/pruebas-automatizadas.svg" alt="Pruebas automatizadas: Django 478, Playwright 115, Spring Boot 46 y Android 42, todas pasan" width="720"></p>
 
 > Pagos, chatbot clasificador, rubros con comisiones y métricas del administrador siguen fuera del alcance (backlog futuro).
 

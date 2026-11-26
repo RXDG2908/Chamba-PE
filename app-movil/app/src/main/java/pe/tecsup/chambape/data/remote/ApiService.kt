@@ -25,6 +25,9 @@ data class PrestadorDto(
     @SerializedName("latitud") val latitud: Double?,
     @SerializedName("longitud") val longitud: Double?,
     @SerializedName("distancia_km") val distanciaKm: Double?,
+    // HU-12: null mientras no tenga calificaciones.
+    @SerializedName("calificacion_promedio") val calificacionPromedio: Double? = null,
+    @SerializedName("calificaciones_total") val calificacionesTotal: Int? = null,
 )
 
 data class DisponibilidadDto(

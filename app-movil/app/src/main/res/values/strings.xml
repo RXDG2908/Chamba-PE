@@ -89,6 +89,10 @@
     <string name="detalle_no_encontrado">No se encontró al prestador. Vuelve a buscarlo.</string>
     <string name="detalle_zona">Zona de atención aproximada: %1$.3f, %2$.3f</string>
     <string name="sin_calificaciones">Sin calificaciones</string>
+    <plurals name="calificacion_resumen">
+        <item quantity="one">★ %1$.1f · %2$d calificación</item>
+        <item quantity="other">★ %1$.1f · %2$d calificaciones</item>
+    </plurals>
     <string name="guardar_en_favoritos">Guardar en favoritos</string>
     <string name="quitar_de_favoritos">Quitar de favoritos</string>
     <string name="solicitud_titulo">Enviar solicitud</string>

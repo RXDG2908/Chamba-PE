@@ -1,59 +1,59 @@
 package pe.tecsup.chambape.ui.busqueda
 
-import android.annotation.SuppressLint
-import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.Paint
-import android.graphics.drawable.BitmapDrawable
-import android.graphics.drawable.Drawable
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.viewinterop.AndroidView
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LifecycleEventObserver
-import androidx.lifecycle.compose.LocalLifecycleOwner
-import org.osmdroid.config.Configuration
-import org.osmdroid.events.MapEventsReceiver
-import org.osmdroid.tileprovider.tilesource.TileSourceFactory
-import org.osmdroid.util.BoundingBox
-import org.osmdroid.util.GeoPoint
-import org.osmdroid.views.CustomZoomButtonsController
-import org.osmdroid.views.MapView
-import org.osmdroid.views.overlay.CopyrightOverlay
-import org.osmdroid.views.overlay.MapEventsOverlay
-import org.osmdroid.views.overlay.Marker
-import org.osmdroid.views.overlay.Polygon
+import com.google.android.gms.maps.CameraUpdateFactory
+import com.google.android.gms.maps.model.BitmapDescriptor
+import com.google.android.gms.maps.model.BitmapDescriptorFactory
+import com.google.android.gms.maps.model.CameraPosition
+import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.LatLngBounds
+import com.google.maps.android.compose.Circle
+import com.google.maps.android.compose.GoogleMap
+import com.google.maps.android.compose.MapProperties
+import com.google.maps.android.compose.MapUiSettings
+import com.google.maps.android.compose.Marker
+import com.google.maps.android.compose.rememberCameraPositionState
+import com.google.maps.android.compose.rememberMarkerState
 import pe.tecsup.chambape.R
 import pe.tecsup.chambape.device.Coordenadas
 import pe.tecsup.chambape.domain.model.Prestador
-import java.io.File
+import kotlin.math.cos
 
-private val LIMA = GeoPoint(-12.046374, -77.042793)
-private const val ZOOM_INICIAL = 13.0
-private const val ZOOM_MAXIMO_ENCUADRE = 15.0
+private val LIMA = LatLng(-12.046374, -77.042793)
+private const val ZOOM_INICIAL = 13f
+private const val ZOOM_MAXIMO_ENCUADRE = 15f
+private const val KM_POR_GRADO = 111.195
 private const val COLOR_UBICACION = 0xFF2463A6.toInt()
 private const val COLOR_PRESTADOR = 0xFF0B6E4F.toInt()
 
 /**
- * Mapa interactivo de OpenStreetMap (osmdroid), equivalente al de Leaflet en la web:
+ * Mapa de Google Maps (maps-compose, como en el lab CampusGPS), equivalente al de la web:
  * un toque elige dónde se necesita el servicio (punto azul) y los prestadores encontrados
- * aparecen como marcadores verdes numerados; al tocarlos se abre su ficha.
+ * aparecen como marcadores verdes numerados; al tocarlos se ve su ficha con la calificación.
  *
- * [encuadre] cambia cada vez que hay que volver a encuadrar ubicación y resultados.
+ * [encuadre] cambia cada vez que hay que volver a encuadrar ubicación y resultados. Con
+ * [radioKm] dibuja el círculo de cobertura alrededor de la ubicación (registro de prestador).
  */
 @Composable
 fun MapaBusqueda(
@@ -62,173 +62,137 @@ fun MapaBusqueda(
     encuadre: Int,
     onElegirUbicacion: (Double, Double) -> Unit,
     modifier: Modifier = Modifier,
-    /** Si se indica, dibuja el círculo de cobertura alrededor de la ubicación (registro de prestador). */
     radioKm: Int? = null,
 ) {
-    val context = LocalContext.current
     val alElegir by rememberUpdatedState(onElegirUbicacion)
     val descripcion = stringResource(R.string.mapa_descripcion)
     val textoUbicacion = stringResource(R.string.mapa_tu_ubicacion)
-    val sinCalificaciones = stringResource(R.string.sin_calificaciones)
+    val camara = rememberCameraPositionState { position = CameraPosition.fromLatLngZoom(LIMA, ZOOM_INICIAL) }
+    // Encuadrar antes de que el mapa tenga tamaño falla: se espera a que termine de cargar.
+    var cargado by remember { mutableStateOf(false) }
 
-    val mapa = remember { crearMapa(context) { lat, lon -> alElegir(lat, lon) } }
-
-    // osmdroid necesita onResume/onPause para arrancar y detener la descarga de teselas.
-    val ciclo = LocalLifecycleOwner.current.lifecycle
-    DisposableEffect(ciclo, mapa) {
-        val observador = LifecycleEventObserver { _, evento ->
-            when (evento) {
-                Lifecycle.Event.ON_RESUME -> mapa.onResume()
-                Lifecycle.Event.ON_PAUSE -> mapa.onPause()
-                else -> Unit
-            }
-        }
-        ciclo.addObserver(observador)
-        onDispose {
-            ciclo.removeObserver(observador)
-            mapa.onDetach()
+    LaunchedEffect(cargado, encuadre) {
+        if (cargado && radioKm == null) encuadrar(camara, ubicacion, prestadores)
+    }
+    // Registro: al mover el centro o cambiar el radio, se ve toda la zona de cobertura.
+    LaunchedEffect(cargado, ubicacion, radioKm) {
+        if (cargado && ubicacion != null && radioKm != null) {
+            camara.animate(CameraUpdateFactory.newLatLngBounds(zona(ubicacion, radioKm), 48))
         }
     }
 
-    AndroidView(
-        factory = { mapa },
+    GoogleMap(
         modifier = modifier
             .fillMaxWidth()
             .height(280.dp)
             .clip(RoundedCornerShape(12.dp))
             .semantics { contentDescription = descripcion },
-        update = { vista ->
-            val estado = EstadoMapa(ubicacion, prestadores, encuadre, radioKm)
-            if (vista.tag == estado) return@AndroidView
-            val encuadrar = (vista.tag as? EstadoMapa)?.encuadre != encuadre
-            vista.tag = estado
+        cameraPositionState = camara,
+        properties = MapProperties(isBuildingEnabled = true),
+        uiSettings = MapUiSettings(zoomControlsEnabled = true, mapToolbarEnabled = false, myLocationButtonEnabled = false),
+        onMapLoaded = { cargado = true },
+        onMapClick = { punto -> alElegir(punto.latitude, punto.longitude) },
+    ) {
+        if (ubicacion != null && radioKm != null) {
+            Circle(
+                center = LatLng(ubicacion.latitud, ubicacion.longitud),
+                radius = radioKm * 1000.0,
+                fillColor = Color(0x332463A6),
+                strokeColor = Color(COLOR_UBICACION),
+                strokeWidth = 4f,
+            )
+        }
+        ubicacion?.let {
+            Marker(
+                state = rememberMarkerState(key = "ubicacion-${it.latitud},${it.longitud}", position = LatLng(it.latitud, it.longitud)),
+                title = textoUbicacion,
+                icon = icono(COLOR_UBICACION, texto = null),
+                anchor = androidx.compose.ui.geometry.Offset(0.5f, 0.5f),
+            )
+        }
+        prestadores.forEachIndexed { indice, prestador ->
+            Marker(
+                state = rememberMarkerState(key = "prestador-${prestador.id}", position = LatLng(prestador.latitud, prestador.longitud)),
+                title = "${indice + 1}. ${prestador.nombreCompleto}",
+                snippet = fichaPrestador(prestador),
+                icon = icono(COLOR_PRESTADOR, texto = "${indice + 1}"),
+                anchor = androidx.compose.ui.geometry.Offset(0.5f, 0.5f),
+            )
+        }
+    }
+}
 
-            // Se conservan el receptor de toques y el aviso de derechos; se rehacen los marcadores.
-            vista.overlays.removeAll { it is Marker || it is Polygon }
-            if (ubicacion != null && radioKm != null) {
-                val circulo = Polygon(vista).apply {
-                    points = Polygon.pointsAsCircle(GeoPoint(ubicacion.latitud, ubicacion.longitud), radioKm * 1000.0)
-                    fillPaint.color = 0x332463A6
-                    outlinePaint.color = COLOR_UBICACION
-                    outlinePaint.strokeWidth = 2 * vista.resources.displayMetrics.density
-                    // No consume el toque: dentro del círculo se puede seguir eligiendo otro centro.
-                    setOnClickListener { _, _, _ -> false }
-                }
-                vista.overlays += circulo
-                // Al mover el centro o cambiar el radio, el mapa se ajusta para mostrar toda la zona.
-                val zona = circulo.bounds
-                val margen = (16 * vista.resources.displayMetrics.density).toInt()
-                vista.post { vista.zoomToBoundingBox(zona, false, margen) }
-            }
-            ubicacion?.let {
-                vista.overlays += Marker(vista).apply {
-                    position = GeoPoint(it.latitud, it.longitud)
-                    icon = icono(vista.context, COLOR_UBICACION, texto = null)
-                    setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_CENTER)
-                    title = textoUbicacion
-                }
-            }
-            prestadores.forEachIndexed { indice, prestador ->
-                vista.overlays += Marker(vista).apply {
-                    position = GeoPoint(prestador.latitud, prestador.longitud)
-                    icon = icono(vista.context, COLOR_PRESTADOR, texto = "${indice + 1}")
-                    setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_CENTER)
-                    title = prestador.nombreCompleto
-                    snippet = fichaPrestador(vista.context, prestador, sinCalificaciones)
-                }
-            }
-            if (encuadrar) encuadrar(vista, ubicacion, prestadores)
-            vista.invalidate()
-        },
+/** Rubros, distancia y calificación del prestador, en una línea (la ficha del marcador). */
+@Composable
+private fun fichaPrestador(prestador: Prestador): String = buildList {
+    if (prestador.rubros.isNotEmpty()) add(prestador.rubros.joinToString(" · "))
+    prestador.distanciaKm?.let { add(stringResource(R.string.distancia_km, it)) }
+    add(textoCalificacion(prestador))
+}.joinToString(" · ")
+
+/** «★ 4,8 · 23 calificaciones» o «Sin calificaciones» (HU-12), igual que en la web. */
+@Composable
+fun textoCalificacion(prestador: Prestador): String =
+    if (prestador.tieneCalificaciones) {
+        pluralStringResource(
+            R.plurals.calificacion_resumen, prestador.calificacionesTotal,
+            prestador.calificacionPromedio ?: 0.0, prestador.calificacionesTotal,
+        )
+    } else {
+        stringResource(R.string.sin_calificaciones)
+    }
+
+/** Mueve la cámara para que se vean la ubicación elegida y todos los resultados. */
+private suspend fun encuadrar(
+    camara: com.google.maps.android.compose.CameraPositionState,
+    ubicacion: Coordenadas?,
+    prestadores: List<Prestador>,
+) {
+    val puntos = buildList {
+        ubicacion?.let { add(LatLng(it.latitud, it.longitud)) }
+        prestadores.forEach { add(LatLng(it.latitud, it.longitud)) }
+    }
+    if (puntos.isEmpty()) return
+    if (puntos.all { it == puntos[0] }) {
+        camara.animate(CameraUpdateFactory.newLatLngZoom(puntos[0], ZOOM_MAXIMO_ENCUADRE))
+        return
+    }
+    val limites = LatLngBounds.builder().apply { puntos.forEach(::include) }.build()
+    camara.animate(CameraUpdateFactory.newLatLngBounds(limites, 64))
+    if (camara.position.zoom > ZOOM_MAXIMO_ENCUADRE) camara.animate(CameraUpdateFactory.zoomTo(ZOOM_MAXIMO_ENCUADRE))
+}
+
+/** Rectángulo que contiene el círculo de cobertura. */
+private fun zona(centro: Coordenadas, radioKm: Int): LatLngBounds {
+    val dLat = radioKm / KM_POR_GRADO
+    val dLon = radioKm / (KM_POR_GRADO * cos(Math.toRadians(centro.latitud)).coerceAtLeast(0.01))
+    return LatLngBounds(
+        LatLng(centro.latitud - dLat, centro.longitud - dLon),
+        LatLng(centro.latitud + dLat, centro.longitud + dLon),
     )
 }
 
-private data class EstadoMapa(
-    val ubicacion: Coordenadas?,
-    val prestadores: List<Prestador>,
-    val encuadre: Int,
-    val radioKm: Int?,
-)
-
-@SuppressLint("ClickableViewAccessibility") // el toque sigue llegando al mapa; solo se evita que la lista lo robe
-private fun crearMapa(context: Context, onToque: (Double, Double) -> Unit): MapView {
-    // Política de uso de OpenStreetMap: identificar la app y guardar las teselas en caché.
-    Configuration.getInstance().apply {
-        userAgentValue = context.packageName
-        osmdroidBasePath = File(context.cacheDir, "osmdroid")
-        osmdroidTileCache = File(osmdroidBasePath, "teselas")
-    }
-    return MapView(context).apply {
-        setTileSource(TileSourceFactory.MAPNIK)
-        setMultiTouchControls(true)
-        zoomController.setVisibility(CustomZoomButtonsController.Visibility.SHOW_AND_FADEOUT)
-        isHorizontalMapRepetitionEnabled = false
-        isVerticalMapRepetitionEnabled = false
-        minZoomLevel = 3.0
-        controller.setZoom(ZOOM_INICIAL)
-        controller.setCenter(LIMA)
-        overlays += CopyrightOverlay(context)
-        overlays += MapEventsOverlay(object : MapEventsReceiver {
-            override fun singleTapConfirmedHelper(punto: GeoPoint): Boolean {
-                onToque(punto.latitude, punto.longitude)
-                return true
-            }
-
-            override fun longPressHelper(punto: GeoPoint) = false
-        })
-        // El mapa va dentro de una lista que se desplaza: mientras se toca, el gesto es del mapa.
-        setOnTouchListener { vista, _ ->
-            vista.parent?.requestDisallowInterceptTouchEvent(true)
-            false
-        }
-    }
-}
-
-/** Centra el mapa para que se vean la ubicación elegida y todos los resultados. */
-private fun encuadrar(mapa: MapView, ubicacion: Coordenadas?, prestadores: List<Prestador>) {
-    val puntos = buildList {
-        ubicacion?.let { add(GeoPoint(it.latitud, it.longitud)) }
-        prestadores.forEach { add(GeoPoint(it.latitud, it.longitud)) }
-    }
-    if (puntos.isEmpty()) return
-    // post: el mapa necesita tener tamaño antes de calcular el encuadre.
-    mapa.post {
-        val todosIguales = puntos.all { it.latitude == puntos[0].latitude && it.longitude == puntos[0].longitude }
-        if (todosIguales) {
-            mapa.controller.setZoom(ZOOM_MAXIMO_ENCUADRE)
-            mapa.controller.setCenter(puntos[0])
-        } else {
-            val margen = (32 * mapa.resources.displayMetrics.density).toInt()
-            mapa.zoomToBoundingBox(BoundingBox.fromGeoPointsSafe(puntos), false, margen, ZOOM_MAXIMO_ENCUADRE, null)
-        }
-    }
-}
-
-private fun fichaPrestador(context: Context, prestador: Prestador, sinCalificaciones: String): String =
-    buildList {
-        if (prestador.rubros.isNotEmpty()) add(prestador.rubros.joinToString(" · "))
-        prestador.distanciaKm?.let { add(context.getString(R.string.distancia_km, it)) }
-        add(sinCalificaciones)
-    }.joinToString("<br>")
-
 /** Círculo de color con borde blanco y, opcionalmente, un número dentro. */
-private fun icono(context: Context, color: Int, texto: String?): Drawable {
-    val densidad = context.resources.displayMetrics.density
-    val lado = ((if (texto == null) 22 else 34) * densidad).toInt()
-    val bitmap = Bitmap.createBitmap(lado, lado, Bitmap.Config.ARGB_8888)
-    val lienzo = Canvas(bitmap)
-    val pincel = Paint(Paint.ANTI_ALIAS_FLAG)
-    val centro = lado / 2f
-    pincel.color = 0xFFFFFFFF.toInt()
-    lienzo.drawCircle(centro, centro, centro, pincel)
-    pincel.color = color
-    lienzo.drawCircle(centro, centro, centro - 3 * densidad, pincel)
-    if (texto != null) {
+@Composable
+private fun icono(color: Int, texto: String?): BitmapDescriptor {
+    val densidad = LocalContext.current.resources.displayMetrics.density
+    return remember(color, texto, densidad) {
+        val lado = ((if (texto == null) 22 else 34) * densidad).toInt()
+        val bitmap = Bitmap.createBitmap(lado, lado, Bitmap.Config.ARGB_8888)
+        val lienzo = Canvas(bitmap)
+        val pincel = Paint(Paint.ANTI_ALIAS_FLAG)
+        val centro = lado / 2f
         pincel.color = 0xFFFFFFFF.toInt()
-        pincel.textAlign = Paint.Align.CENTER
-        pincel.textSize = 15 * densidad
-        pincel.isFakeBoldText = true
-        lienzo.drawText(texto, centro, centro - (pincel.descent() + pincel.ascent()) / 2, pincel)
+        lienzo.drawCircle(centro, centro, centro, pincel)
+        pincel.color = color
+        lienzo.drawCircle(centro, centro, centro - 3 * densidad, pincel)
+        if (texto != null) {
+            pincel.color = 0xFFFFFFFF.toInt()
+            pincel.textAlign = Paint.Align.CENTER
+            pincel.textSize = 15 * densidad
+            pincel.isFakeBoldText = true
+            lienzo.drawText(texto, centro, centro - (pincel.descent() + pincel.ascent()) / 2, pincel)
+        }
+        BitmapDescriptorFactory.fromBitmap(bitmap)
     }
-    return BitmapDrawable(context.resources, bitmap)
 }

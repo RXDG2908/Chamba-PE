@@ -32,6 +32,7 @@ import pe.tecsup.chambape.domain.model.EstadoSolicitud
 import pe.tecsup.chambape.domain.model.Rol
 import pe.tecsup.chambape.domain.model.Sesion
 import pe.tecsup.chambape.domain.model.Solicitud
+import pe.tecsup.chambape.ui.busqueda.textoCalificacion
 
 // ---------- Detalle del prestador + solicitud ----------
 
@@ -59,7 +60,7 @@ fun DetalleScreen(prestadorId: Int, sesion: Sesion) {
                 stringResource(R.string.detalle_zona, prestador.latitud, prestador.longitud),
                 style = MaterialTheme.typography.bodySmall,
             )
-            Text(stringResource(R.string.sin_calificaciones), style = MaterialTheme.typography.bodySmall)
+            Text(textoCalificacion(prestador), style = MaterialTheme.typography.bodyMedium)
             OutlinedButton(onClick = vm::alternarFavorito) {
                 Text(stringResource(if (prestador.favorito) R.string.quitar_de_favoritos else R.string.guardar_en_favoritos))
             }

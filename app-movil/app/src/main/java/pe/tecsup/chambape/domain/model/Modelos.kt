@@ -13,8 +13,12 @@ data class Prestador(
     val longitud: Double,
     val distanciaKm: Double?,
     val favorito: Boolean,
+    /** HU-12: promedio de 1 a 5 estrellas; null sin calificaciones. */
+    val calificacionPromedio: Double? = null,
+    val calificacionesTotal: Int = 0,
 ) {
     val nombreCompleto: String get() = "$nombres $apellidos".trim()
+    val tieneCalificaciones: Boolean get() = calificacionesTotal > 0 && calificacionPromedio?.isFinite() == true
 }
 
 /** Dato junto con su origen: [desdeCache] es true cuando no hubo red y salió de Room. */

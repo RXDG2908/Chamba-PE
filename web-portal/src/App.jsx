@@ -16,6 +16,7 @@ import GestionCuentas from './GestionCuentas.jsx'
 import SolicitudesRecibidas from './SolicitudesRecibidas.jsx'
 import { escuchar, desactivarNotificaciones } from './notificaciones.js'
 import VerificarDni from './VerificarDni.jsx'
+import VerificarRostro from './VerificarRostro.jsx'
 import Consentimiento from './Consentimiento.jsx'
 import EliminarDatos from './EliminarDatos.jsx'
 
@@ -34,6 +35,7 @@ const MENU_POR_ROL = {
     ['/solicitudes', 'Solicitudes'],
     ['/certificaciones', 'Cargar certificado'],
     ['/verificar-dni', 'Verificar mi DNI'],
+    ['/verificar-rostro', 'Verificar mi rostro'],
     ['/consentimiento', 'Consentimiento DNI'],
     ['/eliminar-datos', 'Eliminar datos DNI'],
   ],
@@ -151,6 +153,10 @@ function App() {
         <Route
           path="/verificar-dni"
           element={<RutaPrivada usuario={usuario} rol="prestador"><VerificarDni /></RutaPrivada>}
+        />
+        <Route
+          path="/verificar-rostro"
+          element={<RutaPrivada usuario={usuario} rol="prestador"><VerificarRostro /></RutaPrivada>}
         />
         <Route
           path="/ingresar"

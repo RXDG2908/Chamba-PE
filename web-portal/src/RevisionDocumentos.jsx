@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import './RevisionDocumentos.css'
+import { MOTIVOS_FACIALES } from './textosFaciales.js'
 
 const API = '/api/administracion/revisiones/'
 const RUTA_PANEL = '/administracion/revisiones'
@@ -221,6 +222,106 @@ function RevisionDni() {
   )
 }
 
+const API_FACIAL = '/api/verificacion/facial/'
+
+// HU-20: en la zona gris el administrador ve la foto del DNI y la selfie lado a lado y decide.
+function TarjetaFacial({ intento, onResuelto }) {
+  const [enviando, setEnviando] = useState(false)
+  const [error, setError] = useState('')
+
+  const decidir = async (revision) => {
+    setEnviando(true)
+    setError('')
+    try {
+      const respuesta = await fetch(`${API_FACIAL}${intento.id}/revision/`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json', 'X-CSRFToken': leerCookie('csrftoken') },
+        body: JSON.stringify({ revision }),
+      })
+      const datos = await respuesta.json().catch(() => ({}))
+      if (respuesta.ok || respuesta.status === 409) onResuelto(intento.id)
+      else setError(primerError(datos) || 'No se pudo guardar la decisión.')
+    } catch {
+      setError('No se pudo guardar la decisión. Revisa tu conexión.')
+    } finally {
+      setEnviando(false)
+    }
+  }
+
+  return (
+    <li className="revision-tarjeta">
+      <div className="revision-datos">
+        <h3>{intento.prestador.nombre}</h3>
+        <dl>
+          <div><dt>DNI registrado</dt><dd>{intento.prestador.dni}</dd></div>
+          <div><dt>Similitud</dt><dd>{intento.porcentaje === null ? 'Sin comparar' : `${intento.porcentaje} %`}</dd></div>
+          <div><dt>Recibido</dt><dd>{formatearFecha(intento.creado)}</dd></div>
+        </dl>
+      </div>
+      <div className="comparacion-facial">
+        <figure>
+          {intento.tiene_foto_dni
+            ? <img src={`${API_FACIAL}${intento.id}/foto/dni/`} alt={`Foto del DNI de ${intento.prestador.nombre}`} />
+            : <p className="revision-aviso">La foto del DNI ya se borró.</p>}
+          <figcaption>Foto del DNI</figcaption>
+        </figure>
+        <figure>
+          <img src={`${API_FACIAL}${intento.id}/foto/selfie/`} alt={`Selfie de ${intento.prestador.nombre}`} />
+          <figcaption>Selfie en vivo</figcaption>
+        </figure>
+      </div>
+      <ul className="revision-motivos">
+        {intento.motivos.map((motivo) => <li key={motivo}>{MOTIVOS_FACIALES[motivo] ?? motivo}</li>)}
+      </ul>
+      <div className="revision-acciones revision-botones">
+        <button type="button" className="boton-aprobar" disabled={enviando} onClick={() => decidir('aprobado')}>Es la misma persona</button>
+        <button type="button" className="boton-rechazar" disabled={enviando} onClick={() => decidir('rechazado')}>No es la misma persona</button>
+      </div>
+      {error && <p className="revision-error" role="alert">{error}</p>}
+    </li>
+  )
+}
+
+function RevisionFacial() {
+  const [intentos, setIntentos] = useState([])
+  const [estado, setEstado] = useState('cargando')
+
+  useEffect(() => {
+    const controlador = new AbortController()
+    fetch(`${API_FACIAL}?decision=revision_manual`, { signal: controlador.signal })
+      .then((respuesta) => {
+        if (!respuesta.ok) throw new Error(`HTTP ${respuesta.status}`)
+        return respuesta.json()
+      })
+      .then((datos) => {
+        setIntentos(datos)
+        setEstado('listo')
+      })
+      .catch(() => {
+        if (!controlador.signal.aborted) setEstado('error')
+      })
+    return () => controlador.abort()
+  }, [])
+
+  return (
+    <section className="revision-dni" aria-labelledby="titulo-facial">
+      <h2 id="titulo-facial">Rostro en revisión manual</h2>
+      <p>Selfies cuya similitud con la foto del DNI quedó en duda. Compara las dos fotos y decide.</p>
+      {estado === 'cargando' && <p className="revision-aviso" role="status">Cargando comparaciones…</p>}
+      {estado === 'error' && <p className="revision-aviso revision-aviso-error" role="alert">No se pudieron cargar las comparaciones faciales.</p>}
+      {estado === 'listo' && intentos.length === 0 && <p className="revision-aviso">No hay rostros por revisar.</p>}
+      {estado === 'listo' && intentos.length > 0 && (
+        <ul className="revision-lista">
+          {intentos.map((intento) => (
+            <TarjetaFacial key={intento.id} intento={intento}
+              onResuelto={(id) => setIntentos((actuales) => actuales.filter((i) => i.id !== id))} />
+          ))}
+        </ul>
+      )}
+    </section>
+  )
+}
+
 export default function RevisionDocumentos() {
   const [revisiones, setRevisiones] = useState([])
   const [estado, setEstado] = useState('cargando')
@@ -305,6 +406,7 @@ export default function RevisionDocumentos() {
       )}
 
       {estado === 'listo' && <RevisionDni />}
+      {estado === 'listo' && <RevisionFacial />}
     </main>
   )
 }

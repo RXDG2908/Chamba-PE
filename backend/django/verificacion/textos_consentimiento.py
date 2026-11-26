@@ -24,3 +24,19 @@ TEXTO_DNI_V2 = TEXTO_DNI_V1.replace(
 )
 # v3 (25/11): corrige la errata «DEMONSTRACIÓN» → «DEMOSTRACIÓN». Las aceptaciones v2 quedan desactualizadas.
 TEXTO_DNI = TEXTO_DNI_V2.replace('DEMONSTRACIÓN:', 'DEMOSTRACIÓN:', 1)
+
+# HU-20: finalidad aparte. Aceptar el DNI no autoriza la comparación facial, ni al revés.
+FINALIDAD_FACIAL = 'verificacion_facial'
+VERSION_FACIAL = 'demo-facial-v1'
+TEXTO_FACIAL = (
+    'DEMOSTRACIÓN: texto provisional pendiente de aprobación del Product Owner. '
+    'No es un consentimiento legal definitivo.\n\n'
+    'Acepto que Chamba-PE tome una selfie en vivo con la cámara, compruebe que parpadeo '
+    '(prueba de vida) y compare mi rostro con la foto del titular recortada de mi DNI, para '
+    'confirmar que soy el titular del documento. Se guarda la selfie en un espacio privado, el '
+    'porcentaje de similitud y la decisión con fecha y hora. Si el resultado queda en duda, un '
+    'administrador ve las dos fotos lado a lado para decidir.\n\n'
+    'La comparación no aprueba mi cuenta por sí sola: la decisión final es del administrador. '
+    'No se usa para otros fines. Puedo revocar esta aceptación para impedir nuevas comparaciones '
+    'y pedir que se borren mis selfies; se conservan solo el porcentaje, la decisión y la fecha.'
+)

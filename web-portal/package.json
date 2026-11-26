@@ -18,6 +18,7 @@
     "test:hu11-local": "playwright test --config playwright.hu11-local.config.mjs"
   },
   "dependencies": {
+    "@mediapipe/tasks-vision": "0.10.21",
     "leaflet": "^1.9.4",
     "react": "^19.2.8",
     "react-dom": "^19.2.8",

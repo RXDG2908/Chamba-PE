@@ -5,3 +5,5 @@ firebase-admin>=6.5,<8
 google-auth>=2.20
 easyocr>=1.7
 Pillow>=10
+# HU-20: detector YuNet y reconocedor SFace (ya llega con easyocr; se declara porque se usa directo)
+opencv-python-headless>=4.8

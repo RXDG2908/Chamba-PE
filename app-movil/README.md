@@ -6,10 +6,13 @@ con un único módulo `app` y arquitectura MVVM.
 > **Estado (26/11/2026):**
 > - Compila y pasa 42 pruebas unitarias.
 > - Los registros de cliente y de prestador se recorrieron paso a paso en un emulador (API 36) contra Django local, incluidos los errores de cada paso, el mapa, la revisión y el botón Atrás.
-> - Las solicitudes ya van a la API de Django, las mismas que ve la web.
+> - Las solicitudes ya van a la API, las mismas que ve la web.
+> - Desde el 26/11 la app llama al Back End de usuario en **Spring Boot** (`backend/spring/`, puerto 8080), como
+>   pide el diagrama de arquitectura. Spring responde igual que Django en las 13 rutas que usa la app (paridad
+>   comprobada con `backend/spring/tools/paridad_solicitudes/correr.py`) y usa la misma base de datos.
 >
 > **Falta:**
-> - Recorrer el alta y el ingreso con una cuenta real en el teléfono: el `google-services.json` de `chamba-pe-tecsup` ya está configurado (26/11) y la app arranca con él, pero la cuenta de prueba la crea una persona del equipo.
+> - Recorrer el alta y el ingreso con una cuenta real en el teléfono, con el `google-services.json` del proyecto del equipo (`chamba-pe-c043f`). En la computadora de Renzo hay uno de `chamba-pe-tecsup` (la app arranca con él); la cuenta de prueba la crea una persona del equipo.
 > - Probar en un teléfono físico.
 
 <p align="center">
@@ -73,7 +76,7 @@ Los ViewModel dependen de las interfaces, no de Retrofit ni de Firebase; por eso
 - JDK 17 o superior (probado con Temurin 25).
 - Android SDK con la plataforma 37. Con Android Studio se instala solo; `local.properties`
   (no versionado) debe apuntar a él: `sdk.dir=C\:/Users/<usuario>/AppData/Local/Android/Sdk`.
-- `app/google-services.json` del proyecto Firebase `chamba-pe-tecsup` (no versionado). Se descarga
+- `app/google-services.json` del proyecto Firebase `chamba-pe-c043f` (no versionado). Se descarga
   desde la consola de Firebase: Configuración del proyecto → app Android `pe.tecsup.chambape`.
 - Clave de Google Maps en `local.properties` (no versionado): `MAPS_API_KEY=...`, con «Maps SDK for Android»
   habilitado. Sin clave, el mapa aparece en gris.
@@ -90,51 +93,57 @@ Desde `app-movil/`:
 ./gradlew installDebug         # instala en un emulador o dispositivo conectado
 ```
 
-## Conectar con la API Django
+## Conectar con la API (Spring Boot)
 
-La app llama por defecto a `http://127.0.0.1:8000/`, es decir, al propio dispositivo. Con el
-servidor de Django corriendo en la PC (`python manage.py runserver`), redirige el puerto:
+La app llama por defecto a `http://127.0.0.1:8080/`, es decir, al propio dispositivo. Con Spring
+corriendo en la PC (ver [`backend/spring/README.md`](../backend/spring/README.md)), redirige el puerto:
 
 ```bash
-adb reverse tcp:8000 tcp:8000
+adb reverse tcp:8080 tcp:8080
 ```
 
-Así funciona en emulador y en teléfono por USB sin cambiar `ALLOWED_HOSTS`. Para otra URL:
-`./gradlew assembleDebug -Pchambape.apiBaseUrl=https://mi-servidor/`. Solo se permite HTTP sin
-cifrar hacia `127.0.0.1`, `localhost` y `10.0.2.2`.
+Así funciona en emulador y en teléfono por USB. Spring usa la misma base de datos que Django, así que
+lo que haga la app se ve en la web y en la administración. Para otra URL:
+`./gradlew assembleDebug -Pchambape.apiBaseUrl=https://mi-servidor/` (por ejemplo `http://127.0.0.1:8000/`
+para volver a Django, con `adb reverse tcp:8000 tcp:8000`). Solo se permite HTTP sin cifrar hacia
+`127.0.0.1`, `localhost` y `10.0.2.2`.
 
-## Firebase solo para la identidad; los datos en Django
+## Firebase solo para la identidad; los datos en Spring Boot (y Django)
 
+Como en el diagrama de arquitectura, la parte **Usuario** (esta app y la web de cliente y prestador)
+habla con **Spring Boot**, y **Administración** con Django; los dos usan la misma base de datos.
 Desde el 26/11 la app **no usa Firestore**: Firebase Authentication da la identidad (correo y
-contraseña) y todo lo demás vive en Django, igual que en la web:
+contraseña) y todo lo demás vive en la base compartida:
 
-| Qué | Dónde |
+| Qué | Ruta (Spring, con las mismas respuestas que Django) |
 |---|---|
 | Rol y prestador de la cuenta | `GET /api/usuarios/yo/` (antes Firestore `usuarios/{uid}`) |
 | Alta de cliente | `POST /api/usuarios/registro-movil/` al registrarse; si falla, la cuenta de Firebase se deshace |
 | Alta de prestador | `POST /api/prestadores/registro-movil/`; queda vinculado y con su ID sin pasos manuales |
-| Solicitudes, seguimiento y calificación | API `servicios` y `calificaciones` (AND-23) |
+| Solicitudes, seguimiento y calificación | `servicios` y `calificaciones` (AND-23) |
 
-Todas las rutas privadas reciben `Authorization: Bearer <token de Firebase>`. Para que Django lo acepte
-hay que arrancarlo con `FIREBASE_AUTH_PROJECT_ID=chamba-pe-tecsup` (ya está en `.env.example`).
+Todas las rutas privadas reciben `Authorization: Bearer <token de Firebase>`. Spring y Django lo
+aceptan si arrancan con `FIREBASE_AUTH_PROJECT_ID` igual al proyecto del `google-services.json`.
 
-- Una cuenta de Firebase sin cuenta en Django (por ejemplo, creada antes del 26/11) se crea como
-  **cliente** al entrar. Un prestador creado en la web necesita «UID de Firebase» en su perfil de
-  Django (`/admin/` → Perfiles); ya no hace falta `prestadorId` en Firestore.
-- Si la cuenta está suspendida o bloqueada (HU-13), Django responde 403 con `codigo:
-  "cuenta_sancionada"` y la app no entra (ni sigue dentro al reabrirla).
+- Una cuenta de Firebase sin cuenta en la base (por ejemplo, creada antes del 26/11) se crea como
+  **cliente** al entrar. Un prestador creado en la web necesita «UID de Firebase» en su perfil
+  (`/admin/` de Django → Perfiles); ya no hace falta `prestadorId` en Firestore.
+- Si la cuenta está suspendida o bloqueada (HU-13), la API responde 403 con `codigo:
+  "cuenta_sancionada"` y la app no entra (ni sigue dentro al reabrirla); sin vincular, `codigo:
+  "cuenta_no_vinculada"`.
 - El último perfil conocido se guarda en el teléfono: sin red, la app abre con el rol correcto.
 - Detalle del token en [`docs/API_AUTENTICACION.md`](../docs/API_AUTENTICACION.md).
 
-### Proyecto `chamba-pe-tecsup`
+### Proyecto de Firebase
 
-- App Android `pe.tecsup.chambape` registrada, con las huellas SHA-1 y SHA-256 del certificado de
-  depuración. El `google-services.json` se obtiene con el MCP de Firebase o desde la consola
-  (Configuración del proyecto → app Android) y va en `app/` (no se versiona).
-- Authentication por correo y contraseña activo.
-- Firestore ya no lo usa la app. Sus reglas ([`firestore.rules`](firestore.rules)) siguen limitando
-  cada documento a su dueño; cuando nadie del equipo use una versión anterior al 26/11, se pueden
-  cerrar del todo (`allow read, write: if false;`) con `firebase deploy --only firestore:rules`.
+- Proyecto del equipo: `chamba-pe-c043f` (confirmado por Luis el 26/11). El `google-services.json` de
+  `app/` (no se versiona) y `FIREBASE_AUTH_PROJECT_ID` de Spring y Django **tienen que ser del mismo
+  proyecto**; si no, Django y Spring rechazan el token con 403.
+- `chamba-pe-tecsup` (cuenta de Renzo) tiene la misma app Android registrada con las huellas SHA-1 y
+  SHA-256 de depuración; sirve mientras no haya acceso a `c043f` (el 26/11 la cuenta de Renzo no lo tenía).
+- Authentication por correo y contraseña activo. Firestore ya no lo usa la app: sus reglas
+  ([`firestore.rules`](firestore.rules)) siguen limitando cada documento a su dueño y se pueden cerrar
+  (`allow read, write: if false;`) cuando nadie use una versión anterior al 26/11.
 
 ## Versiones
 

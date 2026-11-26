@@ -8,8 +8,9 @@ import java.util.Base64;
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+
+import pe.tecsup.chambape.comun.ClaveDjango;
 
 /**
  * Código de seguimiento de una solicitud sin cuenta (HU-11), idéntico al de Django
@@ -23,7 +24,8 @@ public class CodigoSeguimiento {
 
     private final byte[] llave;
 
-    public CodigoSeguimiento(@Value("${chambape.django.secret-key:}") String claveSecreta) {
+    public CodigoSeguimiento(ClaveDjango clave) {
+        String claveSecreta = clave.valor();
         // salted_hmac de Django: llave = sha256(sal + "signer" + SECRET_KEY).
         this.llave = claveSecreta.isEmpty() ? null : sha256(SAL + "signer" + claveSecreta);
     }

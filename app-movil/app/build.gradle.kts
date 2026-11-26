@@ -7,10 +7,11 @@ plugins {
     alias(libs.plugins.google.services)
 }
 
-// URL de la API Django. Por defecto apunta al propio dispositivo: con
-// `adb reverse tcp:8000 tcp:8000` llega al runserver de la PC sin tocar ALLOWED_HOSTS.
-// Se puede cambiar con -Pchambape.apiBaseUrl=... o en ~/.gradle/gradle.properties.
-val apiBaseUrl = (findProperty("chambape.apiBaseUrl") as String?) ?: "http://127.0.0.1:8000/"
+// URL del Back End de usuario (Spring Boot, backend/spring), como en el diagrama de arquitectura.
+// Por defecto apunta al propio dispositivo: con `adb reverse tcp:8080 tcp:8080` llega al Spring
+// de la PC. Spring responde igual que Django en las 13 rutas que usa la app; para volver a Django:
+// -Pchambape.apiBaseUrl=http://127.0.0.1:8000/ (o en ~/.gradle/gradle.properties).
+val apiBaseUrl = (findProperty("chambape.apiBaseUrl") as String?) ?: "http://127.0.0.1:8080/"
 
 // Clave de Google Maps (Maps SDK for Android), como en el lab CampusGPS: va en local.properties
 // (MAPS_API_KEY=...), que no se versiona. Sin clave el mapa queda en blanco, pero la app compila.
@@ -72,7 +73,7 @@ dependencies {
     implementation(libs.androidx.room.ktx)
     ksp(libs.androidx.room.compiler)
 
-    // Retrofit: API Django (rubros y búsqueda)
+    // Retrofit: API de usuario (Spring Boot, con las mismas respuestas que Django)
     implementation(libs.retrofit)
     implementation(libs.retrofit.converter.gson)
 

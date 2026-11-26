@@ -77,6 +77,11 @@ public class Solicitudes {
         return conHistorial(jdbc.query(SELECT + " where s.prestador_id = ? order by s.creada desc", this::fila, prestadorId));
     }
 
+    /** HU-12: las que el cliente envió con su cuenta, más recientes primero. */
+    public List<Solicitud> delCliente(long clienteId) {
+        return conHistorial(jdbc.query(SELECT + " where s.cliente_id = ? order by s.creada desc", this::fila, clienteId));
+    }
+
     public long crear(long prestadorId, long rubroId, Long clienteId, String nombre, String telefono,
                       String descripcion, BigDecimal latitud, BigDecimal longitud, Instant creada) {
         GeneratedKeyHolder llave = new GeneratedKeyHolder();

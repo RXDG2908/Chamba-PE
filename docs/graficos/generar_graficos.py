@@ -71,7 +71,7 @@ def burndown():
 
 def pruebas():
     # Pruebas automatizadas que pasan en main (26/11/2026, tras la auditoría «harden» y la migración a Firebase real).
-    datos = [('Django (API)', 478), ('Playwright (web)', 115), ('Spring Boot', 46), ('Android (unitarias)', 42)]
+    datos = [('Django (API)', 478), ('Playwright (web)', 115), ('Spring Boot', 58), ('Android (unitarias)', 42)]
     W, H, izq, der, arr = 720, 300, 170, 70, 70
     fila = 46
     maximo = 500
@@ -92,7 +92,7 @@ def pruebas():
     c.append(f'<line class="eje" x1="{izq}" x2="{izq}" y1="{arr - 6}" y2="{arr + fila * len(datos)}" stroke-width="1.5"/>')
     (AQUI / 'pruebas-automatizadas.svg').write_text(svg(
         W, H, 'Pruebas automatizadas por módulo',
-        'Django 478, Playwright 115, Spring Boot 46 y Android 42 pruebas, todas pasan.', ''.join(c)), encoding='utf-8')
+        'Django 478, Playwright 115, Spring Boot 58 y Android 42 pruebas, todas pasan.', ''.join(c)), encoding='utf-8')
 
 
 burndown()

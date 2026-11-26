@@ -18,11 +18,12 @@ import org.springframework.stereotype.Component;
 import tools.jackson.databind.json.JsonMapper;
 
 import pe.tecsup.chambape.comun.FechasDjango;
+import pe.tecsup.chambape.usuarios.SesionDjango;
 
 /**
  * Aviso push al prestador cuando le llega una solicitud (HU-8), como {@code servicios/push.py}:
- * mensaje FCM solo de datos a los dispositivos que registró el prestador, si su sesión sigue
- * vigente. Usa la cuenta de servicio de GOOGLE_APPLICATION_CREDENTIALS. Un fallo nunca deshace
+ * mensaje FCM solo de datos a los dispositivos que registró el prestador, si su sesión de Django
+ * sigue vigente y es de esa misma cuenta. Usa la cuenta de servicio de GOOGLE_APPLICATION_CREDENTIALS. Un fallo nunca deshace
  * la solicitud: solo se registra, sin el token ni el texto del error.
  */
 @Component
@@ -35,18 +36,21 @@ public class Notificador {
     private final String proyecto;
     private final JdbcTemplate jdbc;
     private final FechasDjango fechas;
+    private final SesionDjango sesiones;
     private final HttpClient http = HttpClient.newBuilder().connectTimeout(Duration.ofSeconds(5)).build();
     private GoogleCredentials credenciales;
 
     public Notificador(@Value("${chambape.fcm.habilitado:false}") boolean habilitado,
-                       @Value("${chambape.fcm.proyecto:}") String proyecto, JdbcTemplate jdbc, FechasDjango fechas) {
+                       @Value("${chambape.fcm.proyecto:}") String proyecto, JdbcTemplate jdbc, FechasDjango fechas,
+                       SesionDjango sesiones) {
         this.habilitado = habilitado && !proyecto.isEmpty();
         this.proyecto = proyecto;
         this.jdbc = jdbc;
         this.fechas = fechas;
+        this.sesiones = sesiones;
     }
 
-    private record Dispositivo(long id, String token, boolean vigente) {
+    private record Dispositivo(long id, String token, String sesion, boolean vigente) {
     }
 
     public void solicitudNueva(long solicitudId, long prestadorUsuarioId) {
@@ -54,16 +58,20 @@ public class Notificador {
             return;
         }
         try {
-            // Solo los dispositivos cuya sesión de Django sigue vigente; los demás se borran (como Django).
+            // Solo los dispositivos cuya sesión de Django sigue vigente y es del prestador; los demás se
+            // borran (como Django). Sin DJANGO_SECRET_KEY la sesión no se puede leer: basta que siga vigente.
             Object ahora = fechas.parametro(FechasDjango.ahora());
             List<Dispositivo> dispositivos = jdbc.query("""
-                select t.id, t.token, (select count(*) from django_session s
+                select t.id, t.token, t.sesion, (select count(*) from django_session s
                                         where s.session_key = t.sesion and s.expire_date > ?) as vigente
                 from servicios_tokenfcm t where t.usuario_id = ?""",
-                (fila, n) -> new Dispositivo(fila.getLong("id"), fila.getString("token"), fila.getInt("vigente") > 0),
+                (fila, n) -> new Dispositivo(fila.getLong("id"), fila.getString("token"), fila.getString("sesion"),
+                    fila.getInt("vigente") > 0),
                 ahora, prestadorUsuarioId);
             for (Dispositivo dispositivo : dispositivos) {
-                if (!dispositivo.vigente()) {
+                boolean suya = !sesiones.disponible() ? dispositivo.vigente()
+                    : sesiones.leer(dispositivo.sesion()).filter(c -> c.usuarioId() == prestadorUsuarioId).isPresent();
+                if (!suya) {
                     jdbc.update("delete from servicios_tokenfcm where id = ?", dispositivo.id());
                     continue;
                 }

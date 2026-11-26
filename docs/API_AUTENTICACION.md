@@ -225,7 +225,7 @@ Authorization: Bearer <token de identidad de Firebase>
 - Un UID solo puede estar en un perfil. Después de autenticar se aplican los mismos permisos por
   rol (`EsPrestador`, etc.).
 - Con token no se exige CSRF, porque no depende de cookies. La sesión web sigue igual.
-- Se activa con la variable `FIREBASE_AUTH_PROJECT_ID` (por ejemplo `chamba-pe-tecsup`). Vacía,
+- Se activa con la variable `FIREBASE_AUTH_PROJECT_ID` (por ejemplo `chamba-pe-c043f`, el del equipo). Vacía,
   no se acepta ningún token.
 - Token ausente, inválido, vencido, de otro proyecto o de una cuenta sin vincular: `403`, igual
   que una petición sin sesión.

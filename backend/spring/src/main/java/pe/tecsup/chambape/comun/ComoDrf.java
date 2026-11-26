@@ -4,6 +4,9 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.RoundingMode;
 import java.text.Normalizer;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
 
@@ -26,11 +29,177 @@ public final class ComoDrf {
     private ComoDrf() {
     }
 
-    /** Error de un campo: el mensaje de DRF. */
+    /** Error de un campo: el mensaje de DRF (o varios, si fallan varios validadores a la vez). */
     public static final class Invalido extends Exception {
+        private final List<String> mensajes;
+
         public Invalido(String mensaje) {
-            super(mensaje, null, false, false);
+            this(List.of(mensaje));
         }
+
+        public Invalido(List<String> mensajes) {
+            super(mensajes.get(0), null, false, false);
+            this.mensajes = List.copyOf(mensajes);
+        }
+
+        public List<String> mensajes() {
+            return mensajes;
+        }
+    }
+
+    /** Convierte el valor de un campo; lanza {@link Invalido} con el mensaje de DRF. */
+    @FunctionalInterface
+    public interface Conversion<T> {
+        T convertir(JsonNode valor) throws Invalido;
+    }
+
+    /**
+     * Valida un campo obligatorio que no admite null, como {@code Field.run_validation}: si falla,
+     * deja sus mensajes en {@code errores} y devuelve null.
+     */
+    public static <T> T campo(JsonNode datos, String nombre, Map<String, List<String>> errores, Conversion<T> conversion) {
+        return campoConMensaje(datos, nombre, REQUERIDO, errores, conversion);
+    }
+
+    /** Como {@link #campo}, con un mensaje propio cuando falta (error_messages['required']). */
+    public static <T> T campoConMensaje(JsonNode datos, String nombre, String siFalta, Map<String, List<String>> errores,
+                                        Conversion<T> conversion) {
+        JsonNode valor = datos.get(nombre);
+        if (valor == null || valor.isMissingNode()) {
+            errores.put(nombre, new ArrayList<>(List.of(siFalta)));
+            return null;
+        }
+        return valorDe(valor, nombre, errores, conversion);
+    }
+
+    /** Como {@link #campo}, para un campo opcional: si no viene, devuelve {@code siFalta}. */
+    public static <T> T opcional(JsonNode datos, String nombre, T siFalta, Map<String, List<String>> errores,
+                                 Conversion<T> conversion) {
+        JsonNode valor = datos.get(nombre);
+        return valor == null || valor.isMissingNode() ? siFalta : valorDe(valor, nombre, errores, conversion);
+    }
+
+    private static <T> T valorDe(JsonNode valor, String nombre, Map<String, List<String>> errores,
+                                 Conversion<T> conversion) {
+        if (valor.isNull()) {
+            errores.put(nombre, new ArrayList<>(List.of(NULO)));
+            return null;
+        }
+        try {
+            return conversion.convertir(valor);
+        } catch (Invalido invalido) {
+            errores.put(nombre, new ArrayList<>(invalido.mensajes()));
+            return null;
+        }
+    }
+
+    /** El cuerpo no es un objeto JSON: {@code non_field_errors} del serializer. */
+    public static ErrorValidacion noEsDiccionario(JsonNode datos) {
+        return new ErrorValidacion(Map.of("non_field_errors", List.of(datos.isNull() ? "No data provided"
+            : "Invalid data. Expected a dictionary, but got " + tipoDeDato(datos) + ".")));
+    }
+
+    /** {@code type(valor).__name__} de Python para un valor JSON. */
+    public static String tipoDeDato(JsonNode valor) {
+        if (valor.isArray()) {
+            return "list";
+        }
+        if (valor.isObject()) {
+            return "dict";
+        }
+        if (valor.isString()) {
+            return "str";
+        }
+        if (valor.isBoolean()) {
+            return "bool";
+        }
+        if (valor.isNull()) {
+            return "NoneType";
+        }
+        return valor.isIntegralNumber() ? "int" : "float";
+    }
+
+    /** DecimalField(max_digits=9, decimal_places=6) con min_value/max_value ±{@code limite}. */
+    public static BigDecimal coordenada(JsonNode valor, int limite) throws Invalido {
+        BigDecimal numero = decimal(valor, 9, 6);
+        if (numero.compareTo(BigDecimal.valueOf(-limite)) < 0) {
+            throw new Invalido("Ensure this value is greater than or equal to -" + limite + ".");
+        }
+        if (numero.compareTo(BigDecimal.valueOf(limite)) > 0) {
+            throw new Invalido("Ensure this value is less than or equal to " + limite + ".");
+        }
+        return numero;
+    }
+
+    /**
+     * CharField de DRF con trim_whitespace=True (el de los ModelSerializer): quita los espacios de
+     * los extremos y corre todos sus validadores (largo máximo, sin caracteres nulos ni sustitutos),
+     * juntando sus mensajes. {@code previos} son validadores que van antes, como los del modelo.
+     */
+    public static String textoRecortado(JsonNode valor, int maxLargo, boolean permiteVacio, String mensajeLargo,
+                                        List<Validador> previos) throws Invalido {
+        if (!valor.isBoolean() && (valor.isString() || valor.isNumber()) && soloEspacios(comoTextoPython(valor))) {
+            if (!permiteVacio) {
+                throw new Invalido("This field may not be blank.");
+            }
+            return "";
+        }
+        if (valor.isBoolean() || !(valor.isString() || valor.isNumber())) {
+            throw new Invalido("Not a valid string.");
+        }
+        String texto = stripPython(comoTextoPython(valor));
+        List<String> mensajes = new ArrayList<>();
+        for (Validador validador : previos) {
+            String mensaje = validador.validar(texto);
+            if (mensaje != null) {
+                mensajes.add(mensaje);
+            }
+        }
+        if (largo(texto) > maxLargo) {
+            mensajes.add(mensajeLargo != null ? mensajeLargo
+                : "Ensure this field has no more than " + maxLargo + " characters.");
+        }
+        if (texto.indexOf('\0') >= 0) {
+            mensajes.add("Null characters are not allowed.");
+        }
+        // Un par de sustitutos es un solo carácter en Python; solo cuenta uno suelto.
+        texto.codePoints().filter(c -> c >= 0xD800 && c <= 0xDFFF).findFirst().ifPresent(c ->
+            mensajes.add(String.format("Surrogate characters are not allowed: U+%X.", c)));
+        if (!mensajes.isEmpty()) {
+            throw new Invalido(mensajes);
+        }
+        return texto;
+    }
+
+    /** Validador de un texto: el mensaje de error, o null si pasa. */
+    @FunctionalInterface
+    public interface Validador {
+        String validar(String texto);
+    }
+
+    /** {@code len(texto)} de Python: cuenta caracteres, no unidades UTF-16. */
+    public static int largo(String texto) {
+        return texto.codePointCount(0, texto.length());
+    }
+
+    /** IntegerField de DRF con min_value y max_value. */
+    public static int entero(JsonNode valor, int minimo, int maximo) throws Invalido {
+        String texto = comoTextoPython(valor);
+        if (valor.isString() && largo(texto) > 1000) {
+            throw new Invalido("String value too large.");
+        }
+        BigInteger numero = valor.isBoolean() || valor.isArray() || valor.isObject() ? null
+            : NumerosComoPython.entero(texto);
+        if (numero == null) {
+            throw new Invalido("A valid integer is required.");
+        }
+        if (numero.compareTo(BigInteger.valueOf(maximo)) > 0) {
+            throw new Invalido("Ensure this value is less than or equal to " + maximo + ".");
+        }
+        if (numero.compareTo(BigInteger.valueOf(minimo)) < 0) {
+            throw new Invalido("Ensure this value is greater than or equal to " + minimo + ".");
+        }
+        return numero.intValueExact();
     }
 
     /** Como {@code str(valor)} de Python para un valor JSON (o el texto de un formulario). */
@@ -190,6 +359,54 @@ public final class ComoDrf {
     /** {@code unicodedata.normalize('NFC', texto)}. */
     public static String nfc(String texto) {
         return Normalizer.normalize(texto, Normalizer.Form.NFC);
+    }
+
+    public static final String MENSAJE_NOMBRE =
+        "Ingresa un nombre con al menos una letra; solo letras, espacios, guiones y apóstrofes.";
+    public static final String MENSAJE_TELEFONO = "Ingresa un teléfono de 9 dígitos (puede empezar con +51).";
+    private static final String PERMITIDOS_EN_NOMBRE = " -'’.";
+    private static final Pattern ESPACIOS_REPETIDOS = Pattern.compile(" {2,}");
+    private static final Pattern SEPARADORES_TELEFONO =
+        Pattern.compile("[\\s-]", Pattern.UNICODE_CHARACTER_CLASS);
+    private static final Pattern PREFIJO_PERU =
+        Pattern.compile("^\\+?51(?=\\d{9}$)", Pattern.UNICODE_CHARACTER_CLASS);
+    private static final Pattern NUEVE_DIGITOS =
+        Pattern.compile("\\d{9}", Pattern.UNICODE_CHARACTER_CLASS);
+
+    /**
+     * {@code usuarios.validadores.nombre_de_persona} de Django: letras de cualquier idioma, espacios,
+     * guiones, apóstrofes y puntos; NFC, sin espacios en los extremos y sin espacios repetidos.
+     */
+    public static String nombreDePersona(String valor) throws Invalido {
+        String nombre = nfc(valor);
+        int inicio = 0;
+        int fin = nombre.length();
+        while (inicio < fin && nombre.charAt(inicio) == ' ') {
+            inicio++;
+        }
+        while (fin > inicio && nombre.charAt(fin - 1) == ' ') {
+            fin--;
+        }
+        nombre = ESPACIOS_REPETIDOS.matcher(nombre.substring(inicio, fin)).replaceAll(" ");
+        boolean algunaLetra = nombre.codePoints().anyMatch(ComoDrf::esLetra);
+        boolean permitido = nombre.codePoints().allMatch(c -> esLetra(c) || PERMITIDOS_EN_NOMBRE.indexOf(c) >= 0);
+        if (!algunaLetra || !permitido) {
+            throw new Invalido(MENSAJE_NOMBRE);
+        }
+        return nombre;
+    }
+
+    /** {@code usuarios.validadores.telefono_peruano}: 9 dígitos con +51, espacios o guiones opcionales. */
+    public static String telefonoPeruano(String valor) throws Invalido {
+        if (soloEspacios(valor)) {
+            return "";
+        }
+        String digitos = SEPARADORES_TELEFONO.matcher(valor).replaceAll("");
+        digitos = PREFIJO_PERU.matcher(digitos).replaceFirst("");
+        if (!NUEVE_DIGITOS.matcher(digitos).matches()) {
+            throw new Invalido(MENSAJE_TELEFONO);
+        }
+        return digitos;
     }
 
     /** {@code str.isalpha()} de un carácter. */

@@ -32,7 +32,7 @@ class EsquemaSpringTests(TestCase):
         self.assertEqual(set(tablas), {
             'auth_user', 'prestadores_rubro', 'prestadores_prestador', 'prestadores_prestador_rubros',
             'usuarios_perfil', 'servicios_solicitud', 'servicios_cambioestado', 'servicios_tokenfcm',
-            'django_session', 'administracion_sancioncuenta',
+            'django_session', 'administracion_sancioncuenta', 'calificaciones_calificacion',
         })
 
         with connection.cursor() as cursor:

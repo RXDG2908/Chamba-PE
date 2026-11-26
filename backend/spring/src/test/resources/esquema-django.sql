@@ -1,6 +1,7 @@
--- Copia del esquema que crean las migraciones de Django en SQLite (main del 25/11/2026, con HU-12 y HU-13),
+-- Copia del esquema que crean las migraciones de Django en SQLite (main del 26/11/2026, con HU-12 y HU-13),
 -- solo con las tablas que usa Spring. Las pruebas no tocan la base real. Si cambia una migración,
 -- backend/django/core/test_esquema_spring.py avisa que hay que actualizar esta copia.
+DROP TABLE IF EXISTS calificaciones_calificacion;
 DROP TABLE IF EXISTS administracion_sancioncuenta;
 DROP TABLE IF EXISTS django_session;
 DROP TABLE IF EXISTS servicios_tokenfcm;
@@ -22,3 +23,6 @@ CREATE TABLE "servicios_tokenfcm" ("id" integer NOT NULL PRIMARY KEY AUTOINCREME
 CREATE TABLE "django_session" ("session_key" varchar(40) NOT NULL PRIMARY KEY, "session_data" text NOT NULL, "expire_date" datetime NOT NULL);
 CREATE TABLE "administracion_sancioncuenta" ("id" integer NOT NULL PRIMARY KEY AUTOINCREMENT, "tipo" varchar(10) NOT NULL, "motivo" text NOT NULL, "hasta" datetime NULL, "creada" datetime NOT NULL, "levantada" datetime NULL, "motivo_levantamiento" text NOT NULL, "creada_por_id" integer NULL REFERENCES "auth_user" ("id") DEFERRABLE INITIALLY DEFERRED, "levantada_por_id" integer NULL REFERENCES "auth_user" ("id") DEFERRABLE INITIALLY DEFERRED, "usuario_id" integer NOT NULL REFERENCES "auth_user" ("id") DEFERRABLE INITIALLY DEFERRED, CONSTRAINT "solo_la_suspension_tiene_fin" CHECK ((("hasta" IS NULL AND "tipo" = 'bloqueo') OR ("hasta" IS NOT NULL AND "tipo" = 'suspension'))));
 CREATE UNIQUE INDEX "una_sancion_abierta_por_cuenta" ON "administracion_sancioncuenta" ("usuario_id") WHERE "levantada" IS NULL;
+CREATE TABLE "calificaciones_calificacion" ("id" integer NOT NULL PRIMARY KEY AUTOINCREMENT, "estrellas" smallint unsigned NOT NULL CHECK ("estrellas" >= 0), "comentario" varchar(500) NOT NULL, "creada" datetime NOT NULL, "cliente_id" integer NOT NULL REFERENCES "auth_user" ("id") DEFERRABLE INITIALLY DEFERRED, "prestador_id" bigint NOT NULL REFERENCES "prestadores_prestador" ("id") DEFERRABLE INITIALLY DEFERRED, "solicitud_id" bigint NOT NULL UNIQUE REFERENCES "servicios_solicitud" ("id") DEFERRABLE INITIALLY DEFERRED, CONSTRAINT "estrellas_de_1_a_5" CHECK (("estrellas" >= 1 AND "estrellas" <= 5)));
+CREATE INDEX "calificaciones_calificacion_cliente_id_c0781608" ON "calificaciones_calificacion" ("cliente_id");
+CREATE INDEX "calificaciones_calificacion_prestador_id_4d5c321f" ON "calificaciones_calificacion" ("prestador_id");

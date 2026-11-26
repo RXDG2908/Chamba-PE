@@ -25,10 +25,9 @@ Compara el [plan Android](PLAN_DESARROLLO_ANDROID.md) (21 tarjetas `AND-*`, de L
 
 > ⚠️ **Android no cabe en el Sprint 4.** Solo entra la parte A (revisar y unir lo ya hecho, sin horas de sprint). La parte B queda en el backlog hasta que el PO decida. Si el curso de Programación en Móviles pide una entrega antes del 25/11, David tiene que sacar algo del Sprint 4 para darle lugar.
 
-**Dos cosas se hicieron distinto al plan** y el equipo todavía no las aprobó:
-
-1. La app usa la **API Django + Firebase** (Auth y Firestore), no el backend Spring.
-2. Las **solicitudes de la app viven en Firestore**, separadas de las de la web (Django).
+**Arquitectura vigente (26/11, según el diagrama del equipo):** la parte **Usuario** (esta app y la web de
+cliente y prestador) llama a **Spring Boot**; **Administración** a Django; los dos comparten la base de datos.
+Firebase queda solo para la identidad (Authentication): la app ya no usa Firestore.
 
 ---
 
@@ -76,7 +75,7 @@ Renzo construyó casi todo, así que **las pruebas y la revisión pasan a Luis y
 | Revisar el PR #39 — backend | **Luis** | `usuarios/autenticacion.py` (token de Firebase), migración `usuarios.0003` y `POST /api/prestadores/registro-movil/`. Instalar desde cero (`requirements.txt` cambió) |
 | Decidir el enfoque | **Equipo** (David como PO) | Django + Firebase en vez de Spring, y solicitudes en Firestore. Ver [decisiones](#5-decisiones-del-equipo) |
 | Atender las observaciones y actualizar el plan | **Renzo** | Plan Android a v0.2 con lo que se decida; quitar «App móvil: por definir» de `PLAN_EQUIPO.md` |
-| Dar acceso al proyecto Firebase | **Renzo** | `chamba-pe-tecsup` está en la cuenta de Renzo: agregar a Luis y David. El `google-services.json` ya está configurado (26/11, con el MCP de Firebase) y las huellas del certificado de depuración, registradas |
+| Dar acceso al proyecto Firebase | **Renzo** | El proyecto del equipo es `chamba-pe-c043f` (Luis): dar acceso a Renzo y David para bajar el `google-services.json`. Mientras tanto, `chamba-pe-tecsup` (Renzo) tiene la app registrada con las huellas de depuración |
 
 ### Parte B · Tarjetas pendientes (backlog, por comprometer)
 
@@ -142,7 +141,7 @@ Reglas del [plan](PLAN_DESARROLLO_ANDROID.md#11-git-colaboración-y-conservació
 
 | # | Decisión | Propuesta del Scrum Master |
 |:---:|---|---|
-| 1 | ¿API Django + Firebase Auth, o el backend Spring del plan? | Django + Firebase: ya funciona y Spring no existe. El plan pasa a v0.2 |
+| 1 | ¿API Django + Firebase Auth, o el backend Spring del plan? | Spring Boot para la parte Usuario, como en el diagrama (26/11, #66 y #68); Firebase solo para la identidad |
 | 2 | ¿Solicitudes en Firestore o en Django? | Django (AND-23): una sola fuente para web y móvil |
 | 3 | ¿Android entra en algún sprint? | Parte A ahora; parte B al backlog. Si el curso de Móviles exige fecha, el PO ajusta el Sprint 4 |
 | 4 | ¿Quién administra el proyecto Firebase? | Renzo, con Luis y David como editores |

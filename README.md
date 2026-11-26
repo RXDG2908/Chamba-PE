@@ -59,9 +59,9 @@ Proyecto Integrador — Diseño y Desarrollo de Software · IV ciclo · Tecsup 2
 | HU-20 Reconocimiento facial | 🟡 En `main` (OpenCV SFace); falta calibrar el umbral con fotos del equipo (T20.4) |
 | HU-19 Escaneo del DNI | 🟡 En `main` con sus pruebas (T19.4); con OCR real muchas fotos pasan a revisión manual ([impedimento 24](AVANCES.md)) |
 | HU-8 Notificaciones push | 🟡 En `main`; falta medir la entrega real en menos de 5 s (T8.3) |
-| App Android | 🟡 Búsqueda con Google Maps, registro por pasos, y solicitudes y perfil en la API de Django (lo mismo que ve la web): Firebase queda solo para la identidad, con el proyecto real `chamba-pe-tecsup`. Falta recorrer el alta con una cuenta real y probar en teléfono físico ([pendientes](docs/android-reparto.md)) |
+| App Android | 🟡 Búsqueda con Google Maps, registro por pasos, y solicitudes y perfil en la API de Django (lo mismo que ve la web): Firebase queda solo para la identidad (proyecto del equipo `chamba-pe-c043f`). Falta recorrer el alta con una cuenta real y probar en teléfono físico ([pendientes](docs/android-reparto.md)) |
 
-<p align="center"><img src="docs/graficos/pruebas-automatizadas.svg" alt="Pruebas automatizadas: Django 478, Playwright 115, Spring Boot 46 y Android 42, todas pasan" width="720"></p>
+<p align="center"><img src="docs/graficos/pruebas-automatizadas.svg" alt="Pruebas automatizadas: Django 478, Playwright 115, Spring Boot 58 y Android 42, todas pasan" width="720"></p>
 
 > Pagos, chatbot clasificador, rubros con comisiones y métricas del administrador siguen fuera del alcance (backlog futuro).
 
@@ -179,15 +179,15 @@ flowchart LR
     A["App Android<br/>Kotlin + Compose"]
   end
   subgraph Servidores
-    D["Django + DRF<br/>API principal y admin"]
-    S["Spring Boot<br/>API de usuario (paridad)"]
+    D["Django + DRF<br/>administración y cuentas"]
+    S["Spring Boot<br/>API de usuario"]
   end
   DB[("Base compartida<br/>SQLite hoy · PostgreSQL")]
   F["Firebase<br/>Auth · FCM"]
   G["Google Maps<br/>JS y Android"]
-  W -- "sesión + CSRF" --> D
-  A -- "token de Firebase" --> D
-  A -. "misma API" .-> S
+  W -- "admin, cuentas, verificación" --> D
+  W -- "búsqueda, solicitudes,<br/>calificaciones (sesión + CSRF)" --> S
+  A -- "token de Firebase" --> S
   D --> DB
   S --> DB
   A --> F
@@ -199,13 +199,13 @@ flowchart LR
 | Módulo | Front end | Back end | Carpeta |
 |---|---|---|---|
 | **Administración** | Web React | Django | `web-portal/` · `backend/django/` |
-| **Usuario** (cliente y prestador) | Móvil Kotlin y web React | Django (API principal) y Spring Boot (misma API) | `app-movil/` · `web-portal/` · `backend/spring/` |
+| **Usuario** (cliente y prestador) | Móvil Kotlin y web React | Spring Boot: la app usa solo Spring; la web usa Spring para búsqueda, solicitudes, seguimiento, disponibilidad y calificaciones (con la misma sesión de Django) y Django para su cuenta y la verificación de identidad | `app-movil/` · `web-portal/` · `backend/spring/` |
 | **Base de datos** | — | Compartida (hoy SQLite local; PostgreSQL previsto): Django es dueño de las tablas y migraciones | configuración por variables de entorno |
 
 | Capa | Tecnología |
 |---|---|
 | Backend principal | Django + Django REST Framework (`backend/django/`) |
-| Backend de usuario | Spring Boot 4.1 + Java 21 (`backend/spring/`): solicitudes, seguimiento y disponibilidad con respuestas idénticas a Django |
+| Backend de usuario | Spring Boot 4.1 + Java 21 (`backend/spring/`): búsqueda, solicitudes, seguimiento, disponibilidad, registro desde la app y calificaciones, con respuestas idénticas a Django |
 | Frontend web | React 19 + Vite, iconos lucide, mapas con Google Maps y respaldo en OpenStreetMap |
 | App móvil | Android nativo: Kotlin, Jetpack Compose (Material 3) y MVVM, con Retrofit, Room, Firebase Auth y maps-compose |
 | Tiempo real | Consulta automática cada 5 s (HU-11); WebSocket queda como mejora posterior |
@@ -353,7 +353,7 @@ Pruebas del backend:
 python manage.py test
 ```
 
-**Frontend (React + Vite)** — requiere Node.js 20 o superior. Dentro de `web-portal/` (con Django corriendo; Vite redirige `/api` al puerto 8000):
+**Frontend (React + Vite)** — requiere Node.js 20 o superior. Dentro de `web-portal/`, con Django (8000) **y** Spring (8080, arrancado con `DJANGO_DEBUG=true`) corriendo: Vite manda la búsqueda, las solicitudes, la disponibilidad y las calificaciones a Spring y el resto a Django. Sin Spring: `$env:CHAMBA_API_USUARIO="http://127.0.0.1:8000"` antes de `npm run dev`.
 
 ```bash
 npm install
@@ -375,7 +375,7 @@ Necesita `google-services.json` (no está en el repositorio), la clave de Google
 
 **Clave de Google Maps en la web:** `web-portal/.env.local` con `VITE_GOOGLE_MAPS_API_KEY=...` (no se versiona) y la «Maps JavaScript API» habilitada en Google Cloud; sin clave, la web usa OpenStreetMap.
 
-**Backend de usuario (Spring Boot)** — en construcción; ya responden rubros y búsqueda. Con Java 21: `cd backend/spring` y `.\mvnw spring-boot:run` (puerto 8080, lee la base de Django en solo lectura). Detalles en [backend/spring/README.md](backend/spring/README.md).
+**Backend de usuario (Spring Boot)** — lo usan la app Android y la parte de usuario de la web. Con Java 21, en otra terminal: `cd backend/spring`, `$env:DJANGO_DEBUG="true"` y `.\mvnw spring-boot:run` (puerto 8080, misma base que Django). Detalles en [backend/spring/README.md](backend/spring/README.md).
 
 ### Para tener en cuenta
 

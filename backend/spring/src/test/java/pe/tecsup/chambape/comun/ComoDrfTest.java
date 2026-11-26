@@ -83,14 +83,14 @@ class ComoDrfTest {
     @Test
     void codigoDeSeguimientoIgualAlDeDjango() {
         // signing.Signer(salt='servicios.solicitud.seguimiento').sign(id) con SECRET_KEY='clave-de-prueba-spring'.
-        CodigoSeguimiento codigos = new CodigoSeguimiento("clave-de-prueba-spring");
+        CodigoSeguimiento codigos = new CodigoSeguimiento(new ClaveDjango("clave-de-prueba-spring", false));
         assertEquals("Mu2dU6kmoRJau7lcWsc3xtfZZOsYcbRsN-um5WFmavI", codigos.de(1));
         assertEquals("hURfMxXndlxozW4g6djnK0bE0YIpwbiHKv8QgYcKXpU", codigos.de(42));
         assertEquals("fv-72qCXnfJahzMLL_d32yAP9RS2nJSJyq6CpoAn6eg", codigos.de(123456));
         assertTrue(codigos.valido(42, "hURfMxXndlxozW4g6djnK0bE0YIpwbiHKv8QgYcKXpU"));
         assertFalse(codigos.valido(43, "hURfMxXndlxozW4g6djnK0bE0YIpwbiHKv8QgYcKXpU"));
         assertFalse(codigos.valido(42, ""));
-        CodigoSeguimiento sinClave = new CodigoSeguimiento("");
+        CodigoSeguimiento sinClave = new CodigoSeguimiento(new ClaveDjango("", false));
         assertNull(sinClave.de(1));
         assertFalse(sinClave.valido(1, "cualquiera"));
     }

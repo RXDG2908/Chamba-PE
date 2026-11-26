@@ -1,5 +1,15 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
+import process from 'node:process'
+
+// Arquitectura: la parte de usuario (búsqueda, solicitudes, seguimiento, disponibilidad y
+// calificaciones) va al Back End de usuario en Spring Boot; el resto (cuentas e inicio de sesión,
+// verificación de identidad, certificados, IA y administración) sigue en Django.
+// Spring lee la misma sesión de Django y exige el mismo CSRF. Para mandar todo a Django:
+// CHAMBA_API_USUARIO=http://127.0.0.1:8000 npm run dev
+const DJANGO = 'http://127.0.0.1:8000'
+const SPRING = process.env.CHAMBA_API_USUARIO || 'http://127.0.0.1:8080'
+const haciaSpring = { target: SPRING, changeOrigin: true, secure: false }
 
 export default defineConfig({
   plugins: [react()],
@@ -11,14 +21,16 @@ export default defineConfig({
   },
   server: {
     proxy: {
+      // Van primero: Vite usa la primera regla que coincide.
+      '^/api/(prestadores/(rubros|buscar)|servicios/solicitudes|usuarios/disponibilidad|calificaciones)/': haciaSpring,
       '/api': {
-        target: 'http://127.0.0.1:8000',
+        target: DJANGO,
         changeOrigin: true,
         secure: false,
       },
       // Los archivos subidos (p. ej. certificados) los sirve Django en /media/.
       '/media': {
-        target: 'http://127.0.0.1:8000',
+        target: DJANGO,
         changeOrigin: true,
         secure: false,
       },
@@ -26,12 +38,12 @@ export default defineConfig({
       // que React, así la cookie de sesión sirve para /api/administracion/.
       // Con la barra final para no capturar la ruta /administracion de React.
       '/admin/': {
-        target: 'http://127.0.0.1:8000',
+        target: DJANGO,
         changeOrigin: true,
         secure: false,
       },
       '/static/': {
-        target: 'http://127.0.0.1:8000',
+        target: DJANGO,
         changeOrigin: true,
         secure: false,
       },

@@ -42,6 +42,19 @@ class CrearSolicitudView(generics.CreateAPIView):
     # Sigue abierta a visitantes; con sesión de cliente (y su CSRF) la solicitud queda a su nombre.
     permission_classes = [AllowAny]
 
+    def create(self, request, *args, **kwargs):
+        # HU-13: la sesión de una cuenta sancionada ya no autentica, pero se reconoce por su id
+        # en la sesión: se explica el motivo en vez de enviar la solicitud como visitante.
+        from django.contrib.auth import SESSION_KEY, get_user_model
+        from administracion.models import sancion_vigente
+        from administracion.sanciones import mensaje_para_la_cuenta
+        id_en_sesion = request.session.get(SESSION_KEY) if hasattr(request, 'session') else None
+        if id_en_sesion and not request.user.is_authenticated:
+            sancion = sancion_vigente(get_user_model()._meta.pk.to_python(id_en_sesion))
+            if sancion is not None:
+                return Response({'detail': mensaje_para_la_cuenta(sancion)}, status=status.HTTP_403_FORBIDDEN)
+        return super().create(request, *args, **kwargs)
+
     def perform_create(self, serializer):
         from .push import notificar_solicitud
         usuario = self.request.user

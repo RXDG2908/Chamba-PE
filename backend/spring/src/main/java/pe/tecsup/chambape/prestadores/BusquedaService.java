@@ -53,8 +53,7 @@ public class BusquedaService {
     private record Parametros(long rubro, double latitud, double longitud) {
     }
 
-    // Sin readOnly=true: el driver de SQLite no deja cambiar ese flag con la conexión abierta;
-    // la base ya se abre en solo lectura (open_mode=1).
+    // Sin readOnly=true: el driver de SQLite no deja cambiar ese flag con la conexión abierta.
     @Transactional
     public List<RubroDto> rubros() {
         return rubros.findAllByOrderByNombreAsc().stream().map(RubroDto::de).toList();

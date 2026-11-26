@@ -337,8 +337,8 @@ Decisión del Product Owner del 28/10: HU-8 pasa completa porque T8.1 no se empe
 | | T20.4 | Calibrar el umbral de similitud con fotos del equipo | Pruebas | 2 | David · 🟡 Comando listo (25/11); faltan las fotos del equipo |
 | HU-21 · Consentimiento biométrico | T21.1 | Pantalla de consentimiento y registro de la aceptación | Frontend | 1 | |
 | | T21.2 | Endpoint para solicitar la eliminación de los datos biométricos | Backend | 1 | |
-| HU-13 · Suspensión y bloqueo | T13.1 | API en Django para suspender y bloquear cuentas | Backend | 2 | |
-| | T13.2 | Pantalla web (React) de gestión de cuentas reportadas | Frontend | 2 | |
+| HU-13 · Suspensión y bloqueo | T13.1 | API en Django para suspender y bloquear cuentas | Backend | 2 | David · 👀 En revisión (25/11): `feature/hu13-suspension` |
+| | T13.2 | Pantalla web (React) de gestión de cuentas reportadas | Frontend | 2 | David · 👀 En revisión (25/11): `/administracion/cuentas` |
 | | | **Total** | | **28** | |
 
 ### Criterios de aceptación de las historias nuevas
@@ -513,7 +513,7 @@ Quedan por completar las comprobaciones de sesión vencida, permiso denegado, so
 | Historia | Tareas conservadas como referencia | Estimación original | Decisión aprobada |
 |---|---|---:|---|
 | HU-20 · Reconocimiento facial | T20.1 selfie/parpadeo 3 h; T20.2 comparación 4 h; T20.3 reglas/panel 2 h; T20.4 calibración 2 h | 11 h | Fuera del compromiso inicial S3; replanificar con PO/equipo |
-| HU-13 · Suspensión y bloqueo | T13.1 API 2 h; T13.2 gestión React 2 h | 4 h | Fuera del compromiso inicial S3; replanificar con PO/equipo |
+| HU-13 · Suspensión y bloqueo | T13.1 API 2 h; T13.2 gestión React 2 h | 4 h | Fuera del compromiso inicial S3. 25/11: construida por David en `feature/hu13-suspension`, en revisión |
 
 Estas 15 h no forman parte de las 24 h asignadas ni de las 6 h de reserva. No se asignan automáticamente al Sprint 4 ni se consume su holgura. La verificación facial, el parpadeo, la comparación y la decisión biométrica automática quedan como flujo futuro de HU-20, no como criterios de entrega de este compromiso.
 

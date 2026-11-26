@@ -106,6 +106,10 @@ WSGI_APPLICATION = 'core.wsgi.application'
 
 # Sesión de Django (web) y, para la app móvil, token de Firebase de una cuenta vinculada.
 # La sesión va primero para que, sin credenciales, las rutas privadas sigan respondiendo 403.
+# HU-13: el ModelBackend de siempre, pero una cuenta suspendida o bloqueada no inicia sesión
+# y sus sesiones abiertas dejan de valer (administracion/sanciones.py).
+AUTHENTICATION_BACKENDS = ['administracion.sanciones.BackendConSanciones']
+
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework.authentication.SessionAuthentication',

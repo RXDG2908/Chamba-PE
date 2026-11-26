@@ -415,11 +415,11 @@ Decisión del Product Owner del 28/10: HU-8 pasa completa porque T8.1 no se empe
 | Día | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 |
 |---|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
 | **Ideal (h)** | 23.4 | 20.8 | 18.2 | 15.6 | 13 | 10.4 | 7.8 | 5.2 | 2.6 | 0 |
-| **Real (h)** | 26 | 26 | 26 | 26 | 26 | 26 | 26 | 13 | 13 | 11 |
+| **Real (h)** | 26 | 26 | 26 | 26 | 26 | 26 | 26 | 13 | 13 | 0 |
 
 > 🔎 **Auditoría del SM (24/11, día 9):** en `main` están HU-11 (#44, #49) y HU-12 (#42), con T12.3; de las pasadas del Sprint 3, T19.4 (#46) y la base de T8.3 (#22). **Falta HU-10 completa (T10.1–T10.4, 11 h, Renzo), sin rama ni código a un día del cierre**, y la medición del push real de T8.3. `main` verificado: 379 pruebas Django, lint, build y navegador OK.
 
-> Días hábiles: 1 = 12/11, 2 = 13/11, 3 = 16/11 … 8 = 23/11, 9 = 24/11, 10 = 25/11. Real = horas de las 26 del sprint que aún no están en `main`. Hasta el 20/11 no se unió ninguna tarea; el 23/11 entran HU-12 (#42, 3 h) y HU-11 con T12.3 (#44, 10 h). El 25/11 entra T11.3 (#49, 2 h). Quedan 11 h: HU-10 completa (Renzo).
+> Días hábiles: 1 = 12/11, 2 = 13/11, 3 = 16/11 … 8 = 23/11, 9 = 24/11, 10 = 25/11. Real = horas de las 26 del sprint que aún no están en `main`. Hasta el 20/11 no se unió ninguna tarea; el 23/11 entran HU-12 (#42, 3 h) y HU-11 con T12.3 (#44, 10 h). El 25/11 entran T11.3 (#49, 2 h) y HU-10 completa (#53 y #55, 11 h): **0 h pendientes, sprint cerrado con 26 de 26 h**. Gráfico en [docs/graficos/burndown-sprint4.svg](docs/graficos/burndown-sprint4.svg).
 
 ## Retrospectiva
 

@@ -12,14 +12,28 @@ class CambioEstadoInline(admin.TabularInline):
     def has_add_permission(self, request, obj=None):
         return False
 
+    def has_change_permission(self, request, obj=None):
+        return False
+
 
 @admin.register(Solicitud)
 class SolicitudAdmin(admin.ModelAdmin):
+    """Solo para consultar (impedimento 15).
+
+    Las solicitudes nacen por la API, que valida al prestador (verificado, disponible, sin
+    sanción, con el rubro y dentro de su radio), y su estado lo cambia solo el prestador
+    asignado, una vez y en orden, con historial (HU-4 y HU-11). Si aquí se pudiera crear o
+    editar, se saltarían esas reglas: por ejemplo, pasar a otro prestador una solicitud ya
+    aceptada o dejar `respondida` vacía. Borrar sí se permite, para quitar solicitudes falsas;
+    el promedio de calificaciones se recalcula al borrar (HU-12).
+    """
     list_display = ['id', 'prestador', 'rubro', 'cliente_nombre', 'cliente', 'estado', 'creada']
-    # HU-11: el estado lo cambia el prestador asignado desde su bandeja, en orden y con historial.
-    # Ya no se edita aquí (antes era temporal para probar HU-12), para que nadie se salte etapas.
-    readonly_fields = ['estado', 'respondida']
     inlines = [CambioEstadoInline]
-    raw_id_fields = ['cliente']
     list_filter = ['estado', 'rubro']
     search_fields = ['cliente_nombre', 'prestador__nombres', 'prestador__apellidos']
+
+    def has_add_permission(self, request):
+        return False
+
+    def has_change_permission(self, request, obj=None):
+        return False

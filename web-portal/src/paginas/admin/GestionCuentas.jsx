@@ -3,6 +3,8 @@ import { useEffect, useState } from 'react'
 import { enviarJson, erroresPorCampo, NOMBRE_ROL } from '../../nucleo/api.js'
 import './RevisionDocumentos.css'
 import './GestionCuentas.css'
+import { Ban, RotateCcw, Search, UserCheck, UserX, Users, X } from 'lucide-react'
+import Cargando from '../../componentes/Cargando.jsx'
 
 const API = '/api/administracion/cuentas/'
 const FILTROS = [['', 'Todas'], ['activa', 'Activas'], ['suspendida', 'Suspendidas'], ['bloqueada', 'Bloqueadas']]
@@ -63,9 +65,10 @@ function FormularioSancion({ cuenta, onListo, onCancelar }) {
       {(errores.detail || errores.tipo) && <p className="cuenta-error" role="alert">{errores.detail || errores.tipo}</p>}
       <div className="revision-botones">
         <button type="submit" className="boton-rechazar" disabled={enviando}>
+          <Ban className="icono" size={18} aria-hidden="true" />
           {enviando ? 'Guardando…' : tipo === 'bloqueo' ? 'Bloquear cuenta' : 'Suspender cuenta'}
         </button>
-        <button type="button" className="boton-secundario" onClick={onCancelar} disabled={enviando}>Cancelar</button>
+        <button type="button" className="boton-secundario" onClick={onCancelar} disabled={enviando}><X className="icono" size={18} aria-hidden="true" />Cancelar</button>
       </div>
     </form>
   )
@@ -100,8 +103,8 @@ function FormularioReactivar({ cuenta, onListo, onCancelar }) {
       </div>
       {error && <p className="cuenta-error" role="alert">{error}</p>}
       <div className="revision-botones">
-        <button type="submit" className="boton-aprobar" disabled={enviando}>{enviando ? 'Guardando…' : 'Reactivar cuenta'}</button>
-        <button type="button" className="boton-secundario" onClick={onCancelar} disabled={enviando}>Cancelar</button>
+        <button type="submit" className="boton-aprobar" disabled={enviando}><RotateCcw className="icono" size={18} aria-hidden="true" />{enviando ? 'Guardando…' : 'Reactivar cuenta'}</button>
+        <button type="button" className="boton-secundario" onClick={onCancelar} disabled={enviando}><X className="icono" size={18} aria-hidden="true" />Cancelar</button>
       </div>
     </form>
   )
@@ -145,8 +148,8 @@ function TarjetaCuenta({ cuenta, onCambio }) {
         {!accion && (
           <div className="revision-botones">
             {cuenta.estado === 'activa'
-              ? <button type="button" className="boton-rechazar" onClick={() => setAccion('sancionar')}>Suspender o bloquear</button>
-              : <button type="button" className="boton-aprobar" onClick={() => setAccion('reactivar')}>Reactivar</button>}
+              ? <button type="button" className="boton-rechazar" onClick={() => setAccion('sancionar')}><UserX className="icono" size={18} aria-hidden="true" />Suspender o bloquear</button>
+              : <button type="button" className="boton-aprobar" onClick={() => setAccion('reactivar')}><UserCheck className="icono" size={18} aria-hidden="true" />Reactivar</button>}
           </div>
         )}
       </div>
@@ -206,7 +209,7 @@ export default function GestionCuentas() {
       <p className="etiqueta">ADMINISTRACIÓN</p>
       <div className="revision-titulo">
         <div>
-          <h2>Cuentas de usuarios</h2>
+          <h2><span className="icono-titulo" aria-hidden="true"><Users size={22} /></span>Cuentas de usuarios</h2>
           <p>Suspende o bloquea cuentas por incumplimiento, siempre con el motivo. Mientras dure, la cuenta no puede iniciar sesión ni enviar o recibir solicitudes.</p>
         </div>
       </div>
@@ -214,7 +217,7 @@ export default function GestionCuentas() {
       <form className="cuentas-filtros" onSubmit={buscar} role="search">
         <label htmlFor="buscar-cuenta" className="visualmente-oculto">Buscar cuenta</label>
         <input id="buscar-cuenta" type="search" placeholder="Nombre, usuario, correo o DNI" value={texto} onChange={(e) => setTexto(e.target.value)} />
-        <button type="submit" className="boton-secundario">Buscar</button>
+        <button type="submit" className="boton-secundario"><Search className="icono" size={18} aria-hidden="true" />Buscar</button>
       </form>
       <div className="cuentas-pestanas" role="group" aria-label="Filtrar por estado">
         {FILTROS.map(([valor, etiqueta]) => (
@@ -222,7 +225,7 @@ export default function GestionCuentas() {
         ))}
       </div>
 
-      {estado === 'cargando' && <p className="revision-aviso" role="status">Cargando cuentas…</p>}
+      {estado === 'cargando' && <Cargando className="revision-aviso" texto="Cargando cuentas…" />}
       {estado === 'sin-permiso' && <p className="revision-aviso revision-aviso-error" role="alert">Esta pantalla es solo para administradores.</p>}
       {estado === 'error' && <p className="revision-aviso revision-aviso-error" role="alert">No se pudieron cargar las cuentas. Revisa que Django esté encendido.</p>}
       {estado === 'listo' && cuentas.length === 0 && <p className="revision-aviso">No hay cuentas con ese filtro.</p>}

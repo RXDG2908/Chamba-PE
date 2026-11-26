@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react'
 import { enviarJson } from '../../nucleo/api.js'
 import '../publico/RegistroPrestador.css'
 import '../../estilos/Cuenta.css'
+import { ToggleRight } from 'lucide-react'
+import Cargando from '../../componentes/Cargando.jsx'
 
 const AVISO_VERIFICACION = {
   pendiente: 'Tu perfil está pendiente de verificación: aparecerás en las búsquedas cuando administración lo apruebe.',
@@ -34,14 +36,14 @@ function Disponibilidad() {
     }
   }
 
-  if (estado === 'cargando') return <p className="registro cuenta" role="status">Cargando tu disponibilidad…</p>
+  if (estado === 'cargando') return <Cargando className="registro cuenta" texto="Cargando tu disponibilidad…" />
   if (!datos) {
     return <p className="registro cuenta error" role="alert">No pudimos cargar tu disponibilidad. Recarga la página.</p>
   }
 
   return (
     <section className="registro cuenta disponibilidad">
-      <h2>Mi disponibilidad</h2>
+      <h2><span className="icono-titulo" aria-hidden="true"><ToggleRight size={22} /></span>Mi disponibilidad</h2>
       <p className="ayuda">Activa tu disponibilidad cuando estés listo para recibir solicitudes.</p>
 
       <label className={`interruptor ${datos.disponible ? 'activo' : ''}`}>

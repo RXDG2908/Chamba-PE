@@ -4,6 +4,7 @@ import { enviarJson } from '../../nucleo/api.js'
 import './RegistroPrestador.css'
 import '../../estilos/Cuenta.css'
 import { INICIO_POR_ROL } from '../../nucleo/roles.js'
+import { LogIn } from 'lucide-react'
 
 // Pantalla a la que va cada rol después de iniciar sesión.
 
@@ -43,7 +44,7 @@ function IniciarSesion({ usuario, alIniciar }) {
 
   return (
     <form className="registro cuenta" onSubmit={enviar} noValidate>
-      <h2>Iniciar sesión</h2>
+      <h2><span className="icono-titulo" aria-hidden="true"><LogIn size={22} /></span>Iniciar sesión</h2>
       <p className="ayuda">Ingresa con tu usuario o tu correo.</p>
 
       {estado === 'fallo' && (
@@ -65,6 +66,7 @@ function IniciarSesion({ usuario, alIniciar }) {
       </div>
 
       <button type="submit" className="boton" disabled={estado === 'enviando'}>
+        <LogIn className="icono" size={18} aria-hidden="true" />
         {estado === 'enviando' ? 'Ingresando…' : 'Ingresar'}
       </button>
       <p className="pie-cuenta">

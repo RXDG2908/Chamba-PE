@@ -4,6 +4,7 @@ import { erroresPorCampo, leerCookie } from '../../nucleo/api.js'
 import '../publico/RegistroPrestador.css'
 import '../../estilos/Cuenta.css'
 import './VerificarDni.css'
+import { Camera, IdCard, RotateCcw, Send } from 'lucide-react'
 
 const LADOS = { anverso: 'del frente (anverso)', reverso: 'de la parte de atrás (reverso)' }
 
@@ -88,7 +89,7 @@ function Camara({ alCapturar }) {
         </div>
       )}
       {camara === 'lista' && (
-        <button type="button" className="boton-principal" onClick={tomarFoto}>Tomar foto</button>
+        <button type="button" className="boton-principal" onClick={tomarFoto}><Camera className="icono" size={18} aria-hidden="true" />Tomar foto</button>
       )}
       {camara === 'iniciando' && <p role="status">Abriendo la cámara…</p>}
       {camara === 'sin' && (
@@ -134,7 +135,7 @@ function Resultado({ intento, alReintentar }) {
           ? 'Administración revisará tus documentos antes de activar tu perfil.'
           : 'Un administrador revisará tu caso. También puedes volver a intentarlo.'}
       </p>
-      <button type="button" onClick={alReintentar}>Volver a intentar</button>
+      <button type="button" onClick={alReintentar}><RotateCcw className="icono" size={18} aria-hidden="true" />Volver a intentar</button>
     </div>
   )
 }
@@ -281,7 +282,7 @@ function VerificarDni() {
 
   return (
     <section className="registro cuenta verificar-dni">
-      <h2>Verificar mi DNI</h2>
+      <h2><span className="icono-titulo" aria-hidden="true"><IdCard size={22} /></span>Verificar mi DNI</h2>
 
       {paso === 'cargando' && <p role="status">Cargando…</p>}
       {paso === 'eliminacion' && <div role="alert"><p>Tu captura está bloqueada por una solicitud de eliminación. No se enviarán nuevas fotografías.</p><Link to="/eliminar-datos">Consultar eliminación</Link></div>}
@@ -317,6 +318,7 @@ function VerificarDni() {
           </div>
           {error && <p className="error caja" role="alert">{error}</p>}
           <button type="button" className="boton-principal" onClick={enviar} disabled={paso === 'enviando'}>
+            <Send className="icono" size={18} aria-hidden="true" />
             {paso === 'enviando' ? 'Validando…' : 'Enviar para validar'}
           </button>
         </>

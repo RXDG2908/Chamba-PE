@@ -4,6 +4,7 @@ import { enviarJson, erroresPorCampo } from '../../nucleo/api.js'
 import '../publico/RegistroPrestador.css'
 import '../../estilos/Cuenta.css'
 import './Consentimiento.css'
+import { FileSignature, RefreshCw, Undo2 } from 'lucide-react'
 
 export default function Consentimiento() {
   const [datos, setDatos] = useState(null)
@@ -63,7 +64,7 @@ export default function Consentimiento() {
 
   return (
     <section className="registro cuenta consentimiento">
-      <h2>Consentimiento para verificar mi DNI</h2>
+      <h2><span className="icono-titulo" aria-hidden="true"><FileSignature size={22} /></span>Consentimiento para verificar mi DNI</h2>
       <p><Link to="/eliminar-datos">Solicitar o consultar la eliminación de datos del DNI</Link></p>
       <p>Decide si autorizas el tratamiento de las fotografías de tu DNI antes de capturarlas.</p>
       <p className="aviso-provisional">Demostración: texto provisional pendiente de aprobación del PO. No es un consentimiento legal definitivo.</p>
@@ -85,6 +86,7 @@ export default function Consentimiento() {
                 <span>He leído y acepto este texto para la verificación de mi DNI.</span>
               </label>
               <button className="boton-principal" type="submit" disabled={!acepto || ocupado}>
+                <FileSignature className="icono" size={18} aria-hidden="true" />
                 {ocupado ? 'Guardando…' : 'Aceptar consentimiento'}
               </button>
             </form>
@@ -92,7 +94,7 @@ export default function Consentimiento() {
             <>
               <Link className="continuar-dni" to="/verificar-dni">Continuar a verificar mi DNI</Link>
               {!confirmarRevocacion ? (
-                <button type="button" onClick={() => setConfirmarRevocacion(true)}>Revocar consentimiento</button>
+                <button type="button" onClick={() => setConfirmarRevocacion(true)}><Undo2 className="icono" size={18} aria-hidden="true" />Revocar consentimiento</button>
               ) : (
                 <div className="confirmar-revocacion caja" role="group" aria-label="Confirmar revocación">
                   <p>¿Revocar el consentimiento? Se bloquearán nuevos procesamientos. Las imágenes existentes no se eliminan en esta operación.</p>
@@ -104,7 +106,7 @@ export default function Consentimiento() {
           )}
         </>
       )}
-      <button className="consultar-consentimiento" type="button" disabled={ocupado} onClick={consultar}>Consultar estado actual</button>
+      <button className="consultar-consentimiento" type="button" disabled={ocupado} onClick={consultar}><RefreshCw className="icono" size={18} aria-hidden="true" />Consultar estado actual</button>
       <p className="ayuda">Esta finalidad no autoriza reconocimiento facial. Puedes solicitar la eliminación por separado; tu cuenta y el DNI registrado se conservan.</p>
     </section>
   )

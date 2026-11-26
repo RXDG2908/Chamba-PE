@@ -3,6 +3,7 @@ import { Link, Navigate } from 'react-router-dom'
 import { enviarJson, erroresPorCampo } from '../../nucleo/api.js'
 import './RegistroPrestador.css'
 import '../../estilos/Cuenta.css'
+import { UserPlus } from 'lucide-react'
 
 const VACIO = { nombres: '', apellidos: '', username: '', email: '', password: '' }
 
@@ -58,7 +59,7 @@ function RegistroCliente({ usuario, alIniciar }) {
 
   return (
     <form className="registro cuenta" onSubmit={enviar} noValidate>
-      <h2>Crear cuenta de cliente</h2>
+      <h2><span className="icono-titulo" aria-hidden="true"><UserPlus size={22} /></span>Crear cuenta de cliente</h2>
       <p className="ayuda">Con tu cuenta puedes buscar prestadores y enviarles solicitudes.</p>
 
       {estado === 'fallo' && (
@@ -74,6 +75,7 @@ function RegistroCliente({ usuario, alIniciar }) {
       </div>
 
       <button type="submit" className="boton" disabled={estado === 'enviando'}>
+        <UserPlus className="icono" size={18} aria-hidden="true" />
         {estado === 'enviando' ? 'Creando cuenta…' : 'Crear cuenta'}
       </button>
       <p className="pie-cuenta">¿Ya tienes cuenta? <Link to="/ingresar">Inicia sesión</Link>.</p>

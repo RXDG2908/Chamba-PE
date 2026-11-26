@@ -15,8 +15,9 @@
   background: #fff; color: var(--texto); text-decoration: none; box-shadow: var(--sombra);
   transition: transform 0.15s, box-shadow 0.15s, border-color 0.15s;
 }
-.panel-tarjeta:hover { transform: translateY(-2px); border-color: #b9d6c5; box-shadow: var(--sombra-alta); }
-.panel-tarjeta:active { transform: translateY(0); }
+.panel-tarjeta:hover { border-color: #b9d6c5; box-shadow: var(--sombra-alta); }
+@media (hover: hover) and (pointer: fine) { .panel-tarjeta:hover { transform: translateY(-2px); } }
+.panel-tarjeta:active { transform: scale(0.98); }
 .panel-dato { font-size: 40px; font-weight: 800; line-height: 1; letter-spacing: -1px; font-variant-numeric: tabular-nums; color: var(--verde-intenso); }
 .panel-titulo { font-weight: 700; }
 .panel-detalle { color: var(--texto-suave); font-size: 14px; }

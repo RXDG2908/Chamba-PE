@@ -11,8 +11,8 @@
 .disponibilidad { text-align: center; }
 .interruptor { display: inline-flex; align-items: center; gap: 14px; margin-top: 20px; cursor: pointer; font-size: 20px; font-weight: 700; color: #58675f; }
 .interruptor input { position: absolute; opacity: 0; width: 1px; height: 1px; }
-.pista { position: relative; width: 64px; height: 36px; border-radius: 999px; background: #cbded3; transition: background 0.2s; }
-.pista::after { content: ''; position: absolute; top: 4px; left: 4px; width: 28px; height: 28px; border-radius: 50%; background: #fff; box-shadow: 0 1px 3px #0003; transition: transform 0.2s; }
+.pista { position: relative; width: 64px; height: 36px; border-radius: 999px; background: #cbded3; transition: background-color 200ms cubic-bezier(0.23, 1, 0.32, 1); }
+.pista::after { content: ''; position: absolute; top: 4px; left: 4px; width: 28px; height: 28px; border-radius: 50%; background: #fff; box-shadow: 0 1px 3px #0003; transition: transform 200ms cubic-bezier(0.23, 1, 0.32, 1); }
 .interruptor.activo { color: #16734f; }
 .interruptor.activo .pista { background: #16734f; }
 .interruptor.activo .pista::after { transform: translateX(28px); }

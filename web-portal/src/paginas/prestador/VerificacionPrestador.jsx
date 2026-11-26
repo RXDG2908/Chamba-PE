@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom'
 import useConsultas from '../../nucleo/useConsultas.js'
 import '../../estilos/Paneles.css'
+import { ShieldCheck } from 'lucide-react'
 
 // Resumen de la verificación: los pasos en orden, con su estado y un enlace a cada uno.
 export default function VerificacionPrestador() {
@@ -40,7 +41,7 @@ export default function VerificacionPrestador() {
     <main className="panel contenedor" aria-busy={cargando}>
       <header className="panel-cabecera">
         <p className="etiqueta">Verificación</p>
-        <h2>Demuestra que eres tú</h2>
+        <h2><span className="icono-titulo" aria-hidden="true"><ShieldCheck size={22} /></span>Demuestra que eres tú</h2>
         <p>Los clientes eligen antes a prestadores verificados. Completa los pasos en este orden.</p>
       </header>
       <ol className="pasos-verificacion">

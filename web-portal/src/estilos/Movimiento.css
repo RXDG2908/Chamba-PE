@@ -1,19 +1,21 @@
 /*
- * Movimiento y detalles de navegador (impeccable «animate» + micro-interaction).
- * Tesis: la web es una herramienta (modo Operate), así que el movimiento da respuesta y continuidad
- * y no hace esperar. Un solo momento con autoría: en la portada, los prestadores «aparecen» en el
- * mapa alrededor del vecino y el radio de búsqueda late una vez. Todo lo demás es breve (100–300 ms).
+ * Movimiento, iconos y detalles del navegador. Revisado con review-animations (Emil Kowalski):
+ * - La web es una herramienta: el movimiento da respuesta y continuidad, nunca hace esperar (< 300 ms).
+ * - Curvas fuertes propias (las de CSS son débiles); nunca ease-in en la interfaz.
+ * - Solo transform, translate, scale y opacity; hover con desplazamiento solo con puntero fino.
+ * - Lo que aparece y desaparece rápido (avisos, estados) usa transiciones: se pueden interrumpir.
+ * - Un único momento con autoría: la portada, donde los prestadores aparecen en el mapa.
  */
 :root {
-  --curva-salida: cubic-bezier(0.16, 1, 0.3, 1);
-  --curva-estandar: cubic-bezier(0.4, 0, 0.2, 1);
-  --rapido: 140ms;
-  --medio: 240ms;
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
+  --rapido: 160ms;
+  --medio: 220ms;
   caret-color: var(--verde);
   accent-color: var(--verde);
 }
 
-/* Detalles que el navegador trae por defecto: también llevan la marca. */
+/* ---------- Detalles del navegador con la marca ---------- */
 ::selection { background: #16734f33; color: var(--verde-oscuro); }
 html { scrollbar-color: #b9cdc1 transparent; scrollbar-width: thin; }
 ::-webkit-scrollbar { width: 10px; height: 10px; }
@@ -21,123 +23,159 @@ html { scrollbar-color: #b9cdc1 transparent; scrollbar-width: thin; }
 ::-webkit-scrollbar-thumb:hover { background-color: #8fb3a0; }
 a { text-underline-offset: 3px; }
 :focus-visible { outline: 3px solid #2463a6; outline-offset: 2px; border-radius: 6px; }
-
-/* Texto solo para lectores de pantalla. */
 .visualmente-oculto { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 
-/* Iconos dentro de textos, botones y enlaces: alineados al texto y del mismo color. */
+/* ---------- Iconos ---------- */
 .icono { flex-shrink: 0; vertical-align: -0.15em; }
 .menu a, .sesion button, .enlace-sesion, .boton-cabecera, .boton-principal, .boton-secundario,
-.boton-contorno, .insignia, .pie-enlaces a, .submenu a {
+.boton-contorno, .insignia, .pie-enlaces a, .submenu a, button:has(> .icono), .etiqueta-estado,
+.solicitud-estado, .estado-solicitud, .cargando {
   display: inline-flex; align-items: center; gap: 7px;
 }
-.menu a .icono { width: 17px; height: 17px; opacity: 0.85; }
+button:has(> .icono) { justify-content: center; }
+.menu a .icono { width: 17px; height: 17px; opacity: 0.8; transition: opacity var(--rapido) var(--ease-out); }
 .menu a.active .icono, .menu a[aria-current='page'] .icono { opacity: 1; }
 
-/* Entrada de cada página: aparece y sube 8 px; la página anterior no espera a salir. */
-.pagina { animation: pagina-entra var(--medio) var(--curva-salida) both; }
-@keyframes pagina-entra {
-  from { opacity: 0; translate: 0 8px; }
-  to { opacity: 1; translate: 0 0; }
-}
-
-/* Presión: todo lo que se pulsa se hunde un poco al instante (100 ms). */
-button, .boton-principal, .boton-secundario, .boton-contorno, .boton-cabecera, .enlace-sesion,
-.panel-tarjeta, .rubros-inicio a {
-  transition: transform var(--rapido) var(--curva-estandar), box-shadow var(--medio) var(--curva-estandar),
-    background-color var(--rapido), border-color var(--rapido), color var(--rapido), filter var(--rapido);
-}
-button:active:not(:disabled), .boton-principal:active, .boton-secundario:active, .boton-contorno:active,
-.boton-cabecera:active, .rubros-inicio a:active {
-  transform: scale(0.97);
-  transition-duration: 80ms;
-}
-button:disabled { cursor: not-allowed; }
-
-/* Flecha de los llamados a la acción: avanza unos píxeles al pasar el cursor. */
-.boton-principal .icono-flecha, .boton-contorno .icono-flecha { transition: transform var(--medio) var(--curva-salida); }
-.boton-principal:hover .icono-flecha, .boton-contorno:hover .icono-flecha { transform: translateX(3px); }
-
-/* Tarjetas del panel: el icono se separa del fondo al pasar el cursor. */
-.panel-tarjeta-icono {
-  display: grid; place-items: center; width: 40px; height: 40px; margin-bottom: 4px; border-radius: 12px;
-  background: var(--verde-claro); color: var(--verde-intenso);
-  transition: transform var(--medio) var(--curva-salida), background-color var(--medio);
-}
-.panel-tarjeta:hover .panel-tarjeta-icono { transform: translateY(-2px) rotate(-6deg); background: #d6ebdf; }
-
-/* Pasos y rubros de la portada con icono propio. */
-.paso-icono {
-  display: grid; place-items: center; width: 44px; height: 44px; border-radius: 14px;
+/* Icono de cada título de pantalla: una baldosa con el color de marca. */
+h2:has(> .icono-titulo) { display: flex; align-items: center; gap: 12px; }
+.icono-titulo {
+  display: inline-grid; place-items: center; flex-shrink: 0; width: 44px; height: 44px; border-radius: 14px;
   background: var(--verde-claro); color: var(--verde-intenso);
 }
-.rubros-inicio a .icono { color: var(--verde); transition: transform var(--medio) var(--curva-salida); }
-.rubros-inicio a:hover .icono { transform: scale(1.15) rotate(-8deg); }
-.rubros-inicio a { display: inline-flex; align-items: center; gap: 8px; }
 
-/* Momento con autoría: los prestadores aparecen en el mapa de la portada y el radio late una vez. */
-.portada-ilustracion .punto { animation: punto-cae 520ms var(--curva-salida) both; }
-.portada-ilustracion .punto-cliente { animation-delay: 120ms; }
-.portada-ilustracion .punto-a { animation-delay: 420ms; }
-.portada-ilustracion .punto-b { animation-delay: 540ms; }
-.portada-ilustracion .punto-c { animation-delay: 660ms; }
-.portada-ilustracion .radio { animation: radio-late 1400ms var(--curva-salida) 200ms both; }
-.portada-ilustracion .ilustracion-tarjeta { animation: tarjeta-sube 480ms var(--curva-salida) 900ms both; }
-@keyframes punto-cae {
-  from { opacity: 0; translate: 0 -14px; scale: 0.6; }
-  to { opacity: 1; translate: 0 0; scale: 1; }
-}
-@keyframes radio-late {
-  0% { opacity: 0; scale: 0.6; }
-  60% { opacity: 1; scale: 1.04; }
-  100% { opacity: 1; scale: 1; }
-}
-@keyframes tarjeta-sube {
-  from { opacity: 0; translate: 0 12px; filter: blur(4px); }
-  to { opacity: 1; translate: 0 0; filter: none; }
-}
-
-/* Seguimiento (HU-11): el tramo recorrido se llena de izquierda a derecha. */
-.seguimiento .seg-etapa:not(:first-child)::before {
-  transform-origin: left center; transition: background-color 400ms var(--curva-salida);
-}
-.seguimiento .seg-etapa.hecha:not(:first-child)::before, .seguimiento .seg-etapa.actual:not(:first-child)::before {
-  animation: tramo-llena 600ms var(--curva-salida) both;
-}
-.seguimiento .seg-punto { transition: background-color var(--medio), border-color var(--medio), box-shadow var(--medio), transform var(--medio) var(--curva-salida); }
-.seguimiento .actual .seg-punto { animation: punto-actual 2.4s ease-in-out 600ms 2; }
-@keyframes tramo-llena { from { transform: scaleX(0); } to { transform: scaleX(1); } }
-@keyframes punto-actual {
-  0%, 100% { box-shadow: 0 0 0 4px var(--verde-claro); }
-  50% { box-shadow: 0 0 0 8px #16734f1a; }
-}
-
-/* Avisos y errores: entran deslizando un poco para que se noten sin asustar. */
-[role='alert'], [role='status']:not(:empty), .panel-aviso {
-  animation: aviso-entra var(--medio) var(--curva-salida) both;
-}
-@keyframes aviso-entra {
-  from { opacity: 0; translate: 0 -4px; }
-  to { opacity: 1; translate: 0 0; }
-}
-
-/* Carga: bloque gris con un brillo que recorre (se usa en listas mientras llegan los datos). */
+/* ---------- Carga ---------- */
+.cargando { color: var(--texto-suave); }
+.girando { animation: girar 700ms linear infinite; }
+@keyframes girar { to { rotate: 1turn; } }
 .esqueleto {
   border-radius: 12px; background: linear-gradient(90deg, #e8efeb 0%, #f4f8f6 40%, #e8efeb 80%) 0 0 / 300% 100%;
   animation: esqueleto 1.4s linear infinite;
 }
 @keyframes esqueleto { to { background-position: -150% 0; } }
 
-/* Con «reducir movimiento» se quitan desplazamientos y bucles; quedan los cambios de color y opacidad. */
+/* ---------- Páginas ----------
+ * Se navega decenas de veces al día: entrada corta (180 ms) y sutil (4 px). La anterior no espera. */
+.pagina { animation: pagina-entra 180ms var(--ease-out) both; }
+@keyframes pagina-entra {
+  from { opacity: 0; translate: 0 4px; }
+  to { opacity: 1; translate: 0 0; }
+}
+
+/* ---------- Presión ----------
+ * Todo lo que se pulsa se hunde al instante y vuelve más despacio (asimétrico: 80 ms / 160 ms). */
+button, .boton-principal, .boton-secundario, .boton-contorno, .boton-cabecera, .enlace-sesion,
+.panel-tarjeta, .rubros-inicio a, .menu a, .submenu a {
+  transition: transform var(--rapido) var(--ease-out), box-shadow var(--medio) var(--ease-out),
+    background-color var(--rapido) ease, border-color var(--rapido) ease, color var(--rapido) ease,
+    filter var(--rapido) ease, opacity var(--rapido) ease;
+}
+button:active:not(:disabled), .boton-principal:active, .boton-secundario:active, .boton-contorno:active,
+.boton-cabecera:active, .enlace-sesion:active, .rubros-inicio a:active, .menu a:active, .submenu a:active {
+  transform: scale(0.97);
+  transition-duration: 80ms;
+}
+.panel-tarjeta:active { transform: scale(0.985); transition-duration: 80ms; }
+button:disabled { cursor: not-allowed; }
+
+/* Flecha y baldosas: pequeñas respuestas al cursor, solo con mouse o trackpad. */
+.icono-flecha, .panel-tarjeta-icono, .rubros-inicio a .icono { transition: transform var(--medio) var(--ease-out); }
+@media (hover: hover) and (pointer: fine) {
+  .boton-principal:hover .icono-flecha, .boton-contorno:hover .icono-flecha { transform: translateX(3px); }
+  .panel-tarjeta:hover .panel-tarjeta-icono { transform: translateY(-2px); }
+  .rubros-inicio a:hover .icono { transform: scale(1.12); }
+}
+
+/* ---------- Paneles y portada ---------- */
+.panel-tarjeta-icono {
+  display: grid; place-items: center; width: 40px; height: 40px; margin-bottom: 4px; border-radius: 12px;
+  background: var(--verde-claro); color: var(--verde-intenso);
+}
+.paso-icono {
+  display: grid; place-items: center; width: 44px; height: 44px; border-radius: 14px;
+  background: var(--verde-claro); color: var(--verde-intenso);
+}
+.rubros-inicio a { display: inline-flex; align-items: center; gap: 8px; }
+.rubros-inicio a .icono { color: var(--verde); }
+
+/* Listas que llegan de la API: entran escalonadas (40 ms) para leerse como lista, no como bloque.
+ * Desde el quinto elemento entran juntos: nadie espera a que termine la cascada. */
+:is(.panel-tarjetas, .lista-servicios, .bandeja-lista, .revision-lista, .lista-prestadores, .pasos, .pasos-verificacion) > * {
+  animation: entra-lista 260ms var(--ease-out) both;
+}
+:is(.panel-tarjetas, .lista-servicios, .bandeja-lista, .revision-lista, .lista-prestadores, .pasos, .pasos-verificacion) > :nth-child(2) { animation-delay: 40ms; }
+:is(.panel-tarjetas, .lista-servicios, .bandeja-lista, .revision-lista, .lista-prestadores, .pasos, .pasos-verificacion) > :nth-child(3) { animation-delay: 80ms; }
+:is(.panel-tarjetas, .lista-servicios, .bandeja-lista, .revision-lista, .lista-prestadores, .pasos, .pasos-verificacion) > :nth-child(4) { animation-delay: 120ms; }
+:is(.panel-tarjetas, .lista-servicios, .bandeja-lista, .revision-lista, .lista-prestadores, .pasos, .pasos-verificacion) > :nth-child(n + 5) { animation-delay: 160ms; }
+@keyframes entra-lista {
+  from { opacity: 0; translate: 0 8px; }
+  to { opacity: 1; translate: 0 0; }
+}
+
+/* Momento con autoría (una vez por visita): los prestadores aparecen en el mapa y el radio se abre. */
+.portada-ilustracion .punto { animation: punto-cae 420ms var(--ease-out) both; }
+.portada-ilustracion .punto-cliente { animation-delay: 100ms; }
+.portada-ilustracion .punto-a { animation-delay: 360ms; }
+.portada-ilustracion .punto-b { animation-delay: 420ms; }
+.portada-ilustracion .punto-c { animation-delay: 480ms; }
+.portada-ilustracion .radio { animation: radio-abre 700ms var(--ease-out) 160ms both; }
+.portada-ilustracion .ilustracion-tarjeta { animation: tarjeta-sube 400ms var(--ease-out) 640ms both; }
+@keyframes punto-cae {
+  from { opacity: 0; translate: 0 -12px; scale: 0.9; }
+  to { opacity: 1; translate: 0 0; scale: 1; }
+}
+@keyframes radio-abre {
+  from { opacity: 0; scale: 0.85; }
+  to { opacity: 1; scale: 1; }
+}
+@keyframes tarjeta-sube {
+  from { opacity: 0; translate: 0 10px; filter: blur(3px); }
+  to { opacity: 1; translate: 0 0; filter: none; }
+}
+
+/* ---------- Estados de una solicitud ----------
+ * El color cambia con transición: cuando el prestador avanza, la etiqueta no «salta». */
+.etiqueta-estado, .solicitud-estado, .estado-solicitud, .solicitud-tarjeta {
+  transition: background-color var(--medio) ease, color var(--medio) ease, border-color var(--medio) ease;
+}
+
+/* Seguimiento (HU-11): el tramo recorrido se llena; el punto actual se marca una vez al llegar. */
+.seguimiento .seg-etapa:not(:first-child)::before {
+  transform-origin: left center; transition: background-color 300ms var(--ease-out);
+}
+.seguimiento .seg-etapa.hecha:not(:first-child)::before, .seguimiento .seg-etapa.actual:not(:first-child)::before {
+  animation: tramo-llena 500ms var(--ease-out) both;
+}
+.seguimiento .seg-punto { transition: background-color var(--medio) ease, border-color var(--medio) ease, box-shadow var(--medio) ease; }
+.seguimiento .actual .seg-punto { animation: punto-actual 900ms var(--ease-out) 300ms 1 both; }
+@keyframes tramo-llena { from { scale: 0 1; } to { scale: 1 1; } }
+@keyframes punto-actual {
+  from { box-shadow: 0 0 0 10px #16734f00; }
+  to { box-shadow: 0 0 0 4px var(--verde-claro); }
+}
+
+/* ---------- Avisos ----------
+ * Transición + @starting-style (no keyframes): si el aviso cambia rápido, la animación se retoma
+ * desde donde va en vez de reiniciarse. */
+[role='alert'], .panel-aviso, .bandeja-mensaje, .confirmacion {
+  transition: opacity var(--medio) var(--ease-out), translate var(--medio) var(--ease-out);
+  @starting-style { opacity: 0; translate: 0 -4px; }
+}
+
+/* ---------- Reducir movimiento ----------
+ * Más suave, no cero: se quitan desplazamientos, escalas y bucles; quedan color y opacidad. */
 @media (prefers-reduced-motion: reduce) {
-  .pagina, [role='alert'], [role='status'], .panel-aviso, .portada-ilustracion .ilustracion-tarjeta {
-    animation-name: aparece; animation-duration: 160ms;
+  .pagina, .portada-ilustracion .ilustracion-tarjeta, .portada-ilustracion .punto, .portada-ilustracion .radio,
+  :is(.panel-tarjetas, .lista-servicios, .bandeja-lista, .revision-lista, .lista-prestadores, .pasos, .pasos-verificacion) > * {
+    animation-name: aparece; animation-duration: 160ms; animation-delay: 0ms;
   }
-  .portada-ilustracion .punto, .portada-ilustracion .radio, .seguimiento .seg-etapa::before,
-  .seguimiento .actual .seg-punto, .esqueleto { animation: none !important; }
+  .seguimiento .seg-etapa::before, .seguimiento .actual .seg-punto, .esqueleto { animation: none !important; }
+  .girando { animation-duration: 1.6s; }
+  [role='alert'], .panel-aviso, .bandeja-mensaje, .confirmacion {
+    @starting-style { opacity: 0; translate: 0 0; }
+  }
   button:active:not(:disabled), .boton-principal:active, .boton-secundario:active, .boton-contorno:active,
-  .boton-cabecera:active, .rubros-inicio a:active { transform: none; }
-  .panel-tarjeta:hover .panel-tarjeta-icono, .rubros-inicio a:hover .icono,
-  .boton-principal:hover .icono-flecha, .boton-contorno:hover .icono-flecha { transform: none; }
+  .boton-cabecera:active, .enlace-sesion:active, .rubros-inicio a:active, .menu a:active, .submenu a:active,
+  .panel-tarjeta:active, .boton-principal:hover .icono-flecha, .boton-contorno:hover .icono-flecha,
+  .panel-tarjeta:hover .panel-tarjeta-icono, .rubros-inicio a:hover .icono { transform: none; }
 }
 @keyframes aparece { from { opacity: 0; } to { opacity: 1; } }

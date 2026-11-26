@@ -1,5 +1,6 @@
 import { Link, useLocation } from 'react-router-dom'
 import { INICIO_POR_ROL, NOMBRE_SECCION } from '../../nucleo/roles.js'
+import { Lock } from 'lucide-react'
 
 // Alguien con sesión entró a una pantalla de otro rol: se explica en vez de mandarlo al inicio sin aviso.
 export default function SinAcceso({ usuario }) {
@@ -9,7 +10,7 @@ export default function SinAcceso({ usuario }) {
   return (
     <main className="pagina-estado contenedor">
       <p className="etiqueta">Acceso restringido</p>
-      <h2>Esta pantalla no es para tu cuenta</h2>
+      <h2><span className="icono-titulo" aria-hidden="true"><Lock size={22} /></span>Esta pantalla no es para tu cuenta</h2>
       <p>
         {seccion ? `Es una sección para ${seccion}. ` : ''}
         Si crees que deberías verla, cierra sesión e ingresa con la cuenta correcta.

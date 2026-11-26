@@ -7,6 +7,7 @@ import '../publico/RegistroPrestador.css'
 import '../../estilos/Cuenta.css'
 import './VerificarDni.css'
 import './VerificarRostro.css'
+import { Check, RotateCcw, ScanFace } from 'lucide-react'
 
 const API = '/api/verificacion/facial/'
 const API_CONSENTIMIENTO = '/api/verificacion/facial/consentimiento/'
@@ -140,7 +141,7 @@ function Resultado({ intento, alRepetir }) {
         {' '}Registrado el {new Date(intento.creado).toLocaleString('es-PE')}
       </p>
       {intento.decision !== 'verificado' && (
-        <button type="button" className="boton-principal" onClick={alRepetir}>Intentar de nuevo</button>
+        <button type="button" className="boton-principal" onClick={alRepetir}><RotateCcw className="icono" size={18} aria-hidden="true" />Intentar de nuevo</button>
       )}
     </div>
   )
@@ -172,6 +173,7 @@ function Consentimiento({ estado, alAceptar }) {
       </label>
       {error && <p className="error caja" role="alert">{error}</p>}
       <button type="button" className="boton-principal" disabled={!marcado || enviando} onClick={aceptar}>
+        <Check className="icono" size={18} aria-hidden="true" />
         {enviando ? 'Guardando…' : 'Aceptar y continuar'}
       </button>
     </div>
@@ -247,7 +249,7 @@ export default function VerificarRostro() {
   return (
     <section className="registro cuenta verificar-dni verificar-rostro">
       <p className="etiqueta">VERIFICACIÓN DE IDENTIDAD</p>
-      <h2>Selfie y comparación con tu DNI</h2>
+      <h2><span className="icono-titulo" aria-hidden="true"><ScanFace size={22} /></span>Selfie y comparación con tu DNI</h2>
       <p>Comparamos tu rostro con la foto de tu DNI para confirmar que eres el titular. Primero debes <Link to="/verificar-dni">verificar tu DNI</Link>.</p>
 
       {fase === 'cargando' && <p className="ayuda" role="status">Cargando…</p>}

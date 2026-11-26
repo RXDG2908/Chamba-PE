@@ -6,6 +6,9 @@ import Seguimiento from '../../componentes/Seguimiento.jsx'
 import { ACCION_SIGUIENTE } from '../../nucleo/etapasSeguimiento.js'
 import '../../estilos/Paneles.css'
 import './SolicitudesRecibidas.css'
+import { Bell, BellOff, Check, Inbox, RotateCcw, X } from 'lucide-react'
+import Cargando from '../../componentes/Cargando.jsx'
+import IconoEstado from '../../componentes/IconoEstado.jsx'
 
 export default function SolicitudesRecibidas({ usuario, alVencer }) {
   const { id } = useParams()
@@ -73,35 +76,36 @@ export default function SolicitudesRecibidas({ usuario, alVencer }) {
   return <main className="bandeja contenedor">
     <header className="panel-cabecera">
       <p className="etiqueta">Trabajo</p>
-      <h2>Solicitudes recibidas</h2>
+      <h2><span className="icono-titulo" aria-hidden="true"><Inbox size={22} /></span>Solicitudes recibidas</h2>
       <p>Responde rápido: el cliente ve tu respuesta y el avance del servicio al momento.</p>
     </header>
     <div className="bandeja-notificaciones">
       <span>Avisos en este navegador</span>
-      <button type="button" className="boton-secundario" disabled={ocupado} onClick={() => configurar(true)}>Activar notificaciones</button>
-      <button type="button" className="boton-texto" disabled={ocupado} onClick={() => configurar(false)}>Desactivar notificaciones</button>
+      <button type="button" className="boton-secundario" disabled={ocupado} onClick={() => configurar(true)}><Bell className="icono" size={18} aria-hidden="true" />Activar notificaciones</button>
+      <button type="button" className="boton-texto" disabled={ocupado} onClick={() => configurar(false)}><BellOff className="icono" size={18} aria-hidden="true" />Desactivar notificaciones</button>
     </div>
     <p role="status" className="bandeja-mensaje">{mensaje}</p>
     {errorActual && <div role="alert" className="error-busqueda"><p>{errorActual}</p>
-      <button type="button" className="boton-secundario" onClick={recargar}>Reintentar consulta</button></div>}
-    {solicitudes === null && !errorActual && <p className="aviso">Cargando solicitudes…</p>}
+      <button type="button" className="boton-secundario" onClick={recargar}><RotateCcw className="icono" size={18} aria-hidden="true" />Reintentar consulta</button></div>}
+    {solicitudes === null && !errorActual && <Cargando className="aviso" texto="Cargando solicitudes…" anunciar={false} />}
     {solicitudes?.length === 0 && <p className="aviso">Aún no tienes solicitudes. Mantén tu disponibilidad activa para recibirlas.</p>}
     <div className="bandeja-lista">
       {solicitudes?.map((s) => <article key={s.id} className={`solicitud-tarjeta estado-${s.estado}`}>
         <header className="solicitud-cabecera">
           <h3><Link to={`/solicitudes/${s.id}`}>Solicitud #{s.id} · {s.rubro}</Link></h3>
-          <p className="solicitud-estado">Estado: {s.estado_display || s.estado}</p>
+          <p className="solicitud-estado"><IconoEstado estado={s.estado} />Estado: {s.estado_display || s.estado}</p>
         </header>
         <p className="solicitud-descripcion">{s.descripcion}</p>
         <p className="solicitud-cliente">{s.cliente_nombre} · <a href={`tel:${s.cliente_telefono}`}>{s.cliente_telefono}</a></p>
         <Seguimiento estado={s.estado} historial={s.historial} />
         <div className="solicitud-acciones">
           {s.estado === 'pendiente' ? <>
-            <button type="button" className="boton boton-principal" disabled={ocupado} onClick={() => responder(s, 'aceptar')}>Aceptar</button>
-            <button type="button" className="boton-secundario" disabled={ocupado} onClick={() => responder(s, 'rechazar')}>Rechazar</button>
+            <button type="button" className="boton boton-principal" disabled={ocupado} onClick={() => responder(s, 'aceptar')}><Check className="icono" size={18} aria-hidden="true" />Aceptar</button>
+            <button type="button" className="boton-secundario" disabled={ocupado} onClick={() => responder(s, 'rechazar')}><X className="icono" size={18} aria-hidden="true" />Rechazar</button>
           </> : ACCION_SIGUIENTE[s.siguiente_estado]
             ? <button type="button" className="boton boton-principal" disabled={ocupado}
               onClick={() => responder(s, 'avanzar', { estado: s.siguiente_estado })}>
+              <IconoEstado estado={s.siguiente_estado} size={18} />
               {ACCION_SIGUIENTE[s.siguiente_estado]}
             </button>
             : <p className="solicitud-cerrada">{s.estado === 'finalizada' ? 'Servicio finalizado.' : 'Esta solicitud ya fue respondida.'}</p>}

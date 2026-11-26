@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { enviarJson } from '../../nucleo/api.js'
 import './Consentimiento.css'
 import './EliminarDatos.css'
+import { Trash2 } from 'lucide-react'
 
 const nombres = { pendiente: 'Pendiente', procesando: 'Procesando', parcial: 'Parcial', fallida: 'Fallida', atendida: 'Atendida' }
 const errores = {
@@ -94,7 +95,7 @@ export default function EliminarDatos() {
 
   return (
     <section className="registro cuenta consentimiento eliminacion-dni">
-      <h2>Eliminar datos de verificación del DNI</h2>
+      <h2><span className="icono-titulo" aria-hidden="true"><Trash2 size={22} /></span>Eliminar datos de verificación del DNI</h2>
       <p>Esta solicitud elimina las fotografías del DNI, el recorte del titular y los datos leídos durante su verificación.</p>
       <p><strong>Conserva tu cuenta y el DNI registrado en tu perfil.</strong> No elimina certificados ni solicitudes de servicios. Se conserva un historial mínimo sin fotografías ni datos leídos.</p>
       <p>El consentimiento DNI no autoriza reconocimiento facial. Su revocación se gestiona por separado.</p>
@@ -107,7 +108,7 @@ export default function EliminarDatos() {
           {datos.bloqueada ? <p className="aviso-provisional" role="status">Hay una eliminación sin resolver. Las nuevas capturas y envíos del DNI están bloqueados, incluso si aceptas nuevamente el consentimiento.</p> : (
             <div className="confirmacion-eliminacion">
               <label><input type="checkbox" checked={confirmo} disabled={ocupado} onChange={(e) => { setConfirmo(e.target.checked); clave.current = null }} /> Confirmo que quiero solicitar la eliminación de estos datos.</label>
-              <button type="button" disabled={!confirmo || ocupado} onClick={() => enviar()}>{ocupado ? 'Registrando…' : 'Solicitar eliminación'}</button>
+              <button type="button" disabled={!confirmo || ocupado} onClick={() => enviar()}><Trash2 className="icono" size={18} aria-hidden="true" />{ocupado ? 'Registrando…' : 'Solicitar eliminación'}</button>
             </div>
           )}
           <h3>Mis solicitudes</h3>

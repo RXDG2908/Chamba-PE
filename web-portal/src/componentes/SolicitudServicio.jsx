@@ -2,6 +2,8 @@ import { useEffect, useRef, useState } from 'react'
 import { enviarJson } from '../nucleo/api.js'
 import Seguimiento from './Seguimiento.jsx'
 import { ESTADOS_FINALES } from '../nucleo/etapasSeguimiento.js'
+import { Send } from 'lucide-react'
+import IconoEstado from './IconoEstado.jsx'
 
 const ESTADOS = {
   pendiente: 'Pendiente de respuesta',
@@ -154,6 +156,7 @@ function SolicitudServicio({ prestador, rubro, ubicacion }) {
           </label>
           {error && <p className="error-solicitud" role="alert">{error}</p>}
           <button type="submit" disabled={enviando}>
+            <Send className="icono" size={18} aria-hidden="true" />
             {enviando ? 'Enviando solicitud…' : 'Enviar solicitud'}
           </button>
         </form>
@@ -161,6 +164,7 @@ function SolicitudServicio({ prestador, rubro, ubicacion }) {
         <div aria-live="polite" role="status">
           <h5>Solicitud #{solicitud.id}</h5>
           <p className={`estado-solicitud estado-${solicitud.estado}`}>
+            <IconoEstado estado={solicitud.estado} />
             {ESTADOS[solicitud.estado] || solicitud.estado_display || solicitud.estado}
           </p>
           <Seguimiento estado={solicitud.estado} historial={solicitud.historial} />

@@ -6,6 +6,9 @@ import { ESTADOS_FINALES } from '../../nucleo/etapasSeguimiento.js'
 import '../publico/RegistroPrestador.css'
 import '../../estilos/Cuenta.css'
 import './MisServicios.css'
+import { ClipboardList, Star } from 'lucide-react'
+import Cargando from '../../componentes/Cargando.jsx'
+import IconoEstado from '../../componentes/IconoEstado.jsx'
 
 const ESTRELLAS = [1, 2, 3, 4, 5]
 const formatoFecha = new Intl.DateTimeFormat('es-PE', { dateStyle: 'medium', timeStyle: 'short' })
@@ -20,7 +23,7 @@ function servicioValido(s) {
 function Estrellas({ cantidad }) {
   return (
     <span className="estrellas-fijas" role="img" aria-label={`${cantidad} de 5 estrellas`}>
-      {ESTRELLAS.map((n) => <span key={n} aria-hidden="true" className={n <= cantidad ? 'llena' : ''}>★</span>)}
+      {ESTRELLAS.map((n) => <Star key={n} size={16} aria-hidden="true" className={n <= cantidad ? 'llena' : ''} fill="currentColor" />)}
     </span>
   )
 }
@@ -66,7 +69,7 @@ function FormularioCalificacion({ servicio, alCalificar }) {
           <label key={n} className={n <= estrellas ? 'llena' : ''}>
             <input type="radio" name={`estrellas-${servicio.id}`} value={n} checked={estrellas === n}
               onChange={() => setEstrellas(n)} disabled={enviando} />
-            <span aria-hidden="true">★</span>
+            <Star className="estrella" size={30} aria-hidden="true" fill="currentColor" strokeWidth={1.5} />
             <span className="solo-lector">{n === 1 ? '1 estrella' : `${n} estrellas`}</span>
           </label>
         ))}
@@ -80,6 +83,7 @@ function FormularioCalificacion({ servicio, alCalificar }) {
       </label>
       {error && <p className="error" role="alert">{error}</p>}
       <button type="submit" className="boton" disabled={enviando}>
+        <Star className="icono" size={18} aria-hidden="true" />
         {enviando ? 'Enviando…' : 'Enviar calificación'}
       </button>
     </form>
@@ -128,14 +132,14 @@ function MisServicios() {
     )))
   }
 
-  if (estado === 'cargando') return <p className="registro cuenta" role="status">Cargando tus servicios…</p>
+  if (estado === 'cargando') return <Cargando className="registro cuenta" texto="Cargando tus servicios…" />
   if (estado === 'fallo') {
     return <p className="registro cuenta error" role="alert">No pudimos cargar tus servicios. Recarga la página.</p>
   }
 
   return (
     <section className="registro cuenta mis-servicios">
-      <h2>Mis servicios</h2>
+      <h2><span className="icono-titulo" aria-hidden="true"><ClipboardList size={22} /></span>Mis servicios</h2>
       <p className="ayuda">
         Aquí ves las solicitudes que enviaste con tu cuenta y en qué etapa va cada servicio (se actualiza
         sola cada 5 segundos). Cuando un servicio queda Finalizado puedes calificarlo
@@ -157,7 +161,7 @@ function MisServicios() {
                   {s.rubro} · {formatoFecha.format(new Date(s.creada))}
                 </p>
               </div>
-              <span className={`etiqueta-estado estado-${s.estado}`}>{s.estado_display}</span>
+              <span className={`etiqueta-estado estado-${s.estado}`}><IconoEstado estado={s.estado} />{s.estado_display}</span>
             </div>
             {s.descripcion && <p className="servicio-descripcion">{s.descripcion}</p>}
             <Seguimiento estado={s.estado} historial={s.historial} />

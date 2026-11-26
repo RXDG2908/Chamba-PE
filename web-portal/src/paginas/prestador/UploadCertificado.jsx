@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { leerCookie } from '../../nucleo/api.js'
 import './UploadCertificado.css'
+import { FileUp, Upload } from 'lucide-react'
 
 const MAX_FILE_SIZE = 5 * 1024 * 1024
 const ALLOWED_TYPES = ['application/pdf', 'image/jpeg']
@@ -76,7 +77,7 @@ export default function UploadCertificado() {
 
   return (
     <main className="container-certificacion">
-      <h2>Cargar certificado</h2>
+      <h2><span className="icono-titulo" aria-hidden="true"><FileUp size={22} /></span>Cargar certificado</h2>
       <p className="descripcion">Adjunta un documento PDF o JPG de hasta 5 MB. Se agrega a tu perfil de prestador.</p>
 
       <form onSubmit={enviarSolicitud} className="form-certificacion">
@@ -90,6 +91,7 @@ export default function UploadCertificado() {
         />
 
         <button type="submit" disabled={estadoCarga === 'cargando' || !archivo}>
+          <Upload className="icono" size={18} aria-hidden="true" />
           {estadoCarga === 'cargando' ? 'Enviando certificado…' : 'Enviar certificado'}
         </button>
       </form>

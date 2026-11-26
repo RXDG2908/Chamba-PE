@@ -3,6 +3,8 @@ import { useLocation } from 'react-router-dom'
 import SolicitudServicio from '../../componentes/SolicitudServicio.jsx'
 import MapaBusqueda from '../../componentes/mapa/MapaBusqueda.jsx'
 import { formatoDistancia, textoCalificacion, USA_GOOGLE_MAPS } from '../../nucleo/formatos.js'
+import { MapPin, Search } from 'lucide-react'
+import Cargando from '../../componentes/Cargando.jsx'
 
 // Validar el contrato antes de renderizar tarjetas y marcadores con los mismos datos.
 function prestadorValido(prestador) {
@@ -168,7 +170,7 @@ function ResultadosPrestadores() {
     <main className="contenedor resultados">
       <div className="introduccion">
         <p className="etiqueta">PRESTADORES DE SERVICIOS</p>
-        <h2>Encuentra una mano para tu hogar</h2>
+        <h2><span className="icono-titulo" aria-hidden="true"><Search size={22} /></span>Encuentra una mano para tu hogar</h2>
         <p>Elige un servicio y tu ubicación para encontrar prestadores disponibles.</p>
       </div>
 
@@ -183,7 +185,7 @@ function ResultadosPrestadores() {
             {rubros.map((opcion) => <option key={opcion.id} value={opcion.id}>{opcion.nombre}</option>)}
           </select>
         </label>
-        {estadoRubros === 'cargando' && <p role="status">Cargando rubros…</p>}
+        {estadoRubros === 'cargando' && <Cargando texto="Cargando rubros…" />}
         {estadoRubros === 'vacio' && <p role="status">No hay rubros disponibles para buscar.</p>}
         {estadoRubros === 'error' && (
           <div className="error-busqueda" role="alert">
@@ -211,13 +213,14 @@ function ResultadosPrestadores() {
               <span>Longitud</span>
               <input name="longitud" type="number" step="any" min="-180" max="180" value={coordenadas.longitud} onChange={editarCoordenada} aria-describedby="ayuda-ubicacion" />
             </label>
-            <button type="button" onClick={usarCoordenadas}>Usar coordenadas</button>
+            <button type="button" onClick={usarCoordenadas}><MapPin className="icono" size={18} aria-hidden="true" />Usar coordenadas</button>
           </div>
           <p className="ubicacion-elegida" role="status">
             {ubicacion ? `Ubicación elegida: ${ubicacion[0].toFixed(6)}, ${ubicacion[1].toFixed(6)}.` : 'Todavía no elegiste una ubicación.'}
           </p>
         </fieldset>
         <button className="boton-buscar" type="submit" disabled={estadoRubros !== 'listo'}>
+          <Search className="icono" size={18} aria-hidden="true" />
           {estado === 'cargando' ? 'Buscar de nuevo' : 'Buscar'}
         </button>
       </form>

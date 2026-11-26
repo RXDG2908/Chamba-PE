@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react'
 import './RevisionDocumentos.css'
 import { MOTIVOS_FACIALES } from '../../nucleo/textosFaciales.js'
+import { Check, CircleX, FileCheck2, IdCard, RefreshCw, RotateCcw, ScanFace, UserCheck, UserX, X } from 'lucide-react'
+import Cargando from '../../componentes/Cargando.jsx'
 
 const API = '/api/administracion/revisiones/'
 const RUTA_PANEL = '/administracion/revisiones'
@@ -125,6 +127,7 @@ function TarjetaRevision({ revision, onResuelta }) {
               />
               <div className="revision-botones">
                 <button type="submit" className="boton-rechazar" disabled={enviando || !comentario.trim()}>
+                  <CircleX className="icono" size={18} aria-hidden="true" />
                   {enviando ? 'Enviando…' : 'Confirmar rechazo'}
                 </button>
                 <button
@@ -144,9 +147,11 @@ function TarjetaRevision({ revision, onResuelta }) {
           ) : (
             <div className="revision-botones">
               <button type="button" className="boton-aprobar" disabled={enviando} onClick={() => decidir('aprobado')}>
+                <Check className="icono" size={18} aria-hidden="true" />
                 {enviando ? 'Enviando…' : 'Aprobar'}
               </button>
               <button type="button" className="boton-rechazar" disabled={enviando} onClick={() => setRechazando(true)}>
+                <X className="icono" size={18} aria-hidden="true" />
                 Rechazar
               </button>
             </div>
@@ -182,9 +187,9 @@ function RevisionDni() {
 
   return (
     <section className="revision-dni" aria-labelledby="titulo-dni">
-      <h2 id="titulo-dni">DNI en revisión manual</h2>
+      <h2 id="titulo-dni"><span className="icono-titulo" aria-hidden="true"><IdCard size={22} /></span>DNI en revisión manual</h2>
       <p>Intentos de verificación del DNI que el sistema no pudo aprobar solo. Revisa las fotos y los motivos.</p>
-      {estado === 'cargando' && <p className="revision-aviso" role="status">Cargando intentos…</p>}
+      {estado === 'cargando' && <Cargando className="revision-aviso" texto="Cargando intentos…" />}
       {estado === 'error' && <p className="revision-aviso revision-aviso-error" role="alert">No se pudieron cargar los intentos de DNI.</p>}
       {estado === 'listo' && intentos.length === 0 && <p className="revision-aviso">No hay DNI por revisar.</p>}
       {estado === 'listo' && intentos.length > 0 && (
@@ -274,8 +279,8 @@ function TarjetaFacial({ intento, onResuelto }) {
         {intento.motivos.map((motivo) => <li key={motivo}>{MOTIVOS_FACIALES[motivo] ?? motivo}</li>)}
       </ul>
       <div className="revision-acciones revision-botones">
-        <button type="button" className="boton-aprobar" disabled={enviando} onClick={() => decidir('aprobado')}>Es la misma persona</button>
-        <button type="button" className="boton-rechazar" disabled={enviando} onClick={() => decidir('rechazado')}>No es la misma persona</button>
+        <button type="button" className="boton-aprobar" disabled={enviando} onClick={() => decidir('aprobado')}><UserCheck className="icono" size={18} aria-hidden="true" />Es la misma persona</button>
+        <button type="button" className="boton-rechazar" disabled={enviando} onClick={() => decidir('rechazado')}><UserX className="icono" size={18} aria-hidden="true" />No es la misma persona</button>
       </div>
       {error && <p className="revision-error" role="alert">{error}</p>}
     </li>
@@ -305,9 +310,9 @@ function RevisionFacial() {
 
   return (
     <section className="revision-dni" aria-labelledby="titulo-facial">
-      <h2 id="titulo-facial">Rostro en revisión manual</h2>
+      <h2 id="titulo-facial"><span className="icono-titulo" aria-hidden="true"><ScanFace size={22} /></span>Rostro en revisión manual</h2>
       <p>Selfies cuya similitud con la foto del DNI quedó en duda. Compara las dos fotos y decide.</p>
-      {estado === 'cargando' && <p className="revision-aviso" role="status">Cargando comparaciones…</p>}
+      {estado === 'cargando' && <Cargando className="revision-aviso" texto="Cargando comparaciones…" />}
       {estado === 'error' && <p className="revision-aviso revision-aviso-error" role="alert">No se pudieron cargar las comparaciones faciales.</p>}
       {estado === 'listo' && intentos.length === 0 && <p className="revision-aviso">No hay rostros por revisar.</p>}
       {estado === 'listo' && intentos.length > 0 && (
@@ -364,15 +369,16 @@ export default function RevisionDocumentos() {
       <p className="etiqueta">ADMINISTRACIÓN</p>
       <div className="revision-titulo">
         <div>
-          <h2>Revisión de documentos</h2>
+          <h2><span className="icono-titulo" aria-hidden="true"><FileCheck2 size={22} /></span>Revisión de documentos</h2>
           <p>Aprueba o rechaza los certificados. Solo los prestadores con un documento aprobado quedan «Verificado» y aparecen en la búsqueda.</p>
         </div>
         <button type="button" className="boton-secundario" onClick={actualizar} disabled={estado === 'cargando'}>
+          <RefreshCw className={`icono${estado === 'cargando' ? ' girando' : ''}`} size={18} aria-hidden="true" />
           Actualizar
         </button>
       </div>
 
-      {estado === 'cargando' && <p className="revision-aviso" role="status">Cargando documentos…</p>}
+      {estado === 'cargando' && <Cargando className="revision-aviso" texto="Cargando documentos…" />}
 
       {estado === 'sin-permiso' && (
         <div className="revision-aviso revision-aviso-error" role="alert">
@@ -384,7 +390,7 @@ export default function RevisionDocumentos() {
       {estado === 'error' && (
         <div className="revision-aviso revision-aviso-error" role="alert">
           <p>No se pudieron cargar los documentos. Revisa que Django esté encendido.</p>
-          <button type="button" className="boton-secundario" onClick={actualizar}>Reintentar</button>
+          <button type="button" className="boton-secundario" onClick={actualizar}><RotateCcw className="icono" size={18} aria-hidden="true" />Reintentar</button>
         </div>
       )}
 

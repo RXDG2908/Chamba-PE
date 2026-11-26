@@ -3,6 +3,7 @@ import { AdvancedMarker, APIProvider, InfoWindow, Map, useAdvancedMarkerRef, use
 import { CLAVE_GOOGLE_MAPS, coincidentesCon, LIMA } from '../../nucleo/formatos.js'
 import FichaPrestadores from './FichaPrestadores.jsx'
 import VigilarCarga from './VigilarCarga.jsx'
+import { Focus } from 'lucide-react'
 
 // Mapa de Google Maps para la búsqueda: el cliente toca el mapa para fijar su ubicación y ve a
 // los prestadores numerados en el mismo orden que la lista. `DEMO_MAP_ID` habilita los marcadores
@@ -27,7 +28,7 @@ function Encuadre({ ubicacion, prestadores }) {
   useEffect(() => encuadrar(mapa, ubicacion, prestadores), [mapa, ubicacion, prestadores])
   return ubicacion && (
     <div className="volver-mapa">
-      <button type="button" onClick={() => encuadrar(mapa, ubicacion, prestadores)}>Ver ubicación y resultados</button>
+      <button type="button" onClick={() => encuadrar(mapa, ubicacion, prestadores)}><Focus className="icono" size={18} aria-hidden="true" />Ver ubicación y resultados</button>
     </div>
   )
 }

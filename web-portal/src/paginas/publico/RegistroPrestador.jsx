@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import MapaCobertura from '../../componentes/mapa/MapaCobertura.jsx'
 import './RegistroPrestador.css'
+import { PartyPopper, Store } from 'lucide-react'
 
 const VACIO = {
   nombres: '', apellidos: '', dni: '', telefono: '', username: '', email: '', password: '',
@@ -85,7 +86,7 @@ function RegistroPrestador() {
   if (estado === 'listo') {
     return (
       <section className="registro exito" role="status">
-        <h2>¡Registro enviado!</h2>
+        <h2><span className="icono-titulo" aria-hidden="true"><PartyPopper size={22} /></span>¡Registro enviado!</h2>
         <p>Tu perfil quedó <strong>Pendiente de verificación</strong>. Te avisaremos cuando sea revisado.</p>
         <p>Ya puedes <Link to="/ingresar">iniciar sesión</Link> con tu usuario y contraseña.</p>
         {prestadorId && (
@@ -108,7 +109,7 @@ function RegistroPrestador() {
 
   return (
     <form className="registro" onSubmit={enviar} noValidate>
-      <h2>Regístrate como prestador</h2>
+      <h2><span className="icono-titulo" aria-hidden="true"><Store size={22} /></span>Regístrate como prestador</h2>
       <p className="ayuda">Completa tus datos, elige tus rubros y marca en el mapa dónde atiendes.</p>
 
       {estado === 'fallo' && (
@@ -160,6 +161,7 @@ function RegistroPrestador() {
       </fieldset>
 
       <button type="submit" className="boton" disabled={estado === 'enviando'}>
+        <Store className="icono" size={18} aria-hidden="true" />
         {estado === 'enviando' ? 'Enviando…' : 'Registrarme'}
       </button>
     </form>

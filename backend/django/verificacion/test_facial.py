@@ -175,7 +175,7 @@ class IntentoFacialTests(TestCase):
         ruta = Path(intento.selfie.path)
         self.assertTrue(ruta.is_file())
         self.assertTrue(ruta.is_relative_to(self.raiz))
-        self.assertIn(f'facial/{self.prestador.pk}/', intento.selfie.name)
+        self.assertTrue(intento.selfie.name.startswith(f'facial/{self.prestador.pk}/'), intento.selfie.name)
 
     def test_con_dni_en_revision_no_queda_verificado(self):
         self.preparado(resultado=IntentoDni.Resultado.REVISION_MANUAL)

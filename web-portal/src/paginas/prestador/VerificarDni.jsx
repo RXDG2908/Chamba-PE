@@ -54,7 +54,12 @@ function Camara({ alCapturar }) {
       return undefined
     }
     navigator.mediaDevices
-      .getUserMedia({ video: { facingMode: { ideal: 'environment' } }, audio: false })
+      // Sin pedir resolución, Chrome en Android entrega 640×480: no alcanza para leer la MRZ
+      // ni para comparar el rostro del DNI en HU-20 (probado en un Galaxy A13 el 26/11).
+      .getUserMedia({
+        video: { facingMode: { ideal: 'environment' }, width: { ideal: 1920 }, height: { ideal: 1080 } },
+        audio: false,
+      })
       .then((medio) => {
         if (!activo) {
           medio.getTracks().forEach((t) => t.stop())

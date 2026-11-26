@@ -84,7 +84,11 @@ function SelfieEnVivo({ alCapturar }) {
         throw new Error('Este navegador no permite usar la cámara. Usa Chrome o Edge en tu celular.')
       }
       try {
-        flujo = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' }, audio: false })
+        // Más resolución que los 640×480 por defecto: el rostro de la selfie sale más nítido.
+        flujo = await navigator.mediaDevices.getUserMedia({
+          video: { facingMode: 'user', width: { ideal: 1280 }, height: { ideal: 720 } },
+          audio: false,
+        })
       } catch {
         throw new Error('Necesitamos permiso para usar la cámara frontal. Actívalo en tu navegador y vuelve a intentar.')
       }

@@ -138,7 +138,8 @@ def persistir(prestador, generacion, intento, selfie):
         raise CapturaInvalidada
     if prestador.intentos_faciales.filter(creado__date=timezone.localdate()).count() >= INTENTOS_POR_DIA:
         raise CapturaInvalidada
-    carpeta = f'facial/{prestador.pk}/{uuid.uuid4().hex}/'
+    # El campo ya agrega «facial/» (upload_to); repetirlo dejaba las selfies en facial/facial/.
+    carpeta = f'{prestador.pk}/{uuid.uuid4().hex}/'
     intento.selfie.save(carpeta + f'selfie.{extension_de(selfie)}', ContentFile(selfie), save=False)
     try:
         intento.save()

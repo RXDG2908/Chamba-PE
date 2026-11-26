@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom'
 import useConsultas from '../../nucleo/useConsultas.js'
 import '../../estilos/Paneles.css'
+import { FileCheck2, IdCard, ScanFace, UserX } from 'lucide-react'
 
 function cantidad(consulta) {
   if (consulta.estado === 'cargando') return '—'
@@ -18,10 +19,10 @@ export default function PanelAdmin({ usuario }) {
   })
   const cargando = Object.values(c).some((x) => x.estado === 'cargando')
   const tarjetas = [
-    ['/administracion/revisiones', c.documentos, 'Certificados por revisar', 'Aprueba o rechaza con motivo'],
-    ['/administracion/revisiones', c.dni, 'DNI en revisión manual', 'El sistema no pudo validarlos solo'],
-    ['/administracion/revisiones', c.rostros, 'Rostros en duda', 'Compara la selfie con la foto del DNI'],
-    ['/administracion/cuentas', c.suspendidas, 'Cuentas suspendidas', `${cantidad(c.bloqueadas)} bloqueadas`],
+    ['/administracion/revisiones', c.documentos, 'Certificados por revisar', 'Aprueba o rechaza con motivo', FileCheck2],
+    ['/administracion/revisiones', c.dni, 'DNI en revisión manual', 'El sistema no pudo validarlos solo', IdCard],
+    ['/administracion/revisiones', c.rostros, 'Rostros en duda', 'Compara la selfie con la foto del DNI', ScanFace],
+    ['/administracion/cuentas', c.suspendidas, 'Cuentas suspendidas', `${cantidad(c.bloqueadas)} bloqueadas`, UserX],
   ]
   return (
     <main className="panel contenedor" aria-busy={cargando}>
@@ -31,8 +32,9 @@ export default function PanelAdmin({ usuario }) {
         <p>Esto es lo que espera tu decisión. Los prestadores solo aparecen en la búsqueda cuando los apruebas.</p>
       </header>
       <section className="panel-tarjetas" aria-label="Pendientes">
-        {tarjetas.map(([ruta, consulta, titulo, detalle]) => (
+        {tarjetas.map(([ruta, consulta, titulo, detalle, Icono]) => (
           <Link key={titulo} to={ruta} className="panel-tarjeta">
+            <span className="panel-tarjeta-icono" aria-hidden="true"><Icono size={20} /></span>
             <span className="panel-dato">{cantidad(consulta)}</span>
             <span className="panel-titulo">{titulo}</span>
             <span className="panel-detalle">{detalle}</span>

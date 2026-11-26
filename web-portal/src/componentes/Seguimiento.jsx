@@ -1,6 +1,9 @@
 import './Seguimiento.css'
+import { Car, Check, CircleCheckBig, Handshake, Wrench } from 'lucide-react'
 
 import { ETAPAS } from '../nucleo/etapasSeguimiento.js'
+
+const ICONO_ETAPA = { aceptada: Handshake, en_camino: Car, en_servicio: Wrench, finalizada: CircleCheckBig }
 
 const formatoHora = new Intl.DateTimeFormat('es-PE', { hour: '2-digit', minute: '2-digit' })
 
@@ -18,7 +21,12 @@ export default function Seguimiento({ estado, historial = [] }) {
         const fecha = fechas[etapa.estado] ? new Date(fechas[etapa.estado]) : null
         return (
           <li key={etapa.estado} className={`seg-etapa ${clase}`} aria-current={i === actual ? 'step' : undefined}>
-            <span className="seg-punto" aria-hidden="true">{i < actual || (i === actual && estado === 'finalizada') ? '✓' : i + 1}</span>
+            <span className="seg-punto" aria-hidden="true">
+              {(() => {
+                const Icono = i < actual || (i === actual && estado === 'finalizada') ? Check : ICONO_ETAPA[etapa.estado]
+                return <Icono size={15} strokeWidth={2.6} />
+              })()}
+            </span>
             <span className="seg-nombre">{etapa.nombre}</span>
             {fecha && !Number.isNaN(fecha.getTime()) && i <= actual && <span className="seg-hora">{formatoHora.format(fecha)}</span>}
           </li>

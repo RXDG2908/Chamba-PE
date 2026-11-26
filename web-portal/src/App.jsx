@@ -5,6 +5,8 @@ import './estilos/Cuenta.css'
 import { enviarJson, NOMBRE_ROL } from './nucleo/api.js'
 import { escuchar, desactivarNotificaciones } from './nucleo/notificaciones.js'
 import { INICIO_POR_ROL, MENU_POR_ROL } from './nucleo/roles.js'
+import { ICONO_RUTA } from './nucleo/iconos.js'
+import { LogIn, LogOut, UserPlus, Wrench } from 'lucide-react'
 import RutaPrivada from './componentes/RutaPrivada.jsx'
 import SubmenuVerificacion from './componentes/SubmenuVerificacion.jsx'
 // Público
@@ -55,10 +57,12 @@ function Menu({ rol }) {
     <nav className="menu" aria-label="Menú principal">
       {(MENU_POR_ROL[rol] ?? []).map(([ruta, texto, tambien]) => {
         const dentro = Boolean(tambien?.includes(pathname))
+        const Icono = ICONO_RUTA[ruta]
         return (
           <NavLink key={ruta} to={ruta} end
             className={({ isActive }) => (isActive || dentro ? 'active' : undefined)}
             aria-current={dentro ? 'page' : undefined}>
+            {Icono && <Icono className="icono" aria-hidden="true" />}
             {texto}
           </NavLink>
         )
@@ -69,6 +73,7 @@ function Menu({ rol }) {
 
 function App() {
   const navegar = useNavigate()
+  const { pathname } = useLocation()
   // undefined mientras se consulta, null sin sesión, objeto con la sesión iniciada.
   const [usuario, setUsuario] = useState(undefined)
   const [cerrando, setCerrando] = useState(false)
@@ -109,7 +114,7 @@ function App() {
       <header className="cabecera">
         <div className="contenedor cabecera-fila">
           <Link to={INICIO_POR_ROL[rol] ?? '/'} className="marca" aria-label="ChambaPE, ir a mi inicio">
-            <span className="marca-icono" aria-hidden="true">C</span>
+            <span className="marca-icono" aria-hidden="true"><Wrench size={20} strokeWidth={2.4} /></span>
             <span className="marca-texto">Chamba<span>PE</span></span>
           </Link>
           {rol && <Menu rol={rol} />}
@@ -124,14 +129,15 @@ function App() {
                   </span>
                 </span>
                 <button type="button" onClick={cerrarSesion} disabled={cerrando}>
+                  <LogOut className="icono" size={16} aria-hidden="true" />
                   {cerrando ? 'Cerrando…' : 'Cerrar sesión'}
                 </button>
               </>
             )}
             {usuario === null && (
               <>
-                <NavLink to="/ingresar" className="enlace-sesion">Iniciar sesión</NavLink>
-                <NavLink to="/crear-cuenta" className="boton-cabecera">Crear cuenta</NavLink>
+                <NavLink to="/ingresar" className="enlace-sesion"><LogIn className="icono" size={16} aria-hidden="true" />Iniciar sesión</NavLink>
+                <NavLink to="/crear-cuenta" className="boton-cabecera"><UserPlus className="icono" size={16} aria-hidden="true" />Crear cuenta</NavLink>
               </>
             )}
           </div>
@@ -140,6 +146,8 @@ function App() {
       {usuario?.rol === 'prestador' && <SubmenuVerificacion />}
 
       <div id="contenido" className="contenido" tabIndex={-1}>
+      {/* La clave por ruta reinicia la animación de entrada en cada cambio de página. */}
+      <div key={pathname} className="pagina">
       <Routes>
         {/* Público */}
         <Route path="/" element={<Inicio usuario={usuario} />} />
@@ -166,6 +174,7 @@ function App() {
 
         <Route path="*" element={<NoEncontrada usuario={usuario} />} />
       </Routes>
+      </div>
       </div>
 
       <footer className="pie">

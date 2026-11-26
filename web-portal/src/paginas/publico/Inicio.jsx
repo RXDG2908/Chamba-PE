@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import './Inicio.css'
+import { ArrowRight, MapPinned, Search, Send, ShieldCheck, Store, ToggleRight, UserRound, Upload } from 'lucide-react'
+import { iconoRubro } from '../../nucleo/iconos.js'
 
 // Botones de la portada según quién entra; coinciden con el menú de App.jsx.
 const ACCIONES_POR_ROL = {
@@ -15,6 +17,8 @@ const PASOS = [
   ['Compara prestadores cercanos', 'Solo ves a quienes están disponibles, cubren tu zona y fueron verificados.'],
   ['Envía tu solicitud', 'El prestador la recibe en su bandeja y te responde si acepta el trabajo.'],
 ]
+const ICONOS_PASOS = [Search, MapPinned, Send]
+const ICONOS_PASOS_PRESTADOR = [UserRound, Upload, ToggleRight]
 
 const PASOS_PRESTADOR = [
   ['Regístrate', 'Tus datos, tus rubros y la zona donde trabajas.'],
@@ -41,7 +45,7 @@ function Inicio({ usuario }) {
       <section className="portada">
         <div className="contenedor portada-rejilla">
           <div className="portada-texto">
-            <p className="insignia">✓ Prestadores verificados por administración</p>
+            <p className="insignia"><ShieldCheck className="icono" size={16} aria-hidden="true" />Prestadores verificados por administración</p>
             <h1>
               {usuario ? <>Hola, {usuario.nombres || usuario.username}.<br /></> : null}
               Encuentra quién te ayude, <span>cerca de ti</span>.
@@ -53,7 +57,10 @@ function Inicio({ usuario }) {
             {acciones.length > 0 && (
               <div className="portada-acciones">
                 {acciones.map(([ruta, texto], indice) => (
-                  <Link key={ruta} to={ruta} className={indice === 0 ? 'boton-principal' : 'boton-contorno'}>{texto}</Link>
+                  <Link key={ruta} to={ruta} className={indice === 0 ? 'boton-principal' : 'boton-contorno'}>
+                    {texto}
+                    {indice === 0 && <ArrowRight className="icono icono-flecha" size={18} aria-hidden="true" />}
+                  </Link>
                 ))}
               </div>
             )}
@@ -84,13 +91,17 @@ function Inicio({ usuario }) {
         <p className="etiqueta">CÓMO FUNCIONA</p>
         <h3 className="seccion-titulo">Tu servicio en tres pasos</h3>
         <ol className="pasos">
-          {PASOS.map(([titulo, texto], indice) => (
+          {PASOS.map(([titulo, texto], indice) => {
+            const Icono = ICONOS_PASOS[indice]
+            return (
             <li key={titulo} className="paso">
-              <span className="paso-numero">{indice + 1}</span>
+              <span className="paso-icono" aria-hidden="true"><Icono size={22} /></span>
+              <span className="visualmente-oculto">Paso {indice + 1}: </span>
               <h4>{titulo}</h4>
               <p>{texto}</p>
             </li>
-          ))}
+            )
+          })}
         </ol>
       </section>
 
@@ -100,7 +111,12 @@ function Inicio({ usuario }) {
           <h3 className="seccion-titulo">¿Qué necesitas hoy?</h3>
           <ul className="rubros-inicio">
             {rubros.map((rubro) => (
-              <li key={rubro.id}><Link to="/resultados" state={{ rubro: rubro.id }}>{rubro.nombre}</Link></li>
+              <li key={rubro.id}>
+                <Link to="/resultados" state={{ rubro: rubro.id }}>
+                  {(() => { const Icono = iconoRubro(rubro.nombre); return <Icono className="icono" size={18} aria-hidden="true" /> })()}
+                  {rubro.nombre}
+                </Link>
+              </li>
             ))}
           </ul>
         </section>
@@ -113,12 +129,15 @@ function Inicio({ usuario }) {
               <p className="etiqueta">PARA PRESTADORES</p>
               <h3 className="seccion-titulo">¿Ofreces un servicio? Consigue clientes en tu zona</h3>
               <ol className="pasos-prestador">
-                {PASOS_PRESTADOR.map(([titulo, texto]) => (
-                  <li key={titulo}><strong>{titulo}.</strong> {texto}</li>
-                ))}
+                {PASOS_PRESTADOR.map(([titulo, texto], indice) => {
+                  const Icono = ICONOS_PASOS_PRESTADOR[indice]
+                  return <li key={titulo}><Icono className="icono" size={16} aria-hidden="true" /> <strong>{titulo}.</strong> {texto}</li>
+                })}
               </ol>
             </div>
-            <Link to="/registro-prestador" className="boton-principal">Registrarme como prestador</Link>
+            <Link to="/registro-prestador" className="boton-principal">
+              <Store className="icono" size={18} aria-hidden="true" />Registrarme como prestador
+            </Link>
           </div>
         </section>
       )}

@@ -178,6 +178,13 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 RAIZ_PRIVADA = os.path.join(BASE_DIR, 'privado')
 # Fuente de los nombres del DNI: 'simulado' (por defecto) o 'eldni'.
 VALIDADOR_DNI = os.environ.get('VALIDADOR_DNI', 'simulado')
+# HU-20: modelos ONNX de OpenCV (no se versionan; `manage.py descargar_modelos_faciales`).
+MODELOS_FACIALES = os.environ.get('MODELOS_FACIALES', os.path.join(BASE_DIR, 'modelos_faciales'))
+# Similitud coseno de SFace. Su autor sugiere 0.363 como «misma persona» en LFW; la foto del DNI es
+# pequeña e impresa, así que entre los dos umbrales va a revisión manual. Se calibran en T20.4
+# con `manage.py calibrar_umbral_facial`.
+UMBRAL_FACIAL_VERIFICADO = float(os.environ.get('UMBRAL_FACIAL_VERIFICADO', '0.45'))
+UMBRAL_FACIAL_RECHAZO = float(os.environ.get('UMBRAL_FACIAL_RECHAZO', '0.25'))
 
 # Límite máximo de carga de archivos (5 MB = 5242880 bytes)
 DATA_UPLOAD_MAX_MEMORY_SIZE = 5242880

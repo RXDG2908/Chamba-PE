@@ -331,10 +331,10 @@ Decisión del Product Owner del 28/10: HU-8 pasa completa porque T8.1 no se empe
 | | T19.2 | OCR del DNI: extraer número y nombres y recortar la foto | Backend | 4 | |
 | | T19.3 | Consulta a eldni.com con validador intercambiable y paso a revisión manual si falla | Backend | 2 | |
 | | T19.4 | Pruebas con DNIs de muestra (lectura y coincidencia de nombres) | Pruebas | 2 | |
-| HU-20 · Reconocimiento facial | T20.1 | Selfie en vivo con detección de parpadeo (MediaPipe) | Frontend | 3 | |
-| | T20.2 | Servicio de comparación facial DNI vs selfie (DeepFace) | Backend | 4 | |
-| | T20.3 | Reglas de decisión (verificado / revisión / rechazado) e integración con el panel de HU-9 | Backend | 2 | |
-| | T20.4 | Calibrar el umbral de similitud con fotos del equipo | Pruebas | 2 | |
+| HU-20 · Reconocimiento facial | T20.1 | Selfie en vivo con detección de parpadeo (MediaPipe) | Frontend | 3 | David · 👀 En revisión (25/11): `/verificar-rostro` |
+| | T20.2 | Servicio de comparación facial DNI vs selfie (DeepFace) | Backend | 4 | David · 👀 En revisión (25/11): OpenCV SFace en lugar de DeepFace (decisión del PO) |
+| | T20.3 | Reglas de decisión (verificado / revisión / rechazado) e integración con el panel de HU-9 | Backend | 2 | David · 👀 En revisión (25/11): `feature/hu20-reconocimiento-facial` |
+| | T20.4 | Calibrar el umbral de similitud con fotos del equipo | Pruebas | 2 | David · 🟡 Comando listo (25/11); faltan las fotos del equipo |
 | HU-21 · Consentimiento biométrico | T21.1 | Pantalla de consentimiento y registro de la aceptación | Frontend | 1 | |
 | | T21.2 | Endpoint para solicitar la eliminación de los datos biométricos | Backend | 1 | |
 | HU-13 · Suspensión y bloqueo | T13.1 | API en Django para suspender y bloquear cuentas | Backend | 2 | |

@@ -7,6 +7,8 @@ __pycache__/
 db.sqlite3
 media/
 privado/
+# HU-20: modelos ONNX de OpenCV (se descargan con manage.py descargar_modelos_faciales)
+modelos_faciales/
 
 # Node / Frontend
 node_modules/

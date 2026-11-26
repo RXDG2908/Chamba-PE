@@ -1,0 +1,12 @@
+.verificar-rostro .visor-selfie { aspect-ratio: 3 / 4; max-width: 360px; margin: 0 auto; }
+/* Espejo: el prestador se ve como en un espejo; la foto enviada no se invierte. */
+.verificar-rostro .visor-selfie video { transform: scaleX(-1); }
+.marco-rostro { position: absolute; inset: 10% 16%; border: 3px dashed #fff; border-radius: 50%; box-shadow: 0 0 0 999px #0006; pointer-events: none; }
+.paso-vida { margin: 0; padding: 10px 14px; border-radius: 10px; background: #e6f2ec; color: #16734f; font-weight: 700; text-align: center; }
+.resultado h3.rechazo { color: #a3322a; }
+.similitud { font-size: 1.1rem; }
+.texto-consentimiento { white-space: pre-line; padding: 12px; border: 1px solid #cbded3; border-radius: 10px; background: #f7faf8; text-align: left; }
+.casilla { display: flex; gap: 8px; align-items: flex-start; margin: 12px 0; text-align: left; }
+.datos-faciales { margin-top: 24px; padding-top: 12px; border-top: 1px solid #cbded3; }
+.datos-faciales .acciones { display: flex; flex-wrap: wrap; gap: 8px; }
+.datos-faciales button { padding: 6px 14px; border: 1px solid #cbded3; border-radius: 999px; background: #fff; color: #20352a; font: inherit; cursor: pointer; }

@@ -167,3 +167,56 @@ class ArchivoEliminacionDni(models.Model):
 
     class Meta:
         constraints = [models.UniqueConstraint(fields=['solicitud', 'nombre_privado'], name='inventario_archivo_unico')]
+
+
+class IntentoFacial(models.Model):
+    """HU-20: selfie en vivo comparada con la foto del titular recortada del DNI (HU-19).
+
+    La decisión automática solo se registra: no cambia `Prestador.estado`. En la zona gris
+    (revisión manual) el administrador ve las dos fotos lado a lado y decide.
+    """
+
+    class Decision(models.TextChoices):
+        VERIFICADO = 'verificado', 'Verificado'
+        REVISION_MANUAL = 'revision_manual', 'En revisión manual'
+        RECHAZADO = 'rechazado', 'Rechazado'
+
+    class Revision(models.TextChoices):
+        APROBADO = 'aprobado', 'Aprobado por el administrador'
+        RECHAZADO = 'rechazado', 'Rechazado por el administrador'
+
+    prestador = models.ForeignKey(Prestador, on_delete=models.CASCADE, related_name='intentos_faciales')
+    # La foto del DNI con la que se comparó; si HU-21 la borra, el intento queda sin ella.
+    intento_dni = models.ForeignKey(IntentoDni, on_delete=models.SET_NULL, null=True, related_name='intentos_faciales')
+    selfie = models.FileField(upload_to='facial/', storage=AlmacenPrivado(), blank=True)
+    parpadeo = models.BooleanField(default=False)
+    # Similitud coseno de SFace (-1 a 1); null si no se pudo comparar (sin rostro, sin modelo).
+    similitud = models.FloatField(null=True, blank=True)
+    decision = models.CharField(max_length=20, choices=Decision.choices)
+    motivos = models.JSONField(default=list, blank=True)
+    comparador = models.CharField(max_length=40, blank=True)
+    revision = models.CharField(max_length=10, choices=Revision.choices, blank=True)
+    revisado_por = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True,
+                                     related_name='revisiones_faciales')
+    revisado_en = models.DateTimeField(null=True, blank=True)
+    creado = models.DateTimeField(default=timezone.now, editable=False)
+
+    class Meta:
+        ordering = ['-creado', '-id']
+        constraints = [
+            models.CheckConstraint(condition=models.Q(decision__in=['verificado', 'revision_manual', 'rechazado']),
+                                   name='facial_decision_valida'),
+            models.CheckConstraint(condition=(models.Q(revision='', revisado_en__isnull=True)
+                                               | (~models.Q(revision='') & models.Q(revisado_en__isnull=False))),
+                                   name='facial_revision_con_fecha'),
+        ]
+
+    def __str__(self):
+        return f'Intento facial de {self.prestador} - {self.decision}'
+
+    @property
+    def porcentaje(self):
+        """Similitud en 0-100 para mostrar; la coseno negativa cuenta como 0."""
+        if self.similitud is None:
+            return None
+        return round(max(0.0, min(1.0, self.similitud)) * 100, 1)

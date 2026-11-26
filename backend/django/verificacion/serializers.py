@@ -24,7 +24,7 @@ class AceptacionConsentimientoSerializer(serializers.Serializer):
         return value
 
     def validate_version_texto(self, value):
-        if value != VERSION_DNI:
+        if value != self.context.get('version', VERSION_DNI):
             raise serializers.ValidationError(
                 'El texto cambió. Consulta la versión vigente antes de aceptar.'
             )

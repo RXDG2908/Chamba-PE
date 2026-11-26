@@ -58,3 +58,10 @@
 
 .revision-dni { margin-top: 2.5rem; }
 .revision-motivos { margin: 0.75rem 0; padding-left: 1.25rem; }
+
+/* HU-20: foto del DNI y selfie lado a lado (una debajo de otra en el celular). */
+.comparacion-facial { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.comparacion-facial figure { margin: 0; text-align: center; }
+.comparacion-facial img { width: 100%; max-height: 320px; object-fit: contain; border: 1px solid #e0e7e4; border-radius: 10px; background: #f4f7f5; }
+.comparacion-facial figcaption { margin-top: 6px; color: #58675f; font-size: 14px; font-weight: 600; }
+@media (max-width: 420px) { .comparacion-facial { grid-template-columns: 1fr; } }

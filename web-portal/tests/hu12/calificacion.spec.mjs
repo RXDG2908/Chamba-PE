@@ -108,14 +108,15 @@ test('si la lista falla se avisa sin mostrar datos', async ({ page }) => {
   await expect(page.getByRole('alert')).toHaveText('No pudimos cargar tus servicios. Recarga la página.')
 })
 
-test('solo el cliente entra: visitante va a iniciar sesión y prestador vuelve al inicio', async ({ page }) => {
+test('solo el cliente entra: visitante va a iniciar sesión y prestador ve «sin acceso»', async ({ page }) => {
   await preparar(page, { usuario: null })
   await page.goto('/mis-servicios')
   await expect(page).toHaveURL(/\/ingresar$/)
   await page.context().unroute('**/api/**')
   await preparar(page, { usuario: { id: 2, username: 'ana', rol: 'prestador' } })
   await page.goto('/mis-servicios')
-  await expect(page).toHaveURL(/\/$/)
+  await expect(page).toHaveURL(/\/sin-acceso$/)
+  await expect(page.getByRole('heading', { name: 'Esta pantalla no es para tu cuenta' })).toBeVisible()
 })
 
 test('el menú del cliente incluye Mis servicios', async ({ page }) => {

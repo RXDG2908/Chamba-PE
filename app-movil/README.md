@@ -3,36 +3,46 @@
 App Android de Chamba PE para clientes y prestadores. Kotlin, Jetpack Compose y Material 3,
 con un único módulo `app` y arquitectura MVVM.
 
-> **Estado:** primera versión. Compila, pasa las pruebas unitarias y los flujos del **cliente** y
-> del **prestador** se probaron en un emulador (API 36) contra Django local y el proyecto Firebase
-> real. **No se probó** en un teléfono físico ni la lectura real de la ubicación (el emulador no la
-> entregó). El enfoque (API Django + Firebase, en lugar del backend Spring del
-> [plan Android](../docs/PLAN_DESARROLLO_ANDROID.md)) está **pendiente de acuerdo con el equipo**.
+> **Estado (26/11/2026):**
+> - Compila y pasa 30 pruebas unitarias.
+> - Los registros de cliente y de prestador se recorrieron paso a paso en un emulador (API 36) contra Django local, incluidos los errores de cada paso, el mapa, la revisión y el botón Atrás.
+> - Las solicitudes ya van a la API de Django, las mismas que ve la web.
+>
+> **Falta:**
+> - Probar el alta y el ingreso con el `google-services.json` real del proyecto (con uno de prueba, Firebase responde «Ocurrió un error»).
+> - Probar en un teléfono físico.
+
+<p align="center">
+  <img src="../docs/capturas/movil-ingreso.png" alt="Ingreso" width="180">
+  <img src="../docs/capturas/movil-registro-servicios.png" alt="Registro: servicios" width="180">
+  <img src="../docs/capturas/movil-registro-zona.png" alt="Registro: zona con Google Maps" width="180">
+  <img src="../docs/capturas/movil-registro-revision.png" alt="Registro: revisión" width="180">
+</p>
 
 ## Qué hace
 
 | Función | Cómo | Tema del curso de Móviles |
 |---|---|---|
-| Ingreso y registro de clientes | Firebase Authentication (correo y contraseña) | Semana 11 |
-| Registro de prestador: datos, rubros y zona de cobertura en el mapa (centro y radio) | Firebase Auth + `POST /api/prestadores/registro-movil/` con el token; si Django lo rechaza, la cuenta se deshace | Semanas 9 y 11 |
+| Ingreso y registro de clientes en 3 pasos (nombre, correo, contraseña) | Firebase Authentication (correo y contraseña) | Semana 11 |
+| Registro de prestador en 5 pasos: cuenta, datos, servicios, zona en el mapa (centro y radio) y revisión con «editar» | Firebase Auth + `POST /api/prestadores/registro-movil/` con el token; si Django lo rechaza, la cuenta se deshace y la app vuelve al paso del error | Semanas 9 y 11 |
 | Roles cliente / prestador | Perfil en Firestore `usuarios/{uid}`; el rol decide las pestañas | Semana 11 |
 | Rubros y búsqueda de prestadores | Retrofit contra la API Django (`/api/prestadores/rubros/` y `/buscar/`) | Semanas 9 y 10 |
 | Datos guardados y modo sin conexión | Room: última búsqueda por rubro y rubros | Semana 8 |
 | Favoritos | Room; se conservan al cerrar la app y al volver a buscar | Semana 8 |
-| Mapa interactivo: tocar para elegir la ubicación, marcadores numerados de prestadores con su ficha y «Ver todo» | OpenStreetMap con osmdroid (sin clave de API), equivalente al Leaflet de la web | Semanas 11 y 12 |
+| Mapa interactivo: tocar para elegir la ubicación, marcadores numerados con ficha y calificación, círculo de cobertura | Google Maps con `maps-compose` (como el lab CampusGPS); clave en `local.properties` | Semanas 11 y 12 |
 | «Usar mi ubicación» | Permiso de ubicación aproximada + Fused Location | Semana 11 |
-| Enviar solicitud y ver su estado en vivo | Firestore `solicitudes/{id}` | Semana 11 |
-| Bandeja del prestador: aceptar / rechazar | Firestore, filtrado por `prestadorId` | Semana 11 |
+| Enviar solicitud, seguir sus etapas (HU-11) y calificar (HU-12) | API Django `servicios` y `calificaciones` con el token; consulta cada 5 s, como la web | Semanas 9 y 11 |
+| Bandeja del prestador: aceptar, rechazar, avanzar y llamar al cliente | API Django (la misma bandeja que la web) | Semanas 9 y 11 |
 | Mi disponibilidad (Activo / Inactivo) del prestador | Retrofit a `/api/usuarios/disponibilidad/` con el token de Firebase; la búsqueda la refleja al instante | Semanas 9 y 11 |
 | Aviso «Solicitud enviada» | Notificación local con canal y permiso `POST_NOTIFICATIONS` | Semana 12 |
 | Navegación y pestañas por rol | Navigation Compose + `NavigationBar` | Semanas 5 y 6 |
 
-**No incluye todavía:** notificaciones push con FCM (necesitan un emisor en el backend),
-certificados ni verificación de DNI.
+**No incluye todavía:** notificaciones push con FCM, certificados ni verificación de DNI desde la app.
 
-El mapa usa las teselas públicas de OpenStreetMap, pensadas para uso moderado: la app se
-identifica con su nombre de paquete y guarda las teselas en caché. Para un uso masivo habría
-que contratar o montar un servidor de teselas.
+**Diseño:**
+- Tema Material 3 claro y oscuro con los colores de la web (`ui/Tema.kt`) e iconos Material.
+- Asistente por pasos reutilizable (`ui/Asistente.kt`): progreso animado, transición de eje X y Back del sistema paso a paso.
+- Microanimaciones breves con curvas de Material: presión de botones, favorito que late, línea de tiempo del servicio y listas con `animateItem`.
 
 ## Estructura
 
@@ -61,6 +71,8 @@ Los ViewModel dependen de las interfaces, no de Retrofit ni de Firebase; por eso
   (no versionado) debe apuntar a él: `sdk.dir=C\:/Users/<usuario>/AppData/Local/Android/Sdk`.
 - `app/google-services.json` del proyecto Firebase `chamba-pe-tecsup` (no versionado). Se descarga
   desde la consola de Firebase: Configuración del proyecto → app Android `pe.tecsup.chambape`.
+- Clave de Google Maps en `local.properties` (no versionado): `MAPS_API_KEY=...`, con «Maps SDK for Android»
+  habilitado. Sin clave, el mapa aparece en gris.
 - No hace falta instalar Gradle: se usa el wrapper (`gradlew`).
 
 ## Comandos
@@ -89,7 +101,7 @@ cifrar hacia `127.0.0.1`, `localhost` y `10.0.2.2`.
 
 ## Rutas privadas de Django (token de Firebase)
 
-Para las funciones que viven en Django (hoy, la disponibilidad) la app envía
+Para las funciones que viven en Django (disponibilidad, solicitudes, seguimiento y calificación) la app envía
 `Authorization: Bearer <token de Firebase>`. Para que Django lo acepte:
 
 1. Arrancar Django con `FIREBASE_AUTH_PROJECT_ID=chamba-pe-tecsup`.
@@ -99,9 +111,10 @@ Para las funciones que viven en Django (hoy, la disponibilidad) la app envía
 Sin ese vínculo la pantalla muestra «Tu cuenta de la app aún no está vinculada».
 Detalle en [`docs/API_AUTENTICACION.md`](../docs/API_AUTENTICACION.md).
 
-Un prestador que se registra **desde la app** ya queda vinculado en Django. Sigue haciendo falta
-un vínculo manual: `prestadorId` en Firestore, para su bandeja. Un prestador creado **en la web**
-necesita los dos (ese y «UID de Firebase» en Django).
+Un prestador que se registra **desde la app** ya queda vinculado en Django. Un **cliente** de la app
+se vincula solo: la primera vez que pide un servicio, la app llama a `POST /api/usuarios/registro-movil/`,
+que crea su cuenta de cliente en Django (sin duplicarla). Un prestador creado **en la web** necesita
+«UID de Firebase» en su perfil de Django y `prestadorId` en Firestore.
 
 ## Firebase
 
@@ -120,8 +133,8 @@ necesita los dos (ese y «UID de Firebase» en Django).
 | `usuarios/{uid}` | `nombre`, `correo`, `rol`, `prestadorId?`, `creadoEn` | Solo su dueño; el rol y `prestadorId` no se cambian desde la app |
 | `solicitudes/{id}` | `prestadorId`, `prestadorNombre`, `clienteUid`, `clienteNombre`, `descripcion`, `direccion`, `estado`, `creadaEn`, `respondidaEn?` | El cliente que la creó y el prestador destinatario; solo este cambia el estado |
 
-Las solicitudes de la app viven en Firestore: **no** son las mismas que las de la web (Django).
-Unificarlas es una decisión pendiente del equipo.
+Desde el 26/11 las solicitudes de la app **ya no** se guardan en Firestore: van a la API de Django y
+son las mismas que ve la web (AND-23). La colección `solicitudes` queda solo por compatibilidad.
 
 ## Versiones
 
@@ -134,7 +147,7 @@ las tareas `AND-*` y sus cambios se coordinan con el equipo.
 | Plugin de Compose / KSP | 2.4.21 / 2.3.14 |
 | Compose BOM / Firebase BOM | 2026.09.00 / 35.2.0 |
 | Room / Retrofit / Navigation | 2.8.5 / 3.0.0 / 2.10.2 |
-| osmdroid | 6.1.20 |
+| maps-compose / íconos Material | 8.4.0 / 1.7.8 (extendidos) |
 | `compileSdk` / `targetSdk` / `minSdk` | 37 / 37 / 26 |
 | Paquete | `pe.tecsup.chambape` |
 

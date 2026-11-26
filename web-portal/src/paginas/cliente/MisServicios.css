@@ -1,0 +1,43 @@
+.mis-servicios .vacio { padding: 16px; background: var(--fondo, #f5f8f6); border-radius: 12px; }
+.lista-servicios { list-style: none; margin: 20px 0 0; padding: 0; display: grid; gap: 14px; }
+.servicio { padding: 18px; border: 1px solid var(--borde, #dfe7e2); border-radius: 14px; background: #fff; }
+.servicio-cabecera { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; flex-wrap: wrap; }
+.servicio h3 { margin: 0; font-size: 18px; }
+.servicio-detalle, .servicio-descripcion, .nota-calificar { margin: 4px 0 0; color: var(--texto-suave, #5a6b62); font-size: 14px; }
+.servicio-descripcion { margin-top: 10px; color: var(--texto, #1c2b23); }
+.nota-calificar { margin-top: 12px; font-style: italic; }
+
+.etiqueta-estado { padding: 4px 12px; border-radius: 999px; font-size: 13px; font-weight: 700; background: var(--fondo, #f5f8f6); color: var(--texto-suave, #5a6b62); }
+.estado-aceptada { background: var(--verde-claro, #eaf4ee); color: var(--verde, #16734f); }
+.estado-rechazada { background: #fdecea; color: #b3261e; }
+.estado-finalizada { background: var(--verde, #16734f); color: #fff; }
+
+.formulario-calificacion { margin-top: 14px; padding-top: 14px; border-top: 1px dashed var(--borde, #dfe7e2); }
+.selector-estrellas { border: 0; padding: 0; margin: 0; display: flex; gap: 4px; flex-wrap: wrap; }
+.selector-estrellas legend { width: 100%; margin-bottom: 6px; font-weight: 700; color: var(--verde, #16734f); }
+.selector-estrellas label { position: relative; cursor: pointer; font-size: 32px; line-height: 1; color: #c9d3ce; }
+.selector-estrellas label.llena { color: var(--acento, #f29f3d); }
+.selector-estrellas input { position: absolute; opacity: 0; width: 100%; height: 100%; margin: 0; cursor: pointer; }
+.selector-estrellas label:has(input:focus-visible) { outline: 2px solid var(--verde, #16734f); outline-offset: 2px; border-radius: 6px; }
+.solo-lector { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+.campo-comentario { display: grid; gap: 6px; margin-top: 14px; font-weight: 600; font-size: 14px; }
+.campo-comentario textarea { font: inherit; font-weight: 400; padding: 10px 12px; border: 1px solid var(--borde, #dfe7e2); border-radius: 10px; resize: vertical; }
+.campo-comentario small { justify-self: end; font-weight: 400; color: var(--texto-suave, #5a6b62); }
+.formulario-calificacion .boton { margin-top: 14px; width: auto; padding: 10px 22px; }
+
+.calificacion-dada { margin-top: 12px; padding: 10px 14px; background: var(--acento-claro, #fff3e3); border-radius: 10px; }
+.calificacion-dada p { margin: 0; }
+.comentario-dado { margin-top: 6px !important; font-style: italic; }
+.estrellas-fijas { color: #c9d3ce; letter-spacing: 1px; }
+.estrellas-fijas .llena { color: var(--acento, #f29f3d); }
+.estado-en_camino, .estado-en_servicio { background: #e8f0fb; color: #1f5fa8; }
+
+/* Estrellas dibujadas (no caracteres). Al elegir, la estrella crece un poco con una curva fuerte;
+   solo color y escala, así que se puede cambiar de idea rápido sin que la animación se trabe. */
+.estrellas-fijas { display: inline-flex; gap: 2px; vertical-align: -2px; }
+.selector-estrellas .estrella { display: block; pointer-events: none; transition: scale 160ms cubic-bezier(0.23, 1, 0.32, 1), color 160ms ease; }
+.selector-estrellas label.llena .estrella { scale: 1.08; }
+.selector-estrellas label:active .estrella { scale: 0.92; transition-duration: 80ms; }
+@media (hover: hover) and (pointer: fine) { .selector-estrellas label:hover .estrella { scale: 1.12; } }
+@media (prefers-reduced-motion: reduce) { .selector-estrellas .estrella { scale: 1 !important; } }

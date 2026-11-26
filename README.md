@@ -32,34 +32,71 @@ Proyecto Integrador — Diseño y Desarrollo de Software · IV ciclo · Tecsup 2
 | [docs/GUIA_NAVEGACION.md](docs/GUIA_NAVEGACION.md) | Cómo comprobar en el navegador cada tarea terminada |
 | [docs/EXPOSICION_HU19.md](docs/EXPOSICION_HU19.md) · [docs/exposicion-renzo-sprint1-2.md](docs/exposicion-renzo-sprint1-2.md) | Guías de exposición y pruebas en vivo |
 | [docs/sprint2-review.md](docs/sprint2-review.md) | Cierre del Sprint 2: estado por tarea, guion de la demo y propuesta de retrospectiva |
+| [docs/API_RECOMENDACION.md](docs/API_RECOMENDACION.md) · [docs/API_VERIFICACION_FACIAL.md](docs/API_VERIFICACION_FACIAL.md) | Recomendación con IA (HU-10) y reconocimiento facial (HU-20) |
+| [docs/graficos/](docs/graficos/) | Gráficos del README (SVG con modo oscuro) y el script que los genera |
 
 ---
 
 ## Estado del proyecto
 
-**Al 23/11/2026 · Sprint 4 en curso (12/11 – 25/11), día 8 de 10.** El detalle diario está en [AVANCES.md](AVANCES.md).
+**Al 26/11/2026 · Sprint 4 cerrado (12/11 – 25/11).** Las 16 historias comprometidas en los 4 sprints están en `main`; quedan validaciones puntuales. El detalle diario está en [AVANCES.md](AVANCES.md).
+
+<p align="center"><img src="docs/graficos/burndown-sprint4.svg" alt="Burndown del Sprint 4: plano en 26 h hasta el 20/11, 13 h el 23/11 y 0 h el 25/11" width="720"></p>
 
 | Sprint | Resultado |
 |:---:|---|
 | 1 | ✅ Cerrado: HU-1 a HU-4 completas (26 de 30 h en el sprint; el resto se unió el 18/10) |
 | 2 | ✅ Cerrado: HU-5, HU-6 y HU-9 completas (15 de 23 h); HU-7 se unió el 04/11 |
-| 3 | 🟡 Sin cierre formal: HU-19 construida (falta su prueba T19.4), HU-8 en `main` (falta la validación T8.3), HU-21 en `main` ([PR #38](https://github.com/RXDG2908/Chamba-PE/pull/38), unido el 21/11); HU-13 y HU-20 postergadas |
-| 4 | 🟡 HU-12 construida (en revisión); HU-10 y HU-11 sin empezar; [reparto propuesto](docs/sprint4-reparto.md) |
+| 3 | ✅ HU-19, HU-21 y HU-8 en `main`; HU-13 y HU-20, que se habían postergado, se unieron el 26/11 (#56 y #59) |
+| 4 | ✅ Cerrado: HU-10 (#53, #55), HU-11 (#44, #49) y HU-12 (#42), 26 de 26 h |
 
 | Historia | Estado |
 |---|---|
 | HU-1 Registro del prestador · HU-2 Certificaciones · HU-3 Búsqueda · HU-4 Solicitud | ✅ En `main` |
 | HU-5 Cuentas y roles · HU-6 Disponibilidad · HU-7 Mapa · HU-9 Revisión por el administrador | ✅ En `main` |
-| HU-8 Notificaciones push | 🟡 En `main`; falta validar la entrega real en menos de 5 s (T8.3) |
-| HU-19 Escaneo del DNI | 🟡 En `main`; faltan las pruebas con muestras (T19.4) y con cámara y OCR reales |
-| HU-21 Consentimiento y eliminación de datos | ✅ En `main` (PR #38, 21/11); desde el 25/11 la eliminación se atiende sola al pedirla (`procesar_eliminaciones_dni` queda de respaldo) |
-| HU-12 Calificación | 🟡 Construida, en revisión: el cliente con sesión califica de 1 a 5 estrellas cuando el servicio está Finalizado ([contrato](docs/API_CALIFICACIONES.md)) |
-| HU-11 Seguimiento | 🟡 Construida, en revisión: el prestador asignado avanza Confirmado → En camino → En servicio → Finalizada y el cliente lo ve cada 5 s ([contrato](docs/API_SEGUIMIENTO.md)) |
-| HU-10 Recomendación | ⚪ Sin empezar (Sprint 4) |
-| HU-13 Suspensión y bloqueo · HU-20 Reconocimiento facial | ⚪ Postergadas, sin sprint asignado |
-| App Android | 🟡 Primera versión en `main` ([PR #39](https://github.com/RXDG2908/Chamba-PE/pull/39), unido el 16/11 sin revisión de otro integrante); [falta](docs/android-reparto.md) probarla en teléfono físico y 10 tarjetas del plan; fuera del compromiso de los sprints |
+| HU-10 Recomendación con IA · HU-11 Seguimiento · HU-12 Calificación | ✅ En `main` ([recomendación](docs/API_RECOMENDACION.md), [seguimiento](docs/API_SEGUIMIENTO.md), [calificación](docs/API_CALIFICACIONES.md)) |
+| HU-13 Suspensión y bloqueo · HU-21 Consentimiento y eliminación de datos | ✅ En `main` |
+| HU-20 Reconocimiento facial | 🟡 En `main` (OpenCV SFace); falta calibrar el umbral con fotos del equipo (T20.4) |
+| HU-19 Escaneo del DNI | 🟡 En `main` con sus pruebas (T19.4); con OCR real muchas fotos pasan a revisión manual ([impedimento 24](AVANCES.md)) |
+| HU-8 Notificaciones push | 🟡 En `main`; falta medir la entrega real en menos de 5 s (T8.3) |
+| App Android | 🟡 Búsqueda con Google Maps, registro por pasos y solicitudes por la API de Django (las mismas de la web); falta probar el ingreso con el `google-services.json` real y en teléfono físico ([pendientes](docs/android-reparto.md)) |
 
-> Varias funcionalidades de las secciones siguientes describen el **producto completo**: seguimiento en tiempo real, calificaciones, recomendación con IA, reconocimiento facial, pagos y suspensión de cuentas todavía no están implementados.
+<p align="center"><img src="docs/graficos/pruebas-automatizadas.svg" alt="Pruebas automatizadas: Django 465, Playwright 115, Spring Boot 46 y Android 30, todas pasan" width="720"></p>
+
+> Pagos, chatbot clasificador, rubros con comisiones y métricas del administrador siguen fuera del alcance (backlog futuro).
+
+---
+
+## Cómo se ve
+
+**Web** — una sola aplicación con pantallas separadas por rol (cliente, prestador y administración).
+
+| Portada | Cliente: Mis servicios |
+|:---:|:---:|
+| ![Portada con buscador y mapa ilustrado](docs/capturas/web-inicio.png) | ![Mis servicios del cliente con seguimiento y calificación](docs/capturas/web-cliente-mis-servicios.png) |
+| **Prestador: solicitudes recibidas** | **Administración: panel** |
+| ![Bandeja del prestador con estados y acciones](docs/capturas/web-prestador-solicitudes.png) | ![Panel del administrador con las colas pendientes](docs/capturas/web-admin-panel.png) |
+
+**App Android** — registro por pasos, una pregunta por pantalla.
+
+| Ingreso | Servicios (paso 3 de 5) | Zona con Google Maps | Revisión antes de enviar |
+|:---:|:---:|:---:|:---:|
+| ![Ingreso](docs/capturas/movil-ingreso.png) | ![Elegir servicios](docs/capturas/movil-registro-servicios.png) | ![Mapa con radio de cobertura](docs/capturas/movil-registro-zona.png) | ![Resumen con botones para editar](docs/capturas/movil-registro-revision.png) |
+
+### Diseño y movimiento
+
+- **Una marca en web y app:** verde `#16734F` y acento naranja `#F29F3D`. En la app, un tema Material 3 claro y oscuro (`app-movil/.../ui/Tema.kt`). En la web, los tokens de `web-portal/src/estilos/Tema.css`.
+- **Iconos de una sola familia:** [lucide](https://lucide.dev) en la web (`src/nucleo/iconos.js`, un icono por ruta, por rubro y por estado) y Material Symbols en la app. No se usan caracteres como ★ o ✓ como iconos.
+- **Movimiento con propósito** (revisado con la guía de Emil Kowalski, `web-portal/src/estilos/Movimiento.css`):
+  - Respuesta inmediata al presionar y avisos que se pueden interrumpir.
+  - Listas que entran escalonadas y un solo momento animado en la portada.
+  - Duraciones bajo 300 ms y curvas propias.
+  - El hover solo mueve elementos con mouse.
+  - Con «reducir movimiento» se quitan los desplazamientos y se mantienen los cambios de color.
+- **Formularios por pasos en la app:**
+  - Progreso visible y foco automático en cada paso.
+  - El botón Atrás del sistema retrocede un paso sin perder datos.
+  - Los errores del servidor llevan al paso donde se corrigen.
 
 ---
 
@@ -135,26 +172,79 @@ Capacidad: 30 h por sprint (3 integrantes × 10 h) · 114 h planificadas. Detall
 
 ## Arquitectura
 
-Dos módulos que comparten una sola base de datos:
+```mermaid
+flowchart LR
+  subgraph Clientes
+    W["Web React + Vite<br/>cliente · prestador · admin"]
+    A["App Android<br/>Kotlin + Compose"]
+  end
+  subgraph Servidores
+    D["Django + DRF<br/>API principal y admin"]
+    S["Spring Boot<br/>API de usuario (paridad)"]
+  end
+  DB[("Base compartida<br/>SQLite hoy · PostgreSQL")]
+  F["Firebase<br/>Auth · FCM"]
+  G["Google Maps<br/>JS y Android"]
+  W -- "sesión + CSRF" --> D
+  A -- "token de Firebase" --> D
+  A -. "misma API" .-> S
+  D --> DB
+  S --> DB
+  A --> F
+  D -- "verifica tokens · push" --> F
+  W --> G
+  A --> G
+```
 
 | Módulo | Front end | Back end | Carpeta |
 |---|---|---|---|
 | **Administración** | Web React | Django | `web-portal/` · `backend/django/` |
-| **Usuario** (cliente y prestador) | Móvil Kotlin y web React | Spring Boot | `app-movil/` · `web-portal/` · `backend/spring/` |
-| **Base de datos** | — | PostgreSQL compartido (pendiente; hoy Django usa SQLite local): Django será el dueño de las tablas (migraciones) y Spring Boot solo las usará | configuración por variables de entorno |
-
-El web de administración y el de usuario son una sola aplicación React (`web-portal/`) con menú y rutas según el rol.
+| **Usuario** (cliente y prestador) | Móvil Kotlin y web React | Django (API principal) y Spring Boot (misma API) | `app-movil/` · `web-portal/` · `backend/spring/` |
+| **Base de datos** | — | Compartida (hoy SQLite local; PostgreSQL previsto): Django es dueño de las tablas y migraciones | configuración por variables de entorno |
 
 | Capa | Tecnología |
 |---|---|
-| Backend de administración | API REST con Django + Django REST Framework (`backend/django/`) |
-| Backend de usuario | Spring Boot 4.1 + Java 21 (`backend/spring/`), en construcción: rubros y búsqueda listos |
-| Frontend web | React + Vite (aplicación responsiva y panel de administración) |
-| App móvil | Android nativo: Kotlin, Jetpack Compose y MVVM, con Retrofit, Room y Firebase (Auth y Firestore). Primera versión en `main`; el enfoque está pendiente de acuerdo del equipo |
-| Tiempo real | Consulta automática cada 5 s (HU-11); WebSocket (Django Channels) queda como mejora posterior |
+| Backend principal | Django + Django REST Framework (`backend/django/`) |
+| Backend de usuario | Spring Boot 4.1 + Java 21 (`backend/spring/`): solicitudes, seguimiento y disponibilidad con respuestas idénticas a Django |
+| Frontend web | React 19 + Vite, iconos lucide, mapas con Google Maps y respaldo en OpenStreetMap |
+| App móvil | Android nativo: Kotlin, Jetpack Compose (Material 3) y MVVM, con Retrofit, Room, Firebase Auth y maps-compose |
+| Tiempo real | Consulta automática cada 5 s (HU-11); WebSocket queda como mejora posterior |
 | Notificaciones | Firebase Cloud Messaging (web, con service worker) |
-| Verificación de identidad | Hoy: lectura de la MRZ del DNI con OCR (EasyOCR) y revisión manual. Previsto: reconocimiento facial (DeepFace) y prueba de vida (MediaPipe) |
-| IA | Recomendación del prestador (HU-10), aún sin implementar |
+| Verificación de identidad | Lectura de la MRZ del DNI (EasyOCR), selfie con prueba de vida (MediaPipe) y comparación facial (OpenCV SFace), con revisión manual cuando hay dudas |
+| IA | Recomendación del prestador por puntaje de distancia, calificación y disponibilidad (HU-10) |
+
+### Flujo de una solicitud (HU-4, HU-11 y HU-12)
+
+```mermaid
+sequenceDiagram
+  actor C as Cliente (web o app)
+  participant API as Django
+  actor P as Prestador
+  C->>API: Busca por rubro y ubicación (HU-3, HU-10)
+  API-->>C: Prestadores verificados y disponibles, el recomendado primero
+  C->>API: Envía la solicitud
+  API-->>P: Push y bandeja (HU-8)
+  P->>API: Acepta
+  loop Cada 5 s
+    C->>API: Consulta el estado
+  end
+  P->>API: En camino → En servicio → Finalizada
+  C->>API: Califica de 1 a 5 estrellas
+  API-->>P: Promedio actualizado en su ficha
+```
+
+### Recorrido por rol
+
+```mermaid
+flowchart TB
+  V(["Visitante"]) --> B["Buscar y ver el mapa"] --> R{"¿Tiene cuenta?"}
+  R -- "no" --> RC["Crear cuenta de cliente"]
+  R -- "sí" --> I["Ingresar"]
+  I --> CL["Cliente: Mis servicios<br/>seguimiento y calificación"]
+  I --> PR["Prestador: Mi panel<br/>solicitudes · disponibilidad · verificación"]
+  I --> AD["Administración: Panel<br/>revisión de documentos · cuentas"]
+  V --> RP["Registrarse como prestador"] --> PR
+```
 
 ## Estructura del repositorio
 
@@ -252,6 +342,10 @@ La API queda en `http://127.0.0.1:8000/` y el panel de Django en `/admin/`.
 | `POST /api/usuarios/login/` · `.../logout/` | Inicio de sesión con usuario o correo, y cierre de sesión (HU-5) |
 | `GET` · `PATCH /api/usuarios/disponibilidad/` | El prestador consulta o cambia su disponibilidad, Activo o Inactivo (HU-6) |
 | `GET /api/usuarios/yo/` | Quién tiene la sesión y con qué rol; 403 sin sesión (HU-5); [contrato completo](docs/API_AUTENTICACION.md) |
+| `POST /api/usuarios/registro-movil/` | La app crea (sin duplicar) la cuenta de cliente vinculada a su usuario de Firebase; requiere el token |
+| `GET /api/ia/recomendacion/` | Prestador recomendado con motivo y tiempo estimado (HU-10); [contrato](docs/API_RECOMENDACION.md) |
+| `POST` · `GET /api/verificacion/facial/` · `.../facial/consentimiento/` | Selfie con prueba de vida y comparación con el DNI (HU-20); [contrato](docs/API_VERIFICACION_FACIAL.md) |
+| `GET /api/administracion/cuentas/` · `.../<id>/sancionar/` · `.../<id>/reactivar/` | El administrador suspende, bloquea o reactiva cuentas (HU-13) |
 
 Pruebas del backend:
 
@@ -277,7 +371,9 @@ La web queda en `http://localhost:5173/`. Para comprobar cada función paso a pa
 ./gradlew assembleDebug
 ```
 
-Necesita `google-services.json` (no está en el repositorio) y el backend corriendo; los pasos completos están en [app-movil/README.md](app-movil/README.md).
+Necesita `google-services.json` (no está en el repositorio), la clave de Google Maps en `app-movil/local.properties` (`MAPS_API_KEY=...`, tampoco se versiona) y el backend corriendo; los pasos completos están en [app-movil/README.md](app-movil/README.md).
+
+**Clave de Google Maps en la web:** `web-portal/.env.local` con `VITE_GOOGLE_MAPS_API_KEY=...` (no se versiona) y la «Maps JavaScript API» habilitada en Google Cloud; sin clave, la web usa OpenStreetMap.
 
 **Backend de usuario (Spring Boot)** — en construcción; ya responden rubros y búsqueda. Con Java 21: `cd backend/spring` y `.\mvnw spring-boot:run` (puerto 8080, lee la base de Django en solo lectura). Detalles en [backend/spring/README.md](backend/spring/README.md).
 

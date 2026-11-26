@@ -13,8 +13,12 @@ data class Prestador(
     val longitud: Double,
     val distanciaKm: Double?,
     val favorito: Boolean,
+    /** HU-12: promedio de 1 a 5 estrellas; null sin calificaciones. */
+    val calificacionPromedio: Double? = null,
+    val calificacionesTotal: Int = 0,
 ) {
     val nombreCompleto: String get() = "$nombres $apellidos".trim()
+    val tieneCalificaciones: Boolean get() = calificacionesTotal > 0 && calificacionPromedio?.isFinite() == true
 }
 
 /** Dato junto con su origen: [desdeCache] es true cuando no hubo red y salió de Room. */
@@ -64,16 +68,44 @@ enum class TipoErrorAuth { CREDENCIALES, CORREO_EN_USO, CLAVE_DEBIL, CORREO_INVA
 
 class ErrorAuth(val tipo: TipoErrorAuth, causa: Throwable? = null) : Exception(tipo.name, causa)
 
-enum class EstadoSolicitud { PENDIENTE, ACEPTADA, RECHAZADA }
+/** Estados de la solicitud en Django (HU-4 y HU-11), con el valor que usa la API. */
+enum class EstadoSolicitud(val api: String) {
+    PENDIENTE("pendiente"), ACEPTADA("aceptada"), RECHAZADA("rechazada"),
+    EN_CAMINO("en_camino"), EN_SERVICIO("en_servicio"), FINALIZADA("finalizada");
 
+    companion object {
+        fun de(valor: String?): EstadoSolicitud? = entries.firstOrNull { it.api == valor }
+    }
+}
+
+/** Una etapa del seguimiento (HU-11) con su fecha y hora ISO 8601. */
+data class Etapa(val estado: EstadoSolicitud, val fecha: String)
+
+/**
+ * Solicitud tal como la guarda Django, la misma que ve la web. [contraparte] es el prestador
+ * para el cliente y el cliente para el prestador; [telefono] solo lo ve el prestador.
+ */
 data class Solicitud(
-    val id: String,
-    val prestadorId: Int,
-    val prestadorNombre: String,
-    val clienteUid: String,
-    val clienteNombre: String,
+    val id: Int,
+    val contraparte: String,
+    val telefono: String?,
+    val rubro: String,
     val descripcion: String,
-    val direccion: String,
     val estado: EstadoSolicitud,
-    val creadaEnMillis: Long?,
+    val estadoTexto: String,
+    /** Estado al que el prestador puede pasarla ahora (null si no puede avanzarla). */
+    val siguienteEstado: EstadoSolicitud? = null,
+    val historial: List<Etapa> = emptyList(),
+    /** Cliente: puede calificar porque está Finalizada y aún no la calificó (HU-12). */
+    val puedeCalificar: Boolean = false,
+    val estrellas: Int? = null,
+)
+
+/** Lo que se envía al pedir un servicio: rubro y ubicación de la búsqueda, más el contacto. */
+data class NuevaSolicitud(
+    val rubroId: Int,
+    val descripcion: String,
+    val telefono: String,
+    val latitud: Double,
+    val longitud: Double,
 )

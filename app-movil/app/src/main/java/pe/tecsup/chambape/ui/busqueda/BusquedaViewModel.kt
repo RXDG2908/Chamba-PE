@@ -16,6 +16,7 @@ import pe.tecsup.chambape.domain.model.Prestador
 import pe.tecsup.chambape.domain.model.Rubro
 import pe.tecsup.chambape.domain.model.TipoError
 import java.util.Locale
+import pe.tecsup.chambape.data.repository.ContextoBusqueda
 
 sealed interface EstadoRubros {
     data object Cargando : EstadoRubros
@@ -59,6 +60,8 @@ internal fun coordenada(texto: String, limite: Double): Double? =
 class BusquedaViewModel(
     private val repository: PrestadorRepository,
     private val ubicacion: UbicacionProvider,
+    /** Guarda rubro y ubicación de la búsqueda: la solicitud se envía con ellos. */
+    private val contexto: ContextoBusqueda? = null,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(BusquedaUiState())
@@ -139,6 +142,7 @@ class BusquedaViewModel(
             }
             return
         }
+        contexto?.ultima = ContextoBusqueda.Datos(rubroId, latitud, longitud)
         // Una búsqueda nueva cancela la anterior: una respuesta antigua no pisa la reciente.
         busquedaEnCurso?.cancel()
         _uiState.update { it.copy(resultados = EstadoResultados.Cargando) }

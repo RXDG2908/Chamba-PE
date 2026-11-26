@@ -10,7 +10,9 @@ export default defineConfig({
   use: { baseURL: 'http://127.0.0.1:5187', browserName: 'chromium', channel: 'chromium', headless: true,
     screenshot: 'only-on-failure', trace: 'retain-on-failure' },
   reporter: 'list',
+  // Sin clave de Google Maps: las pruebas usan el mapa de respaldo (corren sin red).
   webServer: {
+    env: { ...process.env, VITE_GOOGLE_MAPS_API_KEY: '' },
     command: 'npm run build && npm run preview -- --host 127.0.0.1 --port 5187 --strictPort',
     url: 'http://127.0.0.1:5187',
     reuseExistingServer: false,

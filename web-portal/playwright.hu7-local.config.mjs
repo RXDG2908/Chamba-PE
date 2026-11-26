@@ -22,7 +22,7 @@ export default defineConfig({
     { command: `"${python}" tools/hu7_backend_local.py`, cwd: root,
       url: 'http://127.0.0.1:8019/api/prestadores/rubros/', reuseExistingServer: false, timeout: 90000,
       env: { PYTHONDONTWRITEBYTECODE: '1' } },
-    { command: 'npm run build -- --config vite.hu7-local.config.mjs && npm run preview -- --config vite.hu7-local.config.mjs',
+    { env: { ...process.env, VITE_GOOGLE_MAPS_API_KEY: '' }, command: 'npm run build -- --config vite.hu7-local.config.mjs && npm run preview -- --config vite.hu7-local.config.mjs',
       cwd: frontend, url: 'http://127.0.0.1:5189', reuseExistingServer: false, timeout: 60000 },
   ],
 })

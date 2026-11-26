@@ -1,0 +1,36 @@
+/* Bandeja del prestador (HU-4, HU-8 y HU-11) */
+.bandeja { padding-block: 40px 8px; }
+.bandeja-notificaciones {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; margin-bottom: 8px; padding: 12px 14px;
+  border: 1px solid var(--borde); border-radius: 14px; background: #fff; font-size: 14px; color: var(--texto-suave);
+}
+.bandeja-notificaciones span { margin-right: auto; font-weight: 600; color: var(--texto); }
+.boton-texto { padding: 8px 6px; border: 0; background: none; color: var(--texto-suave); font: inherit; font-weight: 600; cursor: pointer; }
+.boton-texto:hover { color: var(--texto); text-decoration: underline; }
+.bandeja-mensaje { min-height: 1.4em; margin: 4px 0 12px; color: var(--verde-intenso); font-weight: 600; }
+.bandeja-lista { display: grid; gap: 16px; }
+
+.solicitud-tarjeta {
+  padding: 20px; border: 1px solid var(--borde); border-left: 4px solid var(--borde); border-radius: var(--radio);
+  background: #fff; box-shadow: var(--sombra);
+}
+.solicitud-tarjeta.estado-pendiente { border-left-color: var(--acento); }
+.solicitud-tarjeta.estado-aceptada, .solicitud-tarjeta.estado-en_camino, .solicitud-tarjeta.estado-en_servicio { border-left-color: var(--verde); }
+.solicitud-tarjeta.estado-rechazada { border-left-color: #b8c2bd; }
+.solicitud-cabecera { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 8px 16px; }
+.solicitud-cabecera h3 { margin: 0; font-size: 18px; }
+.solicitud-cabecera h3 a { color: var(--texto); text-decoration: none; }
+.solicitud-cabecera h3 a:hover { color: var(--verde); text-decoration: underline; }
+.solicitud-estado {
+  margin: 0; padding: 4px 10px; border-radius: 8px; background: var(--verde-claro);
+  color: var(--verde-intenso); font-size: 13px; font-weight: 700;
+}
+.estado-pendiente .solicitud-estado { background: var(--acento-claro); color: #8a5310; }
+.estado-rechazada .solicitud-estado { background: #eef1ef; color: #4b5852; }
+.solicitud-descripcion { margin: 12px 0 4px; color: var(--texto); font-size: 16px; }
+.solicitud-cliente { margin: 0; color: var(--texto-suave); }
+.solicitud-cliente a { font-weight: 700; font-variant-numeric: tabular-nums; }
+.solicitud-acciones { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 16px; }
+.solicitud-acciones .boton { width: auto; min-height: 44px; margin-top: 0; padding: 10px 18px; }
+.solicitud-cerrada { margin: 0; color: var(--texto-suave); font-weight: 600; }
+.volver { display: inline-block; margin-top: 20px; font-weight: 600; }

@@ -10,6 +10,8 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.Upsert
 import kotlinx.coroutines.flow.Flow
+import androidx.room.migration.Migration
+import androidx.sqlite.db.SupportSQLiteDatabase
 
 @Entity(tableName = "rubros")
 data class RubroEntity(
@@ -31,6 +33,9 @@ data class PrestadorEntity(
     /** Rubro de la búsqueda que lo trajo; sirve para mostrarla sin conexión. */
     val rubroConsultaId: Int,
     val favorito: Boolean,
+    /** HU-12: promedio de 1 a 5 estrellas y cuántas calificaciones lo forman. */
+    val calificacionPromedio: Double? = null,
+    val calificacionesTotal: Int = 0,
 )
 
 @Dao
@@ -70,13 +75,23 @@ interface PrestadorDao {
     suspend fun marcarFavorito(id: Int, favorito: Boolean)
 }
 
-@Database(entities = [RubroEntity::class, PrestadorEntity::class], version = 1, exportSchema = false)
+/** Versión 2: el prestador guarda su calificación (HU-12). La caché conserva favoritos al migrar. */
+val MIGRACION_1_2 = object : Migration(1, 2) {
+    override fun migrate(db: SupportSQLiteDatabase) {
+        db.execSQL("ALTER TABLE prestadores ADD COLUMN calificacionPromedio REAL")
+        db.execSQL("ALTER TABLE prestadores ADD COLUMN calificacionesTotal INTEGER NOT NULL DEFAULT 0")
+    }
+}
+
+@Database(entities = [RubroEntity::class, PrestadorEntity::class], version = 2, exportSchema = false)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun rubroDao(): RubroDao
     abstract fun prestadorDao(): PrestadorDao
 
     companion object {
         fun crear(context: Context): AppDatabase =
-            Room.databaseBuilder(context.applicationContext, AppDatabase::class.java, "chambape.db").build()
+            Room.databaseBuilder(context.applicationContext, AppDatabase::class.java, "chambape.db")
+                .addMigrations(MIGRACION_1_2)
+                .build()
     }
 }

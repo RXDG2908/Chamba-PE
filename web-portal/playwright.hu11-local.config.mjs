@@ -25,7 +25,7 @@ export default defineConfig({
     { command: `"${python}" tools/hu11_backend_local.py`, cwd: django,
       url: 'http://127.0.0.1:8021/api/prestadores/rubros/', reuseExistingServer: false, timeout: 90000,
       env: { PYTHONDONTWRITEBYTECODE: '1' } },
-    { command: 'npx vite build --config vite.hu11-local.config.mjs && npx vite preview --config vite.hu11-local.config.mjs',
+    { env: { ...process.env, VITE_GOOGLE_MAPS_API_KEY: '' }, command: 'npx vite build --config vite.hu11-local.config.mjs && npx vite preview --config vite.hu11-local.config.mjs',
       cwd: web, url: 'http://127.0.0.1:5195', reuseExistingServer: false, timeout: 60000 },
   ],
 })

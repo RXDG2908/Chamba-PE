@@ -39,7 +39,7 @@ Compara el [plan Android](PLAN_DESARROLLO_ANDROID.md) (21 tarjetas `AND-*`, de L
 | ID | Tarjeta | Plan decía | Estado | Nota |
 |:---:|---|:---:|:---:|---|
 | AND-01 | Proyecto Kotlin/Compose y versiones | Renzo | ✅ | Compila, pruebas y lint OK |
-| AND-02 | Tema Material 3 y componentes comunes | David | 🟡 | Hay tema y componentes básicos (`Comunes.kt`); sin revisar tema oscuro, texto ampliado ni pantallas anchas |
+| AND-02 | Tema Material 3 y componentes comunes | David | 🟡 | 26/11: tema de marca claro/oscuro (`Tema.kt`), asistente por pasos (`Asistente.kt`) e iconos Material. Falta revisar texto ampliado y pantallas anchas |
 | AND-03 | Navigation Compose | Luis | ✅ | Pestañas por rol |
 | AND-04 | Retrofit, DTO y mappers | David | ✅ | Contra Django |
 | AND-05 | Repository de búsqueda | Renzo | ✅ | Con caché en Room |
@@ -86,7 +86,7 @@ Renzo construyó casi todo, así que **las pruebas y la revisión pasan a Luis y
 |:---:|---|:---:|:---:|---|
 | AND-17 | Probar en **teléfono físico**: búsqueda, GPS real, solicitud y bandeja; dejar evidencia | Pruebas | 2 | #39 revisado |
 | AND-08 | Pruebas de repositorios, mappers y contrato HTTP con servidor simulado | Pruebas | 3 | — |
-| AND-23 | **Nueva.** Solicitudes de la app por la API Django (`servicios`) en vez de Firestore, para que web y móvil vean las mismas | Backend + móvil | 3 | Decisión 2 |
+| AND-23 | ✅ 26/11 (Renzo). Solicitudes de la app por la API Django (`servicios`) en vez de Firestore, para que web y móvil vean las mismas | Backend + móvil | 3 | Decisión 2 |
 | AND-20 | Solicitud, historial y reintento de eliminación de datos del DNI | Móvil | 2 | #38 unido; AND-19 |
 
 #### David Valcarcel — ≈ 10 h

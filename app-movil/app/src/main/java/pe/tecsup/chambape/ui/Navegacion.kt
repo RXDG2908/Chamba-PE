@@ -40,6 +40,21 @@ import pe.tecsup.chambape.domain.model.EstadoSesion
 import pe.tecsup.chambape.domain.model.Rol
 import pe.tecsup.chambape.domain.model.Sesion
 import pe.tecsup.chambape.ui.busqueda.BusquedaRoute
+import androidx.compose.material.icons.outlined.ToggleOff
+import androidx.compose.material.icons.outlined.Search
+import androidx.compose.material.icons.outlined.Person
+import androidx.compose.material.icons.outlined.Inbox
+import androidx.compose.material.icons.outlined.FavoriteBorder
+import androidx.compose.material.icons.filled.ToggleOn
+import androidx.compose.material.icons.filled.Inbox
+import androidx.compose.material.icons.automirrored.outlined.Assignment
+import androidx.compose.material.icons.automirrored.filled.Assignment
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.fadeIn
 
 private object Rutas {
     const val LOGIN = "login"
@@ -54,19 +69,19 @@ private object Rutas {
     fun detalle(id: Int) = "prestador/$id"
 }
 
-private data class Pestana(val ruta: String, @StringRes val titulo: Int, val icono: ImageVector)
+private data class Pestana(val ruta: String, @StringRes val titulo: Int, val icono: ImageVector, val iconoInactivo: ImageVector)
 
 private val PestanasCliente = listOf(
-    Pestana(Rutas.BUSCAR, R.string.tab_buscar, Icons.Filled.Search),
-    Pestana(Rutas.FAVORITOS, R.string.tab_favoritos, Icons.Filled.Favorite),
-    Pestana(Rutas.SOLICITUDES, R.string.tab_solicitudes, Icons.AutoMirrored.Filled.List),
-    Pestana(Rutas.PERFIL, R.string.tab_perfil, Icons.Filled.Person),
+    Pestana(Rutas.BUSCAR, R.string.tab_buscar, Icons.Filled.Search, Icons.Outlined.Search),
+    Pestana(Rutas.FAVORITOS, R.string.tab_favoritos, Icons.Filled.Favorite, Icons.Outlined.FavoriteBorder),
+    Pestana(Rutas.SOLICITUDES, R.string.tab_solicitudes, Icons.AutoMirrored.Filled.Assignment, Icons.AutoMirrored.Outlined.Assignment),
+    Pestana(Rutas.PERFIL, R.string.tab_perfil, Icons.Filled.Person, Icons.Outlined.Person),
 )
 
 private val PestanasPrestador = listOf(
-    Pestana(Rutas.SOLICITUDES, R.string.tab_recibidas, Icons.AutoMirrored.Filled.List),
-    Pestana(Rutas.DISPONIBILIDAD, R.string.tab_disponibilidad, Icons.Filled.CheckCircle),
-    Pestana(Rutas.PERFIL, R.string.tab_perfil, Icons.Filled.Person),
+    Pestana(Rutas.SOLICITUDES, R.string.tab_recibidas, Icons.Filled.Inbox, Icons.Outlined.Inbox),
+    Pestana(Rutas.DISPONIBILIDAD, R.string.tab_disponibilidad, Icons.Filled.ToggleOn, Icons.Outlined.ToggleOff),
+    Pestana(Rutas.PERFIL, R.string.tab_perfil, Icons.Filled.Person, Icons.Outlined.Person),
 )
 
 /** Raíz de la app: el estado de la sesión decide entre ingreso y zona privada. */
@@ -87,7 +102,15 @@ fun ChambaPeApp() {
 @Composable
 private fun NavegacionIngreso() {
     val nav = rememberNavController()
-    NavHost(navController = nav, startDestination = Rutas.LOGIN) {
+    // Abrir un registro entra desde la derecha; volver al ingreso, desde la izquierda (eje X compartido).
+    NavHost(
+        navController = nav,
+        startDestination = Rutas.LOGIN,
+        enterTransition = { slideInHorizontally(tween(Movimiento.MEDIA, easing = Movimiento.Enfatizada)) { it / 4 } + fadeIn(tween(Movimiento.MEDIA)) },
+        exitTransition = { slideOutHorizontally(tween(Movimiento.MEDIA, easing = Movimiento.Enfatizada)) { -it / 4 } + fadeOut(tween(Movimiento.CORTA)) },
+        popEnterTransition = { slideInHorizontally(tween(Movimiento.MEDIA, easing = Movimiento.Enfatizada)) { -it / 4 } + fadeIn(tween(Movimiento.MEDIA)) },
+        popExitTransition = { slideOutHorizontally(tween(Movimiento.MEDIA, easing = Movimiento.Enfatizada)) { it / 4 } + fadeOut(tween(Movimiento.CORTA)) },
+    ) {
         composable(Rutas.LOGIN) {
             LoginScreen(
                 onIrARegistro = { nav.navigate(Rutas.REGISTRO) },
@@ -134,7 +157,7 @@ private fun NavegacionPrincipal(sesion: Sesion, onCerrarSesion: () -> Unit) {
                                     restoreState = true
                                 }
                             },
-                            icon = { Icon(pestana.icono, contentDescription = null) },
+                            icon = { Icon(if (pestana == pestanaActual) pestana.icono else pestana.iconoInactivo, contentDescription = null) },
                             label = { Text(stringResource(pestana.titulo)) },
                         )
                     }
@@ -142,7 +165,16 @@ private fun NavegacionPrincipal(sesion: Sesion, onCerrarSesion: () -> Unit) {
             }
         },
     ) { relleno ->
-        NavHost(navController = nav, startDestination = pestanas.first().ruta, modifier = Modifier.padding(relleno)) {
+        NavHost(
+            navController = nav,
+            startDestination = pestanas.first().ruta,
+            modifier = Modifier.padding(relleno),
+            // Material «fade through» entre pestañas: sale rápido, entra con una leve ampliación.
+            enterTransition = { fadeIn(tween(Movimiento.MEDIA, delayMillis = 60)) + scaleIn(tween(Movimiento.MEDIA), initialScale = 0.96f) },
+            exitTransition = { fadeOut(tween(Movimiento.CORTA)) },
+            popEnterTransition = { fadeIn(tween(Movimiento.MEDIA, delayMillis = 60)) + scaleIn(tween(Movimiento.MEDIA), initialScale = 0.96f) },
+            popExitTransition = { fadeOut(tween(Movimiento.CORTA)) },
+        ) {
             if (sesion.rol == Rol.CLIENTE) {
                 composable(Rutas.BUSCAR) { BusquedaRoute(onAbrirPrestador = { nav.navigate(Rutas.detalle(it)) }) }
                 composable(Rutas.FAVORITOS) { FavoritosScreen(onAbrirPrestador = { nav.navigate(Rutas.detalle(it)) }) }

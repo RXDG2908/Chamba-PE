@@ -17,8 +17,8 @@
 
     <!-- Ingreso y registro -->
     <string name="login_titulo">Ingresa a tu cuenta</string>
-    <string name="registro_titulo">Crea tu cuenta de cliente</string>
-    <string name="registro_ayuda">Las cuentas de prestador las registra y verifica el equipo de Chamba PE.</string>
+    <string name="registro_titulo">Crear cuenta</string>
+    <string name="registro_ayuda">Con tu cuenta pides servicios y sigues su avance.</string>
     <string name="nombre">Nombre</string>
     <string name="correo">Correo</string>
     <string name="clave">Contraseña</string>
@@ -26,17 +26,17 @@
     <string name="ingresando">Ingresando…</string>
     <string name="crear_cuenta">Crear cuenta</string>
     <string name="registrando">Creando cuenta…</string>
-    <string name="ir_a_registro">No tengo cuenta: registrarme</string>
-    <string name="ir_a_registro_prestador">Ofrezco servicios: registrarme como prestador</string>
-    <string name="registro_prestador_titulo">Regístrate como prestador</string>
+    <string name="ir_a_registro">Necesito un servicio</string>
+    <string name="ir_a_registro_prestador">Ofrezco mis servicios</string>
+    <string name="registro_prestador_titulo">Registro de prestador</string>
     <string name="registro_prestador_ayuda">Tu perfil quedará pendiente de verificación: aparecerás en las búsquedas cuando administración lo apruebe.</string>
     <string name="registro_seccion_cuenta">Tu cuenta</string>
     <string name="registro_seccion_datos">Tus datos</string>
     <string name="registro_seccion_rubros">¿Qué servicios ofreces?</string>
     <string name="registro_seccion_cobertura">Zona de cobertura</string>
     <string name="registro_cobertura_ayuda">Toca el mapa para marcar el centro de tu zona y ajusta el radio.</string>
-    <string name="registro_radio">Radio de cobertura: %1$d km</string>
-    <string name="registro_prestador_boton">Registrarme como prestador</string>
+    <string name="registro_radio">%1$d km</string>
+    <string name="registro_prestador_boton">Enviar registro</string>
     <string name="registro_revisa_campos">Revisa los campos marcados.</string>
     <string name="nombres">Nombres</string>
     <string name="apellidos">Apellidos</string>
@@ -89,11 +89,18 @@
     <string name="detalle_no_encontrado">No se encontró al prestador. Vuelve a buscarlo.</string>
     <string name="detalle_zona">Zona de atención aproximada: %1$.3f, %2$.3f</string>
     <string name="sin_calificaciones">Sin calificaciones</string>
+    <plurals name="calificacion_resumen">
+        <item quantity="one">%1$.1f · %2$d calificación</item>
+        <item quantity="other">%1$.1f · %2$d calificaciones</item>
+    </plurals>
     <string name="guardar_en_favoritos">Guardar en favoritos</string>
     <string name="quitar_de_favoritos">Quitar de favoritos</string>
-    <string name="solicitud_titulo">Enviar solicitud</string>
+    <string name="solicitud_titulo">Pide el servicio</string>
     <string name="solicitud_descripcion">¿Qué necesitas?</string>
-    <string name="solicitud_direccion">Dirección o referencia (opcional)</string>
+    <string name="solicitud_telefono">Tu celular (9 dígitos)</string>
+    <string name="error_telefono">Ingresa 9 dígitos, sin +51 ni espacios.</string>
+    <string name="error_sin_busqueda">Primero busca el servicio con tu ubicación: la solicitud se envía con ese rubro y lugar.</string>
+    <string name="solicitud_contacto">Celular: %1$s</string>
     <string name="error_descripcion_corta">Describe lo que necesitas (mínimo %1$d caracteres).</string>
     <string name="enviar_solicitud">Enviar solicitud</string>
     <string name="enviando">Enviando…</string>
@@ -101,17 +108,28 @@
     <string name="solicitud_enviada">Solicitud enviada a %1$s. Sigue su estado en la pestaña Solicitudes.</string>
 
     <!-- Favoritos -->
-    <string name="favoritos_vacio">Aún no tienes favoritos. Márcalos desde la búsqueda.</string>
+    <string name="favoritos_vacio">Aún no tienes favoritos. Toca el corazón de un prestador para guardarlo aquí.</string>
 
     <!-- Solicitudes -->
-    <string name="solicitudes_vacio_cliente">Todavía no has enviado solicitudes.</string>
-    <string name="solicitudes_vacio_prestador">Todavía no has recibido solicitudes.</string>
+    <string name="solicitudes_vacio_cliente">Todavía no has pedido servicios. Busca un prestador y envíale tu solicitud.</string>
+    <string name="solicitudes_vacio_prestador">Aún no tienes solicitudes. Mantén tu disponibilidad activa para recibirlas.</string>
     <string name="prestador_sin_vincular">Tu bandeja se activará cuando administración verifique tu perfil de prestador.</string>
     <string name="error_solicitudes">No se pudieron cargar las solicitudes.</string>
     <string name="error_respuesta">No se pudo guardar tu respuesta. Inténtalo de nuevo.</string>
     <string name="solicitud_en">En: %1$s</string>
     <string name="estado_pendiente">Pendiente</string>
     <string name="estado_aceptada">Aceptada</string>
+    <string name="estado_confirmado">Confirmado</string>
+    <string name="estado_en_camino">En camino</string>
+    <string name="estado_en_servicio">En servicio</string>
+    <string name="estado_finalizada">Finalizada</string>
+    <string name="accion_en_camino">Voy en camino</string>
+    <string name="accion_en_servicio">Empecé el servicio</string>
+    <string name="accion_finalizar">Finalizar servicio</string>
+    <string name="como_fue_el_servicio">¿Cómo fue el servicio?</string>
+    <string name="comentario_opcional">Comentario (opcional)</string>
+    <string name="enviar_calificacion">Enviar calificación</string>
+    <string name="tu_calificacion">Calificaste con %1$d de 5 estrellas</string>
     <string name="estado_rechazada">Rechazada</string>
     <string name="aceptar">Aceptar</string>
     <string name="rechazar">Rechazar</string>
@@ -138,4 +156,63 @@
     <string name="canal_solicitudes_descripcion">Avisos sobre las solicitudes que envías</string>
     <string name="notificacion_solicitud_titulo">Solicitud enviada</string>
     <string name="notificacion_solicitud_texto">%1$s ya puede ver tu solicitud.</string>
+    <string name="siguiente">Siguiente</string>
+    <string name="procesando">Procesando…</string>
+    <string name="paso_de">Paso %1$d de %2$d: %3$s</string>
+    <string name="paso_numero">Paso %1$d de %2$d</string>
+    <string name="mostrar_clave">Mostrar contraseña</string>
+    <string name="ocultar_clave">Ocultar contraseña</string>
+    <string name="clave_ayuda">Mínimo 6 caracteres. Mezcla letras y números.</string>
+    <string name="lema">Servicios del hogar cerca de ti</string>
+    <string name="no_tienes_cuenta">¿No tienes cuenta?</string>
+    <string name="ir_a_registro_ayuda">Crea tu cuenta de cliente en tres pasos.</string>
+    <string name="ir_a_registro_prestador_ayuda">Regístrate como prestador y recibe solicitudes.</string>
+    <string name="paso_nombre">¿Cómo te llamas?</string>
+    <string name="paso_nombre_ayuda">Así te verá el prestador cuando le pidas un servicio.</string>
+    <string name="paso_correo">Tu correo</string>
+    <string name="paso_correo_ayuda">Lo usarás para ingresar. No lo compartimos con nadie.</string>
+    <string name="paso_clave">Crea una contraseña</string>
+    <string name="paso_clave_ayuda">Protege tu cuenta con una contraseña que no uses en otros sitios.</string>
+    <string name="error_nombre">Escribe tu nombre (al menos 2 letras).</string>
+    <string name="error_correo_formato">Revisa el correo: debe tener la forma nombre@dominio.com.</string>
+    <string name="paso_cuenta">Tu cuenta</string>
+    <string name="paso_cuenta_ayuda">Con este correo y contraseña ingresarás a la app.</string>
+    <string name="paso_datos">Tus datos</string>
+    <string name="paso_datos_ayuda">Los usamos para verificar tu identidad con tu DNI.</string>
+    <string name="paso_rubros">Tus servicios</string>
+    <string name="paso_rubros_ayuda">Elige todo lo que sabes hacer. Puedes marcar varios.</string>
+    <string name="paso_cobertura">Tu zona</string>
+    <string name="paso_cobertura_ayuda">Marca en el mapa desde dónde trabajas y hasta dónde llegas.</string>
+    <string name="paso_revisar">Revisa y envía</string>
+    <string name="paso_revisar_ayuda">Confirma que todo esté bien. Toca el lápiz para corregir.</string>
+    <string name="dni_ayuda">8 dígitos, tal como figura en tu DNI.</string>
+    <string name="cobertura_toca_mapa">Toca el mapa para marcar el centro de tu zona.</string>
+    <string name="cobertura_marcada">Ubicación marcada. Toca otro punto para moverla.</string>
+    <string name="radio_cobertura">Radio de cobertura</string>
+    <string name="resumen_dni">DNI %1$s</string>
+    <string name="resumen_cobertura">Hasta %1$d km desde el punto marcado</string>
+    <string name="editar_seccion">Editar %1$s</string>
+    <plurals name="rubros_elegidos">
+        <item quantity="one">%1$d servicio elegido</item>
+        <item quantity="other">%1$d servicios elegidos</item>
+    </plurals>
+    <string name="distancia_de_ti">A %1$.1f km de ti</string>
+    <string name="solicitud_descripcion_ejemplo">Ej.: Se rompió el caño de la cocina y gotea.</string>
+    <string name="solicitud_descripcion_ayuda">Cuenta el problema con detalle.</string>
+    <string name="solicitud_telefono_ayuda">El prestador te llamará a este número.</string>
+    <string name="llamar_a">Llamar al %1$s</string>
+    <string name="seguimiento_resumen">Estado: %1$s, etapa %2$d de %3$d</string>
+    <string name="tu_calificacion_titulo">Tu calificación</string>
+    <string name="estrellas_n">%1$d estrellas</string>
+    <string name="estrellas_1">Malo</string>
+    <string name="estrellas_2">Regular</string>
+    <string name="estrellas_3">Bueno</string>
+    <string name="estrellas_4">Muy bueno</string>
+    <string name="estrellas_5">Excelente</string>
+    <string name="coordenadas_a_mano">Ingresar coordenadas a mano</string>
+    <string name="disponibilidad_verificado">Perfil verificado: los clientes pueden encontrarte.</string>
+    <plurals name="resultados_encontrados">
+        <item quantity="one">%1$d prestador cerca</item>
+        <item quantity="other">%1$d prestadores cerca</item>
+    </plurals>
 </resources>

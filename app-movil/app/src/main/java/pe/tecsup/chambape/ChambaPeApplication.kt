@@ -13,7 +13,8 @@ import pe.tecsup.chambape.data.local.AppDatabase
 import pe.tecsup.chambape.data.remote.RetrofitClient
 import pe.tecsup.chambape.data.repository.DisponibilidadRepository
 import pe.tecsup.chambape.data.repository.DisponibilidadRepositoryImpl
-import pe.tecsup.chambape.data.repository.FirestoreSolicitudRepository
+import pe.tecsup.chambape.data.repository.ApiSolicitudRepository
+import pe.tecsup.chambape.data.repository.ContextoBusqueda
 import pe.tecsup.chambape.data.repository.PrestadorRepository
 import pe.tecsup.chambape.data.repository.PrestadorRepositoryImpl
 import pe.tecsup.chambape.data.repository.RegistroPrestadorRepository
@@ -44,7 +45,9 @@ class AppContainer(context: Context) {
 
     val disponibilidadRepository: DisponibilidadRepository = DisponibilidadRepositoryImpl(api, authRepository)
     val registroPrestadorRepository: RegistroPrestadorRepository = RegistroPrestadorRepositoryImpl(api)
-    val solicitudRepository: SolicitudRepository = FirestoreSolicitudRepository(firestore)
+    // Solicitudes en la API Django, las mismas que ve la web (antes iban a Firestore, separadas).
+    val solicitudRepository: SolicitudRepository = ApiSolicitudRepository(api, authRepository)
+    val contextoBusqueda = ContextoBusqueda()
     val ubicacionProvider: UbicacionProvider = UbicacionFused(context)
     val notificador: Notificador = NotificadorAndroid(context)
 }

@@ -80,4 +80,10 @@ class AutenticacionFirebase(BaseAuthentication):
         perfil = Perfil.objects.select_related('usuario').filter(firebase_uid=uid).first()
         if perfil is None or not perfil.usuario.is_active:
             raise AuthenticationFailed('Esta cuenta de la app aún no está vinculada.')
+        # HU-13: una cuenta suspendida o bloqueada tampoco entra desde la app.
+        from administracion.models import sancion_vigente
+        from administracion.sanciones import mensaje_para_la_cuenta
+        sancion = sancion_vigente(perfil.usuario_id)
+        if sancion is not None:
+            raise AuthenticationFailed(mensaje_para_la_cuenta(sancion))
         return (perfil.usuario, None)

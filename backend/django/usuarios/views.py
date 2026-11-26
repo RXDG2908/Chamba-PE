@@ -14,6 +14,18 @@ from .serializers import (
 User = get_user_model()
 
 
+def cuenta_sancionada(username, password):
+    """Mensaje de la sanción vigente si las credenciales son correctas; si no, None."""
+    from administracion.models import sancion_vigente
+    from administracion.sanciones import mensaje_para_la_cuenta
+
+    cuenta = User.objects.filter(username=username, is_active=True).first()
+    if cuenta is None or not cuenta.check_password(password):
+        return None
+    sancion = sancion_vigente(cuenta.pk)
+    return mensaje_para_la_cuenta(sancion) if sancion else None
+
+
 @method_decorator(ensure_csrf_cookie, name='dispatch')
 class CsrfView(APIView):
     """Deja la cookie csrftoken; React la llama al cargar la app."""
@@ -36,7 +48,7 @@ class RegistroClienteView(APIView):
         usuario = serializer.save()
         from servicios.models import TokenFCM
         TokenFCM.objects.filter(sesion=request.session.session_key).delete()
-        login(request._request, usuario, backend='django.contrib.auth.backends.ModelBackend')
+        login(request._request, usuario, backend='administracion.sanciones.BackendConSanciones')
         return Response(UsuarioActualSerializer(usuario).data, status=status.HTTP_201_CREATED)
 
 
@@ -59,6 +71,10 @@ class LoginView(APIView):
             password=serializer.validated_data['password'],
         )
         if usuario is None:
+            sancionada = cuenta_sancionada(username, serializer.validated_data['password'])
+            if sancionada:
+                # HU-13: con la contraseña correcta se explica por qué no entra.
+                return Response({'detail': sancionada}, status=status.HTTP_403_FORBIDDEN)
             return Response(
                 {'detail': 'Usuario o contraseña incorrectos.'},
                 status=status.HTTP_400_BAD_REQUEST,

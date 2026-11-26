@@ -126,7 +126,9 @@ class SolicitudSerializer(serializers.ModelSerializer):
         # HU-9: solo un prestador verificado por administración recibe solicitudes.
         if prestador.estado != Prestador.Estado.VERIFICADO:
             raise serializers.ValidationError({'prestador': 'El prestador aún no está verificado.'})
-        if not prestador.disponible:
+        # HU-13: un prestador suspendido o bloqueado tampoco recibe solicitudes.
+        from administracion.models import sancion_vigente
+        if not prestador.disponible or sancion_vigente(prestador.usuario_id) is not None:
             raise serializers.ValidationError({'prestador': 'El prestador no está disponible.'})
         if not prestador.rubros.filter(pk=datos['rubro'].pk).exists():
             raise serializers.ValidationError({'rubro': 'El prestador no ofrece ese rubro.'})

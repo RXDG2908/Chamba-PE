@@ -54,7 +54,7 @@ data class Sesion(
     val correo: String,
     val nombre: String,
     val rol: Rol,
-    /** ID del prestador en la API Django; lo vincula un administrador en Firestore. */
+    /** ID del prestador en la API Django (GET /api/usuarios/yo/); null para clientes. */
     val prestadorId: Int?,
 )
 
@@ -64,7 +64,7 @@ sealed interface EstadoSesion {
     data class Activa(val sesion: Sesion) : EstadoSesion
 }
 
-enum class TipoErrorAuth { CREDENCIALES, CORREO_EN_USO, CLAVE_DEBIL, CORREO_INVALIDO, SIN_CONEXION, DESCONOCIDO }
+enum class TipoErrorAuth { CREDENCIALES, CORREO_EN_USO, CLAVE_DEBIL, CORREO_INVALIDO, SIN_CONEXION, CUENTA_SANCIONADA, DESCONOCIDO }
 
 class ErrorAuth(val tipo: TipoErrorAuth, causa: Throwable? = null) : Exception(tipo.name, causa)
 

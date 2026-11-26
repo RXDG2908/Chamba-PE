@@ -4,7 +4,7 @@ App Android de Chamba PE para clientes y prestadores. Kotlin, Jetpack Compose y 
 con un único módulo `app` y arquitectura MVVM.
 
 > **Estado (26/11/2026):**
-> - Compila y pasa 30 pruebas unitarias.
+> - Compila y pasa 42 pruebas unitarias.
 > - Los registros de cliente y de prestador se recorrieron paso a paso en un emulador (API 36) contra Django local, incluidos los errores de cada paso, el mapa, la revisión y el botón Atrás.
 > - Las solicitudes ya van a la API, las mismas que ve la web.
 > - Desde el 26/11 la app llama al Back End de usuario en **Spring Boot** (`backend/spring/`, puerto 8080), como
@@ -12,7 +12,7 @@ con un único módulo `app` y arquitectura MVVM.
 >   comprobada con `backend/spring/tools/paridad_solicitudes/correr.py`) y usa la misma base de datos.
 >
 > **Falta:**
-> - Probar el alta y el ingreso con el `google-services.json` real del proyecto (con uno de prueba, Firebase responde «Ocurrió un error»).
+> - Recorrer el alta y el ingreso con una cuenta real en el teléfono, con el `google-services.json` del proyecto del equipo (`chamba-pe-c043f`). En la computadora de Renzo hay uno de `chamba-pe-tecsup` (la app arranca con él); la cuenta de prueba la crea una persona del equipo.
 > - Probar en un teléfono físico.
 
 <p align="center">
@@ -28,7 +28,7 @@ con un único módulo `app` y arquitectura MVVM.
 |---|---|---|
 | Ingreso y registro de clientes en 3 pasos (nombre, correo, contraseña) | Firebase Authentication (correo y contraseña) | Semana 11 |
 | Registro de prestador en 5 pasos: cuenta, datos, servicios, zona en el mapa (centro y radio) y revisión con «editar» | Firebase Auth + `POST /api/prestadores/registro-movil/` con el token; si Django lo rechaza, la cuenta se deshace y la app vuelve al paso del error | Semanas 9 y 11 |
-| Roles cliente / prestador | Perfil en Firestore `usuarios/{uid}`; el rol decide las pestañas | Semana 11 |
+| Roles cliente / prestador | `GET /api/usuarios/yo/` con el token de Firebase (la misma cuenta que ve la web); el rol decide las pestañas | Semanas 9 y 11 |
 | Rubros y búsqueda de prestadores | Retrofit contra la API Django (`/api/prestadores/rubros/` y `/buscar/`) | Semanas 9 y 10 |
 | Datos guardados y modo sin conexión | Room: última búsqueda por rubro y rubros | Semana 8 |
 | Favoritos | Room; se conservan al cerrar la app y al volver a buscar | Semana 8 |
@@ -108,42 +108,42 @@ lo que haga la app se ve en la web y en la administración. Para otra URL:
 para volver a Django, con `adb reverse tcp:8000 tcp:8000`). Solo se permite HTTP sin cifrar hacia
 `127.0.0.1`, `localhost` y `10.0.2.2`.
 
-## Rutas privadas (token de Firebase)
+## Firebase solo para la identidad; los datos en Spring Boot (y Django)
 
-Para disponibilidad, solicitudes, seguimiento y calificación la app envía
-`Authorization: Bearer <token de Firebase>`. Para que Spring (o Django) lo acepte:
+Como en el diagrama de arquitectura, la parte **Usuario** (esta app y la web de cliente y prestador)
+habla con **Spring Boot**, y **Administración** con Django; los dos usan la misma base de datos.
+Desde el 26/11 la app **no usa Firestore**: Firebase Authentication da la identidad (correo y
+contraseña) y todo lo demás vive en la base compartida:
 
-1. Arrancar Spring con `FIREBASE_AUTH_PROJECT_ID=chamba-pe-c043f` (Django usa la misma variable).
-2. En `/admin/` → Perfiles, abrir el perfil del prestador y pegar en «UID de Firebase» el UID
-   de su cuenta (se ve en Firebase → Authentication, o es el ID de su documento en `usuarios`).
+| Qué | Ruta (Spring, con las mismas respuestas que Django) |
+|---|---|
+| Rol y prestador de la cuenta | `GET /api/usuarios/yo/` (antes Firestore `usuarios/{uid}`) |
+| Alta de cliente | `POST /api/usuarios/registro-movil/` al registrarse; si falla, la cuenta de Firebase se deshace |
+| Alta de prestador | `POST /api/prestadores/registro-movil/`; queda vinculado y con su ID sin pasos manuales |
+| Solicitudes, seguimiento y calificación | `servicios` y `calificaciones` (AND-23) |
 
-Sin ese vínculo la pantalla muestra «Tu cuenta de la app aún no está vinculada».
-Detalle en [`docs/API_AUTENTICACION.md`](../docs/API_AUTENTICACION.md).
+Todas las rutas privadas reciben `Authorization: Bearer <token de Firebase>`. Spring y Django lo
+aceptan si arrancan con `FIREBASE_AUTH_PROJECT_ID` igual al proyecto del `google-services.json`.
 
-Un prestador que se registra **desde la app** ya queda vinculado en Django. Un **cliente** de la app
-se vincula solo: la primera vez que pide un servicio, la app llama a `POST /api/usuarios/registro-movil/`,
-que crea su cuenta de cliente en Django (sin duplicarla). Un prestador creado **en la web** necesita
-«UID de Firebase» en su perfil de Django y `prestadorId` en Firestore.
+- Una cuenta de Firebase sin cuenta en la base (por ejemplo, creada antes del 26/11) se crea como
+  **cliente** al entrar. Un prestador creado en la web necesita «UID de Firebase» en su perfil
+  (`/admin/` de Django → Perfiles); ya no hace falta `prestadorId` en Firestore.
+- Si la cuenta está suspendida o bloqueada (HU-13), la API responde 403 con `codigo:
+  "cuenta_sancionada"` y la app no entra (ni sigue dentro al reabrirla); sin vincular, `codigo:
+  "cuenta_no_vinculada"`.
+- El último perfil conocido se guarda en el teléfono: sin red, la app abre con el rol correcto.
+- Detalle del token en [`docs/API_AUTENTICACION.md`](../docs/API_AUTENTICACION.md).
 
-## Firebase
+### Proyecto de Firebase
 
-- Proyecto: `chamba-pe-c043f` (el que usa el equipo, confirmado por Luis el 26/11). Auth por correo/contraseña y Firestore activos.
-- Reglas en [`firestore.rules`](firestore.rules). Tras cambiar reglas o proveedores: `firebase deploy --only firestore,auth`
-  (sin desplegar `auth`, el ingreso falla con `CONFIGURATION_NOT_FOUND`).
-- Un prestador registrado desde la app queda vinculado en Django automáticamente, pero su
-  bandeja de Firestore se activa cuando administración agrega `prestadorId` a su documento.
-- Para probar un **prestador** ya existente en Django: crear el usuario en
-  Authentication y, en Firestore, el documento `usuarios/{uid}` con `nombre`, `rol: "prestador"`
-  y `prestadorId` (número: el ID del prestador en la API Django).
-  El nombre del campo distingue mayúsculas: `prestadorID` no funciona.
-
-| Colección | Campos | Quién accede |
-|---|---|---|
-| `usuarios/{uid}` | `nombre`, `correo`, `rol`, `prestadorId?`, `creadoEn` | Solo su dueño; el rol y `prestadorId` no se cambian desde la app |
-| `solicitudes/{id}` | `prestadorId`, `prestadorNombre`, `clienteUid`, `clienteNombre`, `descripcion`, `direccion`, `estado`, `creadaEn`, `respondidaEn?` | El cliente que la creó y el prestador destinatario; solo este cambia el estado |
-
-Desde el 26/11 las solicitudes de la app **ya no** se guardan en Firestore: van a la API de Django y
-son las mismas que ve la web (AND-23). La colección `solicitudes` queda solo por compatibilidad.
+- Proyecto del equipo: `chamba-pe-c043f` (confirmado por Luis el 26/11). El `google-services.json` de
+  `app/` (no se versiona) y `FIREBASE_AUTH_PROJECT_ID` de Spring y Django **tienen que ser del mismo
+  proyecto**; si no, Django y Spring rechazan el token con 403.
+- `chamba-pe-tecsup` (cuenta de Renzo) tiene la misma app Android registrada con las huellas SHA-1 y
+  SHA-256 de depuración; sirve mientras no haya acceso a `c043f` (el 26/11 la cuenta de Renzo no lo tenía).
+- Authentication por correo y contraseña activo. Firestore ya no lo usa la app: sus reglas
+  ([`firestore.rules`](firestore.rules)) siguen limitando cada documento a su dueño y se pueden cerrar
+  (`allow read, write: if false;`) cuando nadie use una versión anterior al 26/11.
 
 ## Versiones
 

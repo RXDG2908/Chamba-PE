@@ -53,6 +53,15 @@ data class RegistroPrestadorDto(
 
 data class RegistroClienteDto(@SerializedName("nombre") val nombre: String)
 
+/** GET /api/usuarios/yo/: la cuenta de Django vinculada al token (rol y prestador). */
+data class UsuarioDto(
+    @SerializedName("email") val email: String?,
+    @SerializedName("nombres") val nombres: String?,
+    @SerializedName("apellidos") val apellidos: String?,
+    @SerializedName("rol") val rol: String?,
+    @SerializedName("prestador_id") val prestadorId: Int?,
+)
+
 data class CrearSolicitudDto(
     @SerializedName("prestador") val prestador: Int,
     @SerializedName("rubro") val rubro: Int,
@@ -137,7 +146,11 @@ interface ApiService {
 
     /** Crea (o devuelve) la cuenta de cliente de Django vinculada al usuario de Firebase. */
     @POST("api/usuarios/registro-movil/")
-    suspend fun registrarClienteMovil(@Header("Authorization") autorizacion: String, @Body datos: RegistroClienteDto)
+    suspend fun registrarClienteMovil(@Header("Authorization") autorizacion: String, @Body datos: RegistroClienteDto): UsuarioDto
+
+    /** Rol y prestador de la cuenta (antes en Firestore `usuarios/{uid}`). 403 con `codigo` si no está vinculada o sancionada. */
+    @GET("api/usuarios/yo/")
+    suspend fun yo(@Header("Authorization") autorizacion: String): UsuarioDto
 
     @POST("api/servicios/solicitudes/")
     suspend fun crearSolicitud(@Header("Authorization") autorizacion: String, @Body datos: CrearSolicitudDto): SolicitudCreadaDto

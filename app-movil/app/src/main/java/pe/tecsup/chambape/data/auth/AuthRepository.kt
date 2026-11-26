@@ -8,8 +8,6 @@ import com.google.firebase.auth.FirebaseAuthInvalidUserException
 import com.google.firebase.auth.FirebaseAuthUserCollisionException
 import com.google.firebase.auth.FirebaseAuthWeakPasswordException
 import com.google.firebase.auth.FirebaseUser
-import com.google.firebase.firestore.FieldValue
-import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.NonCancellable
@@ -48,13 +46,17 @@ interface AuthRepository {
 }
 
 /**
- * Firebase Authentication (correo y contraseña) + perfil en Firestore `usuarios/{uid}`.
- * El rol no lo decide la app: se lee del perfil. Desde la app solo se registran clientes;
- * los prestadores los crea y vincula un administrador en la consola.
+ * Firebase Authentication (correo y contraseña) para la identidad + perfil en Django.
+ *
+ * El rol y el ID de prestador ya no se leen de Firestore: los da `GET /api/usuarios/yo/` con el
+ * token de Firebase, la misma cuenta que ve la web. Un cliente que se registra en la app crea su
+ * cuenta en Django al instante (`registro-movil`); si eso falla, la cuenta de Firebase se deshace,
+ * igual que con el prestador. El último perfil se guarda en el teléfono para abrir sin red.
  */
 class FirebaseAuthRepository(
     private val auth: FirebaseAuth,
-    private val firestore: FirebaseFirestore,
+    private val perfiles: PerfilesRemotos,
+    private val almacen: AlmacenPerfil,
     scope: CoroutineScope,
 ) : AuthRepository {
 
@@ -72,9 +74,17 @@ class FirebaseAuthRepository(
                     EstadoSesion.Activa(leerPerfil(actual))
                 } catch (e: CancellationException) {
                     throw e
+                } catch (e: ErrorAuth) {
+                    if (e.tipo == TipoErrorAuth.CUENTA_SANCIONADA) {
+                        // HU-13: una cuenta sancionada no sigue dentro al reabrir la app.
+                        cerrarSesion()
+                        EstadoSesion.SinSesion
+                    } else {
+                        // Sin red al abrir: el último perfil conocido o, si no hay, el de cliente.
+                        EstadoSesion.Activa(sesionDe(actual, almacen.leer(actual.uid) ?: perfilMinimo(actual)))
+                    }
                 } catch (e: Exception) {
-                    // Sin red al abrir: se entra con los datos mínimos de la cuenta.
-                    EstadoSesion.Activa(perfilMinimo(actual))
+                    EstadoSesion.Activa(sesionDe(actual, almacen.leer(actual.uid) ?: perfilMinimo(actual)))
                 }
             }
         }
@@ -83,26 +93,25 @@ class FirebaseAuthRepository(
     override suspend fun ingresar(correo: String, clave: String) {
         val usuario = traducir { auth.signInWithEmailAndPassword(correo.trim(), clave).await().user }
             ?: throw ErrorAuth(TipoErrorAuth.DESCONOCIDO)
-        _sesion.value = EstadoSesion.Activa(traducir { leerPerfil(usuario) })
+        val sesion = try {
+            leerPerfil(usuario)
+        } catch (e: Exception) {
+            // Sin perfil no se entra a medias (ni sancionado ni sin red para saber el rol).
+            auth.signOut()
+            throw e
+        }
+        _sesion.value = EstadoSesion.Activa(sesion)
     }
 
     override suspend fun registrarCliente(nombre: String, correo: String, clave: String) {
         val usuario = traducir { auth.createUserWithEmailAndPassword(correo.trim(), clave).await().user }
             ?: throw ErrorAuth(TipoErrorAuth.DESCONOCIDO)
-        val nombreLimpio = nombre.trim()
-        traducir {
-            firestore.collection(USUARIOS).document(usuario.uid).set(
-                mapOf(
-                    "nombre" to nombreLimpio,
-                    "correo" to usuario.email.orEmpty(),
-                    "rol" to ROL_CLIENTE,
-                    "creadoEn" to FieldValue.serverTimestamp(),
-                ),
-            ).await()
+        val sesion = deshacerSiFalla(usuario) {
+            val perfil = perfiles.crearCliente(token(usuario), nombre.trim())
+            almacen.guardar(usuario.uid, perfil)
+            sesionDe(usuario, perfil)
         }
-        _sesion.value = EstadoSesion.Activa(
-            Sesion(usuario.uid, usuario.email.orEmpty(), nombreLimpio, Rol.CLIENTE, prestadorId = null),
-        )
+        _sesion.value = EstadoSesion.Activa(sesion)
     }
 
     override suspend fun registrarPrestador(
@@ -113,37 +122,18 @@ class FirebaseAuthRepository(
     ) {
         val usuario = traducir { auth.createUserWithEmailAndPassword(correo.trim(), clave).await().user }
             ?: throw ErrorAuth(TipoErrorAuth.DESCONOCIDO)
-        try {
-            val token = traducir { usuario.getIdToken(false).await().token }
-                ?: throw ErrorAuth(TipoErrorAuth.DESCONOCIDO)
-            registrarEnApi(token)
-        } catch (e: Exception) {
-            // Sin prestador en Django no debe quedar una cuenta a medias: se deshace.
-            withContext(NonCancellable) {
-                runCatching { usuario.delete().await() }
-                auth.signOut()
-            }
-            throw e
-        }
-        // El perfil se crea como prestador sin prestadorId: la bandeja se activa cuando
-        // administración verifica el perfil y lo vincula.
-        traducir {
-            firestore.collection(USUARIOS).document(usuario.uid).set(
-                mapOf(
-                    "nombre" to nombre,
-                    "correo" to usuario.email.orEmpty(),
-                    "rol" to ROL_PRESTADOR,
-                    "creadoEn" to FieldValue.serverTimestamp(),
-                ),
-            ).await()
-        }
-        _sesion.value = EstadoSesion.Activa(
-            Sesion(usuario.uid, usuario.email.orEmpty(), nombre, Rol.PRESTADOR, prestadorId = null),
-        )
+        // Sin prestador en Django no debe quedar una cuenta a medias: se deshace.
+        deshacerSiFalla(usuario) { registrarEnApi(token(usuario)) }
+        // Django ya lo dejó vinculado: el ID de prestador llega sin pasos manuales.
+        val perfil = runCatching { perfiles.perfil(token(usuario)) }.getOrNull()
+            ?: PerfilRemoto(nombre, Rol.PRESTADOR, prestadorId = null)
+        almacen.guardar(usuario.uid, perfil)
+        _sesion.value = EstadoSesion.Activa(sesionDe(usuario, perfil))
     }
 
     override fun cerrarSesion() {
         auth.signOut()
+        almacen.borrar()
         _sesion.value = EstadoSesion.SinSesion
     }
 
@@ -156,21 +146,36 @@ class FirebaseAuthRepository(
             null
         }
 
+    private suspend fun token(usuario: FirebaseUser): String =
+        traducir { usuario.getIdToken(false).await().token } ?: throw ErrorAuth(TipoErrorAuth.DESCONOCIDO)
+
     private suspend fun leerPerfil(usuario: FirebaseUser): Sesion {
-        val doc = firestore.collection(USUARIOS).document(usuario.uid).get().await()
-        if (!doc.exists()) return perfilMinimo(usuario)
-        return Sesion(
-            uid = usuario.uid,
-            correo = usuario.email.orEmpty(),
-            nombre = doc.getString("nombre")?.takeIf { it.isNotBlank() } ?: nombrePorCorreo(usuario),
-            rol = if (doc.getString("rol") == ROL_PRESTADOR) Rol.PRESTADOR else Rol.CLIENTE,
-            prestadorId = doc.getLong("prestadorId")?.toInt(),
-        )
+        val perfil = perfiles.perfilOCliente(token(usuario), nombrePorCorreo(usuario))
+        almacen.guardar(usuario.uid, perfil)
+        return sesionDe(usuario, perfil)
     }
 
-    /** Cuenta sin perfil legible: se trata como cliente, el rol con menos permisos. */
-    private fun perfilMinimo(usuario: FirebaseUser) =
-        Sesion(usuario.uid, usuario.email.orEmpty(), nombrePorCorreo(usuario), Rol.CLIENTE, prestadorId = null)
+    private suspend fun <T> deshacerSiFalla(usuario: FirebaseUser, bloque: suspend () -> T): T =
+        try {
+            bloque()
+        } catch (e: Exception) {
+            withContext(NonCancellable) {
+                runCatching { usuario.delete().await() }
+                auth.signOut()
+            }
+            throw e
+        }
+
+    private fun sesionDe(usuario: FirebaseUser, perfil: PerfilRemoto) = Sesion(
+        uid = usuario.uid,
+        correo = usuario.email.orEmpty(),
+        nombre = perfil.nombre.ifBlank { nombrePorCorreo(usuario) },
+        rol = perfil.rol,
+        prestadorId = perfil.prestadorId,
+    )
+
+    /** Sin perfil conocido: se trata como cliente, el rol con menos permisos. */
+    private fun perfilMinimo(usuario: FirebaseUser) = PerfilRemoto(nombrePorCorreo(usuario), Rol.CLIENTE, null)
 
     private fun nombrePorCorreo(usuario: FirebaseUser) = usuario.email.orEmpty().substringBefore('@')
 
@@ -197,9 +202,4 @@ class FirebaseAuthRepository(
             throw ErrorAuth(TipoErrorAuth.DESCONOCIDO, e)
         }
 
-    private companion object {
-        const val USUARIOS = "usuarios"
-        const val ROL_CLIENTE = "cliente"
-        const val ROL_PRESTADOR = "prestador"
-    }
 }

@@ -16,7 +16,9 @@
 .revision-rechazado { border-left-color: #b3261e; }
 
 .revision-cabecera { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; min-width: 0; }
-.revision-datos { min-width: 0; }
+.revision-datos { flex: 1 1 0; min-width: 0; }
+/* Lo que acompaña al nombre (archivo, enlace) no se aprieta aunque el nombre sea enorme. */
+.revision-cabecera > :not(.revision-datos) { flex-shrink: 0; }
 .revision-datos h3 { margin: 0 0 12px; font-size: 18px; overflow-wrap: anywhere; }
 .revision-datos dl { display: flex; flex-wrap: wrap; gap: 12px 32px; margin: 0; }
 .revision-datos dt { margin-bottom: 4px; color: #58675f; font-size: 13px; }

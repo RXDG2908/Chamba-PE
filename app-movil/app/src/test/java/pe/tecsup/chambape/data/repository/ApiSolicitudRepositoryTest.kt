@@ -25,6 +25,7 @@ import pe.tecsup.chambape.data.remote.MiServicioDto
 import pe.tecsup.chambape.data.remote.PrestadorDto
 import pe.tecsup.chambape.data.remote.PrestadorResumenDto
 import pe.tecsup.chambape.data.remote.RegistroClienteDto
+import pe.tecsup.chambape.data.remote.UsuarioDto
 import pe.tecsup.chambape.data.remote.RegistroPrestadorDto
 import pe.tecsup.chambape.data.remote.RubroDto
 import pe.tecsup.chambape.data.remote.SolicitudCreadaDto
@@ -63,10 +64,12 @@ private class ApiFalsa : ApiService {
         if (!clienteRegistrado) throw http(403)
     }
 
-    override suspend fun registrarClienteMovil(autorizacion: String, datos: RegistroClienteDto) {
+    override suspend fun registrarClienteMovil(autorizacion: String, datos: RegistroClienteDto): UsuarioDto {
         registros++
         clienteRegistrado = true
+        return UsuarioDto("c@x.pe", datos.nombre, "", "cliente", null)
     }
+    override suspend fun yo(autorizacion: String): UsuarioDto = UsuarioDto("c@x.pe", "Cliente", "", "cliente", null)
 
     override suspend fun crearSolicitud(autorizacion: String, datos: CrearSolicitudDto): SolicitudCreadaDto {
         comoCliente(autorizacion)

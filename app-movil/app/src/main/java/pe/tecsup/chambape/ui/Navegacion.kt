@@ -126,7 +126,7 @@ private fun NavegacionIngreso() {
 @Composable
 private fun NavegacionPrincipal(sesion: Sesion, onCerrarSesion: () -> Unit) {
     val nav = rememberNavController()
-    // El rol (leído de Firestore) decide qué pestañas existen.
+    // El rol (leído de Django con el token de Firebase) decide qué pestañas existen.
     val pestanas = if (sesion.rol == Rol.PRESTADOR) PestanasPrestador else PestanasCliente
     val rutaActual = nav.currentBackStackEntryAsState().value?.destination?.route
     val pestanaActual = pestanas.firstOrNull { it.ruta == rutaActual }

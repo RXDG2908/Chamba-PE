@@ -104,6 +104,7 @@ solo cambien la dirección del servidor:
 | `GET` · `PATCH /api/usuarios/disponibilidad/` | Disponibilidad del prestador | ✅ |
 | `POST /api/usuarios/registro-movil/` · `POST /api/prestadores/registro-movil/` | Alta de cliente y de prestador desde la app, con el token de Firebase | ✅ 26/11 |
 | `GET /api/calificaciones/mis-servicios/` · `POST /api/calificaciones/` | «Mis servicios» del cliente y calificar (HU-12) | ✅ 26/11 |
+| `GET /api/usuarios/yo/` | Rol y prestador de la cuenta: la app lee de aquí su perfil con el token (antes, Firestore). Los 403 de la app traen `codigo` (`cuenta_no_vinculada`, `cuenta_sancionada`) | ✅ 26/11 |
 
 Con estas, Spring tiene las 13 rutas que usa la app Android. Todas aceptan el token de la app **y** la sesión de la
 web.

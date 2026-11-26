@@ -59,6 +59,30 @@ class AutenticacionFirebaseTests(TestCase):
         self.prestador.refresh_from_db()
         self.assertFalse(self.prestador.disponible)
 
+    def test_yo_con_token_devuelve_rol_y_prestador(self):
+        """La app lee el rol de aquí (ya no de Firestore)."""
+        self.con_token()
+        with patch(VERIFICAR, return_value='uid-ana'):
+            datos = self.cliente_http.get('/api/usuarios/yo/').json()
+        self.assertEqual((datos['rol'], datos['prestador_id'], datos['nombres']), ('prestador', self.prestador.id, 'Ana'))
+
+    def test_sin_vincular_lleva_codigo_estable(self):
+        self.con_token()
+        with patch(VERIFICAR, return_value='uid-nuevo'):
+            respuesta = self.cliente_http.get('/api/usuarios/yo/')
+        self.assertEqual(respuesta.status_code, 403)
+        self.assertEqual(respuesta.json()['codigo'], 'cuenta_no_vinculada')
+
+    def test_sancionada_lleva_codigo_estable(self):
+        from administracion.models import SancionCuenta
+        SancionCuenta.objects.create(usuario=self.usuario, tipo=SancionCuenta.Tipo.BLOQUEO, motivo='Prueba de sanción.')
+        self.con_token()
+        with patch(VERIFICAR, return_value='uid-ana'):
+            respuesta = self.cliente_http.get('/api/usuarios/yo/')
+        self.assertEqual(respuesta.status_code, 403)
+        self.assertEqual(respuesta.json()['codigo'], 'cuenta_sancionada')
+        self.assertIn('detail', respuesta.json())
+
     def test_cuenta_desactivada_se_rechaza(self):
         self.usuario.is_active = False
         self.usuario.save()

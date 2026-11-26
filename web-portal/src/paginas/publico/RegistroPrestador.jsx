@@ -119,18 +119,18 @@ function RegistroPrestador() {
       <fieldset>
         <legend>Tus datos</legend>
         <div className="rejilla">
-          {campo('nombres', 'Nombres', { autoComplete: 'given-name' })}
-          {campo('apellidos', 'Apellidos', { autoComplete: 'family-name' })}
+          {campo('nombres', 'Nombres', { autoComplete: 'given-name', maxLength: 100 })}
+          {campo('apellidos', 'Apellidos', { autoComplete: 'family-name', maxLength: 100 })}
           {campo('dni', 'DNI', { inputMode: 'numeric', maxLength: 8 })}
-          {campo('telefono', 'Teléfono (opcional)', { type: 'tel', autoComplete: 'tel' })}
+          {campo('telefono', 'Teléfono (opcional)', { type: 'tel', autoComplete: 'tel', inputMode: 'tel', maxLength: 16 })}
         </div>
       </fieldset>
 
       <fieldset>
         <legend>Tu cuenta</legend>
         <div className="rejilla">
-          {campo('username', 'Usuario', { autoComplete: 'username' })}
-          {campo('email', 'Correo', { type: 'email', autoComplete: 'email' })}
+          {campo('username', 'Usuario', { autoComplete: 'username', maxLength: 150 })}
+          {campo('email', 'Correo', { type: 'email', autoComplete: 'email', maxLength: 254 })}
           {campo('password', 'Contraseña', { type: 'password', autoComplete: 'new-password' })}
         </div>
       </fieldset>

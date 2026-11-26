@@ -50,6 +50,7 @@
     <string name="ya_tengo_cuenta">Ya tengo cuenta</string>
     <string name="error_campos_vacios">Completa todos los campos.</string>
     <string name="error_clave_corta">La contraseña debe tener al menos %1$d caracteres.</string>
+    <string name="error_cuenta_sancionada">Tu cuenta está suspendida o bloqueada. Escribe a administración para saber el motivo.</string>
     <string name="error_credenciales">Correo o contraseña incorrectos.</string>
     <string name="error_correo_en_uso">Ya existe una cuenta con ese correo.</string>
     <string name="error_clave_debil">La contraseña es muy débil.</string>
@@ -90,8 +91,8 @@
     <string name="detalle_zona">Zona de atención aproximada: %1$.3f, %2$.3f</string>
     <string name="sin_calificaciones">Sin calificaciones</string>
     <plurals name="calificacion_resumen">
-        <item quantity="one">%1$.1f · %2$d calificación</item>
-        <item quantity="other">%1$.1f · %2$d calificaciones</item>
+        <item quantity="one">%1$.1f · %2$,d calificación</item>
+        <item quantity="other">%1$.1f · %2$,d calificaciones</item>
     </plurals>
     <string name="guardar_en_favoritos">Guardar en favoritos</string>
     <string name="quitar_de_favoritos">Quitar de favoritos</string>

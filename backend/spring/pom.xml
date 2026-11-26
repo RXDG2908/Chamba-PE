@@ -40,6 +40,18 @@
             <groupId>org.hibernate.orm</groupId>
             <artifactId>hibernate-community-dialects</artifactId>
         </dependency>
+        <!-- Verifica el token de Firebase de la app (firma con las claves públicas de Google). -->
+        <dependency>
+            <groupId>com.nimbusds</groupId>
+            <artifactId>nimbus-jose-jwt</artifactId>
+            <version>9.40</version>
+        </dependency>
+        <!-- Credenciales de la cuenta de servicio para enviar notificaciones con FCM (HU-8). -->
+        <dependency>
+            <groupId>com.google.auth</groupId>
+            <artifactId>google-auth-library-oauth2-http</artifactId>
+            <version>1.30.0</version>
+        </dependency>
         <!-- Base compartida en la nube (perfil postgres). -->
         <dependency>
             <groupId>org.postgresql</groupId>

@@ -43,7 +43,7 @@ abstract class PruebaConBase {
 
     @DynamicPropertySource
     static void baseSoloLectura(DynamicPropertyRegistry registro) {
-        registro.add("spring.datasource.url", () -> "jdbc:sqlite:" + BASE.toAbsolutePath() + "?open_mode=1");
+        registro.add("spring.datasource.url", () -> "jdbc:sqlite:" + BASE.toAbsolutePath() + "?busy_timeout=5000");
     }
 
     @BeforeAll
@@ -74,9 +74,17 @@ abstract class PruebaConBase {
         prestador(8, "Hugo", String.valueOf(LATITUD_5_KM), "0", 5, true, "verificado", 1);
     }
 
+    /** Cuenta de Django activa, sin contraseña utilizable (como create_user sin clave). */
+    static void cuenta(long id, String usuario) {
+        jdbc.update("""
+            insert into auth_user (id, password, is_superuser, username, first_name, last_name, email, is_staff,
+              is_active, date_joined)
+            values (?, '!', 0, ?, '', '', '', 0, 1, '2026-11-23 10:00:00')""", id, usuario);
+    }
+
     static void prestador(long id, String nombre, String latitud, String longitud, int radio,
                           boolean disponible, String estado, long... rubros) {
-        jdbc.update("insert into auth_user (id, username) values (?, ?)", id, "usuario" + id);
+        cuenta(id, "usuario" + id);
         jdbc.update("""
             insert into prestadores_prestador (id, nombres, apellidos, dni, telefono, latitud, longitud,
               radio_cobertura_km, disponible, estado, creado, usuario_id, calificaciones_total)

@@ -4,6 +4,7 @@ from django.db import transaction
 from rest_framework import serializers
 
 from .models import Perfil, rol_de
+from .validadores import nombre_de_persona
 
 User = get_user_model()
 
@@ -15,7 +16,7 @@ def validar_correo_unico(value):
 
 
 class RegistroClienteSerializer(serializers.Serializer):
-    username = serializers.CharField(max_length=150)
+    username = serializers.CharField(max_length=150, validators=[User.username_validator])
     email = serializers.EmailField()
     password = serializers.CharField(write_only=True, style={'input_type': 'password'})
     nombres = serializers.CharField(max_length=100)
@@ -28,6 +29,12 @@ class RegistroClienteSerializer(serializers.Serializer):
 
     def validate_email(self, value):
         return validar_correo_unico(value)
+
+    def validate_nombres(self, valor):
+        return nombre_de_persona(valor)
+
+    def validate_apellidos(self, valor):
+        return nombre_de_persona(valor)
 
     def validate_password(self, value):
         validate_password(value)

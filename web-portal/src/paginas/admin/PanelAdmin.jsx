@@ -2,10 +2,11 @@ import { Link } from 'react-router-dom'
 import useConsultas from '../../nucleo/useConsultas.js'
 import '../../estilos/Paneles.css'
 import { FileCheck2, IdCard, ScanFace, UserX } from 'lucide-react'
+import { formatoEntero } from '../../nucleo/formatos.js'
 
 function cantidad(consulta) {
   if (consulta.estado === 'cargando') return '—'
-  return Array.isArray(consulta.datos) ? consulta.datos.length : '?'
+  return Array.isArray(consulta.datos) ? formatoEntero.format(consulta.datos.length) : '?'
 }
 
 // Inicio de administración: las colas que esperan una decisión.

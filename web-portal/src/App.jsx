@@ -9,6 +9,7 @@ import { ICONO_RUTA } from './nucleo/iconos.js'
 import { LogIn, LogOut, UserPlus, Wrench } from 'lucide-react'
 import RutaPrivada from './componentes/RutaPrivada.jsx'
 import SubmenuVerificacion from './componentes/SubmenuVerificacion.jsx'
+import LimiteDeError from './componentes/LimiteDeError.jsx'
 // Público
 import Inicio from './paginas/publico/Inicio.jsx'
 import IniciarSesion from './paginas/publico/IniciarSesion.jsx'
@@ -148,6 +149,8 @@ function App() {
       <div id="contenido" className="contenido" tabIndex={-1}>
       {/* La clave por ruta reinicia la animación de entrada en cada cambio de página. */}
       <div key={pathname} className="pagina">
+      {/* Un error en una pantalla no tumba la web: se muestra un aviso y se puede reintentar. */}
+      <LimiteDeError>
       <Routes>
         {/* Público */}
         <Route path="/" element={<Inicio usuario={usuario} />} />
@@ -174,6 +177,7 @@ function App() {
 
         <Route path="*" element={<NoEncontrada usuario={usuario} />} />
       </Routes>
+      </LimiteDeError>
       </div>
       </div>
 

@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { useLocation } from 'react-router-dom'
 import SolicitudServicio from '../../componentes/SolicitudServicio.jsx'
 import MapaBusqueda from '../../componentes/mapa/MapaBusqueda.jsx'
-import { formatoDistancia, textoCalificacion, USA_GOOGLE_MAPS } from '../../nucleo/formatos.js'
+import { formatoDistancia, formatoEntero, iniciales, textoCalificacion, USA_GOOGLE_MAPS } from '../../nucleo/formatos.js'
 import { MapPin, Search } from 'lucide-react'
 import Cargando from '../../componentes/Cargando.jsx'
 
@@ -228,13 +228,13 @@ function ResultadosPrestadores() {
       <section aria-labelledby="titulo-resultados" aria-busy={estado === 'cargando'}>
         <div className="resumen">
           <h3 id="titulo-resultados">Lista de prestadores</h3>
-          {estado === 'listo' && <span>{prestadores.length} {prestadores.length === 1 ? 'prestador' : 'prestadores'}</span>}
+          {estado === 'listo' && <span>{formatoEntero.format(prestadores.length)} {prestadores.length === 1 ? 'prestador' : 'prestadores'}</span>}
         </div>
         <div aria-live="polite" role="status">
           {estado === 'inicial' && <p className="aviso">Elige un rubro y tu ubicación, y pulsa Buscar.</p>}
           {estado === 'cargando' && <p className="aviso">Buscando prestadores disponibles…</p>}
           {estado === 'vacio' && <p className="aviso">No encontramos prestadores disponibles de ese rubro con cobertura en tu ubicación.</p>}
-          {estado === 'listo' && <p className="resultado-anuncio">Búsqueda completada: {prestadores.length} {prestadores.length === 1 ? 'prestador encontrado' : 'prestadores encontrados'}.</p>}
+          {estado === 'listo' && <p className="resultado-anuncio">Búsqueda completada: {formatoEntero.format(prestadores.length)} {prestadores.length === 1 ? 'prestador encontrado' : 'prestadores encontrados'}.</p>}
         </div>
         {estado === 'error' && <p className="error-busqueda" role="alert">{error}</p>}
         {estado === 'listo' && recomendado && <Recomendado prestador={recomendado} />}
@@ -245,7 +245,7 @@ function ResultadosPrestadores() {
                 className={`tarjeta${recomendado?.id === prestador.id ? ' tarjeta-recomendada' : ''}`}>
                 <div className="cabecera-prestador">
                 <div className={`avatar ${['verde', 'azul', 'naranja'][indice % 3]}`} aria-hidden="true">
-                  {prestador.nombres.charAt(0)}{prestador.apellidos.charAt(0)}
+                  {iniciales(prestador.nombres, prestador.apellidos)}
                 </div>
                 <div className="perfil">
                   <h4>{prestador.nombres} {prestador.apellidos}</h4>

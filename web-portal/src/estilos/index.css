@@ -11,6 +11,9 @@
 }
 
 * { box-sizing: border-box; }
-body { margin: 0; min-width: 280px; }
+/* Contenido real (impeccable «harden»): nombres de 200 caracteres, URLs o palabras sin espacios se
+ * cortan solo cuando no caben en la línea. Con «anywhere» (y no «break-word») el ancho mínimo del texto
+ * deja de empujar a su tarjeta, así que ninguna fila de flex o grid crece más que la pantalla. */
+body { margin: 0; min-width: 280px; overflow-wrap: anywhere; }
 p { margin: 0; }
 #root { min-height: 100svh; }

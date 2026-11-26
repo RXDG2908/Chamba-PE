@@ -1,0 +1,36 @@
+/* HU-13: gestión de cuentas. Reutiliza las tarjetas de RevisionDocumentos.css. */
+.cuentas-filtros { display: flex; gap: 10px; margin-bottom: 12px; }
+.cuentas-filtros input { flex: 1; min-width: 0; padding: 10px 12px; border: 1px solid #cbded3; border-radius: 10px; font: inherit; }
+
+.cuentas-pestanas { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 20px; }
+.revision .cuentas-pestanas button { padding: 7px 14px; border: 1px solid #cbded3; border-radius: 999px; background: #fff; color: #355342; font-weight: 600; }
+.revision .cuentas-pestanas button[aria-pressed='true'] { border-color: #16734f; background: #16734f; color: #fff; }
+
+.cuenta-activa { border-left-color: #16734f; }
+.cuenta-suspendida { border-left-color: #d9a441; }
+.cuenta-bloqueada { border-left-color: #b3261e; }
+
+.cuenta-estado { flex-shrink: 0; padding: 5px 12px; border-radius: 999px; font-size: 13px; font-weight: 700; }
+.cuenta-estado-activa { background: #eaf4ee; color: #16734f; }
+.cuenta-estado-suspendida { background: #fff3e3; color: #8a5a10; }
+.cuenta-estado-bloqueada { background: #fdecea; color: #b3261e; }
+
+.cuenta-sancion { margin: 0; padding: 12px 14px; border-radius: 10px; background: #f7f4ee; color: #4a3d25; font-size: 14px; overflow-wrap: anywhere; }
+
+.cuenta-formulario { display: grid; gap: 12px; }
+.cuenta-formulario fieldset { display: grid; gap: 6px; margin: 0; padding: 0; border: 0; }
+.cuenta-formulario legend { margin-bottom: 6px; font-size: 14px; font-weight: 600; }
+.cuenta-formulario fieldset label { display: flex; align-items: center; gap: 8px; }
+.cuenta-campo { display: grid; gap: 6px; }
+.cuenta-campo label { font-size: 14px; font-weight: 600; }
+.cuenta-campo input, .cuenta-campo textarea { width: 100%; min-width: 0; padding: 10px 12px; border: 1px solid #cbded3; border-radius: 10px; color: #20352a; font: inherit; }
+.cuenta-campo input { max-width: 140px; }
+.cuenta-campo textarea { resize: vertical; }
+.cuenta-error { margin: 0; color: #b3261e; font-size: 14px; }
+
+.visualmente-oculto { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+@media (max-width: 560px) {
+  .revision-cabecera { flex-direction: column; }
+  .cuentas-filtros { flex-direction: column; }
+}

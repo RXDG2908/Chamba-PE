@@ -12,6 +12,7 @@ import RegistroPrestador from './RegistroPrestador.jsx'
 import ResultadosPrestadores from './ResultadosPrestadores.jsx'
 import UploadCertificado from './UploadCertificado.jsx'
 import RevisionDocumentos from './RevisionDocumentos.jsx'
+import GestionCuentas from './GestionCuentas.jsx'
 import SolicitudesRecibidas from './SolicitudesRecibidas.jsx'
 import { escuchar, desactivarNotificaciones } from './notificaciones.js'
 import VerificarDni from './VerificarDni.jsx'
@@ -36,7 +37,7 @@ const MENU_POR_ROL = {
     ['/consentimiento', 'Consentimiento DNI'],
     ['/eliminar-datos', 'Eliminar datos DNI'],
   ],
-  administrador: [['/administracion/revisiones', 'Revisión de documentos']],
+  administrador: [['/administracion/revisiones', 'Revisión de documentos'], ['/administracion/cuentas', 'Cuentas']],
 }
 
 // Sin sesión manda a iniciar sesión; con otro rol vuelve al inicio.
@@ -137,6 +138,10 @@ function App() {
         <Route
           path="/administracion/revisiones"
           element={<RutaPrivada usuario={usuario} rol="administrador"><RevisionDocumentos /></RutaPrivada>}
+        />
+        <Route
+          path="/administracion/cuentas"
+          element={<RutaPrivada usuario={usuario} rol="administrador"><GestionCuentas /></RutaPrivada>}
         />
 
         <Route

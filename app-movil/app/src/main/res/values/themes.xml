@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Arranque con androidx SplashScreen; en Android 8 a 11 muestra el icono estático. -->
+    <style name="Theme.ChambaPe.Arranque" parent="Theme.SplashScreen">
+        <item name="windowSplashScreenBackground">@color/fondo_arranque</item>
+        <item name="windowSplashScreenAnimatedIcon">@drawable/splash_icono</item>
+        <item name="postSplashScreenTheme">@style/Theme.ChambaPe</item>
+    </style>
+
+    <style name="Theme.ChambaPe" parent="android:Theme.Material.Light.NoActionBar" />
+</resources>

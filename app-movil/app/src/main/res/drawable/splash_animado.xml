@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Arranque animado (Android 12+), hecho con la skill logo-animation: una sola idea, «build-on» escalonado.
+  Igual que la portada web: el pin cae al mapa (450 ms), el radio de cobertura se abre (desde 250 ms) y la
+  llave gira a su sitio con un leve rebote (desde 320 ms). Todo termina en 740 ms, dentro del segundo que da
+  el sistema, y el último cuadro es el icono exacto. Con animaciones desactivadas, el sistema muestra el final.
+-->
+<animated-vector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aapt="http://schemas.android.com/aapt">
+    <aapt:attr name="android:drawable">
+        <vector android:width="288dp" android:height="288dp"
+            android:viewportWidth="108" android:viewportHeight="108">
+            <group android:name="radio" android:pivotX="54" android:pivotY="78" android:scaleX="0.4" android:scaleY="0.4">
+                <path android:name="anillo" android:pathData="M40,78 a14,4.5 0 1,0 28,0 a14,4.5 0 1,0 -28,0" android:strokeColor="#F29F3D"
+                    android:strokeWidth="3" android:strokeLineCap="round" android:strokeAlpha="0" />
+            </group>
+            <group android:name="pin" android:pivotX="54" android:pivotY="77"
+                android:translateY="-14" android:scaleX="0.9" android:scaleY="0.9">
+                <path android:name="pin_relleno" android:pathData="M54,77 C48,70 36,59 36,47 A18,18 0 0,1 72,47 C72,59 60,70 54,77 Z" android:fillColor="#FFFFFF" android:fillAlpha="0" />
+            </group>
+            <group android:name="llave" android:pivotX="54" android:pivotY="47"
+                android:rotation="-30" android:scaleX="0.6" android:scaleY="0.6">
+                <group android:translateX="43" android:translateY="36" android:scaleX="0.9167" android:scaleY="0.9167">
+                    <path android:name="llave_trazo" android:pathData="M14.7,6.3a1,1 0 0,0 0,1.4l1.6,1.6a1,1 0 0,0 1.4,0l3.77,-3.77a6,6 0 0,1 -7.94,7.94l-6.91,6.91a2.12,2.12 0 0,1 -3,-3l6.91,-6.91a6,6 0 0,1 7.94,-7.94l-3.76,3.76z" android:strokeColor="#16734F"
+                        android:strokeWidth="3" android:strokeLineCap="round" android:strokeLineJoin="round"
+                        android:strokeAlpha="0" />
+                </group>
+            </group>
+        </vector>
+    </aapt:attr>
+
+    <target android:name="pin">
+        <aapt:attr name="android:animation">
+            <set>
+                <objectAnimator android:propertyName="translateY" android:valueFrom="-14" android:valueTo="0" android:duration="450" android:interpolator="@interpolator/salida_fuerte" />
+                <objectAnimator android:propertyName="scaleX" android:valueFrom="0.9" android:valueTo="1" android:duration="450" android:interpolator="@interpolator/salida_fuerte" />
+                <objectAnimator android:propertyName="scaleY" android:valueFrom="0.9" android:valueTo="1" android:duration="450" android:interpolator="@interpolator/salida_fuerte" />
+            </set>
+        </aapt:attr>
+    </target>
+
+    <target android:name="pin_relleno">
+        <aapt:attr name="android:animation">
+            <objectAnimator android:propertyName="fillAlpha" android:valueFrom="0" android:valueTo="1" android:duration="150" android:interpolator="@android:interpolator/linear" />
+        </aapt:attr>
+    </target>
+
+    <target android:name="radio">
+        <aapt:attr name="android:animation">
+            <set>
+                <objectAnimator android:propertyName="scaleX" android:valueFrom="0.4" android:valueTo="1" android:startOffset="250" android:duration="450" android:interpolator="@interpolator/salida_fuerte" />
+                <objectAnimator android:propertyName="scaleY" android:valueFrom="0.4" android:valueTo="1" android:startOffset="250" android:duration="450" android:interpolator="@interpolator/salida_fuerte" />
+            </set>
+        </aapt:attr>
+    </target>
+
+    <target android:name="anillo">
+        <aapt:attr name="android:animation">
+            <objectAnimator android:propertyName="strokeAlpha" android:valueFrom="0" android:valueTo="1" android:startOffset="250" android:duration="200" android:interpolator="@android:interpolator/linear" />
+        </aapt:attr>
+    </target>
+
+    <target android:name="llave">
+        <aapt:attr name="android:animation">
+            <set>
+                <objectAnimator android:propertyName="rotation" android:valueFrom="-30" android:valueTo="0" android:startOffset="320" android:duration="420" android:interpolator="@interpolator/rebote_suave" />
+                <objectAnimator android:propertyName="scaleX" android:valueFrom="0.6" android:valueTo="1" android:startOffset="320" android:duration="420" android:interpolator="@interpolator/rebote_suave" />
+                <objectAnimator android:propertyName="scaleY" android:valueFrom="0.6" android:valueTo="1" android:startOffset="320" android:duration="420" android:interpolator="@interpolator/rebote_suave" />
+            </set>
+        </aapt:attr>
+    </target>
+
+    <target android:name="llave_trazo">
+        <aapt:attr name="android:animation">
+            <objectAnimator android:propertyName="strokeAlpha" android:valueFrom="0" android:valueTo="1" android:startOffset="320" android:duration="170" android:interpolator="@android:interpolator/linear" />
+        </aapt:attr>
+    </target>
+</animated-vector>

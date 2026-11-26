@@ -49,6 +49,29 @@ public class Cuentas {
         return filas.stream().findFirst();
     }
 
+    /**
+     * La cuenta activa de una sesión de la web, con el rol de {@code rol_de}: el de su perfil o,
+     * sin perfil, administrador si es {@code is_staff}.
+     */
+    public Optional<Usuario> activaPorId(long id) {
+        List<Usuario> filas = jdbc.query("""
+            select u.id, u.is_staff, p.rol, pr.id as prestador
+            from auth_user u
+            left join usuarios_perfil p on p.usuario_id = u.id
+            left join prestadores_prestador pr on pr.usuario_id = u.id
+            where u.id = ? and u.is_active = ?""",
+            (fila, n) -> {
+                String rol = fila.getString("rol");
+                if (rol == null && fila.getBoolean("is_staff")) {
+                    rol = "administrador";
+                }
+                return new Usuario(fila.getLong("id"), rol,
+                    fila.getObject("prestador") == null ? null : fila.getLong("prestador"));
+            },
+            id, true);
+        return filas.stream().findFirst();
+    }
+
     /** Mensaje de la sanción vigente (HU-13), igual al de Django, o vacío si no tiene. */
     public Optional<String> sancionVigente(long usuarioId) {
         Object ahora = fechas.parametro(FechasDjango.ahora());

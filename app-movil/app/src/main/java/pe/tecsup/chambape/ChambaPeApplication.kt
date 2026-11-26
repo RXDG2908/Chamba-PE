@@ -45,7 +45,7 @@ class AppContainer(context: Context) {
 
     val disponibilidadRepository: DisponibilidadRepository = DisponibilidadRepositoryImpl(api, authRepository)
     val registroPrestadorRepository: RegistroPrestadorRepository = RegistroPrestadorRepositoryImpl(api)
-    // Solicitudes en la API Django, las mismas que ve la web (antes iban a Firestore, separadas).
+    // Solicitudes en la API (Spring, sobre la misma base que Django), las mismas que ve la web.
     val solicitudRepository: SolicitudRepository = ApiSolicitudRepository(api, authRepository)
     val contextoBusqueda = ContextoBusqueda()
     val ubicacionProvider: UbicacionProvider = UbicacionFused(context)

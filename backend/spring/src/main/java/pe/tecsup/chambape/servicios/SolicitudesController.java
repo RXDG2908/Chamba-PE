@@ -31,16 +31,27 @@ public class SolicitudesController {
     private final SolicitudesService servicio;
     private final Solicitudes solicitudes;
     private final CodigoSeguimiento codigos;
+    private final Cuentas cuentas;
 
-    public SolicitudesController(SolicitudesService servicio, Solicitudes solicitudes, CodigoSeguimiento codigos) {
+    public SolicitudesController(SolicitudesService servicio, Solicitudes solicitudes, CodigoSeguimiento codigos,
+                                 Cuentas cuentas) {
         this.servicio = servicio;
         this.solicitudes = solicitudes;
         this.codigos = codigos;
+        this.cuentas = cuentas;
     }
 
     /** HU-4: el cliente (con o sin cuenta) envía una solicitud; queda Pendiente. */
     @PostMapping("/")
     public ResponseEntity<Map<String, Object>> crear(HttpServletRequest peticion) {
+        // HU-13: la sesión de una cuenta sancionada ya no autentica, pero se reconoce por su id:
+        // se explica el motivo en vez de enviar la solicitud como visitante.
+        Optional<Long> idEnSesion = FiltroFirebase.idEnSesion(peticion);
+        if (idEnSesion.isPresent() && FiltroFirebase.usuario(peticion).isEmpty()) {
+            cuentas.sancionVigente(idEnSesion.get()).ifPresent(motivo -> {
+                throw RespuestaError.detalle(403, motivo);
+            });
+        }
         long id = servicio.crear(CuerpoComoDrf.leer(peticion), FiltroFirebase.usuario(peticion));
         Solicitudes.Solicitud s = solicitudes.buscar(id).orElseThrow();
         Map<String, Object> cuerpo = new LinkedHashMap<>();
@@ -150,7 +161,8 @@ public class SolicitudesController {
         return cuerpo;
     }
 
-    private static List<Map<String, Object>> historial(Solicitudes.Solicitud s) {
+    /** CambioEstadoSerializer: las etapas con su hora (HU-11). */
+    public static List<Map<String, Object>> historial(Solicitudes.Solicitud s) {
         List<Map<String, Object>> etapas = new ArrayList<>();
         for (Solicitudes.Cambio cambio : s.historial()) {
             Map<String, Object> etapa = new LinkedHashMap<>();

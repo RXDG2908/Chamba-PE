@@ -12,7 +12,7 @@ import retrofit2.http.POST
 import retrofit2.http.Path
 import retrofit2.http.Query
 
-/** Lo que responde la API Django (docs/API_BUSQUEDA.md). Todo puede venir nulo: se valida en el mapper. */
+/** Lo que responde la API de usuario (Spring Boot; las mismas respuestas que Django, docs/API_BUSQUEDA.md). Todo puede venir nulo: se valida en el mapper. */
 data class RubroDto(
     @SerializedName("id") val id: Int?,
     @SerializedName("nombre") val nombre: String?,

@@ -57,18 +57,35 @@ public class VerificadorFirebase {
         return !proyecto.isEmpty();
     }
 
+    /** Quién inició sesión según el token: su UID y, si los trae, su correo y su nombre. */
+    public record Identidad(String uid, String correo, String nombre) {
+    }
+
     /** UID de Firebase del token, o vacío si no es válido para este proyecto. */
     public Optional<String> uid(String token) {
+        return identidad(token).map(Identidad::uid);
+    }
+
+    /** Como {@code datos_del_token} de Django: los datos de un token válido, o vacío. */
+    public Optional<Identidad> identidad(String token) {
         if (!configurado()) {
             return Optional.empty();
         }
         try {
-            String sujeto = procesador.process(token, null).getSubject();
-            return sujeto == null || sujeto.isEmpty() ? Optional.empty() : Optional.of(sujeto);
+            JWTClaimsSet datos = procesador.process(token, null);
+            String sujeto = datos.getSubject();
+            if (sujeto == null || sujeto.isEmpty()) {
+                return Optional.empty();
+            }
+            return Optional.of(new Identidad(sujeto, texto(datos.getClaim("email")), texto(datos.getClaim("name"))));
         } catch (Exception error) {
             // Se registra el motivo, nunca el token.
             LOG.warn("Token de Firebase rechazado: {}", error.getClass().getSimpleName());
             return Optional.empty();
         }
+    }
+
+    private static String texto(Object valor) {
+        return valor instanceof String cadena ? cadena : null;
     }
 }

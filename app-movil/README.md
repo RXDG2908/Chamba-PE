@@ -6,7 +6,10 @@ con un único módulo `app` y arquitectura MVVM.
 > **Estado (26/11/2026):**
 > - Compila y pasa 30 pruebas unitarias.
 > - Los registros de cliente y de prestador se recorrieron paso a paso en un emulador (API 36) contra Django local, incluidos los errores de cada paso, el mapa, la revisión y el botón Atrás.
-> - Las solicitudes ya van a la API de Django, las mismas que ve la web.
+> - Las solicitudes ya van a la API, las mismas que ve la web.
+> - Desde el 26/11 la app llama al Back End de usuario en **Spring Boot** (`backend/spring/`, puerto 8080), como
+>   pide el diagrama de arquitectura. Spring responde igual que Django en las 13 rutas que usa la app (paridad
+>   comprobada con `backend/spring/tools/paridad_solicitudes/correr.py`) y usa la misma base de datos.
 >
 > **Falta:**
 > - Probar el alta y el ingreso con el `google-services.json` real del proyecto (con uno de prueba, Firebase responde «Ocurrió un error»).
@@ -73,7 +76,7 @@ Los ViewModel dependen de las interfaces, no de Retrofit ni de Firebase; por eso
 - JDK 17 o superior (probado con Temurin 25).
 - Android SDK con la plataforma 37. Con Android Studio se instala solo; `local.properties`
   (no versionado) debe apuntar a él: `sdk.dir=C\:/Users/<usuario>/AppData/Local/Android/Sdk`.
-- `app/google-services.json` del proyecto Firebase `chamba-pe-tecsup` (no versionado). Se descarga
+- `app/google-services.json` del proyecto Firebase `chamba-pe-c043f` (no versionado). Se descarga
   desde la consola de Firebase: Configuración del proyecto → app Android `pe.tecsup.chambape`.
 - Clave de Google Maps en `local.properties` (no versionado): `MAPS_API_KEY=...`, con «Maps SDK for Android»
   habilitado. Sin clave, el mapa aparece en gris.
@@ -90,25 +93,27 @@ Desde `app-movil/`:
 ./gradlew installDebug         # instala en un emulador o dispositivo conectado
 ```
 
-## Conectar con la API Django
+## Conectar con la API (Spring Boot)
 
-La app llama por defecto a `http://127.0.0.1:8000/`, es decir, al propio dispositivo. Con el
-servidor de Django corriendo en la PC (`python manage.py runserver`), redirige el puerto:
+La app llama por defecto a `http://127.0.0.1:8080/`, es decir, al propio dispositivo. Con Spring
+corriendo en la PC (ver [`backend/spring/README.md`](../backend/spring/README.md)), redirige el puerto:
 
 ```bash
-adb reverse tcp:8000 tcp:8000
+adb reverse tcp:8080 tcp:8080
 ```
 
-Así funciona en emulador y en teléfono por USB sin cambiar `ALLOWED_HOSTS`. Para otra URL:
-`./gradlew assembleDebug -Pchambape.apiBaseUrl=https://mi-servidor/`. Solo se permite HTTP sin
-cifrar hacia `127.0.0.1`, `localhost` y `10.0.2.2`.
+Así funciona en emulador y en teléfono por USB. Spring usa la misma base de datos que Django, así que
+lo que haga la app se ve en la web y en la administración. Para otra URL:
+`./gradlew assembleDebug -Pchambape.apiBaseUrl=https://mi-servidor/` (por ejemplo `http://127.0.0.1:8000/`
+para volver a Django, con `adb reverse tcp:8000 tcp:8000`). Solo se permite HTTP sin cifrar hacia
+`127.0.0.1`, `localhost` y `10.0.2.2`.
 
-## Rutas privadas de Django (token de Firebase)
+## Rutas privadas (token de Firebase)
 
-Para las funciones que viven en Django (disponibilidad, solicitudes, seguimiento y calificación) la app envía
-`Authorization: Bearer <token de Firebase>`. Para que Django lo acepte:
+Para disponibilidad, solicitudes, seguimiento y calificación la app envía
+`Authorization: Bearer <token de Firebase>`. Para que Spring (o Django) lo acepte:
 
-1. Arrancar Django con `FIREBASE_AUTH_PROJECT_ID=chamba-pe-tecsup`.
+1. Arrancar Spring con `FIREBASE_AUTH_PROJECT_ID=chamba-pe-c043f` (Django usa la misma variable).
 2. En `/admin/` → Perfiles, abrir el perfil del prestador y pegar en «UID de Firebase» el UID
    de su cuenta (se ve en Firebase → Authentication, o es el ID de su documento en `usuarios`).
 
@@ -122,7 +127,7 @@ que crea su cuenta de cliente en Django (sin duplicarla). Un prestador creado **
 
 ## Firebase
 
-- Proyecto: `chamba-pe-tecsup` (cuenta de Renzo). Auth por correo/contraseña y Firestore activos.
+- Proyecto: `chamba-pe-c043f` (el que usa el equipo, confirmado por Luis el 26/11). Auth por correo/contraseña y Firestore activos.
 - Reglas en [`firestore.rules`](firestore.rules). Tras cambiar reglas o proveedores: `firebase deploy --only firestore,auth`
   (sin desplegar `auth`, el ingreso falla con `CONFIGURATION_NOT_FOUND`).
 - Un prestador registrado desde la app queda vinculado en Django automáticamente, pero su

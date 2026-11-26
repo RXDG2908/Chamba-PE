@@ -13,6 +13,16 @@ def verificar_token(token):
         return datos['sub']
     except Exception:
         return None
+def datos_del_token(token):
+    # Lo que usan los registros de la app (correo y nombre del token).
+    try:
+        datos = gjwt.decode(token, certs={'k1': publica}, audience=PROYECTO)
+        if datos.get('iss') != f'https://securetoken.google.com/{PROYECTO}' or not datos.get('sub'):
+            return None
+        return datos
+    except Exception:
+        return None
 autenticacion.verificar_token = verificar_token
+autenticacion.datos_del_token = datos_del_token
 from django.core.management import call_command
 call_command('runserver', f'127.0.0.1:{sys.argv[2]}', use_reloader=False)

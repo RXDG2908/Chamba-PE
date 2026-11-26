@@ -2,7 +2,6 @@ package pe.tecsup.chambape.servicios;
 
 import java.math.BigDecimal;
 import java.time.Instant;
-import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -53,15 +52,14 @@ public class SolicitudesService {
     @Transactional
     public long crear(JsonNode datos, Optional<Cuentas.Usuario> usuario) {
         if (!datos.isObject()) {
-            throw new ErrorValidacion(Map.of("non_field_errors", List.of(datos.isNull() ? "No data provided"
-                : "Invalid data. Expected a dictionary, but got " + tipoPython(datos) + ".")));
+            throw ComoDrf.noEsDiccionario(datos);
         }
         Map<String, List<String>> errores = new LinkedHashMap<>();
-        PrestadorDestino prestador = campo(datos, "prestador", errores, valor -> {
+        PrestadorDestino prestador = ComoDrf.campo(datos, "prestador", errores, valor -> {
             long id = ComoDrf.clavePrimaria(valor);
             return prestador(id).orElseThrow(() -> new ComoDrf.Invalido(ComoDrf.noExiste(valor)));
         });
-        Long rubro = campo(datos, "rubro", errores, valor -> {
+        Long rubro = ComoDrf.campo(datos, "rubro", errores, valor -> {
             long id = ComoDrf.clavePrimaria(valor);
             Integer existe = jdbc.queryForObject("select count(*) from prestadores_rubro where id = ?", Integer.class, id);
             if (existe == null || existe == 0) {
@@ -69,7 +67,7 @@ public class SolicitudesService {
             }
             return id;
         });
-        String nombre = campo(datos, "cliente_nombre", errores, valor -> {
+        String nombre = ComoDrf.campo(datos, "cliente_nombre", errores, valor -> {
             String texto = ComoDrf.nfc(ComoDrf.texto(valor, 100, "Ingresa un nombre con al menos una letra."));
             boolean algunaLetra = texto.codePoints().anyMatch(ComoDrf::esLetra);
             boolean permitido = texto.codePoints().allMatch(c -> ComoDrf.esLetra(c) || APOSTROFES.indexOf(c) >= 0);
@@ -79,22 +77,22 @@ public class SolicitudesService {
             }
             return texto;
         });
-        String telefono = campo(datos, "cliente_telefono", errores, valor -> {
+        String telefono = ComoDrf.campo(datos, "cliente_telefono", errores, valor -> {
             String texto = ComoDrf.texto(valor, null, "Ingresa exactamente 9 dígitos del 0 al 9, sin +51 ni espacios.");
             if (!TELEFONO.matcher(texto).matches()) {
                 throw new ComoDrf.Invalido("Ingresa exactamente 9 dígitos del 0 al 9, sin +51 ni espacios.");
             }
             return texto;
         });
-        String descripcion = campo(datos, "descripcion", errores, valor -> {
+        String descripcion = ComoDrf.campo(datos, "descripcion", errores, valor -> {
             String texto = ComoDrf.texto(valor, 500, "Describe el trabajo; no lo dejes en blanco.");
             if (ComoDrf.soloEspacios(texto)) {
                 throw new ComoDrf.Invalido("Describe el trabajo; no uses solo espacios.");
             }
             return texto;
         });
-        BigDecimal latitud = campo(datos, "latitud", errores, valor -> coordenada(valor, 90));
-        BigDecimal longitud = campo(datos, "longitud", errores, valor -> coordenada(valor, 180));
+        BigDecimal latitud = ComoDrf.campo(datos, "latitud", errores, valor -> ComoDrf.coordenada(valor, 90));
+        BigDecimal longitud = ComoDrf.campo(datos, "longitud", errores, valor -> ComoDrf.coordenada(valor, 180));
         if (!errores.isEmpty()) {
             throw new ErrorValidacion(errores);
         }
@@ -195,54 +193,7 @@ public class SolicitudesService {
             id).stream().findFirst();
     }
 
-    private static BigDecimal coordenada(JsonNode valor, int limite) throws ComoDrf.Invalido {
-        BigDecimal numero = ComoDrf.decimal(valor, 9, 6);
-        if (numero.compareTo(BigDecimal.valueOf(-limite)) < 0) {
-            throw new ComoDrf.Invalido("Ensure this value is greater than or equal to -" + limite + ".");
-        }
-        if (numero.compareTo(BigDecimal.valueOf(limite)) > 0) {
-            throw new ComoDrf.Invalido("Ensure this value is less than or equal to " + limite + ".");
-        }
-        return numero;
-    }
-
-    @FunctionalInterface
-    private interface Conversion<T> {
-        T convertir(JsonNode valor) throws ComoDrf.Invalido;
-    }
-
-    private static <T> T campo(JsonNode datos, String nombre, Map<String, List<String>> errores, Conversion<T> conversion) {
-        JsonNode valor = datos.get(nombre);
-        String error;
-        if (valor == null || valor.isMissingNode()) {
-            error = ComoDrf.REQUERIDO;
-        } else if (valor.isNull()) {
-            error = ComoDrf.NULO;
-        } else {
-            try {
-                return conversion.convertir(valor);
-            } catch (ComoDrf.Invalido invalido) {
-                error = invalido.getMessage();
-            }
-        }
-        errores.put(nombre, new ArrayList<>(List.of(error)));
-        return null;
-    }
-
     private static ErrorValidacion error(String campo, String mensaje) {
         return new ErrorValidacion(Map.of(campo, List.of(mensaje)));
-    }
-
-    static String tipoPython(JsonNode valor) {
-        if (valor.isArray()) {
-            return "list";
-        }
-        if (valor.isString()) {
-            return "str";
-        }
-        if (valor.isBoolean()) {
-            return "bool";
-        }
-        return valor.isIntegralNumber() ? "int" : "float";
     }
 }

@@ -33,7 +33,21 @@ SancionCuenta.objects.create(usuario=sanc.usuario, tipo='bloqueo', motivo='Cobro
 cuenta('cliente', 'cliente', 'uid-cliente'); cuenta('otro_cliente', 'cliente', 'uid-otro')
 cli_s = cuenta('cliente_suspendido', 'cliente', 'uid-cli-susp')
 SancionCuenta.objects.create(usuario=cli_s, tipo='suspension', motivo='Lenguaje ofensivo.', hasta=timezone.now() + timedelta(days=3))
-datos = {'ana': ana.pk, 'lejos': lejos.pk, 'sanc': sanc.pk, 'gas': gas.pk, 'otro_rubro': otro.pk}
+# Sesiones de la web (las mismas en las dos bases) y un token CSRF, como tras iniciar sesión en Django.
+from django.contrib.sessions.backends.db import SessionStore
+from django.middleware.csrf import _get_new_csrf_string, _mask_cipher_secret
+def sesion(usuario, hash_malo=False):
+    s = SessionStore()
+    s['_auth_user_id'] = str(usuario.pk)
+    s['_auth_user_backend'] = 'administracion.sanciones.BackendConSanciones'
+    s['_auth_user_hash'] = 'x' if hash_malo else usuario.get_session_auth_hash()
+    s.create(); return s.session_key
+cli = User.objects.get(username='cliente')
+secreto = _get_new_csrf_string()
+sesiones = {'cli': sesion(cli), 'ana': sesion(ana.usuario), 'cli_hash_malo': sesion(cli, hash_malo=True),
+            'cli_susp': sesion(cli_s), 'sanc': sesion(sanc.usuario)}
+datos = {'ana': ana.pk, 'lejos': lejos.pk, 'sanc': sanc.pk, 'gas': gas.pk, 'otro_rubro': otro.pk,
+         'sesiones': sesiones, 'csrf': secreto, 'csrf_enmascarado': _mask_cipher_secret(secreto)}
 (AQUI / 'datos.json').write_text(json.dumps(datos))
 clave = rsa.generate_private_key(public_exponent=65537, key_size=2048)
 (AQUI / 'privada.pem').write_bytes(clave.private_bytes(serialization.Encoding.PEM, serialization.PrivateFormat.PKCS8, serialization.NoEncryption()))

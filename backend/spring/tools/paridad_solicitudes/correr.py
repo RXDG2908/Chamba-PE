@@ -1,4 +1,5 @@
-"""Mismo escenario de solicitudes contra Django (base a) y Spring (base b); luego Django lee la base b.
+"""Mismo escenario (solicitudes, registro de la app y calificaciones) contra Django (base a) y Spring (base b);
+luego Django lee la base b.
 
 Uso, desde la raíz del repo, con Spring ya compilado (mvnw package) y el venv de Django:
 
@@ -21,10 +22,10 @@ PD, PS, PJ, PD2 = 8041, 8042, 8043, 8044
 datos = json.loads((AQUI / 'datos.json').read_text())
 
 firmante = gcrypt.RSASigner.from_string((AQUI / 'privada.pem').read_text(), key_id='k1')
-def token(uid, aud=PROYECTO, venc=3600):
+def token(uid, aud=PROYECTO, venc=3600, **extra):
     ahora = int(time.time())
     return gjwt.encode(firmante, {'iss': f'https://securetoken.google.com/{aud}', 'aud': aud, 'sub': uid,
-                                  'iat': ahora - 30, 'exp': ahora + venc, 'auth_time': ahora - 30}).decode()
+                                  'iat': ahora - 30, 'exp': ahora + venc, 'auth_time': ahora - 30, **extra}).decode()
 
 class SoloJwks(SimpleHTTPRequestHandler):
     def log_message(self, *args):
@@ -44,9 +45,9 @@ procesos.append(subprocess.Popen(['java', '-jar', JAR], cwd=AQUI, stdout=f, stde
     DJANGO_SECRET_KEY=CLAVE_DJANGO, FIREBASE_AUTH_PROJECT_ID=PROYECTO,
     FIREBASE_CLAVES_URL=f'http://127.0.0.1:{PJ}/jwks.json', FCM_ENABLED='false')))
 
-def pedir(puerto, metodo, ruta, cuerpo=None, tipo='application/json', tok=None):
+def pedir(puerto, metodo, ruta, cuerpo=None, tipo='application/json', tok=None, extra=None):
     con = http.client.HTTPConnection('127.0.0.1', puerto, timeout=30)
-    cab = {}
+    cab = dict(extra or {})
     if tok: cab['Authorization'] = 'Bearer ' + tok
     if cuerpo is not None:
         cab['Content-Type'] = tipo
@@ -136,13 +137,130 @@ try:
         r1, r2 = pedir(PD, 'GET', f'{S}{i}/?codigo={c}'), pedir(PS, 'GET', f'{S}{i}/?codigo={c}')
         if (r1[0], normal(r1[1])) == (r2[0], normal(r2[1])) and r1[0] == 200: iguales += 1
         else: distintos.append(('GET código', i, r1[:2], r2[:2]))
-    print(f'Django vs Spring: {iguales} iguales, {len(distintos)} distintos de {len(pasos) + len(codigos)}')
+    total = len(pasos) + len(codigos)
+
+    # Registro de la app y calificaciones (HU-12): los ids salen de la respuesta de Django.
+    def paso(metodo, ruta, cuerpo=None, tok=None, tipo='application/json', extra=None):
+        nonlocal_estado['total'] += 1
+        rd = pedir(PD, metodo, ruta, cuerpo, tipo, tok, extra); rs = pedir(PS, metodo, ruta, cuerpo, tipo, tok, extra)
+        if os.environ.get('PARIDAD_VER'):
+            print(' ', rd[0], metodo, ruta[:40], json.dumps(rd[1], ensure_ascii=False)[:150])
+        if (rd[0], normal(rd[1])) == (rs[0], normal(rs[1])): nonlocal_estado['iguales'] += 1
+        else: distintos.append((metodo, ruta[:60], json.dumps(cuerpo, ensure_ascii=False)[:80] if cuerpo is not None else None, rd[:2], rs[:2]))
+        return rd
+    nonlocal_estado = {'total': 0, 'iguales': 0}
+    RC, RP, C = '/api/usuarios/registro-movil/', '/api/prestadores/registro-movil/', '/api/calificaciones/'
+    nuevo = lambda uid, **extra: token(uid, **extra)
+    paso('POST', RC, {'nombre': 'X'})
+    paso('POST', RC, {'nombre': 'X'}, 'Bearer')
+    paso('POST', RC, {'nombre': 'X'}, T['venc'])
+    t1 = nuevo('uid-nuevo1', email='Nuevo.Uno@Example.COM', name='Nombre Token')
+    paso('POST', RC, {'nombre': '  Luz Nueva  '}, t1); paso('POST', RC, {'nombre': 'Otro'}, t1)
+    paso('POST', RC, {}, T['ana'])
+    paso('POST', RC, {}, nuevo('uid-nuevo2', email='CLIENTE@EXAMPLE.INVALID'))
+    paso('POST', RC, {}, nuevo('uid-nuevo3', name='  Solo Token  '))
+    paso('POST', RC, {'nombre': 5}, nuevo('uid-nuevo4'))
+    paso('POST', RC, {'nombre': '', 'x': 1}, nuevo('uid-nuevo5', email='  sin.nombre@EJEMPLO.pe '))
+    paso('POST', RC, 'nombre=Formulario', nuevo('uid-nuevo6'), 'application/x-www-form-urlencoded')
+    paso('POST', RC, None, nuevo('uid-nuevo7', name='N' * 160))
+    paso('GET', '/api/calificaciones/mis-servicios/', None, t1)
+    paso('POST', RP, {}); paso('POST', RP, {}, T['cli'])
+    paso('POST', RP, {}, nuevo('uid-p0', email='ana@example.invalid'))
+    tp = nuevo('uid-p1', email='Pedro@Ejemplo.PE')
+    for cuerpo in ({}, [1], 'null', {'nombres': '  ', 'apellidos': 'a' * 101, 'dni': '123456789', 'telefono': 'x' * 21,
+                   'rubros': [], 'latitud': '100', 'longitud': 'abc', 'radio_cobertura_km': 0},
+                   {'nombres': 5, 'apellidos': True, 'dni': '1234567a', 'telefono': None, 'rubros': '1', 'latitud': '-12.1234567',
+                    'longitud': -77.0, 'radio_cobertura_km': '5.5'},
+                   {'nombres': 'Ana\u0000', 'apellidos': ['x'], 'dni': '10000001', 'rubros': [999], 'latitud': None,
+                    'radio_cobertura_km': 101},
+                   {'nombres': 'A', 'apellidos': 'B', 'dni': ' 1234 ', 'rubros': [True], 'latitud': 0, 'longitud': 0,
+                    'radio_cobertura_km': True},
+                   {'nombres': 'A', 'apellidos': 'B', 'dni': '12345678', 'rubros': [None], 'latitud': 0, 'longitud': 0,
+                    'radio_cobertura_km': 1e3},
+                   {'nombres': 'A', 'apellidos': 'B', 'dni': '12345678', 'rubros': [datos['gas'], 'x'], 'latitud': 0,
+                    'longitud': 0, 'radio_cobertura_km': [5]}):
+        paso('POST', RP, cuerpo, tp)
+    valido = {'nombres': ' Pedro ', 'apellidos': 'Pérez Ñol', 'dni': '20000001', 'telefono': ' 987654321 ',
+              'rubros': [datos['otro_rubro'], datos['gas']], 'latitud': '-12.05', 'longitud': -77.04, 'radio_cobertura_km': '10'}
+    paso('POST', RP, valido, tp); paso('POST', RP, valido, tp)
+    paso('POST', RP, dict(valido, dni='20000001'), nuevo('uid-p2'))
+    tp3 = nuevo('uid-p3')
+    paso('POST', RP, {k: v for k, v in dict(valido, dni='\u0661\u0662\u0663\u0664\u0665\u0666\u0667\u0668', radio_cobertura_km=5.0).items() if k != 'telefono'}, tp3)
+    for tok in (t1, tp, tp3):
+        paso('GET', '/api/usuarios/disponibilidad/', None, tok)
+
+    # Tres servicios del cliente, finalizados, para calificar y mover el promedio de Ana.
+    finalizadas = []
+    for n in range(3):
+        sid = paso('POST', S, dict(base, descripcion=f'Para calificar {n}'), T['cli'])[1]['id']
+        paso('POST', f'{S}{sid}/aceptar/', None, T['ana'])
+        for etapa in ('en_camino', 'en_servicio', 'finalizada'):
+            paso('POST', f'{S}{sid}/avanzar/', {'estado': etapa}, T['ana'])
+        finalizadas.append(sid)
+    pendiente = paso('POST', S, dict(base, descripcion='Sin terminar'), T['cli'])[1]['id']
+    paso('POST', C, {'solicitud': pendiente, 'estrellas': 5}, T['cli'])
+    MS = C + 'mis-servicios/'
+    paso('GET', MS); paso('GET', MS, None, T['ana']); paso('GET', MS, None, T['cli']); paso('POST', MS, {}, T['cli'])
+    paso('POST', C, {'solicitud': finalizadas[0], 'estrellas': 4}); paso('POST', C, {'solicitud': finalizadas[0], 'estrellas': 4}, T['ana'])
+    for cuerpo in ({}, [1], {'solicitud': '5', 'estrellas': 4.5}, {'solicitud': 0, 'estrellas': 0},
+                   {'solicitud': True, 'estrellas': 6, 'comentario': 'x' * 501}, {'solicitud': None, 'estrellas': None, 'comentario': None},
+                   {'solicitud': finalizadas[0], 'estrellas': [4], 'comentario': 5}, {'solicitud': 3, 'estrellas': 5},
+                   {'solicitud': 1, 'estrellas': 5}, {'solicitud': 999999, 'estrellas': 5}, {'solicitud': 10 ** 30, 'estrellas': 5}):
+        paso('POST', C, cuerpo, T['cli'])
+    paso('POST', C, 'solicitud=%d&estrellas=5' % finalizadas[0], T['cli'], 'application/x-www-form-urlencoded')
+    paso('POST', C, {'solicitud': finalizadas[0], 'estrellas': 4}, T['otro'])
+    paso('POST', C, {'solicitud': finalizadas[0], 'estrellas': 4, 'comentario': '  Muy bien, puntual  '}, T['cli'])
+    paso('POST', C, {'solicitud': finalizadas[0], 'estrellas': 5}, T['cli'])
+    paso('POST', C, {'solicitud': finalizadas[1], 'estrellas': 5}, T['cli'])
+    paso('POST', C, {'solicitud': finalizadas[2], 'estrellas': 4, 'comentario': '   '}, T['cli'])
+    paso('GET', MS, None, T['cli'])
+    paso('GET', '/api/prestadores/buscar/?rubro=%d&latitud=-12.046374&longitud=-77.042793' % G)
+
+    # La web con la sesión de Django: SessionAuthentication va antes que el token y exige CSRF.
+    SES, CSRF, MASC = datos['sesiones'], datos['csrf'], datos['csrf_enmascarado']
+    WEB = 'http://localhost:5173'
+    def web(quien, csrf=True, token=MASC, origen=WEB, cookie_csrf=CSRF):
+        cab = {'Cookie': f'sessionid={SES[quien]}' + (f'; csrftoken={cookie_csrf}' if cookie_csrf else '')}
+        if csrf: cab['X-CSRFToken'] = token
+        if origen: cab['Origin'] = origen
+        return cab
+    paso('GET', MS, None, None, extra=web('cli', csrf=False, cookie_csrf=None))
+    paso('POST', C, {}, None, extra=web('cli', csrf=False, cookie_csrf=None))
+    paso('POST', C, {}, None, extra=web('cli', csrf=False))
+    paso('POST', C, {}, None, extra=web('cli', token='corto'))
+    paso('POST', C, {}, None, extra=web('cli', token='a' * 31 + '!'))
+    paso('POST', C, {}, None, extra=web('cli', token='b' * 64))
+    paso('POST', C, {}, None, extra=web('cli', cookie_csrf='malo'))
+    paso('POST', C, {}, None, extra=web('cli', origen='http://otro-sitio.example'))
+    paso('POST', C, {}, None, extra=web('cli'))
+    paso('POST', C, {}, None, extra=web('cli', token=CSRF))
+    paso('POST', C, {}, None, extra=web('cli', origen=None))
+    sid = paso('POST', S, dict(base, descripcion='Desde la web'), None, extra=web('cli'))[1]['id']
+    paso('POST', S, dict(base, descripcion='Sin CSRF'), None, extra=web('cli', csrf=False))
+    paso('GET', f'{S}{sid}/', None, None, extra=web('cli', csrf=False))
+    paso('GET', MS, None, None, extra=web('cli', csrf=False))
+    paso('GET', S + 'recibidas/', None, None, extra=web('ana', csrf=False))
+    paso('POST', f'{S}{sid}/aceptar/', None, None, extra=web('ana'))
+    paso('PATCH', '/api/usuarios/disponibilidad/', {'disponible': True}, None, extra=web('ana'))
+    paso('PATCH', '/api/usuarios/disponibilidad/', {'disponible': True}, None, extra=web('ana', csrf=False))
+    # La sesión gana sobre el token; una sesión que no autentica deja pasar al token.
+    paso('GET', MS, None, T['ana'], extra=web('cli', csrf=False))
+    paso('GET', MS, None, None, extra=web('cli_hash_malo', csrf=False))
+    paso('GET', MS, None, T['cli'], extra=web('cli_hash_malo', csrf=False))
+    paso('GET', MS, None, None, extra={'Cookie': 'sessionid=inventada123'})
+    # HU-13: sesión de una cuenta sancionada.
+    paso('POST', S, base, None, extra=web('cli_susp', csrf=False))
+    paso('GET', MS, None, None, extra=web('cli_susp', csrf=False))
+    paso('GET', S + 'recibidas/', None, None, extra=web('sanc', csrf=False))
+    iguales += nonlocal_estado['iguales']; total += nonlocal_estado['total']
+    print(f'Django vs Spring: {iguales} iguales, {len(distintos)} distintos de {total}')
     for d in distintos: print('  DISTINTO', json.dumps(d, ensure_ascii=False)[:900])
 
     # Lectura cruzada: un Django sobre la base que escribió Spring ve lo mismo que el Django original.
     procesos.append(django('b.sqlite3', PD2)); esperar(PD2)
     cruz = [('GET', S + 'recibidas/', T['ana'])] + [('GET', f'{S}{i}/', T['ana']) for i in codigos] + \
-           [('GET', '/api/usuarios/disponibilidad/', T['ana'])]
+           [('GET', '/api/usuarios/disponibilidad/', T['ana']), ('GET', MS, T['cli'])] + \
+           [('GET', '/api/usuarios/yo/', tok) for tok in (t1, tp, tp3)] + [('GET', '/api/usuarios/disponibilidad/', tp)]
     malos = 0
     for metodo, ruta, tok in cruz:
         r1, r2 = pedir(PD, metodo, ruta, tok=tok), pedir(PD2, metodo, ruta, tok=tok)

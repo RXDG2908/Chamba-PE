@@ -9,6 +9,7 @@ googleServices = "4.6.0"
 composeBom = "2026.09.00"
 materialIcons = "1.7.8"
 coreKtx = "1.19.1"
+coreSplashscreen = "1.0.1"
 activityCompose = "1.13.0"
 lifecycle = "2.11.0"
 navigation = "2.10.2"
@@ -22,6 +23,7 @@ junit = "4.13.2"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
+androidx-core-splashscreen = { group = "androidx.core", name = "core-splashscreen", version.ref = "coreSplashscreen" }
 androidx-activity-compose = { group = "androidx.activity", name = "activity-compose", version.ref = "activityCompose" }
 androidx-lifecycle-runtime-ktx = { group = "androidx.lifecycle", name = "lifecycle-runtime-ktx", version.ref = "lifecycle" }
 androidx-lifecycle-runtime-compose = { group = "androidx.lifecycle", name = "lifecycle-runtime-compose", version.ref = "lifecycle" }

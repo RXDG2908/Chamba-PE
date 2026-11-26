@@ -40,6 +40,10 @@ con un único módulo `app` y arquitectura MVVM.
 **No incluye todavía:** notificaciones push con FCM, certificados ni verificación de DNI desde la app.
 
 **Diseño:**
+- Icono adaptable vectorial (pin con llave y radio de cobertura) con capa monocroma, y animación de apertura con SplashScreen:
+  el pin cae, el radio se abre y la llave gira a su sitio en 740 ms (Android 12+; en 8 a 11, icono fijo).
+
+  <img src="../docs/capturas/movil-arranque.png" alt="Arranque: el pin cae, el radio se abre y la llave gira a su sitio" width="540">
 - Tema Material 3 claro y oscuro con los colores de la web (`ui/Tema.kt`) e iconos Material.
 - Asistente por pasos reutilizable (`ui/Asistente.kt`): progreso animado, transición de eje X y Back del sistema paso a paso.
 - Microanimaciones breves con curvas de Material: presión de botones, favorito que late, línea de tiempo del servicio y listas con `animateItem`.

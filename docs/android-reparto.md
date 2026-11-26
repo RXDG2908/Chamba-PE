@@ -39,7 +39,7 @@ Compara el [plan Android](PLAN_DESARROLLO_ANDROID.md) (21 tarjetas `AND-*`, de L
 | ID | Tarjeta | Plan decía | Estado | Nota |
 |:---:|---|:---:|:---:|---|
 | AND-01 | Proyecto Kotlin/Compose y versiones | Renzo | ✅ | Compila, pruebas y lint OK |
-| AND-02 | Tema Material 3 y componentes comunes | David | 🟡 | 26/11: tema de marca claro/oscuro (`Tema.kt`), asistente por pasos (`Asistente.kt`) e iconos Material. Falta revisar texto ampliado y pantallas anchas |
+| AND-02 | Tema Material 3 y componentes comunes | David | 🟡 | 26/11: tema de marca claro/oscuro (`Tema.kt`), asistente por pasos (`Asistente.kt`), iconos Material, icono adaptable de la app y arranque animado. Falta revisar texto ampliado y pantallas anchas |
 | AND-03 | Navigation Compose | Luis | ✅ | Pestañas por rol |
 | AND-04 | Retrofit, DTO y mappers | David | ✅ | Contra Django |
 | AND-05 | Repository de búsqueda | Renzo | ✅ | Con caché en Room |

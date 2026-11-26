@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- De noche, un verde más profundo para que el arranque no deslumbre. -->
+    <color name="fondo_arranque">#0F5A3D</color>
+</resources>

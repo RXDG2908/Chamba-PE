@@ -331,14 +331,14 @@ Decisión del Product Owner del 28/10: HU-8 pasa completa porque T8.1 no se empe
 | | T19.2 | OCR del DNI: extraer número y nombres y recortar la foto | Backend | 4 | |
 | | T19.3 | Consulta a eldni.com con validador intercambiable y paso a revisión manual si falla | Backend | 2 | |
 | | T19.4 | Pruebas con DNIs de muestra (lectura y coincidencia de nombres) | Pruebas | 2 | |
-| HU-20 · Reconocimiento facial | T20.1 | Selfie en vivo con detección de parpadeo (MediaPipe) | Frontend | 3 | David · 👀 En revisión (25/11): `/verificar-rostro` |
-| | T20.2 | Servicio de comparación facial DNI vs selfie (DeepFace) | Backend | 4 | David · 👀 En revisión (25/11): OpenCV SFace en lugar de DeepFace (decisión del PO) |
-| | T20.3 | Reglas de decisión (verificado / revisión / rechazado) e integración con el panel de HU-9 | Backend | 2 | David · 👀 En revisión (25/11): `feature/hu20-reconocimiento-facial` |
+| HU-20 · Reconocimiento facial | T20.1 | Selfie en vivo con detección de parpadeo (MediaPipe) | Frontend | 3 | David · ✅ #59 unido (26/11): `/verificar-rostro` |
+| | T20.2 | Servicio de comparación facial DNI vs selfie (DeepFace) | Backend | 4 | David · ✅ #59 unido (26/11): OpenCV SFace en lugar de DeepFace (decisión del PO) |
+| | T20.3 | Reglas de decisión (verificado / revisión / rechazado) e integración con el panel de HU-9 | Backend | 2 | David · ✅ #59 unido (26/11): `feature/hu20-reconocimiento-facial` |
 | | T20.4 | Calibrar el umbral de similitud con fotos del equipo | Pruebas | 2 | David · 🟡 Comando listo (25/11); faltan las fotos del equipo |
 | HU-21 · Consentimiento biométrico | T21.1 | Pantalla de consentimiento y registro de la aceptación | Frontend | 1 | |
 | | T21.2 | Endpoint para solicitar la eliminación de los datos biométricos | Backend | 1 | |
-| HU-13 · Suspensión y bloqueo | T13.1 | API en Django para suspender y bloquear cuentas | Backend | 2 | David · 👀 En revisión (25/11): `feature/hu13-suspension` |
-| | T13.2 | Pantalla web (React) de gestión de cuentas reportadas | Frontend | 2 | David · 👀 En revisión (25/11): `/administracion/cuentas` |
+| HU-13 · Suspensión y bloqueo | T13.1 | API en Django para suspender y bloquear cuentas | Backend | 2 | David · ✅ #56 unido (26/11): `feature/hu13-suspension` |
+| | T13.2 | Pantalla web (React) de gestión de cuentas reportadas | Frontend | 2 | David · ✅ #56 unido (26/11): `/administracion/cuentas` |
 | | | **Total** | | **28** | |
 
 ### Criterios de aceptación de las historias nuevas
@@ -390,10 +390,10 @@ Decisión del Product Owner del 28/10: HU-8 pasa completa porque T8.1 no se empe
 
 | HU | Tarea | Descripción | Tipo | Horas | Responsable |
 |:---:|:---:|---|:---:|:---:|:---:|
-| HU-10 · Recomendación con IA | T10.1 | Definir la fórmula de puntaje (distancia, calificación y disponibilidad) | Backend | 2 | Renzo · 👀 En revisión (25/11): [fórmula](docs/API_RECOMENDACION.md) |
-| | T10.2 | Implementar el servicio de recomendación y ranking | Backend | 5 | Renzo · 👀 En revisión (25/11): `GET /api/ia/recomendacion/`, 13 pruebas |
-| | T10.3 | Mostrar el prestador recomendado con motivo y tiempo estimado | Frontend | 3 | Renzo · 👀 En revisión (25/11): «Recomendado para ti» en `/resultados` |
-| | T10.4 | Pruebas de la recomendación con datos de ejemplo | Pruebas | 1 | David · 👀 En revisión (24/11): 7 pruebas cruzadas y muestra de 300 prestadores ([informe](docs/pruebas-T10.4.md)) |
+| HU-10 · Recomendación con IA | T10.1 | Definir la fórmula de puntaje (distancia, calificación y disponibilidad) | Backend | 2 | Renzo · ✅ #53 unido (25/11): [fórmula](docs/API_RECOMENDACION.md) |
+| | T10.2 | Implementar el servicio de recomendación y ranking | Backend | 5 | Renzo · ✅ #53 unido (25/11): `GET /api/ia/recomendacion/`, 13 pruebas |
+| | T10.3 | Mostrar el prestador recomendado con motivo y tiempo estimado | Frontend | 3 | Renzo · ✅ #53 unido (25/11): «Recomendado para ti» en `/resultados` |
+| | T10.4 | Pruebas de la recomendación con datos de ejemplo | Pruebas | 1 | David · ✅ #55 unido (25/11): 7 pruebas cruzadas y muestra de 300 prestadores ([informe](docs/pruebas-T10.4.md)) |
 | HU-11 · Seguimiento en tiempo real | T11.1 | Modelo de estados y comunicación en tiempo real (WebSocket) | Backend | 4 | Luis · ✅ PR #44 unido (23/11): consulta cada 5 s en lugar de WebSocket, aceptado por el PO |
 | | T11.2 | Pantalla de seguimiento en tiempo real (móvil y web) | Frontend | 5 | Luis · ✅ PR #44 unido (23/11), web responsive. La app Android aún no tiene los estados nuevos: se decide en la Review |
 | | T11.3 | Pruebas de transición de estados | Pruebas | 2 | David · ✅ PR #49 unido (24/11): 4 pruebas de punta a punta con Django real ([informe](docs/pruebas-T11.3.md)) |

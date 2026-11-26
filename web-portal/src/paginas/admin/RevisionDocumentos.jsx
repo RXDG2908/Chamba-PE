@@ -1,0 +1,412 @@
+import { useEffect, useState } from 'react'
+import './RevisionDocumentos.css'
+import { MOTIVOS_FACIALES } from '../../nucleo/textosFaciales.js'
+
+const API = '/api/administracion/revisiones/'
+const RUTA_PANEL = '/administracion/revisiones'
+const LOGIN_ADMIN = `/admin/login/?next=${encodeURIComponent(RUTA_PANEL)}`
+
+const API_DNI = '/api/verificacion/dni/'
+const MOTIVOS_DNI = {
+  lector_no_disponible: 'El lector automático no está disponible; hay que leer el DNI a mano.',
+  mrz_ilegible: 'No se pudo leer la zona MRZ del reverso.',
+  mrz_invalida: 'Los dígitos de control de la MRZ no cuadran.',
+  dni_distinto: 'El DNI de la foto no es el que registró el prestador.',
+  dni_vencido: 'El DNI está vencido.',
+  fuente_no_disponible: 'La fuente externa no respondió.',
+  nombres_distintos: 'Los nombres no coinciden con la fuente externa.',
+  sin_foto: 'No se pudo recortar la foto del titular.',
+}
+
+const ETIQUETAS = { aprobado: 'Aprobado', rechazado: 'Rechazado' }
+
+function leerCookie(nombre) {
+  const fila = document.cookie.split('; ').find((cookie) => cookie.startsWith(`${nombre}=`))
+  return fila ? decodeURIComponent(fila.split('=')[1]) : ''
+}
+
+function primerError(datos) {
+  if (!datos || typeof datos !== 'object') return ''
+  const valor = datos.detail ?? Object.values(datos)[0]
+  return Array.isArray(valor) ? valor[0] : String(valor ?? '')
+}
+
+function formatearFecha(iso) {
+  return new Date(iso).toLocaleString('es-PE', { dateStyle: 'medium', timeStyle: 'short' })
+}
+
+function TarjetaRevision({ revision, onResuelta }) {
+  const [rechazando, setRechazando] = useState(false)
+  const [comentario, setComentario] = useState('')
+  const [enviando, setEnviando] = useState(false)
+  const [error, setError] = useState('')
+  const resuelta = revision.estado !== 'pendiente'
+  const { prestador } = revision
+
+  const decidir = async (estado) => {
+    if (estado === 'rechazado' && !comentario.trim()) {
+      setError('Escribe el motivo del rechazo.')
+      return
+    }
+    setEnviando(true)
+    setError('')
+    try {
+      const respuesta = await fetch(`${API}${revision.id}/`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json', 'X-CSRFToken': leerCookie('csrftoken') },
+        body: JSON.stringify(estado === 'rechazado' ? { estado, comentario: comentario.trim() } : { estado }),
+      })
+      const datos = await respuesta.json().catch(() => null)
+      if (respuesta.ok) {
+        onResuelta(datos)
+      } else if (respuesta.status === 403) {
+        setError('Tu sesión de administrador expiró. Vuelve a iniciar sesión.')
+      } else {
+        setError(primerError(datos) || 'No se pudo guardar la decisión.')
+      }
+    } catch {
+      setError('No se pudo establecer conexión con el servidor.')
+    } finally {
+      setEnviando(false)
+    }
+  }
+
+  return (
+    <li className={`revision-tarjeta${resuelta ? ` revision-${revision.estado}` : ''}`}>
+      <div className="revision-cabecera">
+        <div className="revision-datos">
+          <h3>{prestador ? prestador.nombre : 'Prestador no asociado'}</h3>
+          <dl>
+            <div><dt>DNI</dt><dd>{prestador?.dni ?? '—'}</dd></div>
+            <div>
+              <dt>Documento</dt>
+              <dd>{revision.tipo_documento}{revision.formato ? ` · ${revision.formato}` : ''}</dd>
+            </div>
+            <div><dt>Recibido</dt><dd>{formatearFecha(revision.creado)}</dd></div>
+          </dl>
+        </div>
+        {revision.archivo_url ? (
+          <a className="revision-ver" href={revision.archivo_url} target="_blank" rel="noopener noreferrer">
+            Ver documento
+          </a>
+        ) : (
+          <span className="revision-sin-archivo">Sin archivo</span>
+        )}
+      </div>
+
+      {resuelta ? (
+        <p className="revision-resultado" role="status">
+          <strong>{ETIQUETAS[revision.estado]}.</strong>{' '}
+          {prestador && `El prestador quedó «${prestador.estado_display}».`}
+          {revision.comentario && <span className="revision-motivo">Motivo: {revision.comentario}</span>}
+        </p>
+      ) : (
+        <div className="revision-acciones">
+          {rechazando ? (
+            <form
+              className="revision-rechazo"
+              onSubmit={(evento) => {
+                evento.preventDefault()
+                decidir('rechazado')
+              }}
+            >
+              <label htmlFor={`motivo-${revision.id}`}>Motivo del rechazo</label>
+              <textarea
+                id={`motivo-${revision.id}`}
+                rows="3"
+                required
+                autoFocus
+                value={comentario}
+                onChange={(evento) => {
+                  setComentario(evento.target.value)
+                  setError('')
+                }}
+                placeholder="Ej.: el documento está vencido o no se lee."
+              />
+              <div className="revision-botones">
+                <button type="submit" className="boton-rechazar" disabled={enviando || !comentario.trim()}>
+                  {enviando ? 'Enviando…' : 'Confirmar rechazo'}
+                </button>
+                <button
+                  type="button"
+                  className="boton-secundario"
+                  disabled={enviando}
+                  onClick={() => {
+                    setRechazando(false)
+                    setComentario('')
+                    setError('')
+                  }}
+                >
+                  Cancelar
+                </button>
+              </div>
+            </form>
+          ) : (
+            <div className="revision-botones">
+              <button type="button" className="boton-aprobar" disabled={enviando} onClick={() => decidir('aprobado')}>
+                {enviando ? 'Enviando…' : 'Aprobar'}
+              </button>
+              <button type="button" className="boton-rechazar" disabled={enviando} onClick={() => setRechazando(true)}>
+                Rechazar
+              </button>
+            </div>
+          )}
+        </div>
+      )}
+
+      {error && <p className="revision-error" role="alert">{error}</p>}
+    </li>
+  )
+}
+
+function RevisionDni() {
+  const [intentos, setIntentos] = useState([])
+  const [estado, setEstado] = useState('cargando')
+
+  useEffect(() => {
+    const controlador = new AbortController()
+    fetch(`${API_DNI}?resultado=revision_manual`, { signal: controlador.signal })
+      .then((respuesta) => {
+        if (!respuesta.ok) throw new Error(`HTTP ${respuesta.status}`)
+        return respuesta.json()
+      })
+      .then((datos) => {
+        setIntentos(datos)
+        setEstado('listo')
+      })
+      .catch(() => {
+        if (!controlador.signal.aborted) setEstado('error')
+      })
+    return () => controlador.abort()
+  }, [])
+
+  return (
+    <section className="revision-dni" aria-labelledby="titulo-dni">
+      <h2 id="titulo-dni">DNI en revisión manual</h2>
+      <p>Intentos de verificación del DNI que el sistema no pudo aprobar solo. Revisa las fotos y los motivos.</p>
+      {estado === 'cargando' && <p className="revision-aviso" role="status">Cargando intentos…</p>}
+      {estado === 'error' && <p className="revision-aviso revision-aviso-error" role="alert">No se pudieron cargar los intentos de DNI.</p>}
+      {estado === 'listo' && intentos.length === 0 && <p className="revision-aviso">No hay DNI por revisar.</p>}
+      {estado === 'listo' && intentos.length > 0 && (
+        <ul className="revision-lista">
+          {intentos.map((intento) => (
+            <li key={intento.id} className="revision-tarjeta">
+              <div className="revision-cabecera">
+                <div className="revision-datos">
+                  <h3>{intento.prestador.nombre}</h3>
+                  <dl>
+                    <div><dt>DNI registrado</dt><dd>{intento.prestador.dni}</dd></div>
+                    <div><dt>DNI leído</dt><dd>{intento.lectura.dni || '—'}</dd></div>
+                    <div><dt>Recibido</dt><dd>{formatearFecha(intento.creado)}</dd></div>
+                  </dl>
+                </div>
+                {intento.tiene_foto && (
+                  <a className="revision-ver" href={`${API_DNI}${intento.id}/foto/titular/`} target="_blank" rel="noopener noreferrer">
+                    Ver foto del titular
+                  </a>
+                )}
+              </div>
+              <ul className="revision-motivos">
+                {intento.motivos.map((motivo) => <li key={motivo}>{MOTIVOS_DNI[motivo] ?? motivo}</li>)}
+              </ul>
+              <p>
+                <a href={`${API_DNI}${intento.id}/foto/anverso/`} target="_blank" rel="noopener noreferrer">Frente</a>
+                {' · '}
+                <a href={`${API_DNI}${intento.id}/foto/reverso/`} target="_blank" rel="noopener noreferrer">Reverso</a>
+              </p>
+            </li>
+          ))}
+        </ul>
+      )}
+    </section>
+  )
+}
+
+const API_FACIAL = '/api/verificacion/facial/'
+
+// HU-20: en la zona gris el administrador ve la foto del DNI y la selfie lado a lado y decide.
+function TarjetaFacial({ intento, onResuelto }) {
+  const [enviando, setEnviando] = useState(false)
+  const [error, setError] = useState('')
+
+  const decidir = async (revision) => {
+    setEnviando(true)
+    setError('')
+    try {
+      const respuesta = await fetch(`${API_FACIAL}${intento.id}/revision/`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json', 'X-CSRFToken': leerCookie('csrftoken') },
+        body: JSON.stringify({ revision }),
+      })
+      const datos = await respuesta.json().catch(() => ({}))
+      if (respuesta.ok || respuesta.status === 409) onResuelto(intento.id)
+      else setError(primerError(datos) || 'No se pudo guardar la decisión.')
+    } catch {
+      setError('No se pudo guardar la decisión. Revisa tu conexión.')
+    } finally {
+      setEnviando(false)
+    }
+  }
+
+  return (
+    <li className="revision-tarjeta">
+      <div className="revision-datos">
+        <h3>{intento.prestador.nombre}</h3>
+        <dl>
+          <div><dt>DNI registrado</dt><dd>{intento.prestador.dni}</dd></div>
+          <div><dt>Similitud</dt><dd>{intento.porcentaje === null ? 'Sin comparar' : `${intento.porcentaje} %`}</dd></div>
+          <div><dt>Recibido</dt><dd>{formatearFecha(intento.creado)}</dd></div>
+        </dl>
+      </div>
+      <div className="comparacion-facial">
+        <figure>
+          {intento.tiene_foto_dni
+            ? <img src={`${API_FACIAL}${intento.id}/foto/dni/`} alt={`Foto del DNI de ${intento.prestador.nombre}`} />
+            : <p className="revision-aviso">La foto del DNI ya se borró.</p>}
+          <figcaption>Foto del DNI</figcaption>
+        </figure>
+        <figure>
+          <img src={`${API_FACIAL}${intento.id}/foto/selfie/`} alt={`Selfie de ${intento.prestador.nombre}`} />
+          <figcaption>Selfie en vivo</figcaption>
+        </figure>
+      </div>
+      <ul className="revision-motivos">
+        {intento.motivos.map((motivo) => <li key={motivo}>{MOTIVOS_FACIALES[motivo] ?? motivo}</li>)}
+      </ul>
+      <div className="revision-acciones revision-botones">
+        <button type="button" className="boton-aprobar" disabled={enviando} onClick={() => decidir('aprobado')}>Es la misma persona</button>
+        <button type="button" className="boton-rechazar" disabled={enviando} onClick={() => decidir('rechazado')}>No es la misma persona</button>
+      </div>
+      {error && <p className="revision-error" role="alert">{error}</p>}
+    </li>
+  )
+}
+
+function RevisionFacial() {
+  const [intentos, setIntentos] = useState([])
+  const [estado, setEstado] = useState('cargando')
+
+  useEffect(() => {
+    const controlador = new AbortController()
+    fetch(`${API_FACIAL}?decision=revision_manual`, { signal: controlador.signal })
+      .then((respuesta) => {
+        if (!respuesta.ok) throw new Error(`HTTP ${respuesta.status}`)
+        return respuesta.json()
+      })
+      .then((datos) => {
+        setIntentos(datos)
+        setEstado('listo')
+      })
+      .catch(() => {
+        if (!controlador.signal.aborted) setEstado('error')
+      })
+    return () => controlador.abort()
+  }, [])
+
+  return (
+    <section className="revision-dni" aria-labelledby="titulo-facial">
+      <h2 id="titulo-facial">Rostro en revisión manual</h2>
+      <p>Selfies cuya similitud con la foto del DNI quedó en duda. Compara las dos fotos y decide.</p>
+      {estado === 'cargando' && <p className="revision-aviso" role="status">Cargando comparaciones…</p>}
+      {estado === 'error' && <p className="revision-aviso revision-aviso-error" role="alert">No se pudieron cargar las comparaciones faciales.</p>}
+      {estado === 'listo' && intentos.length === 0 && <p className="revision-aviso">No hay rostros por revisar.</p>}
+      {estado === 'listo' && intentos.length > 0 && (
+        <ul className="revision-lista">
+          {intentos.map((intento) => (
+            <TarjetaFacial key={intento.id} intento={intento}
+              onResuelto={(id) => setIntentos((actuales) => actuales.filter((i) => i.id !== id))} />
+          ))}
+        </ul>
+      )}
+    </section>
+  )
+}
+
+export default function RevisionDocumentos() {
+  const [revisiones, setRevisiones] = useState([])
+  const [estado, setEstado] = useState('cargando')
+  const [intento, setIntento] = useState(0)
+
+  useEffect(() => {
+    const controlador = new AbortController()
+    const cargar = async () => {
+      try {
+        const respuesta = await fetch(`${API}?estado=pendiente`, { signal: controlador.signal })
+        if (respuesta.status === 401 || respuesta.status === 403) {
+          setEstado('sin-permiso')
+          return
+        }
+        if (!respuesta.ok) throw new Error(`HTTP ${respuesta.status}`)
+        const datos = await respuesta.json()
+        setRevisiones(datos)
+        setEstado('listo')
+      } catch {
+        if (!controlador.signal.aborted) setEstado('error')
+      }
+    }
+    cargar()
+    return () => controlador.abort()
+  }, [intento])
+
+  const actualizar = () => {
+    setEstado('cargando')
+    setIntento((actual) => actual + 1)
+  }
+
+  const marcarResuelta = (actualizada) => {
+    setRevisiones((actuales) => actuales.map((r) => (r.id === actualizada.id ? actualizada : r)))
+  }
+
+  const pendientes = revisiones.filter((r) => r.estado === 'pendiente').length
+
+  return (
+    <main className="contenedor revision">
+      <p className="etiqueta">ADMINISTRACIÓN</p>
+      <div className="revision-titulo">
+        <div>
+          <h2>Revisión de documentos</h2>
+          <p>Aprueba o rechaza los certificados. Solo los prestadores con un documento aprobado quedan «Verificado» y aparecen en la búsqueda.</p>
+        </div>
+        <button type="button" className="boton-secundario" onClick={actualizar} disabled={estado === 'cargando'}>
+          Actualizar
+        </button>
+      </div>
+
+      {estado === 'cargando' && <p className="revision-aviso" role="status">Cargando documentos…</p>}
+
+      {estado === 'sin-permiso' && (
+        <div className="revision-aviso revision-aviso-error" role="alert">
+          <p>Esta pantalla es solo para administradores.</p>
+          <a href={LOGIN_ADMIN}>Iniciar sesión como administrador</a>
+        </div>
+      )}
+
+      {estado === 'error' && (
+        <div className="revision-aviso revision-aviso-error" role="alert">
+          <p>No se pudieron cargar los documentos. Revisa que Django esté encendido.</p>
+          <button type="button" className="boton-secundario" onClick={actualizar}>Reintentar</button>
+        </div>
+      )}
+
+      {estado === 'listo' && (
+        <>
+          <p className="revision-resumen" aria-live="polite">
+            {pendientes === 1 ? '1 documento pendiente' : `${pendientes} documentos pendientes`}
+          </p>
+          {revisiones.length === 0 ? (
+            <p className="revision-aviso">No hay documentos por revisar.</p>
+          ) : (
+            <ul className="revision-lista">
+              {revisiones.map((revision) => (
+                <TarjetaRevision key={revision.id} revision={revision} onResuelta={marcarResuelta} />
+              ))}
+            </ul>
+          )}
+        </>
+      )}
+
+      {estado === 'listo' && <RevisionDni />}
+      {estado === 'listo' && <RevisionFacial />}
+    </main>
+  )
+}

@@ -84,16 +84,16 @@ for (const rol of ['cliente', 'administrador', null]) {
     let consultas = 0
     await preparar(page, { rol, consultar: (r) => { consultas++; return r.fulfill({ json: [] }) } })
     await page.goto('/solicitudes/41')
-    await expect(page).toHaveURL(rol ? /\/$/ : /\/ingresar$/)
+    await expect(page).toHaveURL(rol ? /\/sin-acceso$/ : /\/ingresar$/)
     expect(consultas).toBe(0)
     await expect(page.getByRole('link', { name: 'Solicitudes', exact: true })).toHaveCount(0)
   })
 }
 
-test('menú conserva disponibilidad y certificados y añade solicitudes al prestador', async ({ page }) => {
+test('menú del prestador: panel, solicitudes, disponibilidad y verificación', async ({ page }) => {
   await preparar(page)
   await page.goto('/solicitudes')
-  for (const name of ['Mi disponibilidad', 'Cargar certificado', 'Solicitudes']) {
-    await expect(page.getByRole('navigation').getByRole('link', { name, exact: true })).toBeVisible()
+  for (const name of ['Mi panel', 'Solicitudes', 'Mi disponibilidad', 'Verificación']) {
+    await expect(page.getByRole('navigation', { name: 'Menú principal' }).getByRole('link', { name, exact: true })).toBeVisible()
   }
 })

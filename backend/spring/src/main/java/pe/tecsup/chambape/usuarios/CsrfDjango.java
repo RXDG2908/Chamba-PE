@@ -92,7 +92,7 @@ public class CsrfDjango {
         }
     }
 
-    static String cookie(HttpServletRequest peticion, String nombre) {
+    public static String cookie(HttpServletRequest peticion, String nombre) {
         Cookie[] cookies = peticion.getCookies();
         if (cookies == null) {
             return null;

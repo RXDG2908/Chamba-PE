@@ -2,9 +2,9 @@ import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import process from 'node:process'
 
-// Arquitectura: la parte de usuario (búsqueda, solicitudes, seguimiento, disponibilidad y
-// calificaciones) va al Back End de usuario en Spring Boot; el resto (cuentas e inicio de sesión,
-// verificación de identidad, certificados, IA y administración) sigue en Django.
+// Arquitectura: la parte de usuario (búsqueda, solicitudes, seguimiento, disponibilidad,
+// calificaciones y el token de avisos del prestador) va al Back End de usuario en Spring Boot; el resto
+// (cuentas e inicio de sesión, verificación de identidad, certificados, IA y administración) sigue en Django.
 // Spring lee la misma sesión de Django y exige el mismo CSRF. Para mandar todo a Django:
 // CHAMBA_API_USUARIO=http://127.0.0.1:8000 npm run dev
 const DJANGO = 'http://127.0.0.1:8000'
@@ -22,7 +22,7 @@ export default defineConfig({
   server: {
     proxy: {
       // Van primero: Vite usa la primera regla que coincide.
-      '^/api/(prestadores/(rubros|buscar)|servicios/solicitudes|usuarios/disponibilidad|calificaciones)/': haciaSpring,
+      '^/api/(prestadores/(rubros|buscar)|servicios/(solicitudes|notificaciones/token)|usuarios/disponibilidad|calificaciones)/': haciaSpring,
       '/api': {
         target: DJANGO,
         changeOrigin: true,

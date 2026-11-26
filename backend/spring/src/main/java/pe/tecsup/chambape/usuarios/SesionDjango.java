@@ -68,6 +68,11 @@ public class SesionDjango {
         return datos.isEmpty() ? Optional.empty() : decodificar(datos.get(0));
     }
 
+    /** El backend guardado en la sesión es el de {@code AUTHENTICATION_BACKENDS}. */
+    public boolean backendConfigurado(Contenido contenido) {
+        return BACKEND.equals(contenido.backend());
+    }
+
     /**
      * La cuenta que AuthenticationMiddleware pondría en {@code request.user}: el id de la sesión,
      * con el backend configurado y el hash de su contraseña actual. Vacío si no coincide.

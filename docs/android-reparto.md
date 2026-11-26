@@ -76,7 +76,7 @@ Renzo construyó casi todo, así que **las pruebas y la revisión pasan a Luis y
 | Revisar el PR #39 — backend | **Luis** | `usuarios/autenticacion.py` (token de Firebase), migración `usuarios.0003` y `POST /api/prestadores/registro-movil/`. Instalar desde cero (`requirements.txt` cambió) |
 | Decidir el enfoque | **Equipo** (David como PO) | Django + Firebase en vez de Spring, y solicitudes en Firestore. Ver [decisiones](#5-decisiones-del-equipo) |
 | Atender las observaciones y actualizar el plan | **Renzo** | Plan Android a v0.2 con lo que se decida; quitar «App móvil: por definir» de `PLAN_EQUIPO.md` |
-| Dar acceso al proyecto Firebase | **Renzo** | `chamba-pe-tecsup` está en la cuenta de Renzo: agregar a Luis y David y pasarles `google-services.json` |
+| Dar acceso al proyecto Firebase | **Renzo** | `chamba-pe-tecsup` está en la cuenta de Renzo: agregar a Luis y David. El `google-services.json` ya está configurado (26/11, con el MCP de Firebase) y las huellas del certificado de depuración, registradas |
 
 ### Parte B · Tarjetas pendientes (backlog, por comprometer)
 
@@ -105,7 +105,7 @@ Renzo construyó casi todo, así que **las pruebas y la revisión pasan a Luis y
 | AND-15 | Cliente FCM y registro del token del dispositivo en Django | Backend + móvil | 3 | Acordar con Luis el emisor de HU-8 |
 | AND-18 | Verificar recepción real: primer y segundo plano, permiso denegado, cierre de sesión | Pruebas | 2 | AND-15 |
 | AND-21 | Captura del DNI (frente y reverso) y resultado de HU-19 | Móvil | 3 | AND-19 |
-| AND-24 | **Nueva.** Vincular solo `prestadorId` en Firestore al registrarse (hoy lo pone administración a mano) | Backend + móvil | 1 | Sobra si se aprueba AND-23 |
+| AND-24 | ✅ 26/11 (Renzo), resuelta de otra forma: la app ya no usa Firestore; el rol y el ID de prestador salen de `GET /api/usuarios/yo/`, sin vínculo manual | Backend + móvil | 1 | AND-23 |
 
 > AND-18 la construye y la verifica Renzo; para respetar las pruebas cruzadas, **David repite la matriz** en su teléfono.
 

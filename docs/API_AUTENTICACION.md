@@ -229,6 +229,12 @@ Authorization: Bearer <token de identidad de Firebase>
   no se acepta ningún token.
 - Token ausente, inválido, vencido, de otro proyecto o de una cuenta sin vincular: `403`, igual
   que una petición sin sesión.
+- Desde el 26/11 dos de esos `403` traen un `codigo` estable para que la app no dependa del texto:
+  `{"detail": "...", "codigo": "cuenta_no_vinculada"}` (la app crea entonces la cuenta de cliente con
+  `POST /api/usuarios/registro-movil/`) y `{"detail": "...", "codigo": "cuenta_sancionada"}` (HU-13: la
+  app no entra).
+- `GET /api/usuarios/yo/` con token devuelve el rol y `prestador_id`: es de donde la app lee el perfil
+  (antes estaba en Firestore `usuarios/{uid}`).
 
 ### Registro de prestador desde la app
 
@@ -249,7 +255,7 @@ Authorization: Bearer <token de identidad de Firebase>
   radio); los errores llegan por campo. No permite fijar `estado` ni `disponible`.
 - Sin token válido: `403`.
 
-La usan el registro de prestador y la pantalla «Mi disponibilidad» de Android. Las solicitudes del móvil siguen en
+La usan el registro de prestador y la pantalla «Mi disponibilidad» de Android. (Nota del 26/11: las solicitudes del móvil ya van a Django, AND-23.) Antes, las solicitudes del móvil seguían en
 Firestore; unificarlas con las de Django es una decisión pendiente.
 
 ## Qué cambia en lo que ya existe

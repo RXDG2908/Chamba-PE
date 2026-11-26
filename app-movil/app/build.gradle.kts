@@ -76,10 +76,9 @@ dependencies {
     implementation(libs.retrofit)
     implementation(libs.retrofit.converter.gson)
 
-    // Firebase: sesión (Auth) y perfiles/solicitudes (Firestore)
+    // Firebase: solo la sesión (Auth). Perfiles y solicitudes viven en Django.
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.auth)
-    implementation(libs.firebase.firestore)
 
     // Mapa: Google Maps para Compose (como el lab CampusGPS); la clave va en local.properties
     implementation(libs.maps.compose)

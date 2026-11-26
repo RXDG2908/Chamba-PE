@@ -145,6 +145,49 @@ class RegistroYCalificacionesApiTest extends PruebaConBase {
         assertEquals(0, jdbc.queryForObject("select count(*) from auth_user where username = 'fb-uid-nuevo'", Integer.class));
     }
 
+    @Test
+    void yoConTokenDevuelveRolYPrestadorComoDjango() throws Exception {
+        // La app lee de aquí su perfil (antes Firestore usuarios/{uid}).
+        enviar(get("/api/usuarios/yo/"), "", "token-ana")
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.rol").value("prestador"))
+            .andExpect(jsonPath("$.prestador_id").value(1));
+        enviar(get("/api/usuarios/yo/"), "", "token-cliente")
+            .andExpect(jsonPath("$.rol").value("cliente"))
+            .andExpect(jsonPath("$.prestador_id").value(nullValue()));
+        enviar(get("/api/usuarios/yo/"), "", null).andExpect(status().isForbidden())
+            .andExpect(jsonPath("$.detail").value("Authentication credentials were not provided."));
+    }
+
+    @Test
+    void los403DeLaAppTraenCodigoEstable() throws Exception {
+        enviar(get("/api/usuarios/yo/"), "", "token-nuevo").andExpect(status().isForbidden())
+            .andExpect(jsonPath("$.detail").value("Esta cuenta de la app aún no está vinculada."))
+            .andExpect(jsonPath("$.codigo").value("cuenta_no_vinculada"));
+        jdbc.update("""
+            insert into administracion_sancioncuenta (tipo, motivo, hasta, creada, motivo_levantamiento, usuario_id)
+            values ('bloqueo', 'Cobros fuera de la plataforma.', null, '2026-11-25 10:00:00', '', 50)""");
+        enviar(get("/api/usuarios/yo/"), "", "token-cliente").andExpect(status().isForbidden())
+            .andExpect(jsonPath("$.detail").value("Tu cuenta está bloqueada. Motivo: Cobros fuera de la plataforma."))
+            .andExpect(jsonPath("$.codigo").value("cuenta_sancionada"));
+    }
+
+    @Test
+    void prestadorConNombreRaroOTelefonoInvalidoComoDjango() throws Exception {
+        String base = "{\"nombres\": \"NOMBRE\", \"apellidos\": \"Pérez\", \"dni\": \"20000002\", \"rubros\": [1],"
+            + " \"latitud\": \"-12.05\", \"longitud\": -77.04, \"radio_cobertura_km\": 5, \"telefono\": \"TEL\"}";
+        enviar(post(PRESTADOR), base.replace("NOMBRE", "Rosa 🔧").replace("TEL", "abc"), "token-nuevo")
+            .andExpect(status().isBadRequest())
+            .andExpect(jsonPath("$.nombres[0]").value(
+                "Ingresa un nombre con al menos una letra; solo letras, espacios, guiones y apóstrofes."))
+            .andExpect(jsonPath("$.telefono[0]").value("Ingresa un teléfono de 9 dígitos (puede empezar con +51)."));
+        // NFC, espacios juntados y teléfono normalizado a 9 dígitos.
+        enviar(post(PRESTADOR), base.replace("NOMBRE", "Ana   Peña").replace("TEL", "+51 987 654 321"), "token-nuevo")
+            .andExpect(status().isCreated())
+            .andExpect(jsonPath("$.nombres").value("Ana Peña"))
+            .andExpect(jsonPath("$.telefono").value("987654321"));
+    }
+
     private long solicitudDelCliente(String estado) {
         jdbc.update("""
             insert into servicios_solicitud (prestador_id, rubro_id, cliente_id, cliente_nombre, cliente_telefono,

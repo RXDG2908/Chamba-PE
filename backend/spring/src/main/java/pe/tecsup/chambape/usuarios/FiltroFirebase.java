@@ -102,12 +102,12 @@ public class FiltroFirebase extends OncePerRequestFilter {
         }
         Optional<Cuentas.Usuario> usuario = cuentas.porFirebase(uid.get());
         if (usuario.isEmpty()) {
-            rechazar(respuesta, "Esta cuenta de la app aún no está vinculada.");
+            rechazar(respuesta, "Esta cuenta de la app aún no está vinculada.", "cuenta_no_vinculada");
             return;
         }
         Optional<String> sancion = cuentas.sancionVigente(usuario.get().id());
         if (sancion.isPresent()) {
-            rechazar(respuesta, sancion.get());
+            rechazar(respuesta, sancion.get(), "cuenta_sancionada");
             return;
         }
         peticion.setAttribute(ATRIBUTO, usuario.get());
@@ -115,10 +115,20 @@ public class FiltroFirebase extends OncePerRequestFilter {
     }
 
     private static void rechazar(HttpServletResponse respuesta, String detalle) throws IOException {
+        rechazar(respuesta, detalle, null);
+    }
+
+    /** Con {@code codigo} estable (cuenta_no_vinculada, cuenta_sancionada), como Django desde el 26/11. */
+    private static void rechazar(HttpServletResponse respuesta, String detalle, String codigo) throws IOException {
         // DRF responde 403 (no 401) porque la sesión es la primera autenticación configurada.
         respuesta.setStatus(HttpServletResponse.SC_FORBIDDEN);
         respuesta.setContentType(MediaType.APPLICATION_JSON_VALUE);
         respuesta.setCharacterEncoding("UTF-8");
-        respuesta.getWriter().write(JSON.writeValueAsString(Map.of("detail", detalle)));
+        Map<String, String> cuerpo = new java.util.LinkedHashMap<>();
+        cuerpo.put("detail", detalle);
+        if (codigo != null) {
+            cuerpo.put("codigo", codigo);
+        }
+        respuesta.getWriter().write(JSON.writeValueAsString(cuerpo));
     }
 }

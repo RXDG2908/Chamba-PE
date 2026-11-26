@@ -361,6 +361,54 @@ public final class ComoDrf {
         return Normalizer.normalize(texto, Normalizer.Form.NFC);
     }
 
+    public static final String MENSAJE_NOMBRE =
+        "Ingresa un nombre con al menos una letra; solo letras, espacios, guiones y apóstrofes.";
+    public static final String MENSAJE_TELEFONO = "Ingresa un teléfono de 9 dígitos (puede empezar con +51).";
+    private static final String PERMITIDOS_EN_NOMBRE = " -'’.";
+    private static final Pattern ESPACIOS_REPETIDOS = Pattern.compile(" {2,}");
+    private static final Pattern SEPARADORES_TELEFONO =
+        Pattern.compile("[\\s-]", Pattern.UNICODE_CHARACTER_CLASS);
+    private static final Pattern PREFIJO_PERU =
+        Pattern.compile("^\\+?51(?=\\d{9}$)", Pattern.UNICODE_CHARACTER_CLASS);
+    private static final Pattern NUEVE_DIGITOS =
+        Pattern.compile("\\d{9}", Pattern.UNICODE_CHARACTER_CLASS);
+
+    /**
+     * {@code usuarios.validadores.nombre_de_persona} de Django: letras de cualquier idioma, espacios,
+     * guiones, apóstrofes y puntos; NFC, sin espacios en los extremos y sin espacios repetidos.
+     */
+    public static String nombreDePersona(String valor) throws Invalido {
+        String nombre = nfc(valor);
+        int inicio = 0;
+        int fin = nombre.length();
+        while (inicio < fin && nombre.charAt(inicio) == ' ') {
+            inicio++;
+        }
+        while (fin > inicio && nombre.charAt(fin - 1) == ' ') {
+            fin--;
+        }
+        nombre = ESPACIOS_REPETIDOS.matcher(nombre.substring(inicio, fin)).replaceAll(" ");
+        boolean algunaLetra = nombre.codePoints().anyMatch(ComoDrf::esLetra);
+        boolean permitido = nombre.codePoints().allMatch(c -> esLetra(c) || PERMITIDOS_EN_NOMBRE.indexOf(c) >= 0);
+        if (!algunaLetra || !permitido) {
+            throw new Invalido(MENSAJE_NOMBRE);
+        }
+        return nombre;
+    }
+
+    /** {@code usuarios.validadores.telefono_peruano}: 9 dígitos con +51, espacios o guiones opcionales. */
+    public static String telefonoPeruano(String valor) throws Invalido {
+        if (soloEspacios(valor)) {
+            return "";
+        }
+        String digitos = SEPARADORES_TELEFONO.matcher(valor).replaceAll("");
+        digitos = PREFIJO_PERU.matcher(digitos).replaceFirst("");
+        if (!NUEVE_DIGITOS.matcher(digitos).matches()) {
+            throw new Invalido(MENSAJE_TELEFONO);
+        }
+        return digitos;
+    }
+
     /** {@code str.isalpha()} de un carácter. */
     public static boolean esLetra(int caracter) {
         return Character.isLetter(caracter);

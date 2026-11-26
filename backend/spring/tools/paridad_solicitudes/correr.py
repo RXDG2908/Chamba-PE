@@ -252,6 +252,15 @@ try:
     paso('POST', S, base, None, extra=web('cli_susp', csrf=False))
     paso('GET', MS, None, None, extra=web('cli_susp', csrf=False))
     paso('GET', S + 'recibidas/', None, None, extra=web('sanc', csrf=False))
+    # 26/11: perfil de la app (GET /yo con token), 403 con codigo y reglas de nombre y teléfono.
+    for tok in (t1, tp, T['ana'], T['cli'], T['nadie'], T['sanc'], T['clis'], T['venc'], None):
+        paso('GET', '/api/usuarios/yo/', None, tok)
+    tp4 = nuevo('uid-p4')
+    for nombres, telefono in (('Rosa 🔧', 'abc'), ('Ana	María', '12345'), ('​', '+51 (01) 987-654-321'),
+                              ('  Ana   Peña ', '+51 987 654 321'), ("O'Connor-Ñúñez.", '51987654321')):
+        paso('POST', RP, dict(valido, dni='20000004', nombres=nombres, apellidos=nombres, telefono=telefono), tp4)
+    paso('POST', S, dict(base, cliente_nombre='  Ana   María. '), None)
+    paso('POST', S, dict(base, cliente_nombre='Ana	María'), None)
     iguales += nonlocal_estado['iguales']; total += nonlocal_estado['total']
     print(f'Django vs Spring: {iguales} iguales, {len(distintos)} distintos de {total}')
     for d in distintos: print('  DISTINTO', json.dumps(d, ensure_ascii=False)[:900])

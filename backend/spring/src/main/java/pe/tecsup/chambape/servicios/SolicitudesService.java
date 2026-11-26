@@ -30,7 +30,6 @@ import pe.tecsup.chambape.usuarios.Cuentas;
 public class SolicitudesService {
 
     private static final Pattern TELEFONO = Pattern.compile("[0-9]{9}");
-    private static final String APOSTROFES = " -'’";
 
     private final Solicitudes solicitudes;
     private final JdbcTemplate jdbc;
@@ -68,14 +67,8 @@ public class SolicitudesService {
             return id;
         });
         String nombre = ComoDrf.campo(datos, "cliente_nombre", errores, valor -> {
-            String texto = ComoDrf.nfc(ComoDrf.texto(valor, 100, "Ingresa un nombre con al menos una letra."));
-            boolean algunaLetra = texto.codePoints().anyMatch(ComoDrf::esLetra);
-            boolean permitido = texto.codePoints().allMatch(c -> ComoDrf.esLetra(c) || APOSTROFES.indexOf(c) >= 0);
-            if (!algunaLetra || !permitido) {
-                throw new ComoDrf.Invalido(
-                    "Ingresa un nombre con al menos una letra; solo letras, espacios, guiones y apóstrofes.");
-            }
-            return texto;
+            // Misma regla que validate_cliente_nombre → usuarios.validadores.nombre_de_persona.
+            return ComoDrf.nombreDePersona(ComoDrf.texto(valor, 100, "Ingresa un nombre con al menos una letra."));
         });
         String telefono = ComoDrf.campo(datos, "cliente_telefono", errores, valor -> {
             String texto = ComoDrf.texto(valor, null, "Ingresa exactamente 9 dígitos del 0 al 9, sin +51 ni espacios.");

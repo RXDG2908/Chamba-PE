@@ -160,10 +160,11 @@ public class RegistroMovil {
             throw ComoDrf.noEsDiccionario(datos);
         }
         Map<String, List<String>> errores = new LinkedHashMap<>();
+        // validate_nombres / validate_apellidos (DatosPersonalesMixin): después de los validadores del campo.
         String nombres = ComoDrf.campo(datos, "nombres", errores,
-            valor -> ComoDrf.textoRecortado(valor, 100, false, null, List.of()));
+            valor -> ComoDrf.nombreDePersona(ComoDrf.textoRecortado(valor, 100, false, null, List.of())));
         String apellidos = ComoDrf.campo(datos, "apellidos", errores,
-            valor -> ComoDrf.textoRecortado(valor, 100, false, null, List.of()));
+            valor -> ComoDrf.nombreDePersona(ComoDrf.textoRecortado(valor, 100, false, null, List.of())));
         // Validadores del modelo (RegexValidator y MaxLengthValidator de Django) y UniqueValidator, en ese orden.
         String dni = ComoDrf.campo(datos, "dni", errores, valor -> ComoDrf.textoRecortado(valor, 8, false, null, List.of(
             texto -> DNI.matcher(texto).find() ? null : "El DNI debe tener 8 dígitos.",
@@ -171,7 +172,7 @@ public class RegistroMovil {
                 ? "Ensure this value has at most 8 characters (it has " + ComoDrf.largo(texto) + ")." : null,
             texto -> dniEnUso(texto) ? "Ya existe un prestador con ese DNI." : null)));
         String telefono = ComoDrf.opcional(datos, "telefono", "", errores,
-            valor -> ComoDrf.textoRecortado(valor, 20, true, null, List.of()));
+            valor -> ComoDrf.telefonoPeruano(ComoDrf.textoRecortado(valor, 20, true, null, List.of())));
         List<Long> rubros = ComoDrf.campo(datos, "rubros", errores, this::rubros);
         BigDecimal latitud = ComoDrf.campo(datos, "latitud", errores, valor -> ComoDrf.coordenada(valor, 90));
         BigDecimal longitud = ComoDrf.campo(datos, "longitud", errores, valor -> ComoDrf.coordenada(valor, 180));

@@ -20,6 +20,9 @@ import pe.tecsup.chambape.domain.model.Prestador
 import pe.tecsup.chambape.domain.model.Sesion
 import pe.tecsup.chambape.domain.model.Solicitud
 import pe.tecsup.chambape.domain.model.TipoErrorAuth
+import pe.tecsup.chambape.domain.model.NuevaSolicitud
+import pe.tecsup.chambape.domain.model.EstadoSolicitud
+import pe.tecsup.chambape.data.repository.ContextoBusqueda
 
 // ---------- Ingreso y registro ----------
 
@@ -88,8 +91,11 @@ data class DetalleUiState(
     val cargando: Boolean = true,
     val prestador: Prestador? = null,
     val descripcion: String = "",
-    val direccion: String = "",
+    val telefono: String = "",
     val descripcionCorta: Boolean = false,
+    val telefonoInvalido: Boolean = false,
+    /** Sin una búsqueda previa no hay rubro ni ubicación para enviar la solicitud. */
+    val sinBusqueda: Boolean = false,
     val enviando: Boolean = false,
     val enviada: Boolean = false,
     val errorEnvio: Boolean = false,
@@ -101,6 +107,7 @@ class DetalleViewModel(
     private val prestadores: PrestadorRepository,
     private val solicitudes: SolicitudRepository,
     private val notificador: Notificador,
+    private val contexto: ContextoBusqueda,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(DetalleUiState())
     val uiState: StateFlow<DetalleUiState> = _uiState.asStateFlow()
@@ -115,7 +122,9 @@ class DetalleViewModel(
     fun cambiarDescripcion(v: String) =
         _uiState.update { it.copy(descripcion = v.take(DESCRIPCION_MAXIMA), descripcionCorta = false, errorEnvio = false) }
 
-    fun cambiarDireccion(v: String) = _uiState.update { it.copy(direccion = v.take(DIRECCION_MAXIMA)) }
+    fun cambiarTelefono(v: String) = _uiState.update {
+        it.copy(telefono = v.filter(Char::isDigit).take(TELEFONO_DIGITOS), telefonoInvalido = false, errorEnvio = false)
+    }
 
     fun alternarFavorito() {
         viewModelScope.launch {
@@ -128,14 +137,22 @@ class DetalleViewModel(
         val s = _uiState.value
         val prestador = s.prestador ?: return
         if (s.enviando || s.enviada) return // evita el doble envío
-        if (s.descripcion.trim().length < DESCRIPCION_MINIMA) {
-            _uiState.update { it.copy(descripcionCorta = true) }
+        val descripcionCorta = s.descripcion.trim().length < DESCRIPCION_MINIMA
+        val telefonoInvalido = s.telefono.length != TELEFONO_DIGITOS
+        val busqueda = contexto.ultima
+        if (descripcionCorta || telefonoInvalido || busqueda == null) {
+            _uiState.update {
+                it.copy(descripcionCorta = descripcionCorta, telefonoInvalido = telefonoInvalido, sinBusqueda = busqueda == null)
+            }
             return
         }
         _uiState.update { it.copy(enviando = true, errorEnvio = false) }
         viewModelScope.launch {
             val ok = try {
-                solicitudes.crear(sesion, prestador, s.descripcion, s.direccion)
+                solicitudes.crear(
+                    sesion, prestador,
+                    NuevaSolicitud(busqueda.rubroId, s.descripcion, s.telefono, busqueda.latitud, busqueda.longitud),
+                )
                 true
             } catch (e: CancellationException) {
                 throw e
@@ -150,7 +167,7 @@ class DetalleViewModel(
     companion object {
         const val DESCRIPCION_MINIMA = 10
         const val DESCRIPCION_MAXIMA = 500
-        const val DIRECCION_MAXIMA = 120
+        const val TELEFONO_DIGITOS = 9
     }
 }
 
@@ -172,7 +189,7 @@ data class SolicitudesUiState(
     val cargando: Boolean = true,
     val solicitudes: List<Solicitud> = emptyList(),
     val error: Boolean = false,
-    val respondiendoId: String? = null,
+    val respondiendoId: Int? = null,
     val errorRespuesta: Boolean = false,
 )
 
@@ -198,12 +215,21 @@ class SolicitudesViewModel(
         }
     }
 
-    fun responder(solicitudId: String, aceptar: Boolean) {
+    fun responder(solicitudId: Int, aceptar: Boolean) = accion(solicitudId) { repository.responder(solicitudId, aceptar) }
+
+    /** HU-11: el prestador pasa el servicio a la etapa siguiente. */
+    fun avanzar(solicitudId: Int, estado: EstadoSolicitud) = accion(solicitudId) { repository.avanzar(solicitudId, estado) }
+
+    /** HU-12: el cliente califica el servicio finalizado (1 a 5 estrellas). */
+    fun calificar(solicitudId: Int, estrellas: Int, comentario: String) =
+        accion(solicitudId) { repository.calificar(solicitudId, estrellas, comentario) }
+
+    private fun accion(solicitudId: Int, ejecutar: suspend () -> Unit) {
         if (_uiState.value.respondiendoId != null) return
         _uiState.update { it.copy(respondiendoId = solicitudId, errorRespuesta = false) }
         viewModelScope.launch {
             val ok = try {
-                repository.responder(solicitudId, aceptar)
+                ejecutar()
                 true
             } catch (e: CancellationException) {
                 throw e

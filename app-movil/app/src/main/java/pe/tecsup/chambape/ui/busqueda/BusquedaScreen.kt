@@ -43,7 +43,7 @@ import pe.tecsup.chambape.ui.textoError
 /** Conecta el ViewModel con la pantalla; [BusquedaScreen] se puede probar sin él. */
 @Composable
 fun BusquedaRoute(onAbrirPrestador: (Int) -> Unit) {
-    val vm = chambaViewModel { BusquedaViewModel(it.prestadorRepository, it.ubicacionProvider) }
+    val vm = chambaViewModel { BusquedaViewModel(it.prestadorRepository, it.ubicacionProvider, it.contextoBusqueda) }
     val estado by vm.uiState.collectAsStateWithLifecycle()
     val pedirPermiso = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { concedido ->
         if (concedido) vm.usarMiUbicacion() else vm.permisoUbicacionDenegado()

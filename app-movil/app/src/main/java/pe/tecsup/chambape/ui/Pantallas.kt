@@ -33,13 +33,22 @@ import pe.tecsup.chambape.domain.model.Rol
 import pe.tecsup.chambape.domain.model.Sesion
 import pe.tecsup.chambape.domain.model.Solicitud
 import pe.tecsup.chambape.ui.busqueda.textoCalificacion
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.Alignment
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.material3.TextButton
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.annotation.StringRes
 
 // ---------- Detalle del prestador + solicitud ----------
 
 @Composable
 fun DetalleScreen(prestadorId: Int, sesion: Sesion) {
     val vm = chambaViewModel {
-        DetalleViewModel(prestadorId, sesion, it.prestadorRepository, it.solicitudRepository, it.notificador)
+        DetalleViewModel(prestadorId, sesion, it.prestadorRepository, it.solicitudRepository, it.notificador, it.contextoBusqueda)
     }
     val estado by vm.uiState.collectAsStateWithLifecycle()
     // El permiso de notificaciones se pide al enviar; si se niega, la solicitud se envía igual.
@@ -88,13 +97,19 @@ fun DetalleScreen(prestadorId: Int, sesion: Sesion) {
                     modifier = Modifier.fillMaxWidth(),
                 )
                 OutlinedTextField(
-                    value = estado.direccion,
-                    onValueChange = vm::cambiarDireccion,
-                    label = { Text(stringResource(R.string.solicitud_direccion)) },
+                    value = estado.telefono,
+                    onValueChange = vm::cambiarTelefono,
+                    label = { Text(stringResource(R.string.solicitud_telefono)) },
+                    isError = estado.telefonoInvalido,
+                    supportingText = { if (estado.telefonoInvalido) Text(stringResource(R.string.error_telefono)) },
                     singleLine = true,
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
                     enabled = !estado.enviando,
                     modifier = Modifier.fillMaxWidth(),
                 )
+                if (estado.sinBusqueda) {
+                    Text(stringResource(R.string.error_sin_busqueda), color = MaterialTheme.colorScheme.error)
+                }
                 if (estado.errorEnvio) {
                     Text(stringResource(R.string.error_envio_solicitud), color = MaterialTheme.colorScheme.error)
                 }
@@ -162,48 +177,128 @@ fun SolicitudesScreen(sesion: Sesion) {
                 SolicitudCard(
                     solicitud = solicitud,
                     esPrestador = esPrestador,
-                    respondiendo = estado.respondiendoId != null,
+                    ocupado = estado.respondiendoId != null,
                     onResponder = { aceptar -> vm.responder(solicitud.id, aceptar) },
+                    onAvanzar = { siguiente -> vm.avanzar(solicitud.id, siguiente) },
+                    onCalificar = { estrellas, comentario -> vm.calificar(solicitud.id, estrellas, comentario) },
                 )
             }
         }
     }
 }
 
+private val ETAPAS = listOf(
+    EstadoSolicitud.ACEPTADA, EstadoSolicitud.EN_CAMINO, EstadoSolicitud.EN_SERVICIO, EstadoSolicitud.FINALIZADA,
+)
+
+@StringRes
+private fun nombreEtapa(estado: EstadoSolicitud): Int = when (estado) {
+    EstadoSolicitud.PENDIENTE -> R.string.estado_pendiente
+    EstadoSolicitud.ACEPTADA -> R.string.estado_confirmado
+    EstadoSolicitud.RECHAZADA -> R.string.estado_rechazada
+    EstadoSolicitud.EN_CAMINO -> R.string.estado_en_camino
+    EstadoSolicitud.EN_SERVICIO -> R.string.estado_en_servicio
+    EstadoSolicitud.FINALIZADA -> R.string.estado_finalizada
+}
+
+@StringRes
+private fun accionSiguiente(estado: EstadoSolicitud): Int? = when (estado) {
+    EstadoSolicitud.EN_CAMINO -> R.string.accion_en_camino
+    EstadoSolicitud.EN_SERVICIO -> R.string.accion_en_servicio
+    EstadoSolicitud.FINALIZADA -> R.string.accion_finalizar
+    else -> null
+}
+
+/** HU-11: las cuatro etapas, marcando las hechas y la actual (igual que la web). */
 @Composable
-private fun SolicitudCard(solicitud: Solicitud, esPrestador: Boolean, respondiendo: Boolean, onResponder: (Boolean) -> Unit) {
+private fun Seguimiento(solicitud: Solicitud) {
+    val actual = ETAPAS.indexOf(solicitud.estado)
+    if (actual < 0) return
+    Row(horizontalArrangement = Arrangement.spacedBy(6.dp), modifier = Modifier.fillMaxWidth()) {
+        ETAPAS.forEachIndexed { i, etapa ->
+            val hecha = i <= actual
+            Text(
+                (if (hecha) "✓ " else "") + stringResource(nombreEtapa(etapa)),
+                style = MaterialTheme.typography.labelSmall,
+                color = if (hecha) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.weight(1f),
+            )
+        }
+    }
+}
+
+@Composable
+private fun SolicitudCard(
+    solicitud: Solicitud,
+    esPrestador: Boolean,
+    ocupado: Boolean,
+    onResponder: (Boolean) -> Unit,
+    onAvanzar: (EstadoSolicitud) -> Unit,
+    onCalificar: (Int, String) -> Unit,
+) {
     Card(modifier = Modifier.fillMaxWidth()) {
-        Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
-            Text(
-                if (esPrestador) solicitud.clienteNombre else solicitud.prestadorNombre,
-                style = MaterialTheme.typography.titleMedium,
-            )
-            Text(solicitud.descripcion)
-            if (solicitud.direccion.isNotBlank()) {
-                Text(stringResource(R.string.solicitud_en, solicitud.direccion), style = MaterialTheme.typography.bodySmall)
-            }
-            Text(
-                stringResource(
-                    when (solicitud.estado) {
-                        EstadoSolicitud.PENDIENTE -> R.string.estado_pendiente
-                        EstadoSolicitud.ACEPTADA -> R.string.estado_aceptada
-                        EstadoSolicitud.RECHAZADA -> R.string.estado_rechazada
+        Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text(solicitud.contraparte, style = MaterialTheme.typography.titleMedium, modifier = Modifier.weight(1f))
+                Text(
+                    stringResource(nombreEtapa(solicitud.estado)),
+                    style = MaterialTheme.typography.labelLarge,
+                    color = when (solicitud.estado) {
+                        EstadoSolicitud.PENDIENTE -> MaterialTheme.colorScheme.secondary
+                        EstadoSolicitud.RECHAZADA -> MaterialTheme.colorScheme.error
+                        else -> MaterialTheme.colorScheme.primary
                     },
-                ),
-                style = MaterialTheme.typography.labelLarge,
-                color = when (solicitud.estado) {
-                    EstadoSolicitud.PENDIENTE -> MaterialTheme.colorScheme.secondary
-                    EstadoSolicitud.ACEPTADA -> MaterialTheme.colorScheme.primary
-                    EstadoSolicitud.RECHAZADA -> MaterialTheme.colorScheme.error
-                },
-            )
-            if (esPrestador && solicitud.estado == EstadoSolicitud.PENDIENTE) {
-                Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                    Button(onClick = { onResponder(true) }, enabled = !respondiendo) { Text(stringResource(R.string.aceptar)) }
-                    OutlinedButton(onClick = { onResponder(false) }, enabled = !respondiendo) { Text(stringResource(R.string.rechazar)) }
+                )
+            }
+            if (solicitud.rubro.isNotBlank()) Text(solicitud.rubro, style = MaterialTheme.typography.bodySmall)
+            Text(solicitud.descripcion)
+            if (esPrestador && !solicitud.telefono.isNullOrBlank()) {
+                Text(stringResource(R.string.solicitud_contacto, solicitud.telefono), style = MaterialTheme.typography.bodyMedium)
+            }
+            Seguimiento(solicitud)
+            when {
+                esPrestador && solicitud.estado == EstadoSolicitud.PENDIENTE ->
+                    Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                        Button(onClick = { onResponder(true) }, enabled = !ocupado) { Text(stringResource(R.string.aceptar)) }
+                        OutlinedButton(onClick = { onResponder(false) }, enabled = !ocupado) { Text(stringResource(R.string.rechazar)) }
+                    }
+                esPrestador -> solicitud.siguienteEstado?.let { siguiente ->
+                    accionSiguiente(siguiente)?.let { texto ->
+                        Button(onClick = { onAvanzar(siguiente) }, enabled = !ocupado, modifier = Modifier.fillMaxWidth()) {
+                            Text(stringResource(texto))
+                        }
+                    }
                 }
+                solicitud.puedeCalificar -> Calificar(ocupado, onCalificar)
+                solicitud.estrellas != null ->
+                    Text(stringResource(R.string.tu_calificacion, "★".repeat(solicitud.estrellas)), style = MaterialTheme.typography.bodyMedium)
             }
         }
+    }
+}
+
+/** HU-12: de 1 a 5 estrellas y un comentario opcional; una sola vez. */
+@Composable
+private fun Calificar(ocupado: Boolean, onCalificar: (Int, String) -> Unit) {
+    var estrellas by rememberSaveable { mutableIntStateOf(0) }
+    var comentario by rememberSaveable { mutableStateOf("") }
+    Text(stringResource(R.string.como_fue_el_servicio), style = MaterialTheme.typography.titleSmall)
+    Row {
+        (1..5).forEach { n ->
+            TextButton(onClick = { estrellas = n }, enabled = !ocupado) {
+                Text(if (n <= estrellas) "★" else "☆", style = MaterialTheme.typography.headlineSmall)
+            }
+        }
+    }
+    OutlinedTextField(
+        value = comentario,
+        onValueChange = { comentario = it.take(500) },
+        label = { Text(stringResource(R.string.comentario_opcional)) },
+        enabled = !ocupado,
+        modifier = Modifier.fillMaxWidth(),
+    )
+    Button(onClick = { onCalificar(estrellas, comentario) }, enabled = !ocupado && estrellas > 0, modifier = Modifier.fillMaxWidth()) {
+        Text(stringResource(R.string.enviar_calificacion))
     }
 }
 

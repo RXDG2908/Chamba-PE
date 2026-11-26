@@ -6,8 +6,9 @@ Parte **Usuario** de la arquitectura (ver la sección *Arquitectura* del [README
 la app móvil (`app-movil/`) y la web de usuario (`web-portal/`) consumen este backend,
 que comparte la base de datos con el back end de administración (`backend/django/`).
 
-> **Estado (25/11/2026):** ya responden `rubros` y `buscar`, iguales a Django. Faltan solicitudes,
-> disponibilidad y el inicio de sesión con Firebase (ver la tabla de abajo).
+> **Estado (25/11/2026):** responden todas las rutas acordadas (rubros, búsqueda, solicitudes, bandeja del
+> prestador, seguimiento y disponibilidad), iguales a Django, con inicio de sesión por token de Firebase.
+> Falta que la app Android las use (tarjetas AND de Luis).
 
 ## Cómo ejecutarlo
 
@@ -18,9 +19,10 @@ cd backend/spring
 .\mvnw spring-boot:run
 ```
 
-Queda en `http://localhost:8080` (otro puerto: variable `PORT`). Por defecto lee la misma
-`backend/django/db.sqlite3` de Django **en solo lectura**, así que primero corre las migraciones de Django.
-Puedes tener Django (8000) y Spring (8080) abiertos a la vez sobre la misma base.
+Queda en `http://localhost:8080` (otro puerto: variable `PORT`). Por defecto usa la misma
+`backend/django/db.sqlite3` de Django, así que primero corre las migraciones de Django. Puedes tener Django
+(8000) y Spring (8080) abiertos a la vez sobre la misma base: los dos esperan hasta 5 s si el otro está
+escribiendo (`busy_timeout`).
 
 Pruebas (usan una base temporal con el esquema de Django, no tocan la tuya):
 
@@ -31,7 +33,11 @@ Pruebas (usan una base temporal con el esquema de Django, no tocan la tuya):
 | Variable | Para qué |
 |---|---|
 | `PORT` | Puerto (por defecto 8080) |
-| `SPRING_DATASOURCE_URL` | Otra base, en formato JDBC (`jdbc:sqlite:...` o `jdbc:postgresql://host:5432/base`). Si es SQLite, deja `?open_mode=1` al final (solo lectura). No se usa `DATABASE_URL` porque los hostings la llenan con `postgres://usuario:clave@...`, que JDBC no entiende |
+| `SPRING_DATASOURCE_URL` | Otra base, en formato JDBC (`jdbc:sqlite:...?busy_timeout=5000` o `jdbc:postgresql://host:5432/base`). No se usa `DATABASE_URL` porque los hostings la llenan con `postgres://usuario:clave@...`, que JDBC no entiende |
+| `DJANGO_SECRET_KEY` | **La misma** que usa Django. Con ella Spring firma el código de seguimiento (HU-11) igual que `signing.Signer`; sin ella no entrega código ni acepta uno |
+| `FIREBASE_AUTH_PROJECT_ID` | ID del proyecto de Firebase, el mismo que en Django. Sin él, cualquier `Authorization: Bearer` da 403 «El acceso con token no está disponible.» |
+| `FIREBASE_CLAVES_URL` | De dónde leer las claves públicas de los tokens. Por defecto las de Google; solo se cambia para pruebas locales |
+| `FCM_ENABLED=true` + `FIREBASE_PROJECT_ID` + `GOOGLE_APPLICATION_CREDENTIALS` | Aviso push al prestador cuando llega una solicitud, con la misma cuenta de servicio que Django. Apagado por defecto. La ruta del JSON se pone en la variable, nunca el archivo en el repo |
 | `SPRING_PROFILES_ACTIVE=postgres` + `SPRING_DATASOURCE_URL`, `SPRING_DATASOURCE_USERNAME`, `SPRING_DATASOURCE_PASSWORD` | Base PostgreSQL compartida, cuando exista. Sin la URL el arranque falla (no abre el SQLite por error) |
 
 La ruta del SQLite por defecto es relativa a la carpeta desde donde se arranca. Al iniciar, Spring
@@ -41,6 +47,12 @@ escribe en el registro la ruta completa que abrió (`Base de datos SQLite: ...`,
 
 `src/main/java/pe/tecsup/chambape/`
 
+- `usuarios/`: `FiltroFirebase` (lee `Authorization: Bearer`, valida el token con `VerificadorFirebase` y busca la
+  cuenta por `firebase_uid` con `Cuentas`; una cuenta suspendida o bloqueada por HU-13 recibe el mismo 403 que en
+  Django) y `DisponibilidadController`.
+- `servicios/`: `SolicitudesController`, `SolicitudesService` (validación campo por campo y reglas en el mismo
+  orden que el serializer de Django), `Solicitudes` (SQL con `JdbcTemplate`: guarda fechas y decimales con el
+  formato de Django), `CodigoSeguimiento` y `Notificador` (FCM HTTP v1, se envía al confirmar la transacción).
 - `prestadores/`: entidades `Prestador` y `Rubro` (solo lectura, `@Immutable`), repositorios,
   `BusquedaService` (filtros, distancia Haversine, orden y redondeo igual que Django) y `PrestadoresController`.
 - `comun/`: lo que hace que Spring responda como Django:
@@ -51,7 +63,11 @@ escribe en el registro la ruta completa que abrió (`Base de datos SQLite: ...`,
     bytes que no son UTF-8 se cambian por «�», gana el último valor repetido).
   - `NumerosComoPython`: lee números igual que `int()`/`float()` de Python (`"1.0"`, `"1_0"`, `" 1 "` y
     dígitos de otras escrituras como `"١"` valen; `"1d"` y `"0x10"` no). Los largos se cuentan en caracteres.
-  - `ConfiguracionWeb`: CORS abierto para GET, como `CORS_ALLOW_ALL_ORIGINS` de Django.
+  - `ComoDrf`, `PythonRepr`, `CuerpoComoDrf`, `FechasDjango`, `RespuestaError`: campos (`DecimalField`,
+    `CharField`, `BooleanField`, claves foráneas) con los mismos mensajes de DRF, cuerpo JSON o formulario como
+    `request.data`, y fechas como las guarda y las muestra Django.
+  - `ConfiguracionWeb`: CORS abierto para GET, como `CORS_ALLOW_ALL_ORIGINS` de Django (la app Android no lo
+    necesita; la web sigue usando Django para escribir).
   - `AvisoBaseDeDatos`: registra al arrancar qué base se abrió.
 
 ## Alcance acordado
@@ -63,9 +79,12 @@ solo cambien la dirección del servidor:
 |---|---|:---:|
 | `GET /api/prestadores/rubros/` | Lista de rubros | ✅ |
 | `GET /api/prestadores/buscar/` | Búsqueda: solo prestadores Verificados y Activos, dentro de su radio, coordenadas públicas con 3 decimales ([contrato](../../docs/API_BUSQUEDA.md)) | ✅ |
-| `POST /api/servicios/solicitudes/` · `GET /api/servicios/solicitudes/{id}/` | Enviar una solicitud y consultar su estado | Pendiente |
-| `GET /api/servicios/solicitudes/recibidas/` · `POST .../{id}/aceptar/` · `.../rechazar/` | Bandeja del prestador y respuesta | Pendiente |
-| `GET` · `PATCH /api/usuarios/disponibilidad/` | Disponibilidad del prestador | Pendiente |
+| `POST /api/servicios/solicitudes/` · `GET /api/servicios/solicitudes/{id}/` | Enviar una solicitud (con o sin cuenta) y consultar su estado con la cuenta o con `?codigo=` | ✅ |
+| `GET /api/servicios/solicitudes/recibidas/` · `.../recibidas/{id}/` · `POST .../{id}/aceptar/` · `.../rechazar/` · `.../avanzar/` | Bandeja del prestador, respuesta y seguimiento (HU-4, HU-11) | ✅ |
+| `GET` · `PATCH /api/usuarios/disponibilidad/` | Disponibilidad del prestador | ✅ |
+
+Quedan en Django: el registro de cuentas, el inicio de sesión de la web (sesión y CSRF), el token FCM
+(`/api/servicios/notificaciones/token/`), las calificaciones (HU-12) y todo `administracion/`.
 
 La búsqueda incluye también `calificacion_promedio` (`null` sin calificaciones) y `calificaciones_total`
 de HU-12; Spring solo los lee, los mantiene Django.
@@ -84,17 +103,35 @@ orden de las operaciones de coma flotante), y eso se cuenta aparte como «iguale
 «idénticas». El 25/11: 68 respuestas (rubros y 67 búsquedas, incluidas URLs con `%` mal formado, `| { } [ ]`,
 dígitos y espacios Unicode y consultas de 12 KB), 68 idénticas. A igual distancia los dos ordenan por `id`.
 
+`tools/paridad_solicitudes/correr.py` prueba las rutas que escriben. Arma una base con datos ficticios, la copia
+dos veces y levanta Django sobre una y Spring sobre la otra, con la misma `DJANGO_SECRET_KEY` y una clave RSA de
+prueba que reemplaza a las de Google (en los dos). Repite el mismo escenario en ambos (crear con y sin cuenta,
+JSON y formulario, cada error de validación, prestador sin verificar, no disponible, sancionado o lejos, tokens
+vencidos, de otro proyecto o sin vincular, aceptar, rechazar, avanzar hasta Finalizada, conflictos y
+disponibilidad) y al final abre otro Django sobre la base que escribió Spring para comprobar que la lee igual:
+
+```powershell
+python backend/spring/tools/paridad_solicitudes/correr.py
+```
+
+El 25/11: 66 de 66 respuestas idénticas (las fechas se comparan por formato) y 6 de 6 en la lectura cruzada.
+
+Diferencias conocidas con Django: no acepta `multipart/form-data` (la app y la web mandan JSON); el texto de un
+JSON mal formado es otro (el estado 400 es el mismo); al enviar el push no se decodifica la sesión de Django,
+solo se comprueba que siga vigente.
+
 `backend/django/core/test_esquema_spring.py` falla si una migración de Django cambia una columna de la copia
 del esquema que usan las pruebas de Spring (`src/test/resources/esquema-django.sql`).
 
-El inicio de sesión de la app usa Firebase Authentication: Spring Boot valida el token y
-busca al usuario por `firebase_uid` (campo de `usuarios.Perfil`).
+El inicio de sesión de la app usa Firebase Authentication: Spring Boot valida el token (firma, vencimiento,
+proyecto y emisor) y busca al usuario por `firebase_uid` (campo de `usuarios.Perfil`), igual que Django.
 
 ## Reglas de la base de datos compartida
 
 - **Django es el dueño de las tablas:** las crea y modifica con sus migraciones.
-- **Spring Boot no crea ni cambia tablas** (`spring.jpa.hibernate.ddl-auto=none`). Con SQLite además
-  abre la base en solo lectura. Con PostgreSQL se pasará a `validate` cuando probemos contra la base real;
-  antes hay que revisar los tipos (Django usa `smallint` e `integer` con CHECK donde SQLite no distingue) y
-  dar a Spring un usuario de PostgreSQL con solo `SELECT`, porque ahí el pool no está en solo lectura.
+- **Spring Boot no crea ni cambia tablas** (`spring.jpa.hibernate.ddl-auto=none`): solo escribe filas en
+  `servicios_solicitud`, `servicios_cambioestado`, `prestadores_prestador.disponible` y borra tokens FCM que ya
+  no sirven. Con PostgreSQL se pasará a `validate` cuando probemos contra la base real; antes hay que revisar los
+  tipos (Django usa `smallint` e `integer` con CHECK donde SQLite no distingue) y dar a Spring un usuario con
+  permisos solo sobre esas tablas.
 - La conexión se configura con variables de entorno; nunca se versionan contraseñas.

@@ -29,8 +29,11 @@ class EsquemaSpringTests(TestCase):
         copia.executescript(ESQUEMA_SPRING.read_text(encoding='utf-8'))
         tablas = [fila[0] for fila in copia.execute(
             "select name from sqlite_master where type = 'table' and name not like 'sqlite_%'")]
-        self.assertEqual(set(tablas), {'auth_user', 'prestadores_rubro', 'prestadores_prestador',
-                                       'prestadores_prestador_rubros'})
+        self.assertEqual(set(tablas), {
+            'auth_user', 'prestadores_rubro', 'prestadores_prestador', 'prestadores_prestador_rubros',
+            'usuarios_perfil', 'servicios_solicitud', 'servicios_cambioestado', 'servicios_tokenfcm',
+            'django_session', 'administracion_sancioncuenta',
+        })
 
         with connection.cursor() as cursor:
             for tabla in tablas:
@@ -42,9 +45,8 @@ class EsquemaSpringTests(TestCase):
                         self.assertEqual(definicion, reales[columna],
                                          f'{tabla}.{columna} cambió en Django: actualiza esquema-django.sql y Spring.')
 
-                if tabla == 'prestadores_prestador':
-                    # Una columna nueva obligatoria y sin valor por defecto no rompe a Spring (solo lee),
-                    # pero sí sus pruebas, que insertan filas con la copia: también debe estar en ella.
-                    cursor.execute(f'PRAGMA table_info("{tabla}")')
-                    obligatorias = {f[1] for f in cursor.fetchall() if f[3] and f[4] is None and not f[5]}
-                    self.assertLessEqual(obligatorias, set(columnas(copia.cursor(), tabla)))
+                # Una columna nueva obligatoria y sin valor por defecto rompe los INSERT de Spring
+                # (solicitudes, historial) y los de sus pruebas: también debe estar en la copia.
+                cursor.execute(f'PRAGMA table_info("{tabla}")')
+                obligatorias = {f[1] for f in cursor.fetchall() if f[3] and f[4] is None and not f[5]}
+                self.assertLessEqual(obligatorias, set(columnas(copia.cursor(), tabla)))

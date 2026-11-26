@@ -1,10 +1,24 @@
--- Copia del esquema que crean las migraciones de Django en SQLite (main del 24/11/2026, con HU-12),
--- solo con las tablas que lee Spring. Las pruebas no tocan la base real.
+-- Copia del esquema que crean las migraciones de Django en SQLite (main del 25/11/2026, con HU-12 y HU-13),
+-- solo con las tablas que usa Spring. Las pruebas no tocan la base real. Si cambia una migración,
+-- backend/django/core/test_esquema_spring.py avisa que hay que actualizar esta copia.
+DROP TABLE IF EXISTS administracion_sancioncuenta;
+DROP TABLE IF EXISTS django_session;
+DROP TABLE IF EXISTS servicios_tokenfcm;
+DROP TABLE IF EXISTS servicios_cambioestado;
+DROP TABLE IF EXISTS servicios_solicitud;
+DROP TABLE IF EXISTS usuarios_perfil;
 DROP TABLE IF EXISTS prestadores_prestador_rubros;
 DROP TABLE IF EXISTS prestadores_prestador;
 DROP TABLE IF EXISTS prestadores_rubro;
 DROP TABLE IF EXISTS auth_user;
-CREATE TABLE "auth_user" ("id" integer NOT NULL PRIMARY KEY AUTOINCREMENT, "username" varchar(150) NOT NULL UNIQUE);
+CREATE TABLE "auth_user" ("id" integer NOT NULL PRIMARY KEY AUTOINCREMENT, "password" varchar(128) NOT NULL, "last_login" datetime NULL, "is_superuser" bool NOT NULL, "username" varchar(150) NOT NULL UNIQUE, "last_name" varchar(150) NOT NULL, "email" varchar(254) NOT NULL, "is_staff" bool NOT NULL, "is_active" bool NOT NULL, "date_joined" datetime NOT NULL, "first_name" varchar(150) NOT NULL);
 CREATE TABLE "prestadores_rubro" ("id" integer NOT NULL PRIMARY KEY AUTOINCREMENT, "nombre" varchar(60) NOT NULL UNIQUE);
 CREATE TABLE "prestadores_prestador" ("id" integer NOT NULL PRIMARY KEY AUTOINCREMENT, "nombres" varchar(100) NOT NULL, "apellidos" varchar(100) NOT NULL, "dni" varchar(8) NOT NULL UNIQUE, "telefono" varchar(20) NOT NULL, "latitud" decimal NOT NULL, "longitud" decimal NOT NULL, "radio_cobertura_km" smallint unsigned NOT NULL CHECK ("radio_cobertura_km" >= 0), "disponible" bool NOT NULL, "estado" varchar(12) NOT NULL, "creado" datetime NOT NULL, "usuario_id" integer NOT NULL UNIQUE REFERENCES "auth_user" ("id") DEFERRABLE INITIALLY DEFERRED, "calificacion_promedio" decimal NULL, "calificaciones_total" integer unsigned NOT NULL CHECK ("calificaciones_total" >= 0));
 CREATE TABLE "prestadores_prestador_rubros" ("id" integer NOT NULL PRIMARY KEY AUTOINCREMENT, "prestador_id" bigint NOT NULL REFERENCES "prestadores_prestador" ("id") DEFERRABLE INITIALLY DEFERRED, "rubro_id" bigint NOT NULL REFERENCES "prestadores_rubro" ("id") DEFERRABLE INITIALLY DEFERRED);
+CREATE TABLE "usuarios_perfil" ("id" integer NOT NULL PRIMARY KEY AUTOINCREMENT, "rol" varchar(13) NOT NULL, "usuario_id" integer NOT NULL UNIQUE REFERENCES "auth_user" ("id") DEFERRABLE INITIALLY DEFERRED, "firebase_uid" varchar(128) NULL UNIQUE);
+CREATE TABLE "servicios_solicitud" ("id" integer NOT NULL PRIMARY KEY AUTOINCREMENT, "cliente_nombre" varchar(100) NOT NULL, "cliente_telefono" varchar(20) NOT NULL, "descripcion" varchar(500) NOT NULL, "latitud" decimal NOT NULL, "longitud" decimal NOT NULL, "creada" datetime NOT NULL, "respondida" datetime NULL, "prestador_id" bigint NOT NULL REFERENCES "prestadores_prestador" ("id") DEFERRABLE INITIALLY DEFERRED, "rubro_id" bigint NOT NULL REFERENCES "prestadores_rubro" ("id") DEFERRABLE INITIALLY DEFERRED, "cliente_id" integer NULL REFERENCES "auth_user" ("id") DEFERRABLE INITIALLY DEFERRED, "estado" varchar(20) NOT NULL);
+CREATE TABLE "servicios_cambioestado" ("id" integer NOT NULL PRIMARY KEY AUTOINCREMENT, "estado" varchar(20) NOT NULL, "fecha" datetime NOT NULL, "solicitud_id" bigint NOT NULL REFERENCES "servicios_solicitud" ("id") DEFERRABLE INITIALLY DEFERRED);
+CREATE TABLE "servicios_tokenfcm" ("id" integer NOT NULL PRIMARY KEY AUTOINCREMENT, "token" varchar(2048) NOT NULL UNIQUE, "sesion" varchar(40) NOT NULL, "actualizado" datetime NOT NULL, "usuario_id" integer NOT NULL REFERENCES "auth_user" ("id") DEFERRABLE INITIALLY DEFERRED);
+CREATE TABLE "django_session" ("session_key" varchar(40) NOT NULL PRIMARY KEY, "session_data" text NOT NULL, "expire_date" datetime NOT NULL);
+CREATE TABLE "administracion_sancioncuenta" ("id" integer NOT NULL PRIMARY KEY AUTOINCREMENT, "tipo" varchar(10) NOT NULL, "motivo" text NOT NULL, "hasta" datetime NULL, "creada" datetime NOT NULL, "levantada" datetime NULL, "motivo_levantamiento" text NOT NULL, "creada_por_id" integer NULL REFERENCES "auth_user" ("id") DEFERRABLE INITIALLY DEFERRED, "levantada_por_id" integer NULL REFERENCES "auth_user" ("id") DEFERRABLE INITIALLY DEFERRED, "usuario_id" integer NOT NULL REFERENCES "auth_user" ("id") DEFERRABLE INITIALLY DEFERRED, CONSTRAINT "solo_la_suspension_tiene_fin" CHECK ((("hasta" IS NULL AND "tipo" = 'bloqueo') OR ("hasta" IS NOT NULL AND "tipo" = 'suspension'))));
+CREATE UNIQUE INDEX "una_sancion_abierta_por_cuenta" ON "administracion_sancioncuenta" ("usuario_id") WHERE "levantada" IS NULL;

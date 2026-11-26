@@ -29,6 +29,11 @@ public class ManejadorErrores {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error.getErrores());
     }
 
+    @ExceptionHandler(RespuestaError.class)
+    public ResponseEntity<Map<String, Object>> respuestaError(RespuestaError error) {
+        return ResponseEntity.status(error.getEstado()).body(error.getCuerpo());
+    }
+
     @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
     public ResponseEntity<Map<String, String>> metodoNoPermitido(HttpRequestMethodNotSupportedException error) {
         HttpHeaders cabeceras = new HttpHeaders();

@@ -7,7 +7,7 @@ la app móvil (`app-movil/`) y la web de usuario (`web-portal/`) consumen este b
 que comparte la base de datos con el back end de administración (`backend/django/`).
 
 > **Estado (26/11/2026):** responden todas las rutas de usuario (rubros, búsqueda, solicitudes, bandeja del
-> prestador, seguimiento, disponibilidad, registro desde la app y calificaciones), iguales a Django.
+> prestador, seguimiento, disponibilidad, registro desde la app, calificaciones y el token de avisos de la web), iguales a Django.
 > **La app Android y la web de usuario ya las consumen** como pide el diagrama: la app con el token de Firebase
 > (`apiBaseUrl` en el puerto 8080) y la web con la misma sesión de Django (el proxy de Vite manda esas rutas a
 > Spring; el resto sigue en Django).
@@ -71,7 +71,8 @@ escribe en el registro la ruta completa que abrió (`Base de datos SQLite: ...`,
   calificación por solicitud Finalizada y el promedio del prestador en la misma transacción).
 - `servicios/`: `SolicitudesController`, `SolicitudesService` (validación campo por campo y reglas en el mismo
   orden que el serializer de Django), `Solicitudes` (SQL con `JdbcTemplate`: guarda fechas y decimales con el
-  formato de Django), `CodigoSeguimiento` y `Notificador` (FCM HTTP v1, se envía al confirmar la transacción).
+  formato de Django), `CodigoSeguimiento`, `Notificador` (FCM HTTP v1, se envía al confirmar la transacción) y
+  `NotificacionesController` (HU-8: el token FCM del navegador del prestador, con la clave de su sesión de Django).
 - `prestadores/`: entidades `Prestador` y `Rubro` (solo lectura, `@Immutable`), repositorios,
   `BusquedaService` (filtros, distancia Haversine, orden y redondeo igual que Django) y `PrestadoresController`.
 - `comun/`: lo que hace que Spring responda como Django:
@@ -104,15 +105,15 @@ solo cambien la dirección del servidor:
 | `GET` · `PATCH /api/usuarios/disponibilidad/` | Disponibilidad del prestador | ✅ |
 | `POST /api/usuarios/registro-movil/` · `POST /api/prestadores/registro-movil/` | Alta de cliente y de prestador desde la app, con el token de Firebase | ✅ 26/11 |
 | `GET /api/calificaciones/mis-servicios/` · `POST /api/calificaciones/` | «Mis servicios» del cliente y calificar (HU-12) | ✅ 26/11 |
+| `POST` · `DELETE /api/servicios/notificaciones/token/` | El prestador registra o quita el token FCM de su navegador (HU-8). Queda ligado a la sesión de Django con la que se registró, como en Django | ✅ 26/11 |
 | `GET /api/usuarios/yo/` | Rol y prestador de la cuenta: la app lee de aquí su perfil con el token (antes, Firestore). Los 403 de la app traen `codigo` (`cuenta_no_vinculada`, `cuenta_sancionada`) | ✅ 26/11 |
 
-Con estas, Spring tiene las 13 rutas que usa la app Android. Todas aceptan el token de la app **y** la sesión de la
+Con estas, Spring tiene las 13 rutas que usa la app Android y la del token de avisos de la web. Todas aceptan el token de la app **y** la sesión de la
 web.
 
 Quedan en Django (Back End de administración y cuentas): el registro e inicio de sesión de la web
-(`/api/usuarios/login/`, `logout/`, `csrf/`, `yo/`, `registro/` y `/api/prestadores/registro/`), el token FCM de la
-web (`/api/servicios/notificaciones/token/`), la verificación de identidad (HU-19 a HU-21), los certificados, la
-recomendación con IA y todo `administracion/`. El proxy de Vite (`web-portal/vite.config.js`) envía a Spring solo
+(`/api/usuarios/login/`, `logout/`, `csrf/`, `yo/`, `registro/` y `/api/prestadores/registro/`), la verificación de
+identidad (HU-19 a HU-21), los certificados, la recomendación con IA y todo `administracion/`. El proxy de Vite (`web-portal/vite.config.js`) envía a Spring solo
 las rutas de la tabla.
 
 La búsqueda incluye también `calificacion_promedio` (`null` sin calificaciones) y `calificaciones_total`
@@ -137,7 +138,8 @@ dos veces y levanta Django sobre una y Spring sobre la otra, con la misma `DJANG
 prueba que reemplaza a las de Google (en los dos). Repite el mismo escenario en ambos (crear con y sin cuenta,
 JSON y formulario, cada error de validación, prestador sin verificar, no disponible, sancionado o lejos, tokens
 vencidos, de otro proyecto o sin vincular, aceptar, rechazar, avanzar hasta Finalizada, conflictos,
-disponibilidad, registro desde la app con cada error de campo, calificaciones y su promedio, y la web con sesión:
+disponibilidad, registro desde la app con cada error de campo, calificaciones y su promedio, el token FCM de la web
+(registrar, repetir, cada error del token, quitar y quitar uno ajeno) y la web con sesión:
 CSRF ausente, mal formado, incorrecto u otro origen, sesión con otra contraseña, cuenta sancionada y sesión antes
 que token) y al final abre otro Django sobre la base que escribió Spring para comprobar que la lee igual
 (`PARIDAD_VER=1` muestra cada respuesta):
@@ -146,7 +148,8 @@ que token) y al final abre otro Django sobre la base que escribió Spring para c
 python backend/spring/tools/paridad_solicitudes/correr.py
 ```
 
-El 26/11: 166 de 166 respuestas idénticas (las fechas se comparan por formato) y 11 de 11 en la lectura cruzada.
+El 26/11: 230 de 230 respuestas idénticas (las fechas se comparan por formato) y 12 de 12 en la lectura cruzada
+(la última compara las filas de `servicios_tokenfcm` que dejó cada uno, porque esa tabla no tiene ruta de lectura).
 Además se probó en el navegador: con la sesión iniciada en Django, la web buscó, envió una solicitud, vio «Mis
 servicios» y el prestador aceptó y avanzó, todo por Spring (ninguna de esas rutas apareció en el registro de Django).
 

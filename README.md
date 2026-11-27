@@ -373,6 +373,8 @@ La web queda en `http://localhost:5173/`. Para comprobar cada función paso a pa
 
 Necesita `google-services.json` (no está en el repositorio), la clave de Google Maps en `app-movil/local.properties` (`MAPS_API_KEY=...`, tampoco se versiona) y el backend corriendo; los pasos completos están en [app-movil/README.md](app-movil/README.md).
 
+**Ubicación en la web (como en la app):** «Servicio en …» arriba de la búsqueda; la dirección se escribe con sugerencias (Nominatim de OpenStreetMap, gratis y sin clave, limitado al Perú), se toma del navegador o se marca en el mapa, y se puede guardar como «Mi dirección» en ese navegador. Las coordenadas a mano quedan en «Ingresar coordenadas (avanzado)». En PC la lista y el mapa se ven juntos; en el celular, «Lista» o «Mapa».
+
 **Clave de Google Maps en la web:** `web-portal/.env.local` con `VITE_GOOGLE_MAPS_API_KEY=...` (no se versiona) y la «Maps JavaScript API» habilitada en Google Cloud; sin clave, la web usa OpenStreetMap.
 
 **Backend de usuario (Spring Boot)** — lo usan la app Android y la parte de usuario de la web. Con Java 21, en otra terminal: `cd backend/spring`, `$env:DJANGO_DEBUG="true"` y `.\mvnw spring-boot:run` (puerto 8080, misma base que Django). Detalles en [backend/spring/README.md](backend/spring/README.md).

@@ -1,0 +1,62 @@
+/* Barra «Servicio en …» y panel de ubicación: los de la app (SelectorUbicacion.kt) en la web. */
+.barra-ubicacion {
+  display: flex; align-items: center; gap: 12px; width: 100%; min-height: 60px; padding: 8px 16px; border: 0;
+  border-radius: 18px; background: #eaf0ec; color: var(--texto); text-align: left; cursor: pointer;
+  transition: background 0.15s, box-shadow 0.15s;
+}
+.barra-ubicacion:hover { background: #e4ebe7; }
+.barra-ubicacion:focus-visible { outline: 3px solid var(--verde); outline-offset: 2px; }
+.barra-ubicacion-pin { flex-shrink: 0; color: var(--verde); }
+.barra-ubicacion-textos { display: grid; flex: 1; min-width: 0; }
+.barra-ubicacion-textos small { color: var(--texto-suave); font-size: 13px; }
+.barra-ubicacion-textos strong { overflow: hidden; font-size: 17px; text-overflow: ellipsis; white-space: nowrap; overflow-wrap: normal; }
+.barra-ubicacion-textos strong.sin-direccion { color: var(--verde); }
+
+.panel-ubicacion {
+  width: min(560px, calc(100% - 24px)); max-height: min(720px, calc(100% - 48px)); padding: 0; border: 0;
+  border-radius: 24px; background: #fff; color: var(--texto); box-shadow: 0 24px 64px #0b3a2933;
+}
+.panel-ubicacion::backdrop { background: #0b3a2966; backdrop-filter: blur(2px); }
+.panel-ubicacion[open] { animation: aparecer-panel 0.22s cubic-bezier(0.2, 0.8, 0.2, 1); }
+@keyframes aparecer-panel { from { opacity: 0; transform: translateY(12px) scale(0.98); } }
+.panel-ubicacion-contenido { padding: 20px 20px 24px; }
+.panel-ubicacion-cabecera { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 14px; }
+.panel-ubicacion-cabecera h3 { margin: 0; font-size: 22px; }
+.panel-cerrar { display: grid; place-items: center; width: 40px; height: 40px; border: 0; border-radius: 50%; background: transparent; cursor: pointer; }
+.panel-cerrar:hover { background: #eff4f1; }
+
+.buscador-direccion {
+  display: flex; align-items: center; gap: 10px; padding: 0 16px; border: 2px solid var(--borde); border-radius: 16px;
+  color: var(--texto-suave); transition: border-color 0.15s;
+}
+.buscador-direccion:focus-within { border-color: var(--verde); }
+.buscador-direccion input { flex: 1; min-width: 0; padding: 14px 0; border: 0; background: transparent; color: var(--texto); font-size: 17px; outline: none; }
+.ayuda-direccion { margin: 6px 4px 8px; color: var(--texto-suave); font-size: 13px; }
+
+.opciones-ubicacion { display: grid; gap: 4px; margin: 0; padding: 0; list-style: none; }
+.opciones-fijas { margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--borde); }
+.opcion-ubicacion {
+  display: flex; align-items: center; gap: 14px; width: 100%; padding: 12px; border: 0; border-radius: 14px;
+  background: transparent; color: var(--texto-suave); text-align: left; cursor: pointer; transition: background 0.15s;
+}
+.opcion-ubicacion:hover:not(:disabled) { background: #eff4f1; }
+.opcion-ubicacion:focus-visible { outline: 3px solid var(--verde); outline-offset: -3px; }
+.opcion-ubicacion > span { display: grid; gap: 2px; }
+.opcion-ubicacion strong { color: var(--texto); font-weight: 600; }
+.opcion-ubicacion small { color: var(--texto-suave); }
+.opcion-ubicacion small.error { color: #ba1a1a; }
+.opcion-ubicacion.destacada, .opcion-ubicacion.destacada strong { color: var(--verde); }
+.opcion-estado { display: flex; align-items: center; gap: 8px; padding: 12px; color: var(--texto-suave); }
+.girando { animation: girar 0.9s linear infinite; }
+@keyframes girar { to { transform: rotate(360deg); } }
+
+.guardar-mi-direccion, .es-mi-direccion {
+  display: flex; align-items: center; gap: 8px; margin: 14px 0 0; padding: 10px 14px; border-radius: 12px; font-size: 14px;
+}
+.guardar-mi-direccion { border: 1px dashed var(--verde); background: transparent; color: var(--verde); font-weight: 600; cursor: pointer; }
+.guardar-mi-direccion:hover { background: var(--verde-claro); }
+.es-mi-direccion { background: var(--verde-claro); color: var(--verde-intenso); }
+
+@media (prefers-reduced-motion: reduce) {
+  .panel-ubicacion[open], .girando { animation: none; }
+}

@@ -57,9 +57,13 @@ test('flujo completo en el navegador: solicitar, avanzar hasta Finalizada y cali
 
   // El cliente busca y envía la solicitud desde la tarjeta de Ana.
   await ingresar(cliente, datos.cliente)
+  // Sin red hacia el servicio de direcciones: el punto queda como «Punto marcado en el mapa».
+  await cliente.context().route('https://nominatim.openstreetmap.org/**', (r) => r.abort())
   await cliente.goto('/resultados')
   await expect(cliente.getByRole('combobox', { name: /Rubro/ })).toBeEnabled()
   await cliente.getByRole('combobox', { name: /Rubro/ }).selectOption(String(datos.rubro))
+  // Las coordenadas a mano están en «Ingresar coordenadas (avanzado)»: la persona usa su dirección.
+  await cliente.locator('details.coordenadas-avanzado').evaluate((d) => { d.open = true })
   await cliente.getByLabel('Latitud', { exact: true }).fill(String(datos.centro.latitud))
   await cliente.getByLabel('Longitud', { exact: true }).fill(String(datos.centro.longitud))
   await cliente.getByRole('button', { name: 'Usar coordenadas', exact: true }).click()
@@ -108,6 +112,8 @@ test('flujo completo en el navegador: solicitar, avanzar hasta Finalizada y cali
   // La búsqueda ya muestra el promedio de Ana.
   await cliente.goto('/resultados')
   await cliente.getByRole('combobox', { name: /Rubro/ }).selectOption(String(datos.rubro))
+  // Las coordenadas a mano están en «Ingresar coordenadas (avanzado)»: la persona usa su dirección.
+  await cliente.locator('details.coordenadas-avanzado').evaluate((d) => { d.open = true })
   await cliente.getByLabel('Latitud', { exact: true }).fill(String(datos.centro.latitud))
   await cliente.getByLabel('Longitud', { exact: true }).fill(String(datos.centro.longitud))
   await cliente.getByRole('button', { name: 'Usar coordenadas', exact: true }).click()

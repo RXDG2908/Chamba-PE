@@ -83,18 +83,20 @@ try:
     RE, PUNTO = '/api/ia/recomendacion/', 'latitud=-12.046374&longitud=-77.042793'
     pasos = [
         ('GET', f'{RE}?rubro={G}&{PUNTO}', None, None),
-        ('POST', S, base, None), ('POST', S, dict(base, latitud=-12.0463741), None),
+        # Sin cuenta o con una cuenta que no es de cliente: 403 en los dos (bug del 27/11).
+        ('POST', S, base, None), ('POST', S, {}, None), ('POST', S, base, T['ana']),
+        ('POST', S, base, 'cli'), ('POST', S, dict(base, latitud=-12.0463741), 'cli'),
         ('POST', S, dict(base, cliente_nombre='Ana', descripcion='Con cuenta'), T['cli']),
-        ('POST', S, {}, None), ('POST', S, [1], None), ('POST', S, 'x', None),
-        ('POST', S, dict(base, prestador='abc', rubro=None), None), ('POST', S, dict(base, prestador=999), None),
-        ('POST', S, dict(base, prestador=2), None), ('POST', S, dict(base, prestador=3), None),
-        ('POST', S, dict(base, prestador=datos['sanc']), None), ('POST', S, dict(base, rubro=datos['otro_rubro']), None),
-        ('POST', S, dict(base, prestador=datos['lejos']), None),
-        ('POST', S, dict(base, cliente_telefono='+51987654', cliente_nombre='123', descripcion='   '), None),
-        ('POST', S, dict(base, cliente_nombre='', cliente_telefono='', descripcion=''), None),
-        ('POST', S, dict(base, cliente_nombre='a' * 101, descripcion='d' * 501), None),
-        ('POST', S, dict(base, latitud='1234.5', longitud=True), None), ('POST', S, dict(base, latitud='nan'), None),
-        ('POST', S, dict(base, cliente_nombre=5, descripcion=['x']), None),
+        ('POST', S, {}, 'cli'), ('POST', S, [1], 'cli'), ('POST', S, 'x', 'cli'),
+        ('POST', S, dict(base, prestador='abc', rubro=None), 'cli'), ('POST', S, dict(base, prestador=999), 'cli'),
+        ('POST', S, dict(base, prestador=2), 'cli'), ('POST', S, dict(base, prestador=3), 'cli'),
+        ('POST', S, dict(base, prestador=datos['sanc']), 'cli'), ('POST', S, dict(base, rubro=datos['otro_rubro']), 'cli'),
+        ('POST', S, dict(base, prestador=datos['lejos']), 'cli'),
+        ('POST', S, dict(base, cliente_telefono='+51987654', cliente_nombre='123', descripcion='   '), 'cli'),
+        ('POST', S, dict(base, cliente_nombre='', cliente_telefono='', descripcion=''), 'cli'),
+        ('POST', S, dict(base, cliente_nombre='a' * 101, descripcion='d' * 501), 'cli'),
+        ('POST', S, dict(base, latitud='1234.5', longitud=True), 'cli'), ('POST', S, dict(base, latitud='nan'), 'cli'),
+        ('POST', S, dict(base, cliente_nombre=5, descripcion=['x']), 'cli'),
         ('POST', S, 'prestador=%d&rubro=%d&cliente_nombre=Luz&cliente_telefono=912345678&descripcion=Caño&latitud=-12.046374&longitud=-77.042793' % (A, G), 'form'),
         ('POST', S, base, 'clis'), ('POST', S, base, 'venc'), ('POST', S, base, 'proy'), ('POST', S, base, 'nadie'),
         ('GET', S + '1/', None, None), ('GET', S + '1/?codigo=malo', None, None), ('GET', S + '999/', None, None),
@@ -117,16 +119,16 @@ try:
         ('PATCH', '/api/usuarios/disponibilidad/', {}, T['ana']),
         ('PATCH', '/api/usuarios/disponibilidad/', {'disponible': None}, T['ana']),
         ('GET', f'{RE}?rubro={G}&{PUNTO}', None, None),
-        ('POST', S, base, None),
+        ('POST', S, base, 'cli'),
         ('PATCH', '/api/usuarios/disponibilidad/', {'disponible': True}, T['ana']),
-        ('POST', S, base, None),
+        ('POST', S, base, 'cli'),
     ]
     iguales, distintos, codigos = 0, [], {}
     for metodo, ruta, cuerpo, tok in pasos:
         tipo = 'application/json'
         if tok == 'form' or (isinstance(cuerpo, str) and '=' in cuerpo):
             tipo = 'application/x-www-form-urlencoded'
-        if tok in ('form',): tok = None
+        if tok in ('form',): tok = 'cli'
         if tok in T: tok = T[tok]
         if isinstance(cuerpo, str) and cuerpo == 'x': cuerpo = '"x"'
         rd = pedir(PD, metodo, ruta, cuerpo, tipo, tok); rs = pedir(PS, metodo, ruta, cuerpo, tipo, tok)
@@ -263,7 +265,7 @@ try:
     paso('HEAD', f'{RE}?rubro={R}&{PUNTO}')
     # Los servicios en curso los escribe cada servidor y bajan el puntaje de Rocío (pendiente y finalizada no cuentan).
     TR = token('uid-r_ocupado')
-    nueva = lambda: paso('POST', S, dict(base, prestador=datos['r_ocupado'], rubro=R, descripcion='Para HU-10'))[1]['id']
+    nueva = lambda: paso('POST', S, dict(base, prestador=datos['r_ocupado'], rubro=R, descripcion='Para HU-10'), T['cli'])[1]['id']
     s1 = nueva(); reco(f'rubro={R}&{PUNTO}')
     paso('POST', f'{S}{s1}/aceptar/', None, TR); reco(f'rubro={R}&{PUNTO}')
     s2 = nueva(); paso('POST', f'{S}{s2}/aceptar/', None, TR); paso('POST', f'{S}{s2}/avanzar/', {'estado': 'en_camino'}, TR)
@@ -319,8 +321,8 @@ try:
     for nombres, telefono in (('Rosa 🔧', 'abc'), ('Ana	María', '12345'), ('​', '+51 (01) 987-654-321'),
                               ('  Ana   Peña ', '+51 987 654 321'), ("O'Connor-Ñúñez.", '51987654321')):
         paso('POST', RP, dict(valido, dni='20000004', nombres=nombres, apellidos=nombres, telefono=telefono), tp4)
-    paso('POST', S, dict(base, cliente_nombre='  Ana   María. '), None)
-    paso('POST', S, dict(base, cliente_nombre='Ana	María'), None)
+    paso('POST', S, dict(base, cliente_nombre='  Ana   María. '), T['cli'])
+    paso('POST', S, dict(base, cliente_nombre='Ana	María'), T['cli'])
     # HU-8: token FCM de la web del prestador (POST registra, DELETE quita). Va con la sesión de Django.
     NT = '/api/servicios/notificaciones/token/'
     FCM = 'fcm-de-prueba_' + 'Ab9:-' * 30

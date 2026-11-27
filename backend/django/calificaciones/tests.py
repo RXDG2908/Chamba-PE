@@ -222,19 +222,19 @@ class SolicitudConCuentaTests(BaseCalificacion):
         self.assertEqual(r.status_code, 201)
         self.assertEqual(Solicitud.objects.get().cliente, self.cliente)
 
-    def test_visitante_sigue_pudiendo_enviar_sin_cuenta(self):
+    def test_visitante_sin_cuenta_ya_no_puede_enviar(self):
         r = Client(enforce_csrf_checks=True).post(
             reverse('crear_solicitud'), self.datos(), content_type='application/json',
         )
-        self.assertEqual(r.status_code, 201)
-        self.assertIsNone(Solicitud.objects.get().cliente)
+        self.assertEqual(r.status_code, 403)
+        self.assertFalse(Solicitud.objects.exists())
 
-    def test_prestador_con_sesion_no_queda_como_cliente(self):
+    def test_prestador_con_sesion_no_puede_enviar(self):
         otro = self.crear_prestador('beto')
         self.client.force_login(otro.usuario)
         r = self.client.post(reverse('crear_solicitud'), self.datos(), content_type='application/json')
-        self.assertEqual(r.status_code, 201)
-        self.assertIsNone(Solicitud.objects.get().cliente)
+        self.assertEqual(r.status_code, 403)
+        self.assertFalse(Solicitud.objects.exists())
 
     def test_cliente_con_sesion_necesita_csrf(self):
         navegador = Client(enforce_csrf_checks=True)

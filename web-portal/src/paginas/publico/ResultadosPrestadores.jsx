@@ -48,7 +48,7 @@ function Recomendado({ prestador }) {
 
 const aPunto = (direccion) => (direccion ? [direccion.latitud, direccion.longitud] : null)
 
-function ResultadosPrestadores() {
+function ResultadosPrestadores({ usuario }) {
   const { state } = useLocation()
   const [rubros, setRubros] = useState([])
   const [estadoRubros, setEstadoRubros] = useState('cargando')
@@ -350,6 +350,7 @@ function ResultadosPrestadores() {
                     prestador={prestador}
                     rubro={rubro}
                     ubicacion={ubicacion}
+                    usuario={usuario}
                   />
                 </li>
               ))}

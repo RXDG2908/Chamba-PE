@@ -168,7 +168,7 @@ function App() {
       <Routes>
         {/* Público */}
         <Route path="/" element={<Inicio usuario={usuario} />} />
-        <Route path="/resultados" element={<ResultadosPrestadores />} />
+        <Route path="/resultados" element={<ResultadosPrestadores usuario={usuario} />} />
         <Route path="/seccion/:clave" element={<SeccionServicios />} />
         <Route path="/registro-prestador" element={usuario ? <Navigate to="/" replace /> : <RegistroPrestador />} />
         <Route path="/ingresar" element={<IniciarSesion usuario={usuario} alIniciar={setUsuario} />} />

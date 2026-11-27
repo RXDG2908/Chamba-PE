@@ -113,10 +113,10 @@ class FlujoAppConDjangoTests(TestCase):
         self.prestador.refresh_from_db()
         self.assertEqual((float(self.prestador.calificacion_promedio), self.prestador.calificaciones_total), (5.0, 1))
 
-    def test_sin_token_la_solicitud_queda_sin_cliente(self):
+    def test_sin_token_no_se_envia_la_solicitud(self):
         r = APIClient().post(reverse('crear_solicitud'), {
             'prestador': self.prestador.id, 'rubro': self.rubro.id, 'cliente_nombre': 'Anónimo',
             'cliente_telefono': '987654321', 'descripcion': 'x', **LIMA,
         }, format='json')
-        self.assertEqual(r.status_code, 201)
+        self.assertEqual(r.status_code, 403)
         self.assertEqual(self.como('uid-carla', 'get', reverse('mis_servicios')).json(), [])

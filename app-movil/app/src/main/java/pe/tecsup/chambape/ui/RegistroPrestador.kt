@@ -1,5 +1,8 @@
 package pe.tecsup.chambape.ui
 
+import pe.tecsup.chambape.ui.busqueda.HojaUbicacion
+import androidx.compose.material.icons.filled.Search
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.annotation.StringRes
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.expandVertically
@@ -399,6 +402,26 @@ private fun PasoRubros(estado: RegistroPrestadorUiState, vm: RegistroPrestadorVi
 
 @Composable
 private fun PasoCobertura(estado: RegistroPrestadorUiState, vm: RegistroPrestadorViewModel) {
+    // El centro de la zona también se puede escribir (calle o distrito) o tomar del GPS: nadie
+    // tiene que adivinar dónde tocar en el mapa.
+    var buscandoZona by rememberSaveable { mutableStateOf(false) }
+    androidx.compose.material3.OutlinedButton(
+        onClick = { buscandoZona = true },
+        enabled = !estado.enviando,
+        modifier = Modifier.fillMaxWidth(),
+    ) {
+        Icon(Icons.Filled.Search, contentDescription = null, modifier = Modifier.size(18.dp))
+        Text(stringResource(R.string.cobertura_buscar_direccion), modifier = Modifier.padding(start = 8.dp))
+    }
+    if (buscandoZona) {
+        HojaUbicacion(
+            titulo = stringResource(R.string.cobertura_hoja_titulo),
+            actual = null,
+            guardada = null,
+            onElegida = { vm.elegirUbicacion(it.coordenadas.latitud, it.coordenadas.longitud) },
+            onCerrar = { buscandoZona = false },
+        )
+    }
     MapaBusqueda(
         ubicacion = estado.ubicacion,
         prestadores = emptyList(),

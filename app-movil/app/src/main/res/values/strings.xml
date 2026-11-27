@@ -179,7 +179,7 @@
     <string name="paso_revisar">Revisa y envía</string>
     <string name="paso_revisar_ayuda">Confirma que todo esté bien. Toca el lápiz para corregir.</string>
     <string name="dni_ayuda">8 dígitos, tal como figura en tu DNI.</string>
-    <string name="cobertura_toca_mapa">Toca el mapa para marcar el centro de tu zona.</string>
+    <string name="cobertura_toca_mapa">Escribe tu dirección o toca el mapa para marcar el centro de tu zona.</string>
     <string name="cobertura_marcada">Ubicación marcada. Toca otro punto para moverla.</string>
     <string name="radio_cobertura">Radio de cobertura</string>
     <string name="resumen_dni">DNI %1$s</string>
@@ -239,4 +239,7 @@
     <string name="mi_direccion_cambiar">Cambiar</string>
     <string name="mi_direccion_agregar">Agregar</string>
     <string name="mi_direccion_quitar">Quitar mi dirección</string>
+    <string name="cobertura_buscar_direccion">Escribir la dirección o usar mi ubicación</string>
+    <string name="cobertura_hoja_titulo">¿Desde dónde atiendes?</string>
+    <string name="solicitud_lugar">Servicio en %1$s. Para cambiarlo, vuelve a Buscar.</string>
 </resources>

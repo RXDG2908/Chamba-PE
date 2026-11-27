@@ -153,6 +153,8 @@ data class DetalleUiState(
     val telefonoInvalido: Boolean = false,
     /** Sin una búsqueda previa no hay rubro ni ubicación para enviar la solicitud. */
     val sinBusqueda: Boolean = false,
+    /** Dónde se pide el servicio (la dirección de la última búsqueda); null si no hubo búsqueda. */
+    val lugar: String? = null,
     val enviando: Boolean = false,
     val enviada: Boolean = false,
     val errorEnvio: Boolean = false,
@@ -166,7 +168,7 @@ class DetalleViewModel(
     private val notificador: Notificador,
     private val contexto: ContextoBusqueda,
 ) : ViewModel() {
-    private val _uiState = MutableStateFlow(DetalleUiState())
+    private val _uiState = MutableStateFlow(DetalleUiState(lugar = contexto.ultima?.direccion))
     val uiState: StateFlow<DetalleUiState> = _uiState.asStateFlow()
 
     init {

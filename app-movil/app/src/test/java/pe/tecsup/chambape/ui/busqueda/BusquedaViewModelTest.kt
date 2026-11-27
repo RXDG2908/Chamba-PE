@@ -19,6 +19,7 @@ import org.junit.Test
 import pe.tecsup.chambape.data.repository.PrestadorRepository
 import pe.tecsup.chambape.device.Coordenadas
 import pe.tecsup.chambape.data.local.AlmacenDireccionEnMemoria
+import pe.tecsup.chambape.data.repository.ContextoBusqueda
 import pe.tecsup.chambape.device.Direccion
 import pe.tecsup.chambape.domain.model.Datos
 import pe.tecsup.chambape.domain.model.ErrorDatos
@@ -197,5 +198,20 @@ class BusquedaViewModelTest {
 
         vm.elegirDireccion(CASA)
         assertEquals(Coordenadas(-12.08, -77.03), vm.uiState.value.ubicacion)
+    }
+
+    @Test
+    fun `la solicitud recibe el rubro, el punto y la direccion que vio el cliente`() = runTest(dispatcher) {
+        val contexto = ContextoBusqueda()
+        val vm = BusquedaViewModel(repositorio, contexto)
+        vm.elegirDireccion(CASA)
+        vm.seleccionarRubro(1)
+        advanceUntilIdle()
+        assertEquals(ContextoBusqueda.Datos(1, -12.08, -77.03, "Av. Arequipa 1200, Lince"), contexto.ultima)
+
+        // Un punto sin nombre de calle viaja sin texto: la pantalla muestra «Punto marcado en el mapa».
+        vm.elegirDireccion(Direccion("", "", Coordenadas(-12.1, -77.0)))
+        advanceUntilIdle()
+        assertEquals("", contexto.ultima?.direccion)
     }
 }

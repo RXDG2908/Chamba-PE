@@ -24,6 +24,7 @@ import pe.tecsup.chambape.device.Direccion
 import pe.tecsup.chambape.domain.model.Datos
 import pe.tecsup.chambape.domain.model.ErrorDatos
 import pe.tecsup.chambape.domain.model.Prestador
+import pe.tecsup.chambape.domain.model.Recomendacion
 import pe.tecsup.chambape.domain.model.Rubro
 import pe.tecsup.chambape.domain.model.TipoError
 
@@ -35,6 +36,13 @@ private class RepositorioFalso : PrestadorRepository {
     var rubros: () -> Datos<List<Rubro>> = { Datos(listOf(Rubro(1, "Gasfitería")), desdeCache = false) }
     val busquedas = mutableListOf<CompletableDeferred<Datos<List<Prestador>>>>()
     val favoritosFlow = MutableStateFlow<List<Prestador>>(emptyList())
+    var recomendacion: Recomendacion? = null
+    var pedidasRecomendacion = 0
+
+    override suspend fun recomendar(rubroId: Int, latitud: Double, longitud: Double): Recomendacion? {
+        pedidasRecomendacion++
+        return recomendacion
+    }
 
     override suspend fun rubros() = rubros.invoke()
 
@@ -229,5 +237,37 @@ class BusquedaViewModelTest {
         val hogar = BusquedaViewModel(repositorio, almacen = almacen, ubicacionSesion = sesion)
         advanceUntilIdle()
         assertEquals(OFICINA, hogar.uiState.value.direccion)
+    }
+
+    @Test
+    fun `la recomendacion llega despues de los resultados y solo si es uno de ellos`() = runTest(dispatcher) {
+        repositorio.recomendacion = Recomendacion(7, "Es el más cercano.", 90.2, 12)
+        val vm = viewModelListo()
+        advanceUntilIdle()
+        repositorio.busquedas.single().complete(Datos(listOf(unPrestador(7), unPrestador(8)), desdeCache = false))
+        advanceUntilIdle()
+        assertEquals(7, vm.uiState.value.recomendacion?.prestadorId)
+
+        // Una búsqueda nueva la borra; si el recomendado no está en la lista, no se muestra.
+        repositorio.recomendacion = Recomendacion(99, "Otro.", 50.0, 30)
+        vm.buscar()
+        assertEquals(null, vm.uiState.value.recomendacion)
+        advanceUntilIdle()
+        repositorio.busquedas[1].complete(Datos(listOf(unPrestador(7)), desdeCache = false))
+        advanceUntilIdle()
+        assertEquals(null, vm.uiState.value.recomendacion)
+    }
+
+    @Test
+    fun `sin conexion o sin resultados no se pide recomendacion`() = runTest(dispatcher) {
+        val vm = viewModelListo()
+        advanceUntilIdle()
+        repositorio.busquedas.single().complete(Datos(listOf(unPrestador(7)), desdeCache = true))
+        advanceUntilIdle()
+        vm.buscar()
+        advanceUntilIdle()
+        repositorio.busquedas[1].complete(Datos(emptyList(), desdeCache = false))
+        advanceUntilIdle()
+        assertEquals(0, repositorio.pedidasRecomendacion)
     }
 }

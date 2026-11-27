@@ -1,6 +1,7 @@
 package pe.tecsup.chambape.data.repository
 
 import com.google.gson.JsonParseException
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import pe.tecsup.chambape.data.local.PrestadorDao
@@ -11,6 +12,7 @@ import pe.tecsup.chambape.data.remote.ApiService
 import pe.tecsup.chambape.domain.model.Datos
 import pe.tecsup.chambape.domain.model.ErrorDatos
 import pe.tecsup.chambape.domain.model.Prestador
+import pe.tecsup.chambape.domain.model.Recomendacion
 import pe.tecsup.chambape.domain.model.Rubro
 import pe.tecsup.chambape.domain.model.TipoError
 import retrofit2.HttpException
@@ -23,6 +25,12 @@ interface PrestadorRepository {
     suspend fun prestador(id: Int): Prestador?
     fun favoritos(): Flow<List<Prestador>>
     suspend fun alternarFavorito(id: Int): Boolean
+
+    /**
+     * HU-10: el prestador que la IA recomienda para ese rubro y lugar, o null si no hay o falla.
+     * Es un extra: si falla, la búsqueda se muestra igual (como en la web).
+     */
+    suspend fun recomendar(rubroId: Int, latitud: Double, longitud: Double): Recomendacion? = null
 }
 
 /**
@@ -69,6 +77,21 @@ class PrestadorRepositoryImpl(
             throw ErrorDatos(TipoError.SERVIDOR, e)
         } catch (e: JsonParseException) {
             throw ErrorDatos(TipoError.DATOS_INVALIDOS, e)
+        }
+
+    override suspend fun recomendar(rubroId: Int, latitud: Double, longitud: Double): Recomendacion? =
+        try {
+            api.recomendacion(rubroId, latitud, longitud).recomendado?.let { dto ->
+                val motivo = dto.motivo?.trim().orEmpty()
+                val minutos = dto.tiempoEstimadoMin
+                // Igual que la web: sin motivo o sin tiempo válido no se muestra.
+                if (motivo.isEmpty() || minutos == null || minutos < 0) null
+                else Recomendacion(dto.id, motivo, dto.puntaje, minutos)
+            }
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: Exception) {
+            null
         }
 
     override suspend fun prestador(id: Int): Prestador? = prestadorDao.porId(id)?.aModelo()

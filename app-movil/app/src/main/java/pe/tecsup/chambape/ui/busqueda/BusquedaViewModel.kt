@@ -15,6 +15,7 @@ import pe.tecsup.chambape.device.Coordenadas
 import pe.tecsup.chambape.device.Direccion
 import pe.tecsup.chambape.domain.model.ErrorDatos
 import pe.tecsup.chambape.domain.model.Prestador
+import pe.tecsup.chambape.domain.model.Recomendacion
 import pe.tecsup.chambape.domain.model.Rubro
 import pe.tecsup.chambape.domain.model.TipoError
 
@@ -43,6 +44,8 @@ data class BusquedaUiState(
     val faltaDireccion: Boolean = false,
     val favoritos: Set<Int> = emptySet(),
     val resultados: EstadoResultados = EstadoResultados.Inicial,
+    /** HU-10: el recomendado por la IA para esta búsqueda; siempre es uno de los resultados. */
+    val recomendacion: Recomendacion? = null,
 ) {
     /** Punto que pinta el mapa y que va a la API; la persona nunca lo ve como números. */
     val ubicacion: Coordenadas? get() = direccion?.coordenadas
@@ -138,7 +141,7 @@ class BusquedaViewModel(
         contexto?.ultima = ContextoBusqueda.Datos(rubroId, punto.latitud, punto.longitud, nombre)
         // Una búsqueda nueva cancela la anterior: una respuesta antigua no pisa la reciente.
         busquedaEnCurso?.cancel()
-        _uiState.update { it.copy(resultados = EstadoResultados.Cargando) }
+        _uiState.update { it.copy(resultados = EstadoResultados.Cargando, recomendacion = null) }
         busquedaEnCurso = viewModelScope.launch {
             val resultado = try {
                 val datos = repository.buscar(rubroId, punto.latitud, punto.longitud)
@@ -147,6 +150,13 @@ class BusquedaViewModel(
                 EstadoResultados.Error(e.tipo)
             }
             _uiState.update { it.copy(resultados = resultado) }
+            // La lista se muestra primero; la recomendación llega después y es opcional.
+            if (resultado is EstadoResultados.Exito && !resultado.desdeCache) {
+                val recomendada = repository.recomendar(rubroId, punto.latitud, punto.longitud)
+                if (recomendada != null && resultado.prestadores.any { it.id == recomendada.prestadorId }) {
+                    _uiState.update { it.copy(recomendacion = recomendada) }
+                }
+            }
         }
     }
 

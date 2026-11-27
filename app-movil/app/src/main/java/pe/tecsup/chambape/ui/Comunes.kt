@@ -224,6 +224,8 @@ fun PrestadorCard(
     modifier: Modifier = Modifier,
     /** El rubro buscado va primero (su ícono y su nombre), aunque el prestador tenga otros. */
     rubroBuscado: String? = null,
+    /** HU-10: marca al prestador que la IA recomienda (el mismo de la tarjeta de arriba). */
+    recomendado: Boolean = false,
 ) {
     val rubros = prestador.rubros.sortedByDescending { it == rubroBuscado }
     Card(
@@ -239,6 +241,14 @@ fun PrestadorCard(
         ) {
             Iniciales(prestador.nombreCompleto)
             Column(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(3.dp)) {
+                if (recomendado) {
+                    Text(
+                        stringResource(R.string.recomendado_insignia),
+                        style = MaterialTheme.typography.labelMedium,
+                        fontWeight = androidx.compose.ui.text.font.FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.primary,
+                    )
+                }
                 Text(prestador.nombreCompleto, style = MaterialTheme.typography.titleMedium)
                 if (rubros.isNotEmpty()) {
                     Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(4.dp)) {

@@ -266,4 +266,9 @@
         <item quantity="one">%d servicio</item>
         <item quantity="other">%d servicios</item>
     </plurals>
+    <!-- HU-10: recomendación con IA. -->
+    <string name="recomendado_titulo">Recomendado para ti</string>
+    <string name="recomendado_llegada">Llega en ≈ %1$d min</string>
+    <string name="recomendado_ver">Ver y pedir</string>
+    <string name="recomendado_insignia">Recomendado</string>
 </resources>

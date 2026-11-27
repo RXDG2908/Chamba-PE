@@ -21,6 +21,9 @@ import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowForward
+import androidx.compose.material.icons.outlined.Schedule
+import androidx.compose.material.icons.filled.AutoAwesome
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.outlined.List
 import androidx.compose.material.icons.outlined.Map
@@ -217,6 +220,19 @@ fun BusquedaScreen(
                         SelectorVista(vista, onCambiar = { vista = it })
                     }
                 }
+                val recomendado = estado.recomendacion?.let { r ->
+                    resultados.prestadores.firstOrNull { it.id == r.prestadorId }?.let { it to r }
+                }
+                if (recomendado != null) {
+                    item(key = "recomendado") {
+                        TarjetaRecomendado(
+                            prestador = recomendado.first,
+                            recomendacion = recomendado.second,
+                            onAbrir = { onAbrirPrestador(recomendado.first.id) },
+                            modifier = Modifier.padding(horizontal = 16.dp).animateItem(),
+                        )
+                    }
+                }
                 if (vista == Vista.MAPA) {
                     item(key = "mapa-resultados") {
                         Column(modifier = Modifier.padding(horizontal = 16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -243,6 +259,7 @@ fun BusquedaScreen(
                             onFavorito = { onFavorito(prestador.id) },
                             modifier = Modifier.padding(horizontal = 16.dp).animateItem(),
                             rubroBuscado = rubros.firstOrNull { it.id == estado.rubroId }?.nombre,
+                            recomendado = prestador.id == recomendado?.first?.id,
                         )
                     }
                 }
@@ -367,5 +384,62 @@ internal fun OpcionRubro(
             maxLines = 2,
             overflow = TextOverflow.Ellipsis,
         )
+    }
+}
+
+/**
+ * HU-10: el prestador que la IA recomienda, con el motivo en palabras simples y cuánto tardaría.
+ * Va encima de la lista; si la recomendación falla, la lista se ve igual (como en la web).
+ */
+@Composable
+private fun TarjetaRecomendado(
+    prestador: pe.tecsup.chambape.domain.model.Prestador,
+    recomendacion: pe.tecsup.chambape.domain.model.Recomendacion,
+    onAbrir: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    val esquema = MaterialTheme.colorScheme
+    Surface(
+        onClick = onAbrir,
+        modifier = modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(24.dp),
+        color = esquema.primaryContainer,
+        contentColor = esquema.onPrimaryContainer,
+        border = androidx.compose.foundation.BorderStroke(2.dp, esquema.primary),
+    ) {
+        Column(modifier = Modifier.padding(18.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                Icon(androidx.compose.material.icons.Icons.Filled.AutoAwesome, contentDescription = null, modifier = Modifier.size(18.dp), tint = esquema.primary)
+                Text(
+                    stringResource(R.string.recomendado_titulo),
+                    style = MaterialTheme.typography.labelLarge,
+                    fontWeight = FontWeight.Bold,
+                    color = esquema.primary,
+                    modifier = Modifier.semantics { heading() },
+                )
+            }
+            Text(prestador.nombreCompleto, style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
+            Text(recomendacion.motivo, style = MaterialTheme.typography.bodyMedium)
+            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                Surface(shape = RoundedCornerShape(50), color = esquema.surface.copy(alpha = 0.7f)) {
+                    Row(
+                        modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(4.dp),
+                    ) {
+                        Icon(androidx.compose.material.icons.Icons.Outlined.Schedule, contentDescription = null, modifier = Modifier.size(16.dp))
+                        Text(
+                            stringResource(R.string.recomendado_llegada, recomendacion.minutosEstimados),
+                            style = MaterialTheme.typography.labelLarge,
+                        )
+                    }
+                }
+                Box(Modifier.weight(1f))
+                Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                    Text(stringResource(R.string.recomendado_ver), style = MaterialTheme.typography.labelLarge, fontWeight = FontWeight.SemiBold, color = esquema.primary)
+                    Icon(androidx.compose.material.icons.Icons.AutoMirrored.Filled.ArrowForward, contentDescription = null, tint = esquema.primary, modifier = Modifier.size(18.dp))
+                }
+            }
+        }
     }
 }

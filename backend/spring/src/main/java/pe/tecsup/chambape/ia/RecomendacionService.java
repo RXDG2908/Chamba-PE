@@ -57,7 +57,7 @@ public class RecomendacionService {
         @JsonProperty("calificaciones_total") int calificacionesTotal,
         String tipo,
         @JsonProperty("nombre_publico") String nombrePublico,
-        String descripcion, String foto,
+        String descripcion, String foto, boolean nuevo,
         double puntaje,
         @JsonProperty("tiempo_estimado_min") long tiempoEstimadoMin,
         @JsonProperty("servicios_en_curso") int serviciosEnCurso,
@@ -178,7 +178,7 @@ public class RecomendacionService {
 
     private static Detalle detalle(PrestadorDto p, Puntaje puntaje, boolean esElMasCercano) {
         return new Detalle(p.id(), p.nombres(), p.apellidos(), p.rubros(), p.latitud(), p.longitud(), p.distanciaKm(),
-            p.calificacionPromedio(), p.calificacionesTotal(), p.tipo(), p.nombrePublico(), p.descripcion(), p.foto(),
+            p.calificacionPromedio(), p.calificacionesTotal(), p.tipo(), p.nombrePublico(), p.descripcion(), p.foto(), p.nuevo(),
             puntaje.total(), puntaje.minutosEstimados(),
             puntaje.enCurso(), motivo(p, puntaje, esElMasCercano));
     }

@@ -36,6 +36,10 @@ data class PrestadorEntity(
     /** HU-12: promedio de 1 a 5 estrellas y cuántas calificaciones lo forman. */
     val calificacionPromedio: Double? = null,
     val calificacionesTotal: Int = 0,
+    /** Perfil: nombre de la empresa o de la persona, si es empresa y si se registró hace poco. */
+    val nombrePublico: String? = null,
+    val empresa: Boolean = false,
+    val nuevo: Boolean = false,
 )
 
 @Dao
@@ -83,7 +87,16 @@ val MIGRACION_1_2 = object : Migration(1, 2) {
     }
 }
 
-@Database(entities = [RubroEntity::class, PrestadorEntity::class], version = 2, exportSchema = false)
+/** Versión 3: nombre público, empresa e insignia «Nuevo» del prestador. La caché conserva favoritos. */
+val MIGRACION_2_3 = object : Migration(2, 3) {
+    override fun migrate(db: SupportSQLiteDatabase) {
+        db.execSQL("ALTER TABLE prestadores ADD COLUMN nombrePublico TEXT")
+        db.execSQL("ALTER TABLE prestadores ADD COLUMN empresa INTEGER NOT NULL DEFAULT 0")
+        db.execSQL("ALTER TABLE prestadores ADD COLUMN nuevo INTEGER NOT NULL DEFAULT 0")
+    }
+}
+
+@Database(entities = [RubroEntity::class, PrestadorEntity::class], version = 3, exportSchema = false)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun rubroDao(): RubroDao
     abstract fun prestadorDao(): PrestadorDao
@@ -91,7 +104,7 @@ abstract class AppDatabase : RoomDatabase() {
     companion object {
         fun crear(context: Context): AppDatabase =
             Room.databaseBuilder(context.applicationContext, AppDatabase::class.java, "chambape.db")
-                .addMigrations(MIGRACION_1_2)
+                .addMigrations(MIGRACION_1_2, MIGRACION_2_3)
                 .build()
     }
 }

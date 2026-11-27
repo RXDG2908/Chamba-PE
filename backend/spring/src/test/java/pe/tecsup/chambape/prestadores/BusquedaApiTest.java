@@ -105,6 +105,16 @@ class BusquedaApiTest extends PruebaConBase {
     }
 
     @Test
+    void marcaComoNuevosALosRegistradosHaceMenosDe30Dias() throws Exception {
+        // Los de prueba se registraron en 2025 (ya no son nuevos); uno pasa a registrarse ahora.
+        jdbc.update("update prestadores_prestador set creado = ? where id = 1",
+            new pe.tecsup.chambape.comun.FechasDjango("jdbc:sqlite:x").parametro(pe.tecsup.chambape.comun.FechasDjango.ahora()));
+        buscar("rubro=1&latitud=-12.044861&longitud=-77.026582")
+            .andExpect(jsonPath("$[0].nuevo").value(true))
+            .andExpect(jsonPath("$[1].nuevo").value(false));
+    }
+
+    @Test
     void elBordeDelRadioEsInclusivo() throws Exception {
         buscar("rubro=1&latitud=0&longitud=0")
             .andExpect(status().isOk())

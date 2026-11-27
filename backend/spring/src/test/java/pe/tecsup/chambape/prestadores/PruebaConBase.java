@@ -88,7 +88,7 @@ abstract class PruebaConBase {
         jdbc.update("""
             insert into prestadores_prestador (id, nombres, apellidos, dni, telefono, latitud, longitud,
               radio_cobertura_km, disponible, estado, creado, usuario_id, calificaciones_total)
-            values (?, ?, 'Prueba', ?, '', ?, ?, ?, ?, ?, '2026-11-23 10:00:00', ?, 0)""",
+            values (?, ?, 'Prueba', ?, '', ?, ?, ?, ?, ?, '2025-01-15 10:00:00', ?, 0)""",
             id, nombre, String.format("%08d", id), Double.parseDouble(latitud), Double.parseDouble(longitud),
             radio, disponible ? 1 : 0, estado, id);
         for (long rubro : rubros) {

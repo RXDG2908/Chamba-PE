@@ -137,6 +137,11 @@ class Command(BaseCommand):
                 },
             )
             prestador.rubros.set([rubros[n] for n in nombres_rubros])
+            # Prestadores «de siempre» (registrados hace 3 a 12 meses): así en la demo solo lleva la
+            # insignia «Nuevo» quien se registre en vivo. update() porque `creado` es auto_now_add.
+            Prestador.objects.filter(pk=prestador.pk).update(
+                creado=timezone.now() - timedelta(days=90 + (indice * 9) % 275),
+            )
             creados += nuevo_prestador
             actualizados += not nuevo_prestador
 

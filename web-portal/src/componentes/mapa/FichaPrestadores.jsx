@@ -8,6 +8,7 @@ export default function FichaPrestadores({ coincidentes }) {
       {coincidentes.map((persona) => (
         <article key={persona.id}>
           <strong>{nombrePublico(persona)}</strong>
+          {persona.nuevo === true && <p><span className="insignia-nuevo">Nuevo</span></p>}
           <p>{persona.rubros.map((r) => r.nombre).join(' · ')}</p>
           <p>{formatoDistancia.format(persona.distancia_km)} km</p>
           <p>{textoCalificacion(persona)}</p>

@@ -129,6 +129,7 @@ fun DetalleScreen(prestadorId: Int, sesion: Sesion) {
                         Iniciales(prestador.nombreCompleto, tamano = 64.dp)
                         Column(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
                             Text(prestador.nombreCompleto, style = MaterialTheme.typography.titleLarge, modifier = Modifier.semantics { heading() })
+                            InsigniasPrestador(prestador)
                             Calificacion(prestador)
                         }
                         BotonFavorito(

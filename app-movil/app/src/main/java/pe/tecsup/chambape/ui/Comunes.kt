@@ -250,6 +250,7 @@ fun PrestadorCard(
                     )
                 }
                 Text(prestador.nombreCompleto, style = MaterialTheme.typography.titleMedium)
+                InsigniasPrestador(prestador)
                 if (rubros.isNotEmpty()) {
                     Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(4.dp)) {
                         Icon(iconoRubro(rubros.first()), contentDescription = null, modifier = Modifier.size(16.dp), tint = MaterialTheme.colorScheme.primary)
@@ -274,6 +275,44 @@ fun PrestadorCard(
                 ),
                 onClick = onFavorito,
             )
+        }
+    }
+}
+
+/** «Nuevo» (registrado hace menos de 30 días) y «Empresa», como en la web. Nada si no aplica. */
+@Composable
+fun InsigniasPrestador(prestador: Prestador, modifier: Modifier = Modifier) {
+    if (!prestador.nuevo && !prestador.empresa) return
+    Row(modifier = modifier, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+        if (prestador.nuevo) {
+            val descripcion = stringResource(R.string.insignia_nuevo_descripcion)
+            Surface(
+                shape = CircleShape,
+                color = MaterialTheme.colorScheme.tertiaryContainer,
+                contentColor = MaterialTheme.colorScheme.onTertiaryContainer,
+                modifier = Modifier.semantics { contentDescription = descripcion },
+            ) {
+                Text(
+                    stringResource(R.string.insignia_nuevo),
+                    style = MaterialTheme.typography.labelMedium,
+                    fontWeight = androidx.compose.ui.text.font.FontWeight.Bold,
+                    modifier = Modifier.padding(horizontal = 10.dp, vertical = 2.dp),
+                )
+            }
+        }
+        if (prestador.empresa) {
+            Surface(
+                shape = CircleShape,
+                color = MaterialTheme.colorScheme.secondaryContainer,
+                contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
+            ) {
+                Text(
+                    stringResource(R.string.insignia_empresa),
+                    style = MaterialTheme.typography.labelMedium,
+                    fontWeight = androidx.compose.ui.text.font.FontWeight.Bold,
+                    modifier = Modifier.padding(horizontal = 10.dp, vertical = 2.dp),
+                )
+            }
         }
     }
 }

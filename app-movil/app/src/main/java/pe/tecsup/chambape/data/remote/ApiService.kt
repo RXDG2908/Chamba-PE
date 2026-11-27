@@ -29,6 +29,10 @@ data class PrestadorDto(
     // HU-12: null mientras no tenga calificaciones.
     @SerializedName("calificacion_promedio") val calificacionPromedio: Double? = null,
     @SerializedName("calificaciones_total") val calificacionesTotal: Int? = null,
+    // Perfil: empresa o independiente, el nombre que ven los clientes y si se registró hace poco («Nuevo»).
+    @SerializedName("tipo") val tipo: String? = null,
+    @SerializedName("nombre_publico") val nombrePublico: String? = null,
+    @SerializedName("nuevo") val nuevo: Boolean? = null,
 )
 
 data class DisponibilidadDto(

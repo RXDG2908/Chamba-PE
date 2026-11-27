@@ -191,6 +191,17 @@ class PerfilPrestadorTests(PerfilBase):
         self.assertEqual(set(prestador.rubros.values_list('id', flat=True)), set(rubros))
         self.assertEqual(self.client.patch('/api/usuarios/perfil/', {'rubros': []}, format='json').status_code, 400)
 
+    def test_la_busqueda_marca_como_nuevo_al_recien_registrado(self):
+        from datetime import timedelta
+        from django.utils import timezone
+        _, reciente = self.crear_prestador(Prestador.Estado.VERIFICADO)
+        _, antiguo = self.crear_prestador(Prestador.Estado.VERIFICADO, username='beto')
+        antiguo.rubros.set(reciente.rubros.all())
+        Prestador.objects.filter(pk=antiguo.pk).update(creado=timezone.now() - timedelta(days=31))
+        rubro = reciente.rubros.first().id
+        resultado = self.client.get('/api/prestadores/buscar/', {'rubro': rubro, 'latitud': -12.05, 'longitud': -77.04}).json()
+        self.assertEqual({p['id']: p['nuevo'] for p in resultado}, {reciente.id: True, antiguo.id: False})
+
     def test_la_busqueda_muestra_nombre_publico_y_foto(self):
         usuario, prestador = self.crear_prestador(Prestador.Estado.VERIFICADO)
         prestador.tipo, prestador.nombre_comercial = 'empresa', 'Ana SAC'

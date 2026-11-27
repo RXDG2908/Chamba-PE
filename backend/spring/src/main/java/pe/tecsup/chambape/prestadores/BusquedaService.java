@@ -3,16 +3,20 @@ package pe.tecsup.chambape.prestadores;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.RoundingMode;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import pe.tecsup.chambape.comun.ErrorValidacion;
+import pe.tecsup.chambape.comun.FechasDjango;
 import pe.tecsup.chambape.comun.NumerosComoPython;
 
 /**
@@ -27,12 +31,26 @@ public class BusquedaService {
     // Tolerancia de 1 micrómetro en el borde del radio, como en Django.
     private static final double TOLERANCIA_KM = 1e-9;
 
+    // Como DIAS_NUEVO de Django: la insignia «Nuevo» dura los primeros 30 días desde el registro.
+    static final int DIAS_NUEVO = 30;
+
     private final PrestadorRepository prestadores;
     private final RubroRepository rubros;
+    private final JdbcTemplate jdbc;
+    private final FechasDjango fechas;
 
-    public BusquedaService(PrestadorRepository prestadores, RubroRepository rubros) {
+    public BusquedaService(PrestadorRepository prestadores, RubroRepository rubros, JdbcTemplate jdbc,
+                           FechasDjango fechas) {
         this.prestadores = prestadores;
         this.rubros = rubros;
+        this.jdbc = jdbc;
+        this.fechas = fechas;
+    }
+
+    /** Ids de los prestadores registrados hace menos de {@link #DIAS_NUEVO} días. */
+    private Set<Long> nuevos() {
+        Object desde = fechas.parametro(FechasDjango.ahora().minus(DIAS_NUEVO, ChronoUnit.DAYS));
+        return Set.copyOf(jdbc.queryForList("select id from prestadores_prestador where creado >= ?", Long.class, desde));
     }
 
     public record RubroDto(long id, String nombre) {
@@ -51,7 +69,9 @@ public class BusquedaService {
         // Perfil público, en el orden de Django.
         String tipo,
         @com.fasterxml.jackson.annotation.JsonProperty("nombre_publico") String nombrePublico,
-        String descripcion, String foto) {
+        String descripcion, String foto,
+        // Registrado hace menos de 30 días: la web y la app muestran «Nuevo».
+        boolean nuevo) {
     }
 
     private record Parametros(long rubro, double latitud, double longitud) {
@@ -67,6 +87,7 @@ public class BusquedaService {
     public List<PrestadorDto> buscar(String rubro, String latitud, String longitud) {
         Parametros datos = validar(rubro, latitud, longitud);
         List<PrestadorDto> resultados = new ArrayList<>();
+        Set<Long> nuevos = nuevos();
         for (Prestador prestador : prestadores.candidatos(datos.rubro(), Prestador.VERIFICADO)) {
             double distancia = Distancias.km(
                 prestador.getLatitud().doubleValue(), prestador.getLongitud().doubleValue(),
@@ -84,7 +105,7 @@ public class BusquedaService {
                     prestador.getCalificacionPromedio() == null ? null : prestador.getCalificacionPromedio().doubleValue(),
                     prestador.getCalificacionesTotal(),
                     prestador.getTipo(), prestador.getNombrePublico(), prestador.getDescripcion(),
-                    prestador.getFotoUrl()));
+                    prestador.getFotoUrl(), nuevos.contains(prestador.getId())));
             }
         }
         // Orden estable del más cercano al más lejano (T3.3).

@@ -34,6 +34,9 @@ fun PrestadorDto.aEntity(rubroConsultaId: Int, favorito: Boolean): PrestadorEnti
         favorito = favorito,
         calificacionPromedio = calificacionPromedio?.takeIf { it.isFinite() && it in 1.0..5.0 },
         calificacionesTotal = (calificacionesTotal ?: 0).coerceAtLeast(0),
+        nombrePublico = nombrePublico?.trim()?.takeIf { it.isNotEmpty() },
+        empresa = tipo == "empresa",
+        nuevo = nuevo == true,
     )
 }
 
@@ -47,6 +50,9 @@ fun PrestadorEntity.aModelo(): Prestador =
         longitud = longitud,
         distanciaKm = distanciaKm,
         favorito = favorito,
+        nombrePublico = nombrePublico,
+        empresa = empresa,
+        nuevo = nuevo,
         calificacionPromedio = calificacionPromedio,
         calificacionesTotal = calificacionesTotal,
     )

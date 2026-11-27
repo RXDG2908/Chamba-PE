@@ -419,6 +419,7 @@ private fun TarjetaRecomendado(
                 )
             }
             Text(prestador.nombreCompleto, style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
+            pe.tecsup.chambape.ui.InsigniasPrestador(prestador)
             Text(recomendacion.motivo, style = MaterialTheme.typography.bodyMedium)
             Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 Surface(shape = RoundedCornerShape(50), color = esquema.surface.copy(alpha = 0.7f)) {

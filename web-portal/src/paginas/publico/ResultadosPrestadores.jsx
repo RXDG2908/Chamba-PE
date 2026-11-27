@@ -29,12 +29,26 @@ function recomendacionValida(datos, prestadores) {
     && prestadores.some((p) => p.id === r.id)
 }
 
+// «Nuevo» (registrado hace menos de 30 días) y «Empresa». Fuera del título, que es solo el nombre.
+function InsigniasPerfil({ prestador }) {
+  const nuevo = prestador.nuevo === true
+  const empresa = prestador.tipo === 'empresa'
+  if (!nuevo && !empresa) return null
+  return (
+    <p className="insignias-perfil">
+      {nuevo && <span className="insignia-nuevo" title="Se unió a ChambaPE hace poco">Nuevo</span>}
+      {empresa && <span className="insignia-empresa">Empresa</span>}
+    </p>
+  )
+}
+
 // Igual que la tarjeta «Recomendado para ti» de la app: motivo de la IA, llegada estimada y enlace.
 function Recomendado({ prestador }) {
   return (
     <aside className="recomendado" aria-labelledby="titulo-recomendado">
       <p className="etiqueta-recomendado"><Sparkles size={16} aria-hidden="true" /> Recomendado para ti</p>
       <h4 id="titulo-recomendado">{nombrePublico(prestador)}</h4>
+      <InsigniasPerfil prestador={prestador} />
       <p className="motivo-recomendado">{prestador.motivo}</p>
       <div className="pie-recomendado">
         <p className="tiempo-recomendado">
@@ -332,7 +346,7 @@ function ResultadosPrestadores({ usuario }) {
                   </div>
                   <div className="perfil">
                     <h4>{nombrePublico(prestador)}</h4>
-                    {prestador.tipo === 'empresa' && <p className="insignia-empresa">Empresa</p>}
+                    <InsigniasPerfil prestador={prestador} />
                     {/* La insignia va fuera del título: el título es solo el nombre (lectores de pantalla y pruebas). */}
                     {recomendado?.id === prestador.id && <p className="insignia-recomendado">✨ Recomendado</p>}
                     <p className="rubros-tarjeta">

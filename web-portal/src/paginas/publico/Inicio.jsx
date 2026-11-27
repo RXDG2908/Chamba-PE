@@ -1,8 +1,7 @@
-import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import './Inicio.css'
 import { ArrowRight, MapPinned, Search, Send, ShieldCheck, Store, ToggleRight, UserRound, Upload } from 'lucide-react'
-import { iconoRubro } from '../../nucleo/iconos.js'
+import ExplorarServicios from '../../componentes/ExplorarServicios.jsx'
 
 // Botones de la portada según quién entra; coinciden con el menú de App.jsx.
 const ACCIONES_POR_ROL = {
@@ -27,18 +26,8 @@ const PASOS_PRESTADOR = [
 ]
 
 function Inicio({ usuario }) {
-  const [rubros, setRubros] = useState([])
   const rol = usuario?.rol ?? 'visitante'
   const acciones = usuario === undefined ? [] : ACCIONES_POR_ROL[rol] ?? []
-
-  useEffect(() => {
-    const controlador = new AbortController()
-    fetch('/api/prestadores/rubros/', { signal: controlador.signal })
-      .then((r) => (r.ok ? r.json() : []))
-      .then((datos) => setRubros(Array.isArray(datos) ? datos : []))
-      .catch(() => {})
-    return () => controlador.abort()
-  }, [])
 
   return (
     <main className="inicio">
@@ -87,6 +76,9 @@ function Inicio({ usuario }) {
         </div>
       </section>
 
+      {/* Como el Inicio de la app: buscador, una tarjeta grande por sección y «Lo más pedido». */}
+      <ExplorarServicios />
+
       <section className="contenedor seccion">
         <p className="etiqueta">CÓMO FUNCIONA</p>
         <h3 className="seccion-titulo">Tu servicio en tres pasos</h3>
@@ -104,23 +96,6 @@ function Inicio({ usuario }) {
           })}
         </ol>
       </section>
-
-      {rubros.length > 0 && (
-        <section className="contenedor seccion">
-          <p className="etiqueta">RUBROS</p>
-          <h3 className="seccion-titulo">¿Qué necesitas hoy?</h3>
-          <ul className="rubros-inicio">
-            {rubros.map((rubro) => (
-              <li key={rubro.id}>
-                <Link to="/resultados" state={{ rubro: rubro.id }}>
-                  {(() => { const Icono = iconoRubro(rubro.nombre); return <Icono className="icono" size={18} aria-hidden="true" /> })()}
-                  {rubro.nombre}
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </section>
-      )}
 
       {rol === 'visitante' && usuario !== undefined && (
         <section className="contenedor seccion">

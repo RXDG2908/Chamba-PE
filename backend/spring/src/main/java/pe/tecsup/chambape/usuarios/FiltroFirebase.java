@@ -65,7 +65,8 @@ public class FiltroFirebase extends OncePerRequestFilter {
         // está vinculada.
         return !ruta.startsWith("/api/") || ruta.startsWith("/api/prestadores/buscar")
             || ruta.startsWith(RecomendacionController.RUTA)
-            || ruta.equals(RegistroMovilController.CLIENTE) || ruta.equals(RegistroMovilController.PRESTADOR);
+            || ruta.equals(RegistroMovilController.CLIENTE) || ruta.equals(RegistroMovilController.PRESTADOR)
+            || ruta.equals(VincularCuentaController.RUTA);
     }
 
     @Override

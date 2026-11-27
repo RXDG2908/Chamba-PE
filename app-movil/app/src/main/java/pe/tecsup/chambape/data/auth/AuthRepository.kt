@@ -91,8 +91,16 @@ class FirebaseAuthRepository(
     }
 
     override suspend fun ingresar(correo: String, clave: String) {
-        val usuario = traducir { auth.signInWithEmailAndPassword(correo.trim(), clave).await().user }
-            ?: throw ErrorAuth(TipoErrorAuth.DESCONOCIDO)
+        val usuario = try {
+            traducir { auth.signInWithEmailAndPassword(correo.trim(), clave).await().user }
+                ?: throw ErrorAuth(TipoErrorAuth.DESCONOCIDO)
+        } catch (e: ErrorAuth) {
+            if (e.tipo != TipoErrorAuth.CREDENCIALES) throw e
+            // Quizá es una cuenta de la web (sin cuenta de Firebase todavía): se intenta vincular con
+            // el mismo correo y contraseña. Si no resulta, la persona ve el mismo «incorrectos».
+            _sesion.value = EstadoSesion.Activa(entrarConCuentaWeb(correo.trim(), clave, e))
+            return
+        }
         val sesion = try {
             leerPerfil(usuario)
         } catch (e: Exception) {
@@ -101,6 +109,27 @@ class FirebaseAuthRepository(
             throw e
         }
         _sesion.value = EstadoSesion.Activa(sesion)
+    }
+
+    /**
+     * Cuenta creada en la web: se crea su cuenta de Firebase con ese correo y contraseña y se vincula
+     * en la API, que exige la contraseña de la web. Si la API la rechaza, la cuenta de Firebase se borra.
+     */
+    private suspend fun entrarConCuentaWeb(correo: String, clave: String, original: ErrorAuth): Sesion {
+        val nuevo = try {
+            auth.createUserWithEmailAndPassword(correo, clave).await().user
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: Exception) {
+            // Ya existe en Firebase (era la contraseña equivocada), clave corta o sin red: el error original.
+            if (e is FirebaseNetworkException) throw ErrorAuth(TipoErrorAuth.SIN_CONEXION, e)
+            throw original
+        } ?: throw original
+        return deshacerSiFalla(nuevo) {
+            val perfil = perfiles.vincularWeb(token(nuevo), clave)
+            almacen.guardar(nuevo.uid, perfil)
+            sesionDe(nuevo, perfil)
+        }
     }
 
     override suspend fun registrarCliente(nombre: String, correo: String, clave: String) {

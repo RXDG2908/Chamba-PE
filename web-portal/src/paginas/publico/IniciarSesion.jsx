@@ -32,6 +32,23 @@ function IniciarSesion({ usuario, alIniciar }) {
         alIniciar(cuerpo)
         return
       }
+      // ¿Cuenta creada en la app? Con el mismo correo y contraseña entra también aquí.
+      if (respuesta.status === 400 && datos.username.includes('@')) {
+        const { entrarConCuentaDeLaApp } = await import('../../nucleo/cuentaApp.js')
+        const desdeApp = await entrarConCuentaDeLaApp(datos.username, datos.password)
+        if (desdeApp) {
+          const cuerpoApp = await desdeApp.json().catch(() => ({}))
+          if (desdeApp.ok) {
+            alIniciar(cuerpoApp)
+            return
+          }
+          if (cuerpoApp.codigo === 'cuenta_sancionada') {
+            setErrores({ general: cuerpoApp.detail })
+            setEstado('inicial')
+            return
+          }
+        }
+      }
       setErrores({ general: cuerpo.detail || 'No se pudo iniciar sesión.' })
       setEstado('inicial')
     } catch {
@@ -45,7 +62,7 @@ function IniciarSesion({ usuario, alIniciar }) {
   return (
     <form className="registro cuenta" onSubmit={enviar} noValidate>
       <h2><span className="icono-titulo" aria-hidden="true"><LogIn size={22} /></span>Iniciar sesión</h2>
-      <p className="ayuda">Ingresa con tu usuario o tu correo.</p>
+      <p className="ayuda">Ingresa con tu usuario o tu correo. Si te registraste en la app, usa el mismo correo y contraseña.</p>
 
       {estado === 'fallo' && (
         <p className="error caja" role="alert">No pudimos comunicarnos con el servidor. Inténtalo de nuevo.</p>

@@ -18,6 +18,14 @@ public class RespuestaError extends RuntimeException {
         return new RespuestaError(estado, Map.of("detail", mensaje));
     }
 
+    /** {"detail": ..., "codigo": ...} en ese orden, como las respuestas con código estable de Django. */
+    public static RespuestaError detalle(int estado, String mensaje, String codigo) {
+        Map<String, Object> cuerpo = new java.util.LinkedHashMap<>();
+        cuerpo.put("detail", mensaje);
+        cuerpo.put("codigo", codigo);
+        return new RespuestaError(estado, cuerpo);
+    }
+
     // Mensajes de DRF (LANGUAGE_CODE = 'en-us').
     public static RespuestaError sinCredenciales() {
         return detalle(403, "Authentication credentials were not provided.");

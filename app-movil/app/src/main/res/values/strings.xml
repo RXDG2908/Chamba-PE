@@ -43,7 +43,7 @@
     <string name="error_campos_vacios">Completa todos los campos.</string>
     <string name="error_cuenta_sancionada">Tu cuenta está suspendida o bloqueada. Escribe a administración para saber el motivo.</string>
     <string name="error_credenciales">Correo o contraseña incorrectos.</string>
-    <string name="error_correo_en_uso">Ya existe una cuenta con ese correo.</string>
+    <string name="error_correo_en_uso">Ese correo ya tiene una cuenta. Toca «Ingresar» y usa la misma contraseña que en la web.</string>
     <string name="error_clave_debil">La contraseña es muy débil.</string>
     <string name="error_correo_invalido">El correo no es válido.</string>
 
@@ -256,4 +256,5 @@
     <string name="recomendado_ver">Ver y pedir</string>
     <string name="recomendado_insignia">Recomendado</string>
     <string name="ir_a_inicio">Ir a Inicio</string>
+    <string name="error_demasiados_intentos">Demasiados intentos con este correo. Inténtalo de nuevo en una hora.</string>
 </resources>

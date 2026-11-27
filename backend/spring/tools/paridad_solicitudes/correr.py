@@ -169,6 +169,25 @@ try:
     paso('POST', RC, 'nombre=Formulario', nuevo('uid-nuevo6'), 'application/x-www-form-urlencoded')
     paso('POST', RC, None, nuevo('uid-nuevo7', name='N' * 160))
     paso('GET', '/api/calificaciones/mis-servicios/', None, t1)
+    # Una cuenta para la web y la app: vincular la cuenta de Firebase con la de la web, con su contraseña.
+    V = '/api/usuarios/vincular/'
+    paso('POST', V, {'password': 'x'}); paso('POST', V, {'password': 'x'}, T['venc'])
+    paso('POST', V, {'password': 'x'}, T['ana'])  # ya vinculada
+    tl = nuevo('uid-lucia', email='Web_Lucia@Example.invalid')
+    for cuerpo in ({}, [1], 'null', {'password': 5}, {'password': ''}, {'password': 'mala'}):
+        paso('POST', V, cuerpo, tl)
+    paso('POST', V, {'password': 'clave-de-la-web-1'}, nuevo('uid-sin-correo'))
+    paso('POST', V, {'password': 'clave-de-la-web-1'}, nuevo('uid-nadie', email='nadie@example.invalid'))
+    paso('POST', V, {'password': 'clave-de-la-web-1'}, nuevo('uid-adm', email='web_admin@example.invalid'))
+    paso('POST', V, {'password': 'clave-de-la-web-1'}, nuevo('uid-susp', email='web_susp@example.invalid'))
+    paso('POST', V, 'password=clave-de-la-web-1', tl, 'application/x-www-form-urlencoded')  # vincula
+    paso('POST', V, {'password': 'clave-de-la-web-1'}, tl)  # la misma otra vez
+    paso('POST', V, {'password': 'clave-de-la-web-1'}, nuevo('uid-lucia-2', email='web_lucia@example.invalid'))
+    paso('GET', '/api/usuarios/yo/', None, tl)  # ya entra con su token
+    tb = nuevo('uid-bloq', email='web_bloq@example.invalid')
+    for _ in range(10):
+        paso('POST', V, {'password': 'mala'}, tb)
+    paso('POST', V, {'password': 'clave-de-la-web-1'}, tb)  # 429: diez fallos en la hora
     paso('POST', RP, {}); paso('POST', RP, {}, T['cli'])
     paso('POST', RP, {}, nuevo('uid-p0', email='ana@example.invalid'))
     tp = nuevo('uid-p1', email='Pedro@Ejemplo.PE')

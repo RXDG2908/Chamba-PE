@@ -70,6 +70,7 @@ private class ApiFalsa : ApiService {
         return UsuarioDto("c@x.pe", datos.nombre, "", "cliente", null)
     }
     override suspend fun yo(autorizacion: String): UsuarioDto = UsuarioDto("c@x.pe", "Cliente", "", "cliente", null)
+    override suspend fun vincularCuenta(autorizacion: String, datos: pe.tecsup.chambape.data.remote.VincularCuentaDto): pe.tecsup.chambape.data.remote.UsuarioDto = error("no usado")
 
     override suspend fun crearSolicitud(autorizacion: String, datos: CrearSolicitudDto): SolicitudCreadaDto {
         comoCliente(autorizacion)

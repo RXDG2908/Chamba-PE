@@ -48,8 +48,8 @@ private const val COLOR_UBICACION = 0xFF2463A6.toInt()
 private const val COLOR_PRESTADOR = 0xFF0B6E4F.toInt()
 
 /**
- * Mapa de Google Maps (maps-compose, como en el lab CampusGPS), equivalente al de la web:
- * un toque elige dónde se necesita el servicio (punto azul) y los prestadores encontrados
+ * Mapa de Google Maps (maps-compose), equivalente al de la web: el punto azul es dónde se
+ * necesita el servicio (con [onElegirUbicacion], un toque lo mueve) y los prestadores encontrados
  * aparecen como marcadores verdes numerados; al tocarlos se ve su ficha con la calificación.
  *
  * [encuadre] cambia cada vez que hay que volver a encuadrar ubicación y resultados. Con
@@ -60,9 +60,11 @@ fun MapaBusqueda(
     ubicacion: Coordenadas?,
     prestadores: List<Prestador>,
     encuadre: Int,
-    onElegirUbicacion: (Double, Double) -> Unit,
+    /** null: el mapa solo muestra (la ubicación del cliente se elige con la barra de arriba). */
+    onElegirUbicacion: ((Double, Double) -> Unit)?,
     modifier: Modifier = Modifier,
     radioKm: Int? = null,
+    alto: androidx.compose.ui.unit.Dp = 280.dp,
 ) {
     val alElegir by rememberUpdatedState(onElegirUbicacion)
     val descripcion = stringResource(R.string.mapa_descripcion)
@@ -84,14 +86,14 @@ fun MapaBusqueda(
     GoogleMap(
         modifier = modifier
             .fillMaxWidth()
-            .height(280.dp)
+            .height(alto)
             .clip(RoundedCornerShape(12.dp))
             .semantics { contentDescription = descripcion },
         cameraPositionState = camara,
         properties = MapProperties(isBuildingEnabled = true),
         uiSettings = MapUiSettings(zoomControlsEnabled = true, mapToolbarEnabled = false, myLocationButtonEnabled = false),
         onMapLoaded = { cargado = true },
-        onMapClick = { punto -> alElegir(punto.latitude, punto.longitude) },
+        onMapClick = { punto -> alElegir?.invoke(punto.latitude, punto.longitude) },
     ) {
         if (ubicacion != null && radioKm != null) {
             Circle(

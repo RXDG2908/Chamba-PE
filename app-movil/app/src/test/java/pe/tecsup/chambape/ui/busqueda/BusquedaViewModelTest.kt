@@ -18,7 +18,8 @@ import org.junit.Before
 import org.junit.Test
 import pe.tecsup.chambape.data.repository.PrestadorRepository
 import pe.tecsup.chambape.device.Coordenadas
-import pe.tecsup.chambape.device.UbicacionProvider
+import pe.tecsup.chambape.data.local.AlmacenDireccionEnMemoria
+import pe.tecsup.chambape.device.Direccion
 import pe.tecsup.chambape.domain.model.Datos
 import pe.tecsup.chambape.domain.model.ErrorDatos
 import pe.tecsup.chambape.domain.model.Prestador
@@ -50,15 +51,13 @@ private class RepositorioFalso : PrestadorRepository {
     }
 }
 
-private class UbicacionFalsa(var valor: Coordenadas?) : UbicacionProvider {
-    override suspend fun actual() = valor
-}
+private val CASA = Direccion("Av. Arequipa 1200", "Lince, Lima", Coordenadas(-12.08, -77.03))
+private val OFICINA = Direccion("Jr. de la Unión 500", "Cercado de Lima", Coordenadas(-12.05, -77.03))
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class BusquedaViewModelTest {
     private val dispatcher = StandardTestDispatcher()
     private val repositorio = RepositorioFalso()
-    private val ubicacion = UbicacionFalsa(Coordenadas(-12.05, -77.04))
 
     @Before
     fun preparar() = Dispatchers.setMain(dispatcher)
@@ -66,15 +65,14 @@ class BusquedaViewModelTest {
     @After
     fun limpiar() = Dispatchers.resetMain()
 
-    private fun viewModelListo() = BusquedaViewModel(repositorio, ubicacion).apply {
+    private fun viewModelListo() = BusquedaViewModel(repositorio).apply {
+        elegirDireccion(CASA)
         seleccionarRubro(1)
-        cambiarLatitud("-12.046")
-        cambiarLongitud("-77.043")
     }
 
     @Test
     fun `carga los rubros al iniciar`() = runTest(dispatcher) {
-        val vm = BusquedaViewModel(repositorio, ubicacion)
+        val vm = BusquedaViewModel(repositorio)
         assertEquals(EstadoRubros.Cargando, vm.uiState.value.rubros)
         advanceUntilIdle()
         assertEquals(EstadoRubros.Listo(listOf(Rubro(1, "Gasfitería")), desdeCache = false), vm.uiState.value.rubros)
@@ -83,7 +81,7 @@ class BusquedaViewModelTest {
     @Test
     fun `sin conexion al cargar rubros muestra error y permite reintentar`() = runTest(dispatcher) {
         repositorio.rubros = { throw ErrorDatos(TipoError.SIN_CONEXION) }
-        val vm = BusquedaViewModel(repositorio, ubicacion)
+        val vm = BusquedaViewModel(repositorio)
         advanceUntilIdle()
         assertEquals(EstadoRubros.Error(TipoError.SIN_CONEXION), vm.uiState.value.rubros)
 
@@ -94,25 +92,34 @@ class BusquedaViewModelTest {
     }
 
     @Test
-    fun `una entrada invalida no llama al repositorio`() = runTest(dispatcher) {
-        val vm = BusquedaViewModel(repositorio, ubicacion)
-        vm.cambiarLatitud("91")
-        vm.cambiarLongitud("abc")
+    fun `sin rubro ni direccion no llama al repositorio y dice que falta`() = runTest(dispatcher) {
+        val vm = BusquedaViewModel(repositorio)
         vm.buscar()
         advanceUntilIdle()
 
         val estado = vm.uiState.value
         assertTrue(estado.faltaRubro)
-        assertTrue(estado.latitudInvalida)
-        assertTrue(estado.longitudInvalida)
+        assertTrue(estado.faltaDireccion)
         assertEquals(EstadoResultados.Inicial, estado.resultados)
         assertTrue(repositorio.busquedas.isEmpty())
     }
 
     @Test
-    fun `buscar pasa de cargando a exito`() = runTest(dispatcher) {
+    fun `elegir rubro sin direccion no busca y elegir la direccion despues si`() = runTest(dispatcher) {
+        val vm = BusquedaViewModel(repositorio)
+        vm.seleccionarRubro(1)
+        advanceUntilIdle()
+        assertTrue(repositorio.busquedas.isEmpty())
+
+        vm.elegirDireccion(CASA)
+        advanceUntilIdle()
+        assertEquals(1, repositorio.busquedas.size)
+        assertEquals(EstadoResultados.Cargando, vm.uiState.value.resultados)
+    }
+
+    @Test
+    fun `con rubro y direccion busca solo y pasa de cargando a exito`() = runTest(dispatcher) {
         val vm = viewModelListo()
-        vm.buscar()
         advanceUntilIdle()
         assertEquals(EstadoResultados.Cargando, vm.uiState.value.resultados)
 
@@ -124,7 +131,6 @@ class BusquedaViewModelTest {
     @Test
     fun `sin resultados muestra vacio y un fallo muestra error`() = runTest(dispatcher) {
         val vm = viewModelListo()
-        vm.buscar()
         advanceUntilIdle()
         repositorio.busquedas[0].complete(Datos(emptyList(), desdeCache = false))
         advanceUntilIdle()
@@ -140,9 +146,8 @@ class BusquedaViewModelTest {
     @Test
     fun `una respuesta antigua no reemplaza a la busqueda nueva`() = runTest(dispatcher) {
         val vm = viewModelListo()
-        vm.buscar()
         advanceUntilIdle()
-        vm.buscar()
+        vm.elegirDireccion(OFICINA)
         advanceUntilIdle()
         assertEquals(2, repositorio.busquedas.size)
 
@@ -155,24 +160,28 @@ class BusquedaViewModelTest {
     }
 
     @Test
-    fun `usar mi ubicacion rellena las coordenadas o avisa si no hay`() = runTest(dispatcher) {
-        val vm = BusquedaViewModel(repositorio, ubicacion)
-        vm.usarMiUbicacion()
+    fun `empieza con mi direccion y la sigue mientras no se elija otra`() = runTest(dispatcher) {
+        val almacen = AlmacenDireccionEnMemoria(CASA)
+        val vm = BusquedaViewModel(repositorio, almacen = almacen)
         advanceUntilIdle()
-        assertEquals("-12.050000", vm.uiState.value.latitud)
-        assertEquals("-77.040000", vm.uiState.value.longitud)
-        assertFalse(vm.uiState.value.ubicacionNoDisponible)
+        assertEquals(CASA, vm.uiState.value.direccion)
+        assertTrue(vm.uiState.value.usaDireccionGuardada)
 
-        ubicacion.valor = null
-        vm.usarMiUbicacion()
+        almacen.guardar(OFICINA)
         advanceUntilIdle()
-        assertTrue(vm.uiState.value.ubicacionNoDisponible)
-        assertEquals("-12.050000", vm.uiState.value.latitud)
+        assertEquals(OFICINA, vm.uiState.value.direccion)
+
+        // Elegida aquí, ya no la pisa un cambio en Perfil.
+        vm.elegirDireccion(CASA)
+        almacen.guardar(Direccion("Otra", "", Coordenadas(-12.1, -77.0)))
+        advanceUntilIdle()
+        assertEquals(CASA, vm.uiState.value.direccion)
+        assertFalse(vm.uiState.value.usaDireccionGuardada)
     }
 
     @Test
     fun `los favoritos del repositorio se reflejan en el estado`() = runTest(dispatcher) {
-        val vm = BusquedaViewModel(repositorio, ubicacion)
+        val vm = BusquedaViewModel(repositorio)
         advanceUntilIdle()
         assertTrue(vm.uiState.value.favoritos.isEmpty())
         vm.alternarFavorito(7)
@@ -181,19 +190,12 @@ class BusquedaViewModelTest {
     }
 
     @Test
-    fun `tocar el mapa fija la ubicacion y un punto fuera de rango se ignora`() = runTest(dispatcher) {
-        val vm = BusquedaViewModel(repositorio, ubicacion)
-        assertEquals(null, vm.uiState.value.ubicacion)
+    fun `una direccion con coordenadas fuera de rango se ignora`() = runTest(dispatcher) {
+        val vm = BusquedaViewModel(repositorio)
+        vm.elegirDireccion(Direccion("Mala", "", Coordenadas(95.0, 10.0)))
+        assertEquals(null, vm.uiState.value.direccion)
 
-        vm.elegirUbicacion(-12.0463741, -77.0427934)
-        assertEquals("-12.046374", vm.uiState.value.latitud)
-        assertEquals("-77.042793", vm.uiState.value.longitud)
-        assertEquals(Coordenadas(-12.046374, -77.042793), vm.uiState.value.ubicacion)
-
-        vm.elegirUbicacion(95.0, 10.0)
-        assertEquals("-12.046374", vm.uiState.value.latitud)
-
-        vm.cambiarLatitud("abc")
-        assertEquals(null, vm.uiState.value.ubicacion)
+        vm.elegirDireccion(CASA)
+        assertEquals(Coordenadas(-12.08, -77.03), vm.uiState.value.ubicacion)
     }
 }

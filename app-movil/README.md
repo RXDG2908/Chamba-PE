@@ -32,8 +32,10 @@ con un único módulo `app` y arquitectura MVVM.
 | Rubros y búsqueda de prestadores | Retrofit contra la API Django (`/api/prestadores/rubros/` y `/buscar/`) | Semanas 9 y 10 |
 | Datos guardados y modo sin conexión | Room: última búsqueda por rubro y rubros | Semana 8 |
 | Favoritos | Room; se conservan al cerrar la app y al volver a buscar | Semana 8 |
-| Mapa interactivo: tocar para elegir la ubicación, marcadores numerados con ficha y calificación, círculo de cobertura | Google Maps con `maps-compose` (como el lab CampusGPS); clave en `local.properties` | Semanas 11 y 12 |
-| «Usar mi ubicación» | Permiso de ubicación aproximada + Fused Location | Semana 11 |
+| Ubicación del cliente arriba, como una app de delivery: se **escribe la dirección** (calle y distrito, con sugerencias), se usa el GPS o se mueve el mapa bajo un alfiler; nunca se ven coordenadas | `Geocoder` del sistema (sin clave), limitado al Perú; hoja inferior de Material 3 | Semanas 11 y 12 |
+| «Mi dirección» en Perfil: Buscar empieza con ella | `SharedPreferences`; se borra al cerrar sesión | Semana 8 |
+| Rubros con un ícono cada uno; resultados en **Lista** o **Mapa** (marcadores numerados con ficha y calificación) y círculo de cobertura en el registro de prestador | Íconos Material outlined; Google Maps con `maps-compose`; clave en `local.properties` | Semanas 11 y 12 |
+| «Usar mi ubicación actual» | Permiso de ubicación aproximada + Fused Location; la calle sale del `Geocoder` | Semana 11 |
 | Enviar solicitud, seguir sus etapas (HU-11) y calificar (HU-12) | API Django `servicios` y `calificaciones` con el token; consulta cada 5 s, como la web | Semanas 9 y 11 |
 | Bandeja del prestador: aceptar, rechazar, avanzar y llamar al cliente | API Django (la misma bandeja que la web) | Semanas 9 y 11 |
 | Mi disponibilidad (Activo / Inactivo) del prestador | Retrofit a `/api/usuarios/disponibilidad/` con el token de Firebase; la búsqueda la refleja al instante | Semanas 9 y 11 |

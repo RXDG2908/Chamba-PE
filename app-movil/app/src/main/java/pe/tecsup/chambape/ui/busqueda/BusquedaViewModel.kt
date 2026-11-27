@@ -8,15 +8,15 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import pe.tecsup.chambape.data.local.AlmacenDireccion
+import pe.tecsup.chambape.data.repository.ContextoBusqueda
 import pe.tecsup.chambape.data.repository.PrestadorRepository
 import pe.tecsup.chambape.device.Coordenadas
-import pe.tecsup.chambape.device.UbicacionProvider
+import pe.tecsup.chambape.device.Direccion
 import pe.tecsup.chambape.domain.model.ErrorDatos
 import pe.tecsup.chambape.domain.model.Prestador
 import pe.tecsup.chambape.domain.model.Rubro
 import pe.tecsup.chambape.domain.model.TipoError
-import java.util.Locale
-import pe.tecsup.chambape.data.repository.ContextoBusqueda
 
 sealed interface EstadoRubros {
     data object Cargando : EstadoRubros
@@ -35,37 +35,34 @@ sealed interface EstadoResultados {
 data class BusquedaUiState(
     val rubros: EstadoRubros = EstadoRubros.Cargando,
     val rubroId: Int? = null,
-    val latitud: String = "",
-    val longitud: String = "",
+    /** Dónde se necesita el servicio, ya con nombre de calle (lo resuelve [SelectorUbicacionViewModel]). */
+    val direccion: Direccion? = null,
+    /** La dirección vino de «Mi dirección» (Perfil): si cambia allá, cambia aquí. */
+    val usaDireccionGuardada: Boolean = false,
     val faltaRubro: Boolean = false,
-    val latitudInvalida: Boolean = false,
-    val longitudInvalida: Boolean = false,
-    val ubicando: Boolean = false,
-    val ubicacionNoDisponible: Boolean = false,
+    val faltaDireccion: Boolean = false,
     val favoritos: Set<Int> = emptySet(),
     val resultados: EstadoResultados = EstadoResultados.Inicial,
 ) {
-    /** Ubicación elegida para el servicio, si las dos coordenadas son válidas (la que pinta el mapa). */
-    val ubicacion: Coordenadas?
-        get() {
-            val lat = coordenada(latitud, 90.0) ?: return null
-            val lon = coordenada(longitud, 180.0) ?: return null
-            return Coordenadas(lat, lon)
-        }
+    /** Punto que pinta el mapa y que va a la API; la persona nunca lo ve como números. */
+    val ubicacion: Coordenadas? get() = direccion?.coordenadas
 }
 
-internal fun coordenada(texto: String, limite: Double): Double? =
-    texto.trim().replace(',', '.').toDoubleOrNull()?.takeIf { it.isFinite() && it >= -limite && it <= limite }
+private fun Coordenadas.valida() = latitud in -90.0..90.0 && longitud in -180.0..180.0 &&
+    latitud.isFinite() && longitud.isFinite()
 
 class BusquedaViewModel(
     private val repository: PrestadorRepository,
-    private val ubicacion: UbicacionProvider,
     /** Guarda rubro y ubicación de la búsqueda: la solicitud se envía con ellos. */
     private val contexto: ContextoBusqueda? = null,
+    private val almacen: AlmacenDireccion? = null,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(BusquedaUiState())
     val uiState: StateFlow<BusquedaUiState> = _uiState.asStateFlow()
+
+    /** «Mi dirección» de Perfil, para ofrecerla en el selector de ubicación. */
+    val direccionGuardada: StateFlow<Direccion?> = almacen?.guardada ?: MutableStateFlow(null)
 
     private var busquedaEnCurso: Job? = null
 
@@ -74,6 +71,18 @@ class BusquedaViewModel(
         viewModelScope.launch {
             repository.favoritos().collect { lista ->
                 _uiState.update { it.copy(favoritos = lista.map { p -> p.id }.toSet()) }
+            }
+        }
+        // Empieza con «Mi dirección» y la sigue mientras la persona no elija otra aquí.
+        almacen?.let { guardadas ->
+            viewModelScope.launch {
+                guardadas.guardada.collect { guardada ->
+                    val estado = _uiState.value
+                    if (guardada != null && (estado.direccion == null || estado.usaDireccionGuardada)) {
+                        _uiState.update { it.copy(direccion = guardada, usaDireccionGuardada = true, faltaDireccion = false) }
+                        buscarSiEstaListo()
+                    }
+                }
             }
         }
     }
@@ -91,64 +100,40 @@ class BusquedaViewModel(
         }
     }
 
-    fun seleccionarRubro(id: Int) = _uiState.update { it.copy(rubroId = id, faltaRubro = false) }
-
-    fun cambiarLatitud(texto: String) = _uiState.update { it.copy(latitud = texto, latitudInvalida = false) }
-
-    fun cambiarLongitud(texto: String) = _uiState.update { it.copy(longitud = texto, longitudInvalida = false) }
-
-    /** Rellena las coordenadas con la ubicación del celular; el permiso lo pide la pantalla. */
-    fun usarMiUbicacion() {
-        _uiState.update { it.copy(ubicando = true, ubicacionNoDisponible = false) }
-        viewModelScope.launch {
-            val actual = ubicacion.actual()
-            _uiState.update {
-                if (actual == null) {
-                    it.copy(ubicando = false, ubicacionNoDisponible = true)
-                } else {
-                    it.copy(ubicando = false).conUbicacion(actual.latitud, actual.longitud)
-                }
-            }
-        }
+    /** Elegir el rubro ya busca si hay dirección: un toque, como en una app de delivery. */
+    fun seleccionarRubro(id: Int) {
+        _uiState.update { it.copy(rubroId = id, faltaRubro = false) }
+        buscarSiEstaListo()
     }
 
-    /** Ubicación elegida tocando el mapa. */
-    fun elegirUbicacion(latitud: Double, longitud: Double) {
-        if (latitud !in -90.0..90.0 || longitud !in -180.0..180.0) return
-        _uiState.update { it.conUbicacion(latitud, longitud).copy(ubicacionNoDisponible = false) }
+    /** Lugar elegido en el selector de ubicación (escrito, en el mapa o el del celular). */
+    fun elegirDireccion(direccion: Direccion) {
+        if (!direccion.coordenadas.valida()) return
+        _uiState.update { it.copy(direccion = direccion, usaDireccionGuardada = false, faltaDireccion = false) }
+        buscarSiEstaListo()
     }
 
-    private fun BusquedaUiState.conUbicacion(latitud: Double, longitud: Double) = copy(
-        latitud = formato(latitud),
-        longitud = formato(longitud),
-        latitudInvalida = false,
-        longitudInvalida = false,
-    )
-
-    /** Seis decimales, como guarda la API, y siempre con punto. */
-    private fun formato(valor: Double) = String.format(Locale.ROOT, "%.6f", valor)
-
-    fun permisoUbicacionDenegado() = _uiState.update { it.copy(ubicacionNoDisponible = true) }
+    private fun buscarSiEstaListo() {
+        val estado = _uiState.value
+        if (estado.rubroId != null && estado.direccion != null) buscar()
+    }
 
     fun buscar() {
         val estado = _uiState.value
-        val latitud = coordenada(estado.latitud, 90.0)
-        val longitud = coordenada(estado.longitud, 180.0)
         val rubroId = estado.rubroId
-        if (rubroId == null || latitud == null || longitud == null) {
-            // Una entrada inválida no llega al repositorio.
-            _uiState.update {
-                it.copy(faltaRubro = rubroId == null, latitudInvalida = latitud == null, longitudInvalida = longitud == null)
-            }
+        val punto = estado.direccion?.coordenadas
+        if (rubroId == null || punto == null) {
+            // Sin rubro o sin lugar no se llama a la API: la pantalla dice qué falta.
+            _uiState.update { it.copy(faltaRubro = rubroId == null, faltaDireccion = punto == null) }
             return
         }
-        contexto?.ultima = ContextoBusqueda.Datos(rubroId, latitud, longitud)
+        contexto?.ultima = ContextoBusqueda.Datos(rubroId, punto.latitud, punto.longitud)
         // Una búsqueda nueva cancela la anterior: una respuesta antigua no pisa la reciente.
         busquedaEnCurso?.cancel()
         _uiState.update { it.copy(resultados = EstadoResultados.Cargando) }
         busquedaEnCurso = viewModelScope.launch {
             val resultado = try {
-                val datos = repository.buscar(rubroId, latitud, longitud)
+                val datos = repository.buscar(rubroId, punto.latitud, punto.longitud)
                 if (datos.valor.isEmpty()) EstadoResultados.Vacio else EstadoResultados.Exito(datos.valor, datos.desdeCache)
             } catch (e: ErrorDatos) {
                 EstadoResultados.Error(e.tipo)
@@ -160,5 +145,4 @@ class BusquedaViewModel(
     fun alternarFavorito(prestadorId: Int) {
         viewModelScope.launch { repository.alternarFavorito(prestadorId) }
     }
-
 }

@@ -87,14 +87,15 @@ private val PestanasPrestador = listOf(
 /** Raíz de la app: el estado de la sesión decide entre ingreso y zona privada. */
 @Composable
 fun ChambaPeApp() {
-    val auth = (LocalContext.current.applicationContext as ChambaPeApplication).container.authRepository
+    val container = (LocalContext.current.applicationContext as ChambaPeApplication).container
+    val auth = container.authRepository
     val estado by auth.sesion.collectAsStateWithLifecycle()
     Surface(modifier = Modifier.fillMaxSize()) {
         when (val e = estado) {
             EstadoSesion.Cargando -> PantallaCentrada { Cargando() }
             EstadoSesion.SinSesion -> NavegacionIngreso()
             // Al cambiar de cuenta se recrea toda la navegación: no queda estado del usuario anterior.
-            is EstadoSesion.Activa -> key(e.sesion.uid) { NavegacionPrincipal(e.sesion, onCerrarSesion = auth::cerrarSesion) }
+            is EstadoSesion.Activa -> key(e.sesion.uid) { NavegacionPrincipal(e.sesion, onCerrarSesion = container::cerrarSesion) }
         }
     }
 }

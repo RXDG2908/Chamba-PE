@@ -361,7 +361,7 @@ pre.code .s{color:var(--accent-ink)}
         </div>
         <div class="door l">
           <div class="plate code" id="isoCode">CHPU 202602</div>
-          <div class="plate data">MAX. GROSS &nbsp;21 HU<br>TARE &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;62 SP<br>NET &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;693 PRUEBAS</div>
+          <div class="plate data">MAX. GROSS &nbsp;21 HU<br>TARE &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;62 SP<br>NET &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;774 PRUEBAS</div>
           <span class="stencil">CHAMBA</span>
         </div>
         <div class="door r">
@@ -374,7 +374,7 @@ pre.code .s{color:var(--accent-ink)}
     <div class="stats">
       <div class="stat"><b>8</b><span>contenedores en la arquitectura</span></div>
       <div class="stat"><b>21</b><span>historias de usuario · 62 SP</span></div>
-      <div class="stat"><b>693</b><span>pruebas automatizadas que pasan</span></div>
+      <div class="stat"><b>774</b><span>pruebas automatizadas que pasan</span></div>
       <div class="stat"><b>4</b><span>sprints de 2 semanas</span></div>
     </div>
     <div class="team"><span><b>Renzo León</b> · Scrum Master</span><span><b>Luis Abad</b> · Desarrollo</span><span><b>David Valcarcel</b> · Product Owner</span></div>
@@ -472,13 +472,13 @@ const NODES={
    summary:'Aplicación React con pantallas separadas por rol. El visitante busca y ve el mapa; el cliente pide y sigue sus servicios; el prestador recibe solicitudes y se verifica; el administrador revisa documentos y cuentas.',
    techs:[['react','React','19.2','Interfaz por componentes'],['vite','Vite','8.3','Servidor de desarrollo y build'],['router','React Router','7.18','Rutas por rol con RutaPrivada'],['gmaps','Google Maps','vis.gl 1.5','Mapa de prestadores'],['leaflet','Leaflet','1.9','Mapa de respaldo'],['firebase','Firebase SDK','13.1','Token de avisos push'],['mediapipe','MediaPipe Tasks Vision','0.10.21','Prueba de vida: detecta el parpadeo en la selfie'],['lucide','lucide-react','1.71','Una familia de iconos para todo'],['playwright','Playwright','1.64','Pruebas de punta a punta por historia']],
    parts:[{n:'paginas/publico/',d:'Portada, buscador y mapa para el visitante.',tags:['HU-3','HU-7']},{n:'paginas/cliente/',d:'Mis servicios, seguimiento en vivo y calificación.',tags:['HU-4','HU-11','HU-12']},{n:'paginas/prestador/',d:'Solicitudes recibidas, disponibilidad y verificación.',tags:['HU-6','HU-19','HU-20']},{n:'paginas/admin/',d:'Colas de revisión, suspensión y bloqueo.',tags:['HU-9','HU-13']},{n:'nucleo/api.js',d:'fetch con la cookie de sesión y el token CSRF.',tags:['sesión']},{n:'nucleo/useConsultas.js',d:'Vuelve a consultar el estado cada 5 s.',tags:['tiempo real']},{n:'nucleo/pruebaDeVida.js',d:'Usa face_landmarker para pedir un parpadeo.',tags:['IA']},{n:'estilos/Tema.css',d:'Tokens de la marca: verde #16734F y naranja #F29F3D.',tags:['diseño']}],
-   tests:[115,'pruebas Playwright'],
+   tests:[116,'pruebas Playwright'],
    facts:['Habla con <b>dos backends</b> con la misma sesión: Django para cuentas y verificación, Spring para búsqueda y solicitudes.','Duraciones de animación bajo 300 ms y respeto a «reducir movimiento».']},
  django:{name:'Django + DRF',kind:'Servidor',c:'#2BA977',logo:'django',area:'2 / 2',blurb:'Backend principal: cuentas, admin y verificación',chips:['python','django','drf','firebase'],
    summary:'El backend principal y dueño de la base de datos: define las tablas y sus migraciones. Maneja cuentas y roles, la revisión del administrador, la verificación de identidad y también expone búsqueda, solicitudes y calificaciones.',
    techs:[['python','Python','3.12','Lenguaje del backend y de la IA'],['django','Django','6.1','Modelos, migraciones, sesiones y admin'],['drf','Django REST Framework','3.16','API JSON y permisos por rol'],['cors','django-cors-headers','4.4','Permite al portal web en otro puerto'],['firebase','firebase-admin','6.5+','Verifica tokens y envía push'],['easyocr','EasyOCR','1.7','Lee la MRZ del DNI'],['opencv','OpenCV','4.8','YuNet + SFace para comparar rostros'],['pillow','Pillow','10+','Procesa las fotos subidas']],
    parts:[{n:'prestadores',d:'Perfil del prestador, rubros y cobertura.',tags:['Prestador','Rubro']},{n:'usuarios',d:'Cuentas, login con roles, perfil y disponibilidad.',tags:['Perfil']},{n:'servicios',d:'Solicitudes y su historial de estados.',tags:['Solicitud','CambioEstado','TokenFCM']},{n:'calificaciones',d:'Estrellas de 1 a 5 y promedio del prestador.',tags:['Calificacion']},{n:'certificaciones',d:'Documentos que acreditan el oficio.',tags:['CertificacionPrestador']},{n:'verificacion',d:'DNI, selfie, consentimiento y eliminación de datos.',tags:['IntentoDni','IntentoFacial','Consentimiento']},{n:'administracion',d:'Revisión de documentos y sanciones.',tags:['RevisionDocumento','SancionCuenta']},{n:'ia',d:'Recomendación del prestador por puntaje.',tags:['HU-10']}],
-   tests:[478,'pruebas de Django'],
+   tests:[512,'pruebas de Django'],
    sample:['Rutas principales',`<span class="k">POST</span> /api/usuarios/login/
 <span class="k">GET</span>  /api/usuarios/yo/
 <span class="k">POST</span> /api/verificacion/dni/
@@ -501,13 +501,13 @@ const NODES={
    summary:'App nativa con arquitectura MVVM. El registro del prestador va por pasos, una pregunta por pantalla, con progreso visible. Firebase solo da la identidad: los datos se piden a la API.',
    techs:[['kotlin','Kotlin','2.4.21','Lenguaje de la app'],['compose','Jetpack Compose','BOM 2026.09','Pantallas declarativas'],['material','Material 3','claro y oscuro','Tema con la marca (ui/Tema.kt)'],['retrofit','Retrofit','3.0.0','Cliente HTTP con Gson'],['room','Room','2.8.5','Caché local en SQLite del teléfono'],['firebase','Firebase Auth','BOM 35.2.0','Ingreso y ID token'],['gmaps','maps-compose','8.4.0','Mapa nativo'],['coroutines','Coroutines','1.11.0','Llamadas sin bloquear la pantalla'],['gradle','Gradle + AGP','9.5.1','Build con catálogo de versiones']],
    parts:[{n:'ui/',d:'Pantallas Compose: ingreso, registro en 5 pasos, búsqueda.',tags:['View']},{n:'domain/model/',d:'Modelos del negocio sin dependencias de Android.',tags:['Model']},{n:'data/remote/',d:'Interfaces Retrofit hacia la API.',tags:['HTTP']},{n:'data/local/',d:'Base Room para trabajar sin conexión.',tags:['Room']},{n:'data/auth/',d:'Sesión con Firebase Auth.',tags:['Firebase']},{n:'data/repository/',d:'Decide si leer de la red o de la caché.',tags:['MVVM']},{n:'device/',d:'Ubicación del teléfono.',tags:['GPS']}],
-   tests:[42,'pruebas de Android'],
+   tests:[68,'pruebas de Android'],
    facts:['El botón Atrás del sistema retrocede un paso del registro sin perder datos.','Los errores del servidor llevan al paso donde se corrigen.']},
  spring:{name:'Spring Boot',kind:'Servidor',c:'#6DB33F',logo:'spring',area:'3 / 2',blurb:'API de usuario con respuestas idénticas a Django',chips:['java','spring','jpa','maven'],
    summary:'API para el cliente y el prestador. Atiende a la app Android y a la web en búsqueda, recomendación, solicitudes, seguimiento, disponibilidad y calificaciones. Responde con el mismo JSON que Django, campo por campo.',
    techs:[['java','Java','21','Lenguaje del backend'],['spring','Spring Boot','4.1.3','Web MVC y configuración'],['jpa','Spring Data JPA','Hibernate','Lee y escribe las tablas que creó Django'],['sqlite','sqlite-jdbc','dialecto community','Base local de desarrollo'],['postgres','Driver PostgreSQL','previsto','Base de producción'],['jwt','Nimbus JOSE + JWT','9.40','Valida el token de Firebase'],['gauth','Google Auth Library','1.30.0','Credenciales para enviar push'],['maven','Maven','wrapper','Build y pruebas']],
    parts:[{n:'prestadores/',d:'Búsqueda por rubro y distancia.',tags:['BusquedaService','Distancias']},{n:'ia/',d:'Recomendación del mejor prestador.',tags:['RecomendacionService']},{n:'servicios/',d:'Solicitudes, estados y aviso push.',tags:['SolicitudesService','Notificador']},{n:'usuarios/',d:'Sesión de Django, CSRF y token de Firebase.',tags:['SesionDjango','FiltroFirebase']},{n:'calificaciones/',d:'Calificar y recalcular el promedio.',tags:['CalificacionesService']},{n:'comun/',d:'Imita el formato de Django: fechas, números y errores.',tags:['ComoDrf','PythonRepr','FechasDjango']}],
-   tests:[58,'pruebas de Spring Boot'],
+   tests:[78,'pruebas de Spring Boot'],
    sample:['Búsqueda de prestadores',`<span class="k">GET</span> /api/prestadores/buscar/?rubro=<span class="s">gasfiteria</span>&amp;lat=-12.05&amp;lng=-77.04
 
 [{

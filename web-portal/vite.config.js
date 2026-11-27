@@ -7,8 +7,8 @@ import process from 'node:process'
 // Spring Boot; el resto (cuentas e inicio de sesión, verificación de identidad, certificados y
 // administración) sigue en Django.
 // Spring lee la misma sesión de Django y exige el mismo CSRF. Para mandar todo a Django:
-// CHAMBA_API_USUARIO=http://127.0.0.1:8000 npm run dev
-const DJANGO = 'http://127.0.0.1:8000'
+// CHAMBA_API_USUARIO=http://127.0.0.1:8000 npm run dev  (CHAMBA_API_DJANGO cambia la dirección de Django)
+const DJANGO = process.env.CHAMBA_API_DJANGO || 'http://127.0.0.1:8000'
 const SPRING = process.env.CHAMBA_API_USUARIO || 'http://127.0.0.1:8080'
 const haciaSpring = { target: SPRING, changeOrigin: true, secure: false }
 

@@ -206,6 +206,8 @@ CSRF_TRUSTED_ORIGINS = [
     "http://localhost:5173",
     "http://127.0.0.1:5173",
 ]
+# Otro puerto de Vite en local (p. ej. dos copias de la web a la vez): DJANGO_CSRF_ORIGENES_EXTRA=http://localhost:5180
+CSRF_TRUSTED_ORIGINS += [o.strip() for o in os.environ.get('DJANGO_CSRF_ORIGENES_EXTRA', '').split(',') if o.strip()]
 
 CORS_ALLOW_METHODS = [
     "DELETE",

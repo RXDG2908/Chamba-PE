@@ -65,7 +65,7 @@ public class RegistroMovil {
     public Map<String, Object> usuarioActual(long usuarioId) {
         return jdbc.queryForObject("""
             select u.id, u.username, u.email, u.first_name, u.last_name, u.is_staff, p.rol,
-                   pr.id as prestador, pr.nombres, pr.apellidos
+                   pr.id as prestador, pr.nombres, pr.apellidos, p.foto, pr.tipo, pr.nombre_comercial
             from auth_user u
             left join usuarios_perfil p on p.usuario_id = u.id
             left join prestadores_prestador pr on pr.usuario_id = u.id
@@ -83,6 +83,13 @@ public class RegistroMovil {
             cuerpo.put("apellidos", esPrestador ? fila.getString("apellidos") : fila.getString("last_name"));
             cuerpo.put("rol", rol);
             cuerpo.put("prestador_id", esPrestador ? fila.getLong("prestador") : null);
+            // Perfil, como Django: ruta de la foto (o null) y el nombre que ven los clientes.
+            String foto = fila.getString("foto");
+            cuerpo.put("foto", foto == null || foto.isEmpty() ? null : "/media/" + foto);
+            String comercial = fila.getString("nombre_comercial");
+            cuerpo.put("nombre_publico", !esPrestador ? null
+                : "empresa".equals(fila.getString("tipo")) && comercial != null && !comercial.isEmpty() ? comercial
+                : (fila.getString("nombres") + " " + fila.getString("apellidos")).strip());
             return cuerpo;
         }, usuarioId);
     }

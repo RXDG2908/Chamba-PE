@@ -19,6 +19,9 @@ import ResultadosPrestadores from './paginas/publico/ResultadosPrestadores.jsx'
 import SeccionServicios from './paginas/publico/SeccionServicios.jsx'
 import SinAcceso from './paginas/publico/SinAcceso.jsx'
 import NoEncontrada from './paginas/publico/NoEncontrada.jsx'
+// Cuenta (cliente y prestador)
+import MiPerfil from './paginas/cuenta/MiPerfil.jsx'
+import './paginas/cuenta/MiPerfil.css'
 // Cliente
 import MisServicios from './paginas/cliente/MisServicios.jsx'
 // Prestador
@@ -123,13 +126,23 @@ function App() {
           <div className="sesion">
             {usuario && (
               <>
-                <span className="sesion-usuario">
-                  <span className="sesion-avatar" aria-hidden="true">{(usuario.nombres || usuario.username).charAt(0).toUpperCase()}</span>
-                  <span>
-                    <strong>{usuario.nombres || usuario.username}</strong>
-                    <small>{NOMBRE_ROL[usuario.rol] || 'Sin rol'}</small>
-                  </span>
-                </span>
+                {/* Clientes y prestadores abren su perfil desde aquí. */}
+                {(() => {
+                  const contenido = (
+                    <>
+                      <span className="sesion-avatar" aria-hidden="true">
+                        {usuario.foto ? <img src={usuario.foto} alt="" /> : (usuario.nombres || usuario.username).charAt(0).toUpperCase()}
+                      </span>
+                      <span>
+                        <strong>{usuario.nombres || usuario.username}</strong>
+                        <small>{NOMBRE_ROL[usuario.rol] || 'Sin rol'}</small>
+                      </span>
+                    </>
+                  )
+                  return ['cliente', 'prestador'].includes(usuario.rol)
+                    ? <Link to="/perfil" className="sesion-usuario sesion-usuario-enlace" title="Mi perfil">{contenido}</Link>
+                    : <span className="sesion-usuario">{contenido}</span>
+                })()}
                 <button type="button" onClick={cerrarSesion} disabled={cerrando}>
                   <LogOut className="icono" size={16} aria-hidden="true" />
                   {cerrando ? 'Cerrando…' : 'Cerrar sesión'}
@@ -161,6 +174,11 @@ function App() {
         <Route path="/ingresar" element={<IniciarSesion usuario={usuario} alIniciar={setUsuario} />} />
         <Route path="/crear-cuenta" element={<RegistroCliente usuario={usuario} alIniciar={setUsuario} />} />
         <Route path="/sin-acceso" element={<SinAcceso usuario={usuario} />} />
+
+        {/* Cuenta: cliente y prestador */}
+        <Route path="/perfil" element={
+          <RutaPrivada usuario={usuario} rol={['cliente', 'prestador']}><MiPerfil usuario={usuario} alActualizar={setUsuario} /></RutaPrivada>
+        } />
 
         {/* Cliente */}
         <Route path="/mis-servicios" element={privada('cliente', MisServicios)} />

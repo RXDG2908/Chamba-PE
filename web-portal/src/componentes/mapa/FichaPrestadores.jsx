@@ -1,4 +1,4 @@
-import { formatoDistancia, textoCalificacion } from '../../nucleo/formatos.js'
+import { formatoDistancia, nombrePublico, textoCalificacion } from '../../nucleo/formatos.js'
 
 // Contenido de la ventana de un marcador: uno o varios prestadores en el mismo punto.
 export default function FichaPrestadores({ coincidentes }) {
@@ -7,7 +7,7 @@ export default function FichaPrestadores({ coincidentes }) {
       {coincidentes.length > 1 && <p><strong>{coincidentes.length} prestadores en esta ubicación</strong></p>}
       {coincidentes.map((persona) => (
         <article key={persona.id}>
-          <strong>{persona.nombres} {persona.apellidos}</strong>
+          <strong>{nombrePublico(persona)}</strong>
           <p>{persona.rubros.map((r) => r.nombre).join(' · ')}</p>
           <p>{formatoDistancia.format(persona.distancia_km)} km</p>
           <p>{textoCalificacion(persona)}</p>

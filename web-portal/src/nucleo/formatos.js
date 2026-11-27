@@ -22,6 +22,17 @@ export function iniciales(nombres, apellidos) {
   return (primeraLetra(nombres) + primeraLetra(apellidos)) || '?'
 }
 
+/** Nombre con el que se presenta el prestador (su empresa o su nombre); con un backend antiguo, sus nombres. */
+export function nombrePublico(prestador) {
+  const publico = typeof prestador?.nombre_publico === 'string' ? prestador.nombre_publico.trim() : ''
+  return publico || `${prestador?.nombres ?? ''} ${prestador?.apellidos ?? ''}`.trim()
+}
+
+/** Solo fotos servidas por la propia API (/media/…): nunca una URL externa que llegue en los datos. */
+export function fotoSegura(ruta) {
+  return typeof ruta === 'string' && ruta.startsWith('/media/') && !ruta.includes('..')
+}
+
 // HU-12: promedio y total de calificaciones; sin datos válidos se mantiene «Sin calificaciones».
 export function textoCalificacion(prestador) {
   const total = prestador.calificaciones_total

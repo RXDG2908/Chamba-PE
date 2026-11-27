@@ -74,6 +74,9 @@ class UsuarioActualSerializer(serializers.Serializer):
             'apellidos': prestador.apellidos if prestador else usuario.last_name,
             'rol': rol,
             'prestador_id': prestador.id if prestador else None,
+            # Perfil: foto (o null) y el nombre con el que lo ven los clientes.
+            'foto': perfil.foto.url if (perfil := getattr(usuario, 'perfil', None)) and perfil.foto else None,
+            'nombre_publico': prestador.nombre_publico if prestador else None,
         }
 
 

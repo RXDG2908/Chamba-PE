@@ -30,12 +30,14 @@ export const MENU_POR_ROL = {
     ['/', 'Inicio'],
     ['/resultados', 'Buscar servicios'],
     ['/mis-servicios', 'Mis servicios'],
+    ['/perfil', 'Mi perfil'],
   ],
   prestador: [
     ['/prestador', 'Mi panel'],
     ['/solicitudes', 'Solicitudes'],
     ['/disponibilidad', 'Mi disponibilidad'],
     ['/prestador/verificacion', 'Verificación', RUTAS_VERIFICACION],
+    ['/perfil', 'Mi perfil'],
   ],
   administrador: [
     ['/administracion', 'Panel'],

@@ -47,7 +47,11 @@ public class BusquedaService {
         @com.fasterxml.jackson.annotation.JsonProperty("distancia_km") double distanciaKm,
         // HU-12: null mientras no tenga calificaciones, igual que Django.
         @com.fasterxml.jackson.annotation.JsonProperty("calificacion_promedio") Double calificacionPromedio,
-        @com.fasterxml.jackson.annotation.JsonProperty("calificaciones_total") int calificacionesTotal) {
+        @com.fasterxml.jackson.annotation.JsonProperty("calificaciones_total") int calificacionesTotal,
+        // Perfil público, en el orden de Django.
+        String tipo,
+        @com.fasterxml.jackson.annotation.JsonProperty("nombre_publico") String nombrePublico,
+        String descripcion, String foto) {
     }
 
     private record Parametros(long rubro, double latitud, double longitud) {
@@ -78,7 +82,9 @@ public class BusquedaService {
                     redondear3(prestador.getLongitud().doubleValue()),
                     distancia,
                     prestador.getCalificacionPromedio() == null ? null : prestador.getCalificacionPromedio().doubleValue(),
-                    prestador.getCalificacionesTotal()));
+                    prestador.getCalificacionesTotal(),
+                    prestador.getTipo(), prestador.getNombrePublico(), prestador.getDescripcion(),
+                    prestador.getFotoUrl()));
             }
         }
         // Orden estable del más cercano al más lejano (T3.3).

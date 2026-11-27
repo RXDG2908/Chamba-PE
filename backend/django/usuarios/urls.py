@@ -1,6 +1,7 @@
 from django.urls import path
 
 from .cuentas_compartidas import LoginFirebaseView, VincularCuentaView
+from .perfil import CambioContrasenaView, FotoPerfilView, PerfilView
 
 from .views import (
     CsrfView, DisponibilidadView, LoginView, LogoutView, RegistroClienteMovilView, RegistroClienteView, UsuarioActualView,
@@ -15,5 +16,8 @@ urlpatterns = [
     path('vincular/', VincularCuentaView.as_view(), name='vincular_cuenta'),
     path('logout/', LogoutView.as_view(), name='logout'),
     path('yo/', UsuarioActualView.as_view(), name='usuario_actual'),
+    path('perfil/', PerfilView.as_view(), name='perfil'),
+    path('perfil/foto/', FotoPerfilView.as_view(), name='perfil_foto'),
+    path('perfil/contrasena/', CambioContrasenaView.as_view(), name='perfil_contrasena'),
     path('disponibilidad/', DisponibilidadView.as_view(), name='disponibilidad'),
 ]

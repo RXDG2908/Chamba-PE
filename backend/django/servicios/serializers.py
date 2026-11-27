@@ -58,13 +58,20 @@ class PrestadorBusquedaSerializer(serializers.ModelSerializer):
     distancia_km = serializers.FloatField(read_only=True)
     # HU-12: null mientras no tenga calificaciones.
     calificacion_promedio = serializers.FloatField(read_only=True, allow_null=True)
+    # Perfil: nombre de la empresa o de la persona, y la ruta de su foto (o null).
+    nombre_publico = serializers.CharField(read_only=True)
+    foto = serializers.SerializerMethodField()
 
     class Meta:
         model = Prestador
         fields = [
             'id', 'nombres', 'apellidos', 'rubros', 'latitud', 'longitud', 'distancia_km',
-            'calificacion_promedio', 'calificaciones_total',
+            'calificacion_promedio', 'calificaciones_total', 'tipo', 'nombre_publico', 'descripcion', 'foto',
         ]
+
+    def get_foto(self, prestador):
+        perfil = getattr(prestador.usuario, 'perfil', None)
+        return perfil.foto.url if perfil and perfil.foto else None
 
     def to_representation(self, instance):
         datos = super().to_representation(instance)

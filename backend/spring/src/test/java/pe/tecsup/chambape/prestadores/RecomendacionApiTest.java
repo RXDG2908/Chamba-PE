@@ -92,7 +92,7 @@ class RecomendacionApiTest extends PruebaConBase {
             .andExpect(jsonPath("$.recomendado.telefono").doesNotExist())
             // Mismo orden de campos que Django: los de la búsqueda y luego los de la recomendación.
             .andExpect(content().string(containsString(
-                "\"calificaciones_total\":25,\"puntaje\":87.8,\"tiempo_estimado_min\":16,\"servicios_en_curso\":0,\"motivo\"")));
+                "\"calificaciones_total\":25,\"tipo\":\"independiente\",\"nombre_publico\":\"Valorado Prueba\",\"descripcion\":\"\",\"foto\":null,\"puntaje\":87.8,\"tiempo_estimado_min\":16,\"servicios_en_curso\":0,\"motivo\"")));
     }
 
     @Test

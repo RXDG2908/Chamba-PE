@@ -151,10 +151,18 @@ class RegistroYCalificacionesApiTest extends PruebaConBase {
         enviar(get("/api/usuarios/yo/"), "", "token-ana")
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.rol").value("prestador"))
-            .andExpect(jsonPath("$.prestador_id").value(1));
+            .andExpect(jsonPath("$.prestador_id").value(1))
+            .andExpect(jsonPath("$.nombre_publico").value("Ana Prueba"))
+            .andExpect(jsonPath("$.foto").value(nullValue()));
+        jdbc.update("update prestadores_prestador set tipo = 'empresa', nombre_comercial = 'Ana SAC' where id = 1");
+        jdbc.update("update usuarios_perfil set foto = 'fotos/usuario-1-x.jpg' where usuario_id = 1");
+        enviar(get("/api/usuarios/yo/"), "", "token-ana")
+            .andExpect(jsonPath("$.nombre_publico").value("Ana SAC"))
+            .andExpect(jsonPath("$.foto").value("/media/fotos/usuario-1-x.jpg"));
         enviar(get("/api/usuarios/yo/"), "", "token-cliente")
             .andExpect(jsonPath("$.rol").value("cliente"))
-            .andExpect(jsonPath("$.prestador_id").value(nullValue()));
+            .andExpect(jsonPath("$.prestador_id").value(nullValue()))
+            .andExpect(jsonPath("$.nombre_publico").value(nullValue()));
         enviar(get("/api/usuarios/yo/"), "", null).andExpect(status().isForbidden())
             .andExpect(jsonPath("$.detail").value("Authentication credentials were not provided."));
     }

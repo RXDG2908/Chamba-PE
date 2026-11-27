@@ -97,14 +97,13 @@ Desde `app-movil/`:
 
 ## Conectar con la API (Spring Boot)
 
-La app llama por defecto a `http://127.0.0.1:8080/`, es decir, al propio dispositivo. Con Spring
-corriendo en la PC (ver [`backend/spring/README.md`](../backend/spring/README.md)), redirige el puerto:
+La app llama por defecto a `http://127.0.0.1:8080/` con Spring corriendo en la PC (ver
+[`backend/spring/README.md`](../backend/spring/README.md)).
 
-```bash
-adb reverse tcp:8080 tcp:8080
-```
-
-Así funciona en emulador y en teléfono por USB. Spring usa la misma base de datos que Django, así que
+- **Emulador:** no hace falta nada. La app detecta el emulador y usa `10.0.2.2`, la dirección con la que
+  el emulador llega a la PC (antes dependía de `adb reverse`, que se pierde al reiniciar adb o el
+  emulador y dejaba la app en «No hay conexión»).
+- **Teléfono por USB:** redirige el puerto con `adb reverse tcp:8080 tcp:8080`. Spring usa la misma base de datos que Django, así que
 lo que haga la app se ve en la web y en la administración. Para otra URL:
 `./gradlew assembleDebug -Pchambape.apiBaseUrl=https://mi-servidor/` (por ejemplo `http://127.0.0.1:8000/`
 para volver a Django, con `adb reverse tcp:8000 tcp:8000`). Solo se permite HTTP sin cifrar hacia

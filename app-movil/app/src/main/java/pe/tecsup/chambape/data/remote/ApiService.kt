@@ -179,6 +179,21 @@ interface ApiService {
 }
 
 object RetrofitClient {
+    /**
+     * En el emulador, 127.0.0.1 es el propio emulador: la API de la PC está en 10.0.2.2. Así la app
+     * no depende de `adb reverse`, que se pierde cada vez que se reinicia adb o el emulador (y la
+     * app solo decía «No hay conexión»). En un teléfono por USB se sigue usando 127.0.0.1 con
+     * `adb reverse`, y una URL pública no se toca.
+     */
+    fun urlParaEsteEquipo(baseUrl: String, enEmulador: Boolean): String {
+        if (!enEmulador) return baseUrl
+        return Regex("""^(https?://)(127\.0\.0\.1|localhost)(?=[:/]|$)""").replace(baseUrl) { it.groupValues[1] + "10.0.2.2" }
+    }
+
+    /** Emulador del SDK de Android (imágenes «sdk_gphone», hardware ranchu o goldfish). */
+    fun esEmulador(): Boolean = android.os.Build.HARDWARE in setOf("ranchu", "goldfish") ||
+        android.os.Build.FINGERPRINT.startsWith("generic") || android.os.Build.PRODUCT.startsWith("sdk_gphone")
+
     fun crear(baseUrl: String): ApiService =
         Retrofit.Builder()
             .baseUrl(baseUrl)

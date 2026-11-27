@@ -127,7 +127,8 @@ class BusquedaViewModel(
             _uiState.update { it.copy(faltaRubro = rubroId == null, faltaDireccion = punto == null) }
             return
         }
-        contexto?.ultima = ContextoBusqueda.Datos(rubroId, punto.latitud, punto.longitud)
+        val nombre = estado.direccion?.takeIf { it.titulo.isNotBlank() }?.corta.orEmpty()
+        contexto?.ultima = ContextoBusqueda.Datos(rubroId, punto.latitud, punto.longitud, nombre)
         // Una búsqueda nueva cancela la anterior: una respuesta antigua no pisa la reciente.
         busquedaEnCurso?.cancel()
         _uiState.update { it.copy(resultados = EstadoResultados.Cargando) }

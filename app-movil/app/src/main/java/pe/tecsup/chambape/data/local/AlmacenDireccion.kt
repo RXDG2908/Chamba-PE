@@ -31,6 +31,7 @@ class AlmacenDireccionPreferencias(context: Context) : AlmacenDireccion {
                 Double.fromBits(prefs.getLong("latitud", 0)),
                 Double.fromBits(prefs.getLong("longitud", 0)),
             ),
+            distrito = prefs.getString("distrito", "").orEmpty(),
         )
     }
 
@@ -41,6 +42,7 @@ class AlmacenDireccionPreferencias(context: Context) : AlmacenDireccion {
             } else {
                 putString("titulo", direccion.titulo)
                 putString("detalle", direccion.detalle)
+                putString("distrito", direccion.distrito)
                 putLong("latitud", direccion.coordenadas.latitud.toRawBits())
                 putLong("longitud", direccion.coordenadas.longitud.toRawBits())
             }

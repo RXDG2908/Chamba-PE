@@ -34,7 +34,7 @@ import pe.tecsup.chambape.device.UbicacionProvider
 class AppContainer(context: Context) {
     private val alcanceApp = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
     private val baseDatos = AppDatabase.crear(context)
-    private val api = RetrofitClient.crear(BuildConfig.API_BASE_URL)
+    private val api = RetrofitClient.crear(RetrofitClient.urlParaEsteEquipo(BuildConfig.API_BASE_URL, RetrofitClient.esEmulador()))
 
     // Firebase solo para la identidad; el rol y el prestador salen de Django (GET /api/usuarios/yo/).
     val authRepository: AuthRepository = FirebaseAuthRepository(

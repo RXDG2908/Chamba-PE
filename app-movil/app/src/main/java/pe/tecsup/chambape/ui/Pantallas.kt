@@ -53,6 +53,7 @@ import androidx.compose.material.icons.outlined.Handyman
 import androidx.compose.material.icons.outlined.HourglassEmpty
 import androidx.compose.material.icons.outlined.Inbox
 import androidx.compose.material.icons.outlined.NearMe
+import androidx.compose.material.icons.outlined.Place
 import androidx.compose.material.icons.outlined.Phone
 import androidx.compose.material.icons.outlined.PersonSearch
 import androidx.compose.material.icons.outlined.TaskAlt
@@ -145,7 +146,7 @@ fun DetalleScreen(prestadorId: Int, sesion: Sesion) {
                                 AssistChip(
                                     onClick = {},
                                     label = { Text(rubro) },
-                                    leadingIcon = { Icon(Icons.Outlined.Handyman, contentDescription = null, modifier = Modifier.size(18.dp)) },
+                                    leadingIcon = { Icon(iconoRubro(rubro), contentDescription = null, modifier = Modifier.size(18.dp)) },
                                 )
                             }
                         }
@@ -160,6 +161,17 @@ fun DetalleScreen(prestadorId: Int, sesion: Sesion) {
             }
 
             Text(stringResource(R.string.solicitud_titulo), style = MaterialTheme.typography.titleMedium, modifier = Modifier.semantics { heading() })
+            // El cliente ve a dónde irá el prestador antes de enviar (la dirección de su búsqueda).
+            estado.lugar?.takeUnless { estado.enviada }?.let { lugar ->
+                Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Icon(Icons.Outlined.Place, contentDescription = null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(18.dp))
+                    Text(
+                        stringResource(R.string.solicitud_lugar, lugar.ifBlank { stringResource(R.string.ubicacion_sin_calle) }),
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
+            }
             // Al enviar, el formulario se transforma en la confirmación (mismo lugar, sin salto de pantalla).
             AnimatedContent(
                 targetState = estado.enviada,
@@ -430,7 +442,10 @@ private fun SolicitudCard(
                 Column(modifier = Modifier.weight(1f)) {
                     Text(solicitud.contraparte, style = MaterialTheme.typography.titleMedium)
                     if (solicitud.rubro.isNotBlank()) {
-                        Text(solicitud.rubro, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.primary)
+                        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                            Icon(iconoRubro(solicitud.rubro), contentDescription = null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(14.dp))
+                            Text(solicitud.rubro, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.primary)
+                        }
                     }
                 }
                 EstadoPill(solicitud.estado)

@@ -149,7 +149,8 @@ internal fun SolicitudRecibidaDto.aModelo(): Solicitud? {
  * el prestador ofrezca ese rubro y cubra esa ubicación). Vive mientras la app está abierta.
  */
 class ContextoBusqueda {
-    data class Datos(val rubroId: Int, val latitud: Double, val longitud: Double)
+    /** [direccion]: la línea que vio el cliente («Av. Arequipa 1200, Lince»); vacía si no tiene nombre. */
+    data class Datos(val rubroId: Int, val latitud: Double, val longitud: Double, val direccion: String = "")
 
     @Volatile
     var ultima: Datos? = null

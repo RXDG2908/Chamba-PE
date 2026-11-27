@@ -15,9 +15,19 @@ import kotlin.coroutines.resume
  * Un lugar como lo entiende el cliente: calle y distrito. Las coordenadas viajan por dentro
  * (la búsqueda y la solicitud las necesitan), pero nunca se muestran.
  */
-data class Direccion(val titulo: String, val detalle: String, val coordenadas: Coordenadas) {
+data class Direccion(
+    val titulo: String,
+    val detalle: String,
+    val coordenadas: Coordenadas,
+    /** Distrito («Miraflores»): lo que reconoce la persona en la barra, más que la urbanización. */
+    val distrito: String = "",
+) {
     /** Una línea para la barra de ubicación: «Av. Arequipa 1234, Miraflores». */
-    val corta: String get() = if (detalle.isBlank()) titulo else "$titulo, ${detalle.substringBefore(',')}"
+    val corta: String
+        get() {
+            val zona = distrito.ifBlank { detalle.substringBefore(',').trim() }
+            return if (zona.isBlank() || zona == titulo) titulo else "$titulo, $zona"
+        }
 }
 
 /** Convierte lo que escribe la persona en lugares, y un punto del mapa en una dirección legible. */
@@ -111,5 +121,6 @@ internal fun aDireccion(lugar: Address): Direccion? {
     val urbanizacion = lugar.subLocality?.takeUnless { sub -> lugar.locality?.let { sub.contains(it, ignoreCase = true) } == true }
     val detalle = listOfNotNull(urbanizacion, lugar.locality, lugar.adminArea)
         .map(String::trim).filter { it.isNotBlank() && it != titulo }.distinct().joinToString(", ")
-    return Direccion(titulo, detalle, Coordenadas(lugar.latitude, lugar.longitude))
+    val distrito = (lugar.locality ?: lugar.subLocality).orEmpty().trim()
+    return Direccion(titulo, detalle, Coordenadas(lugar.latitude, lugar.longitude), distrito)
 }

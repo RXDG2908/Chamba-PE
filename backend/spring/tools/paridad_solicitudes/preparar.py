@@ -33,6 +33,26 @@ SancionCuenta.objects.create(usuario=sanc.usuario, tipo='bloqueo', motivo='Cobro
 cuenta('cliente', 'cliente', 'uid-cliente'); cuenta('otro_cliente', 'cliente', 'uid-otro')
 cli_s = cuenta('cliente_suspendido', 'cliente', 'uid-cli-susp')
 SancionCuenta.objects.create(usuario=cli_s, tipo='suspension', motivo='Lenguaje ofensivo.', hasta=timezone.now() + timedelta(days=3))
+# HU-10: rubro propio para la recomendación, con distancias, calificaciones y empates distintos.
+# Van al final para no mover los ids que usan los casos anteriores.
+from decimal import Decimal
+reco = Rubro.objects.create(nombre='Paridad HU-10')
+KM = 1 / 111.195  # grados de latitud por km
+def recomendable(u, nombre, km, promedio=None, total=0, radio=15, **cambios):
+    p = Prestador.objects.create(usuario=cuenta(u, 'prestador', f'uid-{u}'), nombres=nombre, apellidos='Ficticia',
+        dni=f'{10000100 + Prestador.objects.count():08d}', latitud=f'{-12.046374 + km * KM:.6f}', longitud='-77.042793',
+        radio_cobertura_km=radio, calificacion_promedio=None if promedio is None else Decimal(promedio),
+        calificaciones_total=total, **{'disponible': True, 'estado': 'verificado', **cambios})
+    p.rubros.add(reco); return p
+r_cerca = recomendable('r_cerca', 'Rita', 0.5)
+recomendable('r_valorado', 'Raúl', 2, '4.90', 25)
+r_ocupado = recomendable('r_ocupado', 'Rocío', 1, '4.50', 10)
+recomendable('r_uno', 'Rubén', 1)
+recomendable('r_dos', 'Ruth', 1)
+recomendable('r_lejos', 'Rosa', 6, '4.60', 1)
+recomendable('r_corto', 'Rolando', 3, '5.00', 3, radio=2)
+recomendable('r_inactivo', 'Remo', 0.1, '5.00', 50, disponible=False)
+recomendable('r_pendiente', 'Reina', 0.1, estado='pendiente')
 # Sesiones de la web (las mismas en las dos bases) y un token CSRF, como tras iniciar sesión en Django.
 from django.contrib.sessions.backends.db import SessionStore
 from django.middleware.csrf import _get_new_csrf_string, _mask_cipher_secret
@@ -46,7 +66,7 @@ cli = User.objects.get(username='cliente')
 secreto = _get_new_csrf_string()
 sesiones = {'cli': sesion(cli), 'ana': sesion(ana.usuario), 'cli_hash_malo': sesion(cli, hash_malo=True),
             'cli_susp': sesion(cli_s), 'sanc': sesion(sanc.usuario)}
-datos = {'ana': ana.pk, 'lejos': lejos.pk, 'sanc': sanc.pk, 'gas': gas.pk, 'otro_rubro': otro.pk,
+datos = {'reco': reco.pk, 'r_cerca': r_cerca.pk, 'r_ocupado': r_ocupado.pk, 'ana': ana.pk, 'lejos': lejos.pk, 'sanc': sanc.pk, 'gas': gas.pk, 'otro_rubro': otro.pk,
          'sesiones': sesiones, 'csrf': secreto, 'csrf_enmascarado': _mask_cipher_secret(secreto)}
 (AQUI / 'datos.json').write_text(json.dumps(datos))
 clave = rsa.generate_private_key(public_exponent=65537, key_size=2048)

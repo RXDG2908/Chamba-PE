@@ -199,13 +199,13 @@ flowchart LR
 | Módulo | Front end | Back end | Carpeta |
 |---|---|---|---|
 | **Administración** | Web React | Django | `web-portal/` · `backend/django/` |
-| **Usuario** (cliente y prestador) | Móvil Kotlin y web React | Spring Boot: la app usa solo Spring; la web usa Spring para búsqueda, solicitudes, seguimiento, disponibilidad y calificaciones (con la misma sesión de Django) y Django para su cuenta y la verificación de identidad | `app-movil/` · `web-portal/` · `backend/spring/` |
+| **Usuario** (cliente y prestador) | Móvil Kotlin y web React | Spring Boot: la app usa solo Spring; la web usa Spring para búsqueda, recomendación con IA, solicitudes, seguimiento, disponibilidad y calificaciones (con la misma sesión de Django) y Django para su cuenta y la verificación de identidad | `app-movil/` · `web-portal/` · `backend/spring/` |
 | **Base de datos** | — | Compartida (hoy SQLite local; PostgreSQL previsto): Django es dueño de las tablas y migraciones | configuración por variables de entorno |
 
 | Capa | Tecnología |
 |---|---|
 | Backend principal | Django + Django REST Framework (`backend/django/`) |
-| Backend de usuario | Spring Boot 4.1 + Java 21 (`backend/spring/`): búsqueda, solicitudes, seguimiento, disponibilidad, registro desde la app y calificaciones, con respuestas idénticas a Django |
+| Backend de usuario | Spring Boot 4.1 + Java 21 (`backend/spring/`): búsqueda, recomendación con IA (HU-10), solicitudes, seguimiento, disponibilidad, registro desde la app y calificaciones, con respuestas idénticas a Django |
 | Frontend web | React 19 + Vite, iconos lucide, mapas con Google Maps y respaldo en OpenStreetMap |
 | App móvil | Android nativo: Kotlin, Jetpack Compose (Material 3) y MVVM, con Retrofit, Room, Firebase Auth y maps-compose |
 | Tiempo real | Consulta automática cada 5 s (HU-11); WebSocket queda como mejora posterior |
@@ -353,7 +353,7 @@ Pruebas del backend:
 python manage.py test
 ```
 
-**Frontend (React + Vite)** — requiere Node.js 20 o superior. Dentro de `web-portal/`, con Django (8000) **y** Spring (8080, arrancado con `DJANGO_DEBUG=true`) corriendo: Vite manda la búsqueda, las solicitudes, la disponibilidad y las calificaciones a Spring y el resto a Django. Sin Spring: `$env:CHAMBA_API_USUARIO="http://127.0.0.1:8000"` antes de `npm run dev`.
+**Frontend (React + Vite)** — requiere Node.js 20 o superior. Dentro de `web-portal/`, con Django (8000) **y** Spring (8080, arrancado con `DJANGO_DEBUG=true`) corriendo: Vite manda la búsqueda, la recomendación, las solicitudes, la disponibilidad y las calificaciones a Spring y el resto a Django. Sin Spring: `$env:CHAMBA_API_USUARIO="http://127.0.0.1:8000"` antes de `npm run dev`.
 
 ```bash
 npm install

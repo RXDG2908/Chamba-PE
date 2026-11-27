@@ -72,6 +72,9 @@ escribe en el registro la ruta completa que abrió (`Base de datos SQLite: ...`,
 - `servicios/`: `SolicitudesController`, `SolicitudesService` (validación campo por campo y reglas en el mismo
   orden que el serializer de Django), `Solicitudes` (SQL con `JdbcTemplate`: guarda fechas y decimales con el
   formato de Django), `CodigoSeguimiento` y `Notificador` (FCM HTTP v1, se envía al confirmar la transacción).
+- `ia/`: `RecomendacionController` y `RecomendacionService` (HU-10): toma los prestadores de `BusquedaService`,
+  cuenta sus servicios en curso y calcula puntaje, orden, tiempo estimado y motivo en el mismo orden de
+  operaciones que Python (redondeos con `round()` mitad al par y `:.1f` sobre el valor binario exacto).
 - `prestadores/`: entidades `Prestador` y `Rubro` (solo lectura, `@Immutable`), repositorios,
   `BusquedaService` (filtros, distancia Haversine, orden y redondeo igual que Django) y `PrestadoresController`.
 - `comun/`: lo que hace que Spring responda como Django:
@@ -104,6 +107,7 @@ solo cambien la dirección del servidor:
 | `GET` · `PATCH /api/usuarios/disponibilidad/` | Disponibilidad del prestador | ✅ |
 | `POST /api/usuarios/registro-movil/` · `POST /api/prestadores/registro-movil/` | Alta de cliente y de prestador desde la app, con el token de Firebase | ✅ 26/11 |
 | `GET /api/calificaciones/mis-servicios/` · `POST /api/calificaciones/` | «Mis servicios» del cliente y calificar (HU-12) | ✅ 26/11 |
+| `GET /api/ia/recomendacion/` | Prestador recomendado y hasta 3 alternativas con puntaje, motivo y tiempo estimado (HU-10), con la misma fórmula y textos que `ia/recomendacion.py` ([contrato](../../docs/API_RECOMENDACION.md)). Pública, como la búsqueda; hoy la usa la web | ✅ 27/11 |
 | `GET /api/usuarios/yo/` | Rol y prestador de la cuenta: la app lee de aquí su perfil con el token (antes, Firestore). Los 403 de la app traen `codigo` (`cuenta_no_vinculada`, `cuenta_sancionada`) | ✅ 26/11 |
 
 Con estas, Spring tiene las 13 rutas que usa la app Android. Todas aceptan el token de la app **y** la sesión de la
@@ -111,8 +115,8 @@ web.
 
 Quedan en Django (Back End de administración y cuentas): el registro e inicio de sesión de la web
 (`/api/usuarios/login/`, `logout/`, `csrf/`, `yo/`, `registro/` y `/api/prestadores/registro/`), el token FCM de la
-web (`/api/servicios/notificaciones/token/`), la verificación de identidad (HU-19 a HU-21), los certificados, la
-recomendación con IA y todo `administracion/`. El proxy de Vite (`web-portal/vite.config.js`) envía a Spring solo
+web (`/api/servicios/notificaciones/token/`), la verificación de identidad (HU-19 a HU-21), los certificados y todo
+`administracion/`. El proxy de Vite (`web-portal/vite.config.js`) envía a Spring solo
 las rutas de la tabla.
 
 La búsqueda incluye también `calificacion_promedio` (`null` sin calificaciones) y `calificaciones_total`

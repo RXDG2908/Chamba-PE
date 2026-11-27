@@ -80,7 +80,9 @@ try:
          'sanc': 'uid-sanc', 'clis': 'uid-cli-susp', 'nadie': 'uid-desconocido'}.items()}
     T['venc'] = token('uid-ana', venc=-300); T['proy'] = token('uid-ana', aud='otro-proyecto')
     S = '/api/servicios/solicitudes/'
+    RE, PUNTO = '/api/ia/recomendacion/', 'latitud=-12.046374&longitud=-77.042793'
     pasos = [
+        ('GET', f'{RE}?rubro={G}&{PUNTO}', None, None),
         ('POST', S, base, None), ('POST', S, dict(base, latitud=-12.0463741), None),
         ('POST', S, dict(base, cliente_nombre='Ana', descripcion='Con cuenta'), T['cli']),
         ('POST', S, {}, None), ('POST', S, [1], None), ('POST', S, 'x', None),
@@ -114,6 +116,7 @@ try:
         ('PATCH', '/api/usuarios/disponibilidad/', {'disponible': 2}, T['ana']),
         ('PATCH', '/api/usuarios/disponibilidad/', {}, T['ana']),
         ('PATCH', '/api/usuarios/disponibilidad/', {'disponible': None}, T['ana']),
+        ('GET', f'{RE}?rubro={G}&{PUNTO}', None, None),
         ('POST', S, base, None),
         ('PATCH', '/api/usuarios/disponibilidad/', {'disponible': True}, T['ana']),
         ('POST', S, base, None),
@@ -149,6 +152,7 @@ try:
         else: distintos.append((metodo, ruta[:60], json.dumps(cuerpo, ensure_ascii=False)[:80] if cuerpo is not None else None, rd[:2], rs[:2]))
         return rd
     nonlocal_estado = {'total': 0, 'iguales': 0}
+    web_sin_csrf = lambda quien: {'Cookie': f'sessionid={datos["sesiones"][quien]}', 'Origin': 'http://localhost:5173'}
     RC, RP, C = '/api/usuarios/registro-movil/', '/api/prestadores/registro-movil/', '/api/calificaciones/'
     nuevo = lambda uid, **extra: token(uid, **extra)
     paso('POST', RC, {'nombre': 'X'})
@@ -216,6 +220,42 @@ try:
     paso('GET', MS, None, T['cli'])
     paso('GET', '/api/prestadores/buscar/?rubro=%d&latitud=-12.046374&longitud=-77.042793' % G)
 
+    # HU-10: recomendación con IA. Pública como la búsqueda, con su misma validación.
+    R = datos['reco']
+    reco = lambda consulta, **k: paso('GET', f'{RE}?{consulta}', **k)
+    for consulta in ('', 'rubro=abc&latitud=0&longitud=0', 'rubro=0&latitud=0&longitud=0', 'rubro=999&latitud=0&longitud=0',
+                     'rubro=1.0&latitud=91&longitud=x', 'rubro=1&latitud=nan&longitud=inf', 'latitud=0',
+                     'rubro=%ZZ&latitud=1%&longitud=%2', 'rubro=' + '9' * 1001 + '&latitud=0&longitud=0',
+                     'rubro=1&latitud=' + '1' * 5000 + '&longitud=0', 'rubro=1&latitud=-0&longitud=Infinity',
+                     f'rubro={R}&rubro=abc&{PUNTO}', f'rubro=abc&rubro={R}&{PUNTO}',
+                     f'rubro=%20{R}%20&latitud=%C2%A0-12.046374%E3%80%80&longitud=-77.042793',
+                     f'rubro={R}.0&latitud=-12.046374&longitud=-77.042793&x=%FF'):
+        reco(consulta)
+    for lat, lon in ((-12.046374, -77.042793), (-12.0464, -77.0428), (-12.03, -77.042793), (-12.12, -77.03),
+                     (-12.0, -77.1), (0, 0), (-90, 180)):
+        reco(f'rubro={R}&latitud={lat}&longitud={lon}'); reco(f'rubro={G}&latitud={lat}&longitud={lon}')
+    # No autentica (authentication_classes = []): ni un token vencido ni una sesión sancionada la bloquean.
+    for tok, extra in ((T['venc'], None), (T['ana'], None), ('Bearer', None), (None, web_sin_csrf('cli_susp')),
+                       (None, {'Cookie': 'sessionid=inventada123'})):
+        reco(f'rubro={R}&{PUNTO}', tok=tok, extra=extra)
+    for metodo in ('POST', 'PUT', 'PATCH', 'DELETE'):
+        paso(metodo, f'{RE}?rubro={R}&{PUNTO}', {})
+    paso('HEAD', f'{RE}?rubro={R}&{PUNTO}')
+    # Los servicios en curso los escribe cada servidor y bajan el puntaje de Rocío (pendiente y finalizada no cuentan).
+    TR = token('uid-r_ocupado')
+    nueva = lambda: paso('POST', S, dict(base, prestador=datos['r_ocupado'], rubro=R, descripcion='Para HU-10'))[1]['id']
+    s1 = nueva(); reco(f'rubro={R}&{PUNTO}')
+    paso('POST', f'{S}{s1}/aceptar/', None, TR); reco(f'rubro={R}&{PUNTO}')
+    s2 = nueva(); paso('POST', f'{S}{s2}/aceptar/', None, TR); paso('POST', f'{S}{s2}/avanzar/', {'estado': 'en_camino'}, TR)
+    reco(f'rubro={R}&{PUNTO}')
+    for etapa in ('en_camino', 'en_servicio'):
+        paso('POST', f'{S}{s1}/avanzar/', {'estado': etapa}, TR)
+    s3 = nueva(); paso('POST', f'{S}{s3}/aceptar/', None, TR); reco(f'rubro={R}&{PUNTO}')
+    paso('POST', f'{S}{s1}/avanzar/', {'estado': 'finalizada'}, TR); s4 = nueva(); paso('POST', f'{S}{s4}/rechazar/', None, TR)
+    reco(f'rubro={R}&{PUNTO}'); reco(f'rubro={R}&latitud=-12.03&longitud=-77.042793')
+    # Rita se desconecta: sale de la recomendación.
+    paso('PATCH', '/api/usuarios/disponibilidad/', {'disponible': False}, token('uid-r_cerca')); reco(f'rubro={R}&{PUNTO}')
+
     # La web con la sesión de Django: SessionAuthentication va antes que el token y exige CSRF.
     SES, CSRF, MASC = datos['sesiones'], datos['csrf'], datos['csrf_enmascarado']
     WEB = 'http://localhost:5173'
@@ -269,7 +309,8 @@ try:
     procesos.append(django('b.sqlite3', PD2)); esperar(PD2)
     cruz = [('GET', S + 'recibidas/', T['ana'])] + [('GET', f'{S}{i}/', T['ana']) for i in codigos] + \
            [('GET', '/api/usuarios/disponibilidad/', T['ana']), ('GET', MS, T['cli'])] + \
-           [('GET', '/api/usuarios/yo/', tok) for tok in (t1, tp, tp3)] + [('GET', '/api/usuarios/disponibilidad/', tp)]
+           [('GET', '/api/usuarios/yo/', tok) for tok in (t1, tp, tp3)] + [('GET', '/api/usuarios/disponibilidad/', tp)] + \
+           [('GET', f'{RE}?rubro={r}&{PUNTO}', None) for r in (R, G)]
     malos = 0
     for metodo, ruta, tok in cruz:
         r1, r2 = pedir(PD, metodo, ruta, tok=tok), pedir(PD2, metodo, ruta, tok=tok)

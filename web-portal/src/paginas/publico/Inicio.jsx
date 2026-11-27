@@ -12,7 +12,7 @@ const ACCIONES_POR_ROL = {
 }
 
 const PASOS = [
-  ['Elige el servicio', 'Gasfitería, electricidad, limpieza y más. Marca en el mapa dónde lo necesitas.'],
+  ['Elige el servicio', 'Gasfitería, electricidad, limpieza y más. Escribe tu dirección o márcala en el mapa.'],
   ['Compara prestadores cercanos', 'Solo ves a quienes están disponibles, cubren tu zona y fueron verificados.'],
   ['Envía tu solicitud', 'El prestador la recibe en su bandeja y te responde si acepta el trabajo.'],
 ]

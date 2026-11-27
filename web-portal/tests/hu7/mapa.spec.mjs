@@ -50,9 +50,13 @@ async function preparar(page, opciones = {}) {
     }
     return route.fulfill({ status: 404, json: {} })
   })
+  // Sin red hacia el servicio de direcciones: el punto queda como «Punto marcado en el mapa».
+  await page.context().route('https://nominatim.openstreetmap.org/**', (r) => r.abort())
   await page.goto('/resultados', { waitUntil: 'domcontentloaded' })
   await expect(page.getByRole('combobox', { name: /Rubro/ })).toBeEnabled()
   await page.getByRole('combobox', { name: /Rubro/ }).selectOption('1')
+  // Las coordenadas a mano están en «Ingresar coordenadas (avanzado)»: la persona usa su dirección.
+  await page.locator('details.coordenadas-avanzado').evaluate((d) => { d.open = true })
   await page.getByLabel('Latitud', { exact: true }).fill(String(centro.latitud))
   await page.getByLabel('Longitud', { exact: true }).fill(String(centro.longitud))
   await page.getByRole('button', { name: 'Usar coordenadas', exact: true }).click()
@@ -62,6 +66,12 @@ async function buscar(page) {
   await page.getByRole('button', { name: 'Buscar', exact: true }).click()
 }
 const marcadores = (page) => page.locator('.marcador-prestador')
+
+// En pantallas angostas los resultados se ven como Lista o Mapa (como en la app): se abre el mapa.
+async function verMapa(page) {
+  const boton = page.getByRole('button', { name: 'Mapa', exact: true })
+  if (await boton.isVisible()) await boton.click()
+}
 const tarjetas = (page) => page.locator('.lista-prestadores > li')
 
 test('mapa/lista conservan personas, coordenadas relativas y popup sin mover al cliente', async ({ page }) => {
@@ -94,7 +104,8 @@ test('coordenadas compartidas con cliente permiten consultar a todos', async ({ 
   await expect(popup).toContainText('Beto Prueba')
   await expect(popup.locator('article')).toHaveCount(2)
   await expect(tarjetas(page)).toHaveCount(2)
-  await expect(page.locator('.ubicacion-elegida')).toContainText(String(centro.latitud))
+  // La ubicación del cliente no cambió (sus coordenadas siguen en el campo avanzado).
+  await expect(page.getByLabel('Latitud', { exact: true })).toHaveValue(centro.latitud.toFixed(6))
 })
 
 test('cambiar rubro o coordenadas retira tarjetas y marcadores anteriores', async ({ page }) => {
@@ -206,6 +217,7 @@ for (const ancho of [320, 390, 1280]) {
     await preparar(page, { datos: [persona(1, { apellidos: 'NombreMuyLargo'.repeat(8) })] })
     await buscar(page)
     await expect(tarjetas(page)).toHaveCount(1)
+    await verMapa(page)
     await marcadores(page).first().click()
     await expect(page.locator('.leaflet-popup-content')).toBeVisible()
     const medidas = await page.evaluate(() => ({ scroll: document.documentElement.scrollWidth, ancho: innerWidth }))
@@ -226,7 +238,8 @@ test('seleccionar punto libre limpia resultados; volver al mapa no cambia ubicac
   await page.locator('.mapa-busqueda').click({ position: { x: 45, y: 45 } })
   await expect(marcadores(page)).toHaveCount(0)
   await expect(tarjetas(page)).toHaveCount(0)
-  await expect(page.locator('.ubicacion-elegida')).not.toContainText('-12.046374, -77.042793')
+  await expect(page.getByLabel('Latitud', { exact: true })).not.toHaveValue('-12.046374')
+  await expect(page.locator('.ubicacion-elegida')).toContainText('Punto marcado en el mapa')
 })
 
 test('solicitar desde tarjeta conserva prestador, rubro y coordenadas elegidas', async ({ page }) => {
@@ -244,4 +257,30 @@ test('solicitar desde tarjeta conserva prestador, rubro y coordenadas elegidas',
   await tarjeta.getByRole('button', { name: 'Enviar solicitud' }).click()
   await expect(tarjeta.getByText('Solicitud #42')).toBeVisible()
   expect(enviada).toMatchObject({ prestador: 1, rubro: 1, latitud: '-12.046374', longitud: '-77.042793' })
+})
+
+test('la ubicación se escribe como dirección, se busca con ella y queda como mi dirección', async ({ page }) => {
+  await preparar(page)
+  // El servicio de direcciones responde con un lugar ficticio (la prueba no sale a internet).
+  await page.context().route('https://nominatim.openstreetmap.org/search**', (r) => r.fulfill({ json: [{
+    lat: '-12.120000', lon: '-77.030000', name: 'Larco',
+    address: { road: 'Avenida José Larco', house_number: '400', suburb: 'Miraflores', city: 'Lima' },
+  }] }))
+  await page.getByRole('button', { name: /Cambiar ubicación/ }).click()
+  const panel = page.getByRole('dialog', { name: '¿Dónde necesitas el servicio?' })
+  await expect(panel).toBeVisible()
+  await panel.getByPlaceholder('Calle y número, o distrito').fill('Larco 400')
+  await panel.getByRole('button', { name: /Avenida José Larco 400/ }).click()
+  await expect(panel).toBeHidden()
+  await expect(page.locator('.ubicacion-elegida')).toHaveText('Ubicación elegida: Avenida José Larco 400, Miraflores.')
+  await expect(page.getByLabel('Latitud', { exact: true })).toHaveValue('-12.120000')
+  await buscar(page)
+  await expect(tarjetas(page)).toHaveCount(2)
+
+  await page.getByRole('button', { name: /Cambiar ubicación/ }).click()
+  await panel.getByRole('button', { name: /como mi dirección/ }).click()
+  await expect(panel).toContainText('Es tu dirección guardada')
+  await page.keyboard.press('Escape')
+  await page.reload({ waitUntil: 'domcontentloaded' })
+  await expect(page.getByRole('button', { name: /Cambiar ubicación/ })).toContainText('Avenida José Larco 400, Miraflores')
 })

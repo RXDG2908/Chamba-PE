@@ -1,0 +1,76 @@
+/*
+ * Búsqueda en PC con las funciones del mapa de la app: ubicación como dirección arriba, rubros con
+ * su ícono y color de sección, y resultados con lista y mapa lado a lado (en el celular, Lista/Mapa).
+ */
+.busqueda-fila { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr) auto; gap: 12px; align-items: end; }
+.busqueda .busqueda-fila .boton-buscar { width: auto; min-height: 60px; margin: 0; padding-inline: 28px; border-radius: 18px; }
+.campo-rubro { display: grid; gap: 6px; }
+.campo-rubro select { min-height: 60px; border-radius: 18px; }
+
+.chips-rubros { display: flex; flex-wrap: wrap; gap: 8px; margin: 16px 0 0; padding: 0; list-style: none; }
+.busqueda .chip-rubro {
+  display: inline-flex; align-items: center; gap: 8px; padding: 6px 14px 6px 6px; border: 1px solid var(--borde);
+  border-radius: 999px; background: #fff; color: var(--texto); font-size: 14px; font-weight: 600; cursor: pointer;
+  transition: border-color 0.15s, background 0.15s, color 0.15s;
+}
+.busqueda .chip-rubro:hover { border-color: var(--tinta-seccion); }
+.chip-rubro-icono {
+  display: grid; place-items: center; width: 28px; height: 28px; border-radius: 50%;
+  background: var(--fondo-seccion); color: var(--tinta-seccion);
+}
+.busqueda .chip-rubro.elegido { border-color: var(--verde); background: var(--verde); color: #fff; }
+.chip-rubro.elegido .chip-rubro-icono { background: #ffffff33; color: #fff; }
+.busqueda .ubicacion-elegida { margin: 14px 0 0; color: var(--texto-suave); font-size: 14px; }
+
+/* Lista y mapa lado a lado en PC; el mapa queda fijo mientras se recorre la lista. */
+.selector-vista { display: none; }
+.resultados-rejilla { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 24px; align-items: start; }
+.columna-mapa { position: sticky; top: 92px; display: grid; gap: 10px; }
+.columna-mapa .mapa-busqueda { height: min(560px, calc(100vh - 220px)); border-radius: 20px; }
+.columna-mapa.eligiendo .mapa-busqueda { outline: 3px solid var(--verde); outline-offset: 3px; }
+.aviso-elegir-mapa {
+  display: flex; align-items: center; gap: 8px; margin: 0; padding: 10px 14px; border-radius: 12px;
+  background: var(--verde-claro); color: var(--verde-intenso); font-weight: 600;
+}
+.leyenda-mapa { margin: 0; color: var(--texto-suave); font-size: 13px; }
+.coordenadas-avanzado summary {
+  display: inline-flex; align-items: center; gap: 6px; color: var(--texto-suave); font-size: 14px; cursor: pointer;
+}
+.coordenadas-avanzado .coordenadas-busqueda { margin-top: 12px; }
+.coordenadas-avanzado button {
+  padding: 12px 16px; border: 1px solid #cbded3; border-radius: 10px; background: #eaf4ee; color: #20352a; font: inherit; cursor: pointer;
+}
+
+/* «Recomendado para ti» como en la app: tarjeta verde con borde, motivo y llegada. */
+.columna-lista .recomendado {
+  margin-bottom: 16px; padding: 18px 20px; border: 2px solid var(--verde); border-radius: 24px; background: #b7f0d3; color: #002114;
+}
+.recomendado .etiqueta-recomendado { display: flex; align-items: center; gap: 6px; margin: 0; color: var(--verde-intenso); font-weight: 800; }
+.recomendado h4 { margin: 6px 0; font-size: 22px; }
+.recomendado .motivo-recomendado { margin: 0; }
+.pie-recomendado { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px; margin-top: 12px; }
+.recomendado .tiempo-recomendado {
+  display: inline-flex; align-items: center; gap: 6px; margin: 0; padding: 6px 12px; border-radius: 999px; background: #ffffffb3;
+}
+.pie-recomendado a { display: inline-flex; align-items: center; gap: 4px; color: var(--verde-intenso); font-weight: 700; }
+.rubros-tarjeta .icono { margin-right: 4px; vertical-align: -2px; }
+
+@media (max-width: 980px) {
+  .resultados-rejilla { grid-template-columns: 1fr; }
+  .columna-mapa { position: static; }
+  .columna-mapa .mapa-busqueda { height: 420px; }
+  .selector-vista {
+    display: inline-flex; margin: 0 0 16px; padding: 4px; border: 1px solid var(--borde); border-radius: 999px; background: #fff;
+  }
+  .selector-vista button {
+    display: inline-flex; align-items: center; gap: 6px; padding: 8px 16px; border: 0; border-radius: 999px;
+    background: transparent; color: var(--texto-suave); font: inherit; font-weight: 600; cursor: pointer;
+  }
+  .selector-vista button[aria-pressed='true'] { background: #ffddb8; color: #2c1600; }
+  .vista-lista .columna-mapa { display: none; }
+  .vista-mapa .columna-lista { display: none; }
+}
+@media (max-width: 720px) {
+  .busqueda-fila { grid-template-columns: 1fr; }
+  .busqueda .busqueda-fila .boton-buscar { width: 100%; }
+}

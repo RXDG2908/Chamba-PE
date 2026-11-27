@@ -13,12 +13,21 @@ function urlBusqueda(rubro, latitud = fixtures.centro.latitud, longitud = fixtur
   return '/api/prestadores/buscar/?' + new URLSearchParams({ rubro, latitud, longitud })
 }
 async function preparar(page) {
+  // Sin red hacia el servicio de direcciones: el punto queda como «Punto marcado en el mapa».
+  await page.context().route('https://nominatim.openstreetmap.org/**', (r) => r.abort())
   await page.goto('/resultados', { waitUntil: 'domcontentloaded' })
   await expect(page.getByRole('combobox', { name: /Rubro/ })).toBeEnabled()
   await page.getByRole('combobox', { name: /Rubro/ }).selectOption(String(fixtures.rubros['Gasfitería']))
+  // Las coordenadas a mano están en «Ingresar coordenadas (avanzado)»: la persona usa su dirección.
+  await page.locator('details.coordenadas-avanzado').evaluate((d) => { d.open = true })
   await page.getByLabel('Latitud', { exact: true }).fill(String(fixtures.centro.latitud))
   await page.getByLabel('Longitud', { exact: true }).fill(String(fixtures.centro.longitud))
   await page.getByRole('button', { name: 'Usar coordenadas', exact: true }).click()
+}
+// En pantallas angostas los resultados se ven como Lista o Mapa (como en la app): se abre el mapa.
+async function verMapa(page) {
+  const boton = page.getByRole('button', { name: 'Mapa', exact: true })
+  if (await boton.isVisible()) await boton.click()
 }
 async function buscar(page) {
   const pending = page.waitForResponse((r) => r.url().includes('/api/prestadores/buscar/') && r.status() === 200)
@@ -240,6 +249,7 @@ for (const width of [320, 390, 1280]) {
   await page.setViewportSize({ width, height: 900 })
   await preparar(page)
   const data = await buscar(page)
+  await verMapa(page)
   await expect.poll(() => marcadoresDentro(page)).toBe(true)
   const encuadreInicial = await posicionRelativa(page)
   const compartidos = markers(page).filter({ hasText: '+' })
@@ -278,6 +288,7 @@ for (const width of [320, 390, 1280]) {
     await page.setViewportSize({ width, height: 900 })
     await preparar(page)
     await consistencia(page, await buscar(page))
+    await verMapa(page)
     // El encuadre debe ser correcto antes del primer clic, sin botón de recuperación.
     await expect.poll(() => marcadoresDentro(page)).toBe(true)
     await markers(page).last().click()

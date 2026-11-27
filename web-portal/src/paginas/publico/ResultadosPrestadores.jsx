@@ -1,10 +1,16 @@
-import { useEffect, useRef, useState } from 'react'
+import { createElement, useEffect, useRef, useState } from 'react'
 import { useLocation } from 'react-router-dom'
 import SolicitudServicio from '../../componentes/SolicitudServicio.jsx'
 import MapaBusqueda from '../../componentes/mapa/MapaBusqueda.jsx'
-import { formatoDistancia, formatoEntero, iniciales, textoCalificacion, USA_GOOGLE_MAPS } from '../../nucleo/formatos.js'
-import { MapPin, Search } from 'lucide-react'
+import PanelUbicacion, { BarraUbicacion } from '../../componentes/UbicacionServicio.jsx'
+import { formatoDistancia, formatoEntero, iniciales, textoCalificacion } from '../../nucleo/formatos.js'
+import { leerMiDireccion, nombrarPunto, textoCorto } from '../../nucleo/direcciones.js'
+import { iconoRubro } from '../../nucleo/iconos.js'
+import { seccionDe } from '../../nucleo/secciones.js'
+import { ArrowRight, Clock, List, Map as IconoMapa, MapPin, MousePointerClick, Search, Sparkles } from 'lucide-react'
 import Cargando from '../../componentes/Cargando.jsx'
+import '../../componentes/Secciones.css'
+import './ResultadosPrestadores.css'
 
 // Validar el contrato antes de renderizar tarjetas y marcadores con los mismos datos.
 function prestadorValido(prestador) {
@@ -23,19 +29,24 @@ function recomendacionValida(datos, prestadores) {
     && prestadores.some((p) => p.id === r.id)
 }
 
+// Igual que la tarjeta «Recomendado para ti» de la app: motivo de la IA, llegada estimada y enlace.
 function Recomendado({ prestador }) {
   return (
     <aside className="recomendado" aria-labelledby="titulo-recomendado">
-      <p className="etiqueta-recomendado">✨ Recomendado para ti</p>
+      <p className="etiqueta-recomendado"><Sparkles size={16} aria-hidden="true" /> Recomendado para ti</p>
       <h4 id="titulo-recomendado">{prestador.nombres} {prestador.apellidos}</h4>
       <p className="motivo-recomendado">{prestador.motivo}</p>
-      <p className="tiempo-recomendado">
-        Llegada estimada: <strong>≈ {prestador.tiempo_estimado_min} min</strong>
-      </p>
-      <a href={`#prestador-${prestador.id}`}>Ver y solicitar</a>
+      <div className="pie-recomendado">
+        <p className="tiempo-recomendado">
+          <Clock size={16} aria-hidden="true" /> Llegada estimada: <strong>≈ {prestador.tiempo_estimado_min} min</strong>
+        </p>
+        <a href={`#prestador-${prestador.id}`}>Ver y solicitar <ArrowRight size={16} aria-hidden="true" /></a>
+      </div>
     </aside>
   )
 }
+
+const aPunto = (direccion) => (direccion ? [direccion.latitud, direccion.longitud] : null)
 
 function ResultadosPrestadores() {
   const { state } = useLocation()
@@ -44,13 +55,24 @@ function ResultadosPrestadores() {
   const [intentoRubros, setIntentoRubros] = useState(0)
   // La portada puede llegar con un rubro elegido; se confirma al cargar la lista.
   const [rubro, setRubro] = useState(() => String(state?.rubro ?? ''))
-  const [ubicacion, setUbicacion] = useState(null)
-  const [coordenadas, setCoordenadas] = useState({ latitud: '', longitud: '' })
+  // Como en la app: la búsqueda empieza con «Mi dirección» si hay una guardada en este navegador.
+  const [direccion, setDireccion] = useState(() => leerMiDireccion())
+  const ubicacion = aPunto(direccion)
+  const [coordenadas, setCoordenadas] = useState(() => {
+    const punto = aPunto(direccion)
+    return punto ? { latitud: punto[0].toFixed(6), longitud: punto[1].toFixed(6) } : { latitud: '', longitud: '' }
+  })
+  const [panelAbierto, setPanelAbierto] = useState(false)
+  const [eligiendoEnMapa, setEligiendoEnMapa] = useState(false)
+  const [vista, setVista] = useState('lista') // en pantallas angostas: lista | mapa
   const [prestadores, setPrestadores] = useState([])
   const [estado, setEstado] = useState('inicial')
   const [error, setError] = useState('')
   const [recomendado, setRecomendado] = useState(null)
   const peticion = useRef(null)
+  const nombrando = useRef(null)
+  const zonaMapa = useRef(null)
+  const busquedaInicial = useRef(Boolean(state?.rubro) && Boolean(direccion))
 
   useEffect(() => {
     const controlador = new AbortController()
@@ -73,7 +95,10 @@ function ResultadosPrestadores() {
     return () => controlador.abort()
   }, [intentoRubros])
 
-  useEffect(() => () => peticion.current?.abort(), [])
+  useEffect(() => () => {
+    peticion.current?.abort()
+    nombrando.current?.abort()
+  }, [])
 
   function limpiarBusqueda() {
     peticion.current?.abort()
@@ -83,15 +108,37 @@ function ResultadosPrestadores() {
     setError('')
   }
 
+  // Lugar elegido en el panel (escrito, GPS o «Mi dirección»): ya trae su nombre de calle.
+  function elegirDireccion(nueva) {
+    limpiarBusqueda()
+    nombrando.current?.abort()
+    setDireccion(nueva)
+    setCoordenadas({ latitud: nueva.latitud.toFixed(6), longitud: nueva.longitud.toFixed(6) })
+    setPanelAbierto(false)
+    setEligiendoEnMapa(false)
+  }
+
+  // Clic en el mapa (o coordenadas a mano): se usa enseguida y se le pone nombre de calle cuando llega.
   function elegirUbicacion(punto) {
     limpiarBusqueda()
-    setUbicacion(punto)
-    setCoordenadas({ latitud: punto[0].toFixed(6), longitud: punto[1].toFixed(6) })
+    nombrando.current?.abort()
+    const [latitud, longitud] = punto
+    setDireccion({ titulo: '', detalle: '', distrito: '', latitud, longitud })
+    setCoordenadas({ latitud: latitud.toFixed(6), longitud: longitud.toFixed(6) })
+    setEligiendoEnMapa(false)
+    const controlador = new AbortController()
+    nombrando.current = controlador
+    nombrarPunto(punto, controlador.signal).then((nombrada) => {
+      if (controlador.signal.aborted || !nombrada.titulo) return
+      // Solo si la persona no eligió otro lugar mientras tanto.
+      setDireccion((actual) => (actual?.latitud === latitud && actual?.longitud === longitud ? nombrada : actual))
+    }).catch(() => {})
   }
 
   function editarCoordenada(evento) {
     limpiarBusqueda()
-    setUbicacion(null)
+    nombrando.current?.abort()
+    setDireccion(null)
     setCoordenadas({ ...coordenadas, [evento.target.name]: evento.target.value })
   }
 
@@ -109,6 +156,13 @@ function ResultadosPrestadores() {
     elegirUbicacion([latitud, longitud])
   }
 
+  function elegirEnMapa() {
+    setPanelAbierto(false)
+    setEligiendoEnMapa(true)
+    setVista('mapa')
+    requestAnimationFrame(() => zonaMapa.current?.scrollIntoView({ behavior: 'smooth', block: 'center' }))
+  }
+
   // HU-10: si la recomendación falla, la búsqueda se muestra igual, solo sin el recuadro.
   async function cargarRecomendacion(parametros, controlador, datos) {
     try {
@@ -123,16 +177,17 @@ function ResultadosPrestadores() {
   }
 
   async function buscar(evento) {
-    evento.preventDefault()
+    evento?.preventDefault()
     limpiarBusqueda()
     if (!rubro || !ubicacion) {
-      setError(!rubro ? 'Elige un rubro para buscar.' : 'Elige tu ubicación en el mapa o confirma las coordenadas.')
+      setError(!rubro ? 'Elige un rubro para buscar.' : 'Elige dónde necesitas el servicio: escribe tu dirección, usa tu ubicación o márcala en el mapa.')
       setEstado('error')
       return
     }
     const controlador = new AbortController()
     peticion.current = controlador
     setEstado('cargando')
+    setVista('lista')
     const parametros = new URLSearchParams({
       rubro, latitud: ubicacion[0], longitud: ubicacion[1],
     })
@@ -166,25 +221,59 @@ function ResultadosPrestadores() {
     }
   }
 
+  // Desde Inicio con un rubro y «Mi dirección» guardada: se busca sola, como en la app.
+  useEffect(() => {
+    if (busquedaInicial.current && estadoRubros === 'listo' && rubro) {
+      busquedaInicial.current = false
+      buscar()
+    }
+  })
+
+  const rubroElegido = rubros.find((r) => String(r.id) === rubro)
   return (
     <main className="contenedor resultados">
       <div className="introduccion">
         <p className="etiqueta">PRESTADORES DE SERVICIOS</p>
         <h2><span className="icono-titulo" aria-hidden="true"><Search size={22} /></span>Encuentra una mano para tu hogar</h2>
-        <p>Elige un servicio y tu ubicación para encontrar prestadores disponibles.</p>
+        <p>Dinos dónde y qué necesitas: te mostramos a los prestadores verificados cerca de ti.</p>
       </div>
 
       <form className="busqueda" onSubmit={buscar} noValidate>
-        <label className="campo-busqueda" htmlFor="rubro-busqueda">
-          <span>Rubro</span>
-          <select id="rubro-busqueda" value={rubro} disabled={estadoRubros !== 'listo'} onChange={(evento) => {
-            limpiarBusqueda()
-            setRubro(evento.target.value)
-          }}>
-            <option value="">Elige un rubro</option>
-            {rubros.map((opcion) => <option key={opcion.id} value={opcion.id}>{opcion.nombre}</option>)}
-          </select>
-        </label>
+        <div className="busqueda-fila">
+          <BarraUbicacion direccion={direccion} onAbrir={() => setPanelAbierto(true)} />
+          <label className="campo-busqueda campo-rubro" htmlFor="rubro-busqueda">
+            <span>Rubro</span>
+            <select id="rubro-busqueda" value={rubro} disabled={estadoRubros !== 'listo'} onChange={(evento) => {
+              limpiarBusqueda()
+              setRubro(evento.target.value)
+            }}>
+              <option value="">Elige un rubro</option>
+              {rubros.map((opcion) => <option key={opcion.id} value={opcion.id}>{opcion.nombre}</option>)}
+            </select>
+          </label>
+          <button className="boton-buscar" type="submit" disabled={estadoRubros !== 'listo'}>
+            <Search className="icono" size={18} aria-hidden="true" />
+            {estado === 'cargando' ? 'Buscar de nuevo' : 'Buscar'}
+          </button>
+        </div>
+
+        {estadoRubros === 'listo' && (
+          <ul className="chips-rubros" aria-label="Elegir rubro">
+            {rubros.map((opcion) => {
+              const elegido = String(opcion.id) === rubro
+              return (
+                <li key={opcion.id}>
+                  <button type="button" aria-pressed={elegido}
+                    className={`chip-rubro seccion-${seccionDe(opcion).clave}${elegido ? ' elegido' : ''}`}
+                    onClick={() => { limpiarBusqueda(); setRubro(String(opcion.id)) }}>
+                    <span className="chip-rubro-icono" aria-hidden="true">{createElement(iconoRubro(opcion.nombre), { size: 16 })}</span>
+                    {opcion.nombre}
+                  </button>
+                </li>
+              )
+            })}
+          </ul>
+        )}
         {estadoRubros === 'cargando' && <Cargando texto="Cargando rubros…" />}
         {estadoRubros === 'vacio' && <p role="status">No hay rubros disponibles para buscar.</p>}
         {estadoRubros === 'error' && (
@@ -196,78 +285,100 @@ function ResultadosPrestadores() {
             }}>Reintentar carga de rubros</button>
           </div>
         )}
-
-        <fieldset>
-          <legend>Tu ubicación</legend>
-          <p id="ayuda-ubicacion">Toca el mapa para elegir dónde necesitas el servicio o introduce tus coordenadas.</p>
-          <div role="region" aria-label="Mapa de prestadores y ubicación">
-          <MapaBusqueda ubicacion={ubicacion} prestadores={prestadores} onElegir={elegirUbicacion} />
-          </div>
-          <p className="leyenda-mapa">● Azul: tu ubicación · Marcadores verdes numerados: prestadores (centro de cobertura). El signo + indica varios en el mismo punto; ábrelo para verlos todos.{USA_GOOGLE_MAPS ? ' Mapa de Google Maps.' : ''}</p>
-          <div className="coordenadas-busqueda">
-            <label className="campo-busqueda">
-              <span>Latitud</span>
-              <input name="latitud" type="number" step="any" min="-90" max="90" value={coordenadas.latitud} onChange={editarCoordenada} aria-describedby="ayuda-ubicacion" />
-            </label>
-            <label className="campo-busqueda">
-              <span>Longitud</span>
-              <input name="longitud" type="number" step="any" min="-180" max="180" value={coordenadas.longitud} onChange={editarCoordenada} aria-describedby="ayuda-ubicacion" />
-            </label>
-            <button type="button" onClick={usarCoordenadas}><MapPin className="icono" size={18} aria-hidden="true" />Usar coordenadas</button>
-          </div>
-          <p className="ubicacion-elegida" role="status">
-            {ubicacion ? `Ubicación elegida: ${ubicacion[0].toFixed(6)}, ${ubicacion[1].toFixed(6)}.` : 'Todavía no elegiste una ubicación.'}
-          </p>
-        </fieldset>
-        <button className="boton-buscar" type="submit" disabled={estadoRubros !== 'listo'}>
-          <Search className="icono" size={18} aria-hidden="true" />
-          {estado === 'cargando' ? 'Buscar de nuevo' : 'Buscar'}
-        </button>
+        <p className="ubicacion-elegida" role="status">
+          {ubicacion ? `Ubicación elegida: ${textoCorto(direccion)}.` : 'Todavía no elegiste una ubicación.'}
+        </p>
       </form>
 
-      <section aria-labelledby="titulo-resultados" aria-busy={estado === 'cargando'}>
-        <div className="resumen">
-          <h3 id="titulo-resultados">Lista de prestadores</h3>
-          {estado === 'listo' && <span>{formatoEntero.format(prestadores.length)} {prestadores.length === 1 ? 'prestador' : 'prestadores'}</span>}
+      <PanelUbicacion abierto={panelAbierto} actual={direccion} onElegir={elegirDireccion}
+        onCerrar={() => setPanelAbierto(false)} onElegirEnMapa={elegirEnMapa} />
+
+      {/* En pantallas angostas, con resultados: Lista o Mapa, como en la app (en PC se ven juntos). */}
+      {estado === 'listo' && (
+        <div className="selector-vista" role="group" aria-label="Ver resultados como">
+          <button type="button" aria-pressed={vista === 'lista'} onClick={() => setVista('lista')}><List size={18} aria-hidden="true" />Lista</button>
+          <button type="button" aria-pressed={vista === 'mapa'} onClick={() => setVista('mapa')}><IconoMapa size={18} aria-hidden="true" />Mapa</button>
         </div>
-        <div aria-live="polite" role="status">
-          {estado === 'inicial' && <p className="aviso">Elige un rubro y tu ubicación, y pulsa Buscar.</p>}
-          {estado === 'cargando' && <p className="aviso">Buscando prestadores disponibles…</p>}
-          {estado === 'vacio' && <p className="aviso">No encontramos prestadores disponibles de ese rubro con cobertura en tu ubicación.</p>}
-          {estado === 'listo' && <p className="resultado-anuncio">Búsqueda completada: {formatoEntero.format(prestadores.length)} {prestadores.length === 1 ? 'prestador encontrado' : 'prestadores encontrados'}.</p>}
-        </div>
-        {estado === 'error' && <p className="error-busqueda" role="alert">{error}</p>}
-        {estado === 'listo' && recomendado && <Recomendado prestador={recomendado} />}
-        {estado === 'listo' && (
-          <ul className="lista-prestadores">
-            {prestadores.map((prestador, indice) => (
-              <li key={prestador.id} id={`prestador-${prestador.id}`}
-                className={`tarjeta${recomendado?.id === prestador.id ? ' tarjeta-recomendada' : ''}`}>
-                <div className="cabecera-prestador">
-                <div className={`avatar ${['verde', 'azul', 'naranja'][indice % 3]}`} aria-hidden="true">
-                  {iniciales(prestador.nombres, prestador.apellidos)}
-                </div>
-                <div className="perfil">
-                  <h4>{prestador.nombres} {prestador.apellidos}</h4>
-                  {/* La insignia va fuera del título: el título es solo el nombre (lectores de pantalla y pruebas). */}
-                  {recomendado?.id === prestador.id && <p className="insignia-recomendado">✨ Recomendado</p>}
-                  <p className="rubros-tarjeta">{prestador.rubros.map((especialidad) => especialidad.nombre).join(' · ')}</p>
-                  <p className="rubros-tarjeta">{textoCalificacion(prestador)}</p>
-                </div>
-                <dl className="detalles">
-                  <div><dt>Distancia</dt><dd>{formatoDistancia.format(prestador.distancia_km)} km</dd></div>
-                </dl>
-                </div>
-                <SolicitudServicio
-                  prestador={prestador}
-                  rubro={rubro}
-                  ubicacion={ubicacion}
-                />
-              </li>
-            ))}
-          </ul>
-        )}
-      </section>
+      )}
+
+      <div className={`resultados-rejilla vista-${estado === 'listo' || eligiendoEnMapa ? vista : 'ambas'}`}>
+        <section className="columna-lista" aria-labelledby="titulo-resultados" aria-busy={estado === 'cargando'}>
+          <div className="resumen">
+            <h3 id="titulo-resultados">Lista de prestadores</h3>
+            {estado === 'listo' && <span>{formatoEntero.format(prestadores.length)} {prestadores.length === 1 ? 'prestador' : 'prestadores'}</span>}
+          </div>
+          <div aria-live="polite" role="status">
+            {estado === 'inicial' && (
+              <p className="aviso">
+                {!ubicacion ? 'Primero dinos dónde necesitas el servicio.' : !rubro ? 'Elige un rubro y pulsa Buscar.' : `Pulsa Buscar para ver quién atiende ${rubroElegido?.nombre ?? ''} cerca.`}
+              </p>
+            )}
+            {estado === 'cargando' && <p className="aviso">Buscando prestadores disponibles…</p>}
+            {estado === 'vacio' && <p className="aviso">No encontramos prestadores disponibles de ese rubro con cobertura en tu ubicación.</p>}
+            {estado === 'listo' && <p className="resultado-anuncio">Búsqueda completada: {formatoEntero.format(prestadores.length)} {prestadores.length === 1 ? 'prestador encontrado' : 'prestadores encontrados'}.</p>}
+          </div>
+          {estado === 'error' && <p className="error-busqueda" role="alert">{error}</p>}
+          {estado === 'listo' && recomendado && <Recomendado prestador={recomendado} />}
+          {estado === 'listo' && (
+            <ul className="lista-prestadores">
+              {prestadores.map((prestador, indice) => (
+                <li key={prestador.id} id={`prestador-${prestador.id}`}
+                  className={`tarjeta${recomendado?.id === prestador.id ? ' tarjeta-recomendada' : ''}`}>
+                  <div className="cabecera-prestador">
+                  <div className={`avatar ${['verde', 'azul', 'naranja'][indice % 3]}`} aria-hidden="true">
+                    {iniciales(prestador.nombres, prestador.apellidos)}
+                  </div>
+                  <div className="perfil">
+                    <h4>{prestador.nombres} {prestador.apellidos}</h4>
+                    {/* La insignia va fuera del título: el título es solo el nombre (lectores de pantalla y pruebas). */}
+                    {recomendado?.id === prestador.id && <p className="insignia-recomendado">✨ Recomendado</p>}
+                    <p className="rubros-tarjeta">
+                      {createElement(iconoRubro(rubroElegido?.nombre ?? prestador.rubros[0]?.nombre ?? ''), { size: 15, className: 'icono', 'aria-hidden': true })}
+                      {prestador.rubros.map((especialidad) => especialidad.nombre).join(' · ')}
+                    </p>
+                    <p className="rubros-tarjeta">{textoCalificacion(prestador)}</p>
+                  </div>
+                  <dl className="detalles">
+                    <div><dt>Distancia</dt><dd>{formatoDistancia.format(prestador.distancia_km)} km</dd></div>
+                  </dl>
+                  </div>
+                  <SolicitudServicio
+                    prestador={prestador}
+                    rubro={rubro}
+                    ubicacion={ubicacion}
+                  />
+                </li>
+              ))}
+            </ul>
+          )}
+        </section>
+
+        <section className={`columna-mapa${eligiendoEnMapa ? ' eligiendo' : ''}`} ref={zonaMapa} aria-label="Mapa">
+          {eligiendoEnMapa && (
+            <p className="aviso-elegir-mapa" role="status">
+              <MousePointerClick size={18} aria-hidden="true" />Haz clic en el mapa donde necesitas el servicio.
+            </p>
+          )}
+          <div role="region" aria-label="Mapa de prestadores y ubicación">
+            <MapaBusqueda ubicacion={ubicacion} prestadores={prestadores} onElegir={elegirUbicacion} />
+          </div>
+          <p className="leyenda-mapa">● Azul: dónde necesitas el servicio · Verdes numerados: prestadores (centro de su zona). El signo + indica varios en el mismo punto.</p>
+          <details className="coordenadas-avanzado">
+            <summary><MapPin size={16} aria-hidden="true" />Ingresar coordenadas (avanzado)</summary>
+            <div className="coordenadas-busqueda">
+              <label className="campo-busqueda">
+                <span>Latitud</span>
+                <input name="latitud" type="number" step="any" min="-90" max="90" value={coordenadas.latitud} onChange={editarCoordenada} />
+              </label>
+              <label className="campo-busqueda">
+                <span>Longitud</span>
+                <input name="longitud" type="number" step="any" min="-180" max="180" value={coordenadas.longitud} onChange={editarCoordenada} />
+              </label>
+              <button type="button" onClick={usarCoordenadas}><MapPin className="icono" size={18} aria-hidden="true" />Usar coordenadas</button>
+            </div>
+          </details>
+        </section>
+      </div>
     </main>
   )
 }

@@ -14,6 +14,10 @@ class Rubro(models.Model):
 
 
 class Prestador(models.Model):
+    class Tipo(models.TextChoices):
+        INDEPENDIENTE = 'independiente', 'Independiente'
+        EMPRESA = 'empresa', 'Empresa'
+
     class Estado(models.TextChoices):
         PENDIENTE = 'pendiente', 'Pendiente de verificación'
         VERIFICADO = 'verificado', 'Verificado'
@@ -48,9 +52,27 @@ class Prestador(models.Model):
     # HU-12: se recalculan cada vez que un cliente califica; sin calificaciones queda vacío.
     calificacion_promedio = models.DecimalField(max_digits=3, decimal_places=2, null=True, blank=True)
     calificaciones_total = models.PositiveIntegerField(default=0)
+    # Perfil: se presenta con su nombre (independiente) o con el de su empresa. Con valor por
+    # defecto en la base porque Spring inserta prestadores sin estas columnas (registro de la app).
+    tipo = models.CharField(
+        max_length=13, choices=Tipo.choices, default=Tipo.INDEPENDIENTE, db_default=Tipo.INDEPENDIENTE,
+    )
+    nombre_comercial = models.CharField(max_length=120, blank=True, default='', db_default='')
+    ruc = models.CharField(
+        'RUC', max_length=11, blank=True, default='', db_default='',
+        validators=[RegexValidator(r'^(10|15|17|20)\d{9}$', 'El RUC tiene 11 dígitos y empieza con 10, 15, 17 o 20.')],
+    )
+    descripcion = models.CharField('sobre mí', max_length=500, blank=True, default='', db_default='')
 
     class Meta:
         verbose_name_plural = 'prestadores'
 
     def __str__(self):
         return f'{self.nombres} {self.apellidos} ({self.dni})'
+
+    @property
+    def nombre_publico(self):
+        """Nombre que ven los clientes: el de su empresa o el suyo."""
+        if self.tipo == self.Tipo.EMPRESA and self.nombre_comercial:
+            return self.nombre_comercial
+        return f'{self.nombres} {self.apellidos}'.strip()

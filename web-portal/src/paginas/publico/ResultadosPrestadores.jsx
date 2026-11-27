@@ -3,7 +3,7 @@ import { useLocation } from 'react-router-dom'
 import SolicitudServicio from '../../componentes/SolicitudServicio.jsx'
 import MapaBusqueda from '../../componentes/mapa/MapaBusqueda.jsx'
 import PanelUbicacion, { BarraUbicacion } from '../../componentes/UbicacionServicio.jsx'
-import { formatoDistancia, formatoEntero, iniciales, textoCalificacion } from '../../nucleo/formatos.js'
+import { formatoDistancia, formatoEntero, fotoSegura, iniciales, nombrePublico, textoCalificacion } from '../../nucleo/formatos.js'
 import { leerMiDireccion, nombrarPunto, textoCorto } from '../../nucleo/direcciones.js'
 import { iconoRubro } from '../../nucleo/iconos.js'
 import { seccionDe } from '../../nucleo/secciones.js'
@@ -34,7 +34,7 @@ function Recomendado({ prestador }) {
   return (
     <aside className="recomendado" aria-labelledby="titulo-recomendado">
       <p className="etiqueta-recomendado"><Sparkles size={16} aria-hidden="true" /> Recomendado para ti</p>
-      <h4 id="titulo-recomendado">{prestador.nombres} {prestador.apellidos}</h4>
+      <h4 id="titulo-recomendado">{nombrePublico(prestador)}</h4>
       <p className="motivo-recomendado">{prestador.motivo}</p>
       <div className="pie-recomendado">
         <p className="tiempo-recomendado">
@@ -326,10 +326,13 @@ function ResultadosPrestadores() {
                   className={`tarjeta${recomendado?.id === prestador.id ? ' tarjeta-recomendada' : ''}`}>
                   <div className="cabecera-prestador">
                   <div className={`avatar ${['verde', 'azul', 'naranja'][indice % 3]}`} aria-hidden="true">
-                    {iniciales(prestador.nombres, prestador.apellidos)}
+                    {fotoSegura(prestador.foto)
+                      ? <img src={prestador.foto} alt="" loading="lazy" />
+                      : iniciales(prestador.nombres, prestador.apellidos)}
                   </div>
                   <div className="perfil">
-                    <h4>{prestador.nombres} {prestador.apellidos}</h4>
+                    <h4>{nombrePublico(prestador)}</h4>
+                    {prestador.tipo === 'empresa' && <p className="insignia-empresa">Empresa</p>}
                     {/* La insignia va fuera del título: el título es solo el nombre (lectores de pantalla y pruebas). */}
                     {recomendado?.id === prestador.id && <p className="insignia-recomendado">✨ Recomendado</p>}
                     <p className="rubros-tarjeta">
@@ -337,6 +340,7 @@ function ResultadosPrestadores() {
                       {prestador.rubros.map((especialidad) => especialidad.nombre).join(' · ')}
                     </p>
                     <p className="rubros-tarjeta">{textoCalificacion(prestador)}</p>
+                    {prestador.descripcion && <p className="descripcion-tarjeta">{prestador.descripcion}</p>}
                   </div>
                   <dl className="detalles">
                     <div><dt>Distancia</dt><dd>{formatoDistancia.format(prestador.distancia_km)} km</dd></div>

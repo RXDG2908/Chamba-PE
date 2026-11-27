@@ -27,6 +27,7 @@ Proyecto Integrador — Diseño y Desarrollo de Software · IV ciclo · Tecsup 2
 | [docs/API_CONSENTIMIENTO.md](docs/API_CONSENTIMIENTO.md) | Consentimiento DNI versionado: aceptación, revocación y bloqueo de captura. |
 | [docs/API_ELIMINACION_DNI.md](docs/API_ELIMINACION_DNI.md) | Eliminación DNI: estados, reintentos, procesador y límites; pendiente de revisión. |
 | [docs/API_CALIFICACIONES.md](docs/API_CALIFICACIONES.md) | Calificación del servicio (HU-12): reglas, endpoints, promedio del prestador y cómo probarla |
+| [docs/API_PERFIL.md](docs/API_PERFIL.md) | Perfil del cliente y del prestador: foto, nombre, independiente o empresa, contraseña, rubros y cobertura |
 | [docs/API_SEGUIMIENTO.md](docs/API_SEGUIMIENTO.md) | Seguimiento del servicio (HU-11): estados, orden, endpoint para avanzar y cómo probarlo |
 | [docs/HU8_NOTIFICACIONES.md](docs/HU8_NOTIFICACIONES.md) | Notificaciones push (HU-8): configuración de FCM y guion de la validación T8.3 |
 | [docs/GUIA_NAVEGACION.md](docs/GUIA_NAVEGACION.md) | Cómo comprobar en el navegador cada tarea terminada |

@@ -79,6 +79,7 @@ class BusquedaPrestadoresTests(TestCase):
         self.assertEqual(set(resultado), {
             'id', 'nombres', 'apellidos', 'rubros', 'latitud', 'longitud', 'distancia_km',
             'calificacion_promedio', 'calificaciones_total',  # HU-12: públicos, ayudan a decidir
+            'tipo', 'nombre_publico', 'descripcion', 'foto',  # perfil público del prestador
         })
         self.assertEqual(resultado['rubros'], [{'id': self.rubro.id, 'nombre': self.rubro.nombre}])
         self.assertEqual(resultado['distancia_km'], 0)

@@ -12,6 +12,7 @@ import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.OrderBy;
 import jakarta.persistence.Table;
+import org.hibernate.annotations.Formula;
 import org.hibernate.annotations.Immutable;
 
 /**
@@ -50,6 +51,17 @@ public class Prestador {
 
     @Column(name = "calificaciones_total")
     private Integer calificacionesTotal;
+
+    // Perfil (lo edita Django en /api/usuarios/perfil/): independiente o empresa, y la foto de su cuenta.
+    private String tipo;
+
+    @Column(name = "nombre_comercial")
+    private String nombreComercial;
+
+    private String descripcion;
+
+    @Formula("(select p.foto from usuarios_perfil p where p.usuario_id = usuario_id)")
+    private String foto;
 
     @ManyToMany
     @JoinTable(
@@ -104,5 +116,26 @@ public class Prestador {
 
     public List<Rubro> getRubros() {
         return rubros;
+    }
+
+    public String getTipo() {
+        return tipo;
+    }
+
+    public String getDescripcion() {
+        return descripcion;
+    }
+
+    /** Como {@code Prestador.nombre_publico} de Django: el de la empresa o el de la persona. */
+    public String getNombrePublico() {
+        if ("empresa".equals(tipo) && nombreComercial != null && !nombreComercial.isEmpty()) {
+            return nombreComercial;
+        }
+        return (nombres + " " + apellidos).strip();
+    }
+
+    /** Ruta pública de la foto, como {@code FieldFile.url} de Django ({@code /media/...}), o null. */
+    public String getFotoUrl() {
+        return foto == null || foto.isEmpty() ? null : "/media/" + foto;
     }
 }

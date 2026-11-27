@@ -1,0 +1,54 @@
+/* Mi perfil (cliente y prestador). Usa los colores del tema (Tema.css). */
+.mi-perfil { width: min(820px, calc(100% - 32px)); }
+.mi-perfil h3 { display: flex; align-items: center; gap: 8px; margin: 0 0 6px; font-size: 18px; }
+.perfil-seccion { margin-top: 24px; padding-top: 24px; border-top: 1px solid var(--borde); }
+.perfil-foto { display: flex; align-items: center; gap: 20px; }
+.perfil-avatar {
+  flex: none; display: grid; place-items: center; width: 104px; height: 104px; border-radius: 50%; overflow: hidden;
+  background: var(--acento-claro); color: #9a5a12; font-size: 34px; font-weight: 800; box-shadow: var(--sombra);
+}
+.perfil-avatar img { width: 100%; height: 100%; object-fit: cover; }
+.perfil-acciones { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.boton-secundario, .boton-texto {
+  display: inline-flex; align-items: center; gap: 6px; padding: 9px 16px; border-radius: 999px; font: inherit;
+  font-weight: 600; cursor: pointer;
+}
+.boton-secundario { border: 1px solid var(--verde); background: #fff; color: var(--verde); }
+.boton-secundario:hover:not(:disabled) { background: var(--verde-claro); }
+.boton-texto { border: 0; background: none; color: #b3261e; }
+.boton-secundario:disabled, .boton-texto:disabled { opacity: 0.6; cursor: wait; }
+.perfil-seccion .boton-secundario[type='submit'] { margin-top: 16px; }
+.campo input:disabled { background: var(--fondo); color: var(--texto-suave); }
+.campo textarea {
+  width: 100%; min-width: 0; padding: 10px 12px; border: 1px solid #cbded3; border-radius: 10px; font: inherit; resize: vertical;
+}
+.campo .contador { justify-self: end; color: var(--texto-suave); }
+.perfil-nota {
+  display: flex; align-items: center; gap: 8px; margin: 0 0 12px; padding: 10px 14px; border-radius: 10px;
+  background: #fdf6e3; color: #6b5413; font-size: 14px;
+}
+.perfil-tipos { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; }
+.perfil-tipo {
+  display: flex; align-items: center; gap: 12px; padding: 14px 16px; border: 1px solid #cbded3; border-radius: 14px;
+  cursor: pointer; color: var(--texto-suave);
+}
+.perfil-tipo input { position: absolute; opacity: 0; width: 1px; height: 1px; }
+.perfil-tipo span { display: grid; gap: 2px; }
+.perfil-tipo strong { color: var(--texto); }
+.perfil-tipo small { font-size: 13px; }
+.perfil-tipo.activo { border-color: var(--verde); background: var(--verde-claro); color: var(--verde); }
+.perfil-tipo:has(input:focus-visible) { outline: 3px solid var(--verde); outline-offset: 2px; }
+.perfil-empresa { margin-top: 14px; }
+.perfil-vista { margin: 14px 0; font-size: 14px; color: var(--texto-suave); }
+.perfil-vista strong { color: var(--texto); }
+.aviso-ok { margin-top: 12px; padding: 10px 14px; border-radius: 10px; background: var(--verde-claro); color: var(--verde-intenso); }
+
+@media (max-width: 560px) {
+  .perfil-foto { flex-direction: column; text-align: center; }
+  .perfil-acciones { justify-content: center; }
+}
+
+/* Foto en la cabecera y en las tarjetas de la búsqueda */
+.sesion-avatar img, .avatar img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; }
+.sesion-usuario-enlace { color: inherit; text-decoration: none; border-radius: 999px; }
+.sesion-usuario-enlace:hover strong { text-decoration: underline; }

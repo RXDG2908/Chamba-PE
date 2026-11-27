@@ -88,6 +88,23 @@ class BusquedaApiTest extends PruebaConBase {
     }
 
     @Test
+    void muestraElPerfilPublicoComoDjango() throws Exception {
+        // Así lo deja Django al editar el perfil: empresa con nombre comercial y foto de la cuenta.
+        jdbc.update("update prestadores_prestador set tipo = 'empresa', nombre_comercial = 'Gasfitería Ana SAC',"
+            + " descripcion = 'Atendemos todo Lima.' where id = 1");
+        jdbc.update("insert into usuarios_perfil (rol, usuario_id, foto) values ('prestador', 1, 'fotos/usuario-1-abc.jpg')");
+        buscar("rubro=1&latitud=-12.044861&longitud=-77.026582")
+            .andExpect(jsonPath("$[0].tipo").value("empresa"))
+            .andExpect(jsonPath("$[0].nombre_publico").value("Gasfitería Ana SAC"))
+            .andExpect(jsonPath("$[0].descripcion").value("Atendemos todo Lima."))
+            .andExpect(jsonPath("$[0].foto").value("/media/fotos/usuario-1-abc.jpg"))
+            // Sin perfil ni foto: independiente, con su nombre, y foto null.
+            .andExpect(jsonPath("$[1].tipo").value("independiente"))
+            .andExpect(jsonPath("$[1].nombre_publico").value("Eva Prueba"))
+            .andExpect(jsonPath("$[1].foto").value(org.hamcrest.Matchers.nullValue()));
+    }
+
+    @Test
     void elBordeDelRadioEsInclusivo() throws Exception {
         buscar("rubro=1&latitud=0&longitud=0")
             .andExpect(status().isOk())

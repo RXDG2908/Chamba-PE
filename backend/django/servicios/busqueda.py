@@ -13,7 +13,7 @@ def prestadores_en_cobertura(rubro, latitud, longitud):
     """
     candidatos = Prestador.objects.filter(
         disponible=True, estado=Prestador.Estado.VERIFICADO, rubros__id=rubro,
-    ).prefetch_related('rubros').order_by('id')  # a igual distancia, por id (Spring hace lo mismo)
+    ).select_related('usuario__perfil').prefetch_related('rubros').order_by('id')  # a igual distancia, por id (Spring hace lo mismo)
     resultados = []
     for prestador in candidatos:
         distancia = distancia_km(prestador.latitud, prestador.longitud, latitud, longitud)

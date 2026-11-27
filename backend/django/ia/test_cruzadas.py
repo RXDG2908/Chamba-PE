@@ -32,7 +32,7 @@ CLIENTE = {'latitud': -12.046374, 'longitud': -77.042793}
 KM = 1 / 111.195  # 1 km de latitud en grados
 CAMPOS_PUBLICOS = {
     'id', 'nombres', 'apellidos', 'rubros', 'latitud', 'longitud', 'distancia_km',
-    'calificacion_promedio', 'calificaciones_total',
+    'calificacion_promedio', 'calificaciones_total', 'tipo', 'nombre_publico', 'descripcion', 'foto',
     'puntaje', 'tiempo_estimado_min', 'servicios_en_curso', 'motivo',
 }
 EN_CURSO = ('aceptada', 'en_camino', 'en_servicio')

@@ -2,7 +2,7 @@
 import {
   AirVent, AppWindow, BadgeCheck, BrickWall, Brush, Bug, Car, Cctv, ClipboardList, Droplets, Flame, Hammer, House,
   Inbox, KeyRound, LayoutDashboard, Leaf, Paintbrush, Plug, Refrigerator, Router, Search, ShieldCheck, Sparkles, Store,
-  ToggleRight, Truck, UserCog, Wrench, Zap,
+  ToggleRight, Truck, UserCog, UserRound, Wrench, Zap,
 } from 'lucide-react'
 
 // Menú principal: icono por ruta.
@@ -14,6 +14,7 @@ export const ICONO_RUTA = {
   '/prestador': LayoutDashboard,
   '/solicitudes': Inbox,
   '/disponibilidad': ToggleRight,
+  '/perfil': UserRound,
   '/prestador/verificacion': ShieldCheck,
   '/administracion': LayoutDashboard,
   '/administracion/revisiones': BadgeCheck,

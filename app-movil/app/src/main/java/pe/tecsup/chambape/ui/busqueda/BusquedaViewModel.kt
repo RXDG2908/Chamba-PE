@@ -56,6 +56,11 @@ class BusquedaViewModel(
     /** Guarda rubro y ubicación de la búsqueda: la solicitud se envía con ellos. */
     private val contexto: ContextoBusqueda? = null,
     private val almacen: AlmacenDireccion? = null,
+    /**
+     * El lugar elegido en esta sesión, compartido entre Inicio y las secciones: si la persona lo
+     * cambia en «Urgente», Inicio y «Hogar» ya lo tienen. Se vacía al cerrar sesión.
+     */
+    private val ubicacionSesion: MutableStateFlow<Direccion?>? = null,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(BusquedaUiState())
@@ -67,6 +72,7 @@ class BusquedaViewModel(
     private var busquedaEnCurso: Job? = null
 
     init {
+        ubicacionSesion?.value?.let { elegido -> _uiState.update { it.copy(direccion = elegido) } }
         cargarRubros()
         viewModelScope.launch {
             repository.favoritos().collect { lista ->
@@ -110,6 +116,7 @@ class BusquedaViewModel(
     fun elegirDireccion(direccion: Direccion) {
         if (!direccion.coordenadas.valida()) return
         _uiState.update { it.copy(direccion = direccion, usaDireccionGuardada = false, faltaDireccion = false) }
+        ubicacionSesion?.value = direccion
         buscarSiEstaListo()
     }
 

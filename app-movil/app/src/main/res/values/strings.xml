@@ -57,7 +57,7 @@
     <string name="error_correo_invalido">El correo no es válido.</string>
 
     <!-- Pestañas -->
-    <string name="tab_buscar">Buscar</string>
+    <string name="tab_buscar">Inicio</string>
     <string name="tab_favoritos">Favoritos</string>
     <string name="tab_solicitudes">Solicitudes</string>
     <string name="tab_recibidas">Recibidas</string>
@@ -254,4 +254,16 @@
     <string name="seccion_empresas_desc">Oficinas, locales y talleres</string>
     <string name="seccion_otros">Más servicios</string>
     <string name="seccion_otros_desc">Otros oficios disponibles</string>
+    <!-- Inicio del cliente (hub de secciones). -->
+    <string name="inicio_hola">Hola, %1$s</string>
+    <string name="inicio_titulo">¿Qué necesitas hoy?</string>
+    <string name="inicio_buscar">Busca: gasfitero, pintor, wifi…</string>
+    <string name="inicio_sin_coincidencias">No encontramos «%1$s». Prueba con otra palabra o entra a una sección.</string>
+    <string name="inicio_populares">Lo más pedido</string>
+    <string name="inicio_abrir_seccion">%1$s, %2$s. Toca para entrar.</string>
+    <string name="inicio_en_seccion">En %1$s</string>
+    <plurals name="inicio_servicios">
+        <item quantity="one">%d servicio</item>
+        <item quantity="other">%d servicios</item>
+    </plurals>
 </resources>

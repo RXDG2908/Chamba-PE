@@ -4,12 +4,13 @@ import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Home
+import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Person
-import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -39,9 +40,9 @@ import pe.tecsup.chambape.R
 import pe.tecsup.chambape.domain.model.EstadoSesion
 import pe.tecsup.chambape.domain.model.Rol
 import pe.tecsup.chambape.domain.model.Sesion
-import pe.tecsup.chambape.ui.busqueda.BusquedaRoute
+import pe.tecsup.chambape.ui.busqueda.InicioRoute
+import pe.tecsup.chambape.ui.busqueda.SeccionRoute
 import androidx.compose.material.icons.outlined.ToggleOff
-import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material.icons.outlined.Inbox
 import androidx.compose.material.icons.outlined.FavoriteBorder
@@ -67,12 +68,15 @@ private object Rutas {
     const val PERFIL = "perfil"
     const val DETALLE = "prestador/{id}"
     fun detalle(id: Int) = "prestador/$id"
+    // Una sección de Inicio («Urgente», «Hogar»…), opcionalmente con un rubro ya elegido.
+    const val SECCION = "seccion/{clave}?rubro={rubro}"
+    fun seccion(seccion: Seccion, rubro: Int?) = "seccion/${seccion.name}" + (rubro?.let { "?rubro=$it" } ?: "")
 }
 
 private data class Pestana(val ruta: String, @StringRes val titulo: Int, val icono: ImageVector, val iconoInactivo: ImageVector)
 
 private val PestanasCliente = listOf(
-    Pestana(Rutas.BUSCAR, R.string.tab_buscar, Icons.Filled.Search, Icons.Outlined.Search),
+    Pestana(Rutas.BUSCAR, R.string.tab_buscar, Icons.Filled.Home, Icons.Outlined.Home),
     Pestana(Rutas.FAVORITOS, R.string.tab_favoritos, Icons.Filled.Favorite, Icons.Outlined.FavoriteBorder),
     Pestana(Rutas.SOLICITUDES, R.string.tab_solicitudes, Icons.AutoMirrored.Filled.Assignment, Icons.AutoMirrored.Outlined.Assignment),
     Pestana(Rutas.PERFIL, R.string.tab_perfil, Icons.Filled.Person, Icons.Outlined.Person),
@@ -132,9 +136,11 @@ private fun NavegacionPrincipal(sesion: Sesion, onCerrarSesion: () -> Unit) {
     val rutaActual = nav.currentBackStackEntryAsState().value?.destination?.route
     val pestanaActual = pestanas.firstOrNull { it.ruta == rutaActual }
 
+    // Inicio y las secciones dibujan su propia cabecera (ubicación arriba, color de la sección).
+    val sinBarra = rutaActual == Rutas.BUSCAR || rutaActual == Rutas.SECCION
     Scaffold(
         topBar = {
-            TopAppBar(
+            if (!sinBarra) TopAppBar(
                 title = { Text(stringResource(pestanaActual?.titulo ?: R.string.detalle_titulo)) },
                 navigationIcon = {
                     if (pestanaActual == null) {
@@ -177,7 +183,24 @@ private fun NavegacionPrincipal(sesion: Sesion, onCerrarSesion: () -> Unit) {
             popExitTransition = { fadeOut(tween(Movimiento.CORTA)) },
         ) {
             if (sesion.rol == Rol.CLIENTE) {
-                composable(Rutas.BUSCAR) { BusquedaRoute(onAbrirPrestador = { nav.navigate(Rutas.detalle(it)) }) }
+                composable(Rutas.BUSCAR) {
+                    InicioRoute(nombre = sesion.nombre, onAbrirSeccion = { seccion, rubro -> nav.navigate(Rutas.seccion(seccion, rubro)) })
+                }
+                composable(
+                    Rutas.SECCION,
+                    arguments = listOf(
+                        navArgument("clave") { type = NavType.StringType },
+                        navArgument("rubro") { type = NavType.IntType; defaultValue = -1 },
+                    ),
+                ) { entrada ->
+                    val seccion = Seccion.entries.firstOrNull { it.name == entrada.arguments?.getString("clave") } ?: Seccion.OTROS
+                    SeccionRoute(
+                        seccion = seccion,
+                        rubroInicial = entrada.arguments?.getInt("rubro")?.takeIf { it > 0 },
+                        onVolver = { nav.popBackStack() },
+                        onAbrirPrestador = { nav.navigate(Rutas.detalle(it)) },
+                    )
+                }
                 composable(Rutas.FAVORITOS) { FavoritosScreen(onAbrirPrestador = { nav.navigate(Rutas.detalle(it)) }) }
                 composable(Rutas.DETALLE, arguments = listOf(navArgument("id") { type = NavType.IntType })) { entrada ->
                     DetalleScreen(prestadorId = entrada.arguments?.getInt("id") ?: -1, sesion = sesion)

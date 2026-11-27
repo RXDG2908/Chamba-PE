@@ -102,3 +102,65 @@ enum class Seccion(
         return claves.mapNotNull { porClave[it] }
     }
 }
+
+/** La primera sección que contiene al rubro (para abrirlo desde la búsqueda de Inicio). */
+fun seccionDe(rubro: Rubro): Seccion =
+    Seccion.entries.firstOrNull { it != Seccion.OTROS && clave(rubro.nombre) in it.claves } ?: Seccion.OTROS
+
+/** «Lo más pedido» en Inicio: atajos a los rubros que más se buscan, en este orden. */
+val RUBROS_POPULARES = listOf("gasfiteria", "electricidad", "limpieza", "cerrajeria", "pintura", "carpinteria", "camaras de seguridad")
+
+fun populares(todos: List<Rubro>): List<Rubro> {
+    val porClave = todos.associateBy { clave(it.nombre) }
+    return RUBROS_POPULARES.mapNotNull { porClave[it] }
+}
+
+/**
+ * Colores de cada sección (law-of-similarity): el mismo par en su tarjeta de Inicio, su cabecera
+ * y sus rubros, así la sección se reconoce de un vistazo. Son roles del tema: el modo oscuro los
+ * resuelve solo.
+ */
+@androidx.compose.runtime.Composable
+fun coloresSeccion(seccion: Seccion): Pair<androidx.compose.ui.graphics.Color, androidx.compose.ui.graphics.Color> {
+    val c = androidx.compose.material3.MaterialTheme.colorScheme
+    return when (seccion) {
+        Seccion.URGENTE -> c.errorContainer to c.onErrorContainer
+        Seccion.HOGAR -> c.secondaryContainer to c.onSecondaryContainer
+        Seccion.RESIDENCIAL -> c.tertiaryContainer to c.onTertiaryContainer
+        Seccion.EMPRESAS -> c.primaryContainer to c.onPrimaryContainer
+        Seccion.OTROS -> c.surfaceContainerHighest to c.onSurfaceVariant
+    }
+}
+
+/**
+ * Palabras con que la gente pide cada rubro (search-ux: se busca con el vocabulario de la persona,
+ * no con el nombre del catálogo). «gasfitero», «plomero» o «agua» llevan a Gasfitería.
+ */
+private val SINONIMOS = mapOf(
+    "gasfiteria" to listOf("gasfitero", "plomero", "plomeria", "agua", "cano", "fuga", "desague", "inodoro", "terma"),
+    "electricidad" to listOf("electricista", "luz", "corto", "enchufe", "tomacorriente", "cable"),
+    "carpinteria" to listOf("carpintero", "madera", "mueble", "puerta", "closet"),
+    "pintura" to listOf("pintor", "pintar", "pared"),
+    "albanileria" to listOf("albanil", "construccion", "obra", "pared", "piso", "mayolica"),
+    "cerrajeria" to listOf("cerrajero", "llave", "chapa", "cerradura"),
+    "limpieza" to listOf("limpiar", "aseo", "limpiador"),
+    "jardineria" to listOf("jardinero", "jardin", "pasto", "plantas", "poda"),
+    "soldadura" to listOf("soldador", "soldar", "reja", "metal"),
+    "mecanica" to listOf("mecanico", "auto", "carro", "moto"),
+    "camaras de seguridad" to listOf("camara", "camaras", "seguridad", "cctv", "vigilancia"),
+    "aire acondicionado" to listOf("aire", "aire acondicionado", "clima", "frio"),
+    "fumigacion" to listOf("fumigar", "plaga", "cucaracha", "ratas", "termitas"),
+    "redes e internet" to listOf("internet", "wifi", "red", "router", "redes"),
+    "mudanzas" to listOf("mudanza", "flete", "mudar"),
+    "vidrieria" to listOf("vidrio", "vidriero", "ventana", "espejo"),
+    "electrodomesticos" to listOf("refrigeradora", "lavadora", "cocina", "microondas", "electrodomestico"),
+    "techos y drywall" to listOf("techo", "drywall", "tabique", "goteras"),
+)
+
+/** ¿El rubro coincide con lo que la persona escribió? Sin tildes, por nombre o por sinónimo. */
+fun coincide(rubro: Rubro, texto: String): Boolean {
+    val buscado = clave(texto)
+    if (buscado.length < 2) return false
+    val nombre = clave(rubro.nombre)
+    return nombre.contains(buscado) || SINONIMOS[nombre].orEmpty().any { it.startsWith(buscado) || buscado.startsWith(it) }
+}

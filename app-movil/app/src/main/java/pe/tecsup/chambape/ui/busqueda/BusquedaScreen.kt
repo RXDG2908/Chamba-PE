@@ -1,269 +1,283 @@
 package pe.tecsup.chambape.ui.busqueda
 
-import android.Manifest
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material3.Button
-import androidx.compose.material3.FilterChip
+import androidx.compose.foundation.selection.selectable
+import androidx.compose.foundation.selection.selectableGroup
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.outlined.List
+import androidx.compose.material.icons.outlined.Map
+import androidx.compose.material.icons.outlined.SearchOff
+import androidx.compose.material.icons.outlined.TravelExplore
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.SegmentedButton
+import androidx.compose.material3.SegmentedButtonDefaults
+import androidx.compose.material3.SingleChoiceSegmentedButtonRow
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.heading
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import pe.tecsup.chambape.R
+import pe.tecsup.chambape.domain.model.Rubro
+import pe.tecsup.chambape.ui.AvisoError
 import pe.tecsup.chambape.ui.AvisoSinConexion
 import pe.tecsup.chambape.ui.Cargando
 import pe.tecsup.chambape.ui.Mensaje
 import pe.tecsup.chambape.ui.PrestadorCard
 import pe.tecsup.chambape.ui.chambaViewModel
-import pe.tecsup.chambape.ui.textoError
 import pe.tecsup.chambape.ui.iconoError
-import pe.tecsup.chambape.ui.BotonPrincipal
-import pe.tecsup.chambape.ui.AvisoError
-import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.semantics.heading
-import androidx.compose.ui.res.pluralStringResource
-import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.material3.Icon
-import androidx.compose.material3.FilterChipDefaults
-import androidx.compose.material.icons.outlined.TravelExplore
-import androidx.compose.material.icons.outlined.SearchOff
-import androidx.compose.material.icons.outlined.Place
-import androidx.compose.material.icons.outlined.MyLocation
-import androidx.compose.material.icons.outlined.Handyman
-import androidx.compose.material.icons.outlined.CenterFocusStrong
-import androidx.compose.material.icons.filled.Search
-import androidx.compose.material.icons.filled.ExpandMore
-import androidx.compose.material.icons.filled.ExpandLess
-import androidx.compose.material.icons.filled.Check
-import androidx.compose.material.icons.Icons
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.heightIn
-import androidx.compose.animation.scaleOut
-import androidx.compose.animation.scaleIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.AnimatedVisibility
-import androidx.annotation.StringRes
+import pe.tecsup.chambape.ui.iconoRubro
+import pe.tecsup.chambape.ui.textoError
 
 /** Conecta el ViewModel con la pantalla; [BusquedaScreen] se puede probar sin él. */
 @Composable
 fun BusquedaRoute(onAbrirPrestador: (Int) -> Unit) {
-    val vm = chambaViewModel { BusquedaViewModel(it.prestadorRepository, it.ubicacionProvider, it.contextoBusqueda) }
+    val vm = chambaViewModel { BusquedaViewModel(it.prestadorRepository, it.contextoBusqueda, it.almacenDireccion) }
     val estado by vm.uiState.collectAsStateWithLifecycle()
-    val pedirPermiso = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { concedido ->
-        if (concedido) vm.usarMiUbicacion() else vm.permisoUbicacionDenegado()
-    }
+    val guardada by vm.direccionGuardada.collectAsStateWithLifecycle()
+    var eligiendoLugar by rememberSaveable { mutableStateOf(false) }
     BusquedaScreen(
         estado = estado,
+        onCambiarUbicacion = { eligiendoLugar = true },
         onRubro = vm::seleccionarRubro,
-        onLatitud = vm::cambiarLatitud,
-        onLongitud = vm::cambiarLongitud,
-        onElegirEnMapa = vm::elegirUbicacion,
-        onMiUbicacion = { pedirPermiso.launch(Manifest.permission.ACCESS_COARSE_LOCATION) },
-        onBuscar = vm::buscar,
+        onReintentar = vm::buscar,
         onReintentarRubros = vm::cargarRubros,
         onAbrirPrestador = onAbrirPrestador,
         onFavorito = vm::alternarFavorito,
     )
-}
-
-@Composable
-private fun TituloSeccion(icono: ImageVector, @StringRes texto: Int) {
-    Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-        Icon(icono, contentDescription = null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(22.dp))
-        Text(stringResource(texto), style = MaterialTheme.typography.titleMedium, modifier = Modifier.semantics { heading() })
+    if (eligiendoLugar) {
+        HojaUbicacion(
+            titulo = stringResource(R.string.ubicacion_hoja_titulo),
+            actual = estado.direccion,
+            guardada = guardada,
+            onElegida = vm::elegirDireccion,
+            onCerrar = { eligiendoLugar = false },
+        )
     }
 }
+
+private enum class Vista { LISTA, MAPA }
 
 @Composable
 fun BusquedaScreen(
     estado: BusquedaUiState,
+    onCambiarUbicacion: () -> Unit,
     onRubro: (Int) -> Unit,
-    onLatitud: (String) -> Unit,
-    onLongitud: (String) -> Unit,
-    onElegirEnMapa: (Double, Double) -> Unit,
-    onMiUbicacion: () -> Unit,
-    onBuscar: () -> Unit,
+    onReintentar: () -> Unit,
     onReintentarRubros: () -> Unit,
     onAbrirPrestador: (Int) -> Unit,
     onFavorito: (Int) -> Unit,
 ) {
-    val decimal = KeyboardOptions(keyboardType = KeyboardType.Text)
-    val prestadoresEnMapa = (estado.resultados as? EstadoResultados.Exito)?.prestadores.orEmpty()
-    // El mapa se vuelve a encuadrar al llegar resultados nuevos, al fijar la ubicación
-    // con el botón «Usar mi ubicación» y cuando la persona lo pide.
-    var reencuadres by rememberSaveable { mutableIntStateOf(0) }
-    // Las coordenadas a mano son para casos raros: quedan plegadas y se abren solas si hay un error.
-    var coordenadas by rememberSaveable { mutableStateOf(false) }
-    val encuadre = remember(prestadoresEnMapa, estado.ubicando, reencuadres) { Any() }.hashCode()
-    LazyColumn(
-        modifier = Modifier.fillMaxSize(),
-        contentPadding = PaddingValues(16.dp),
-        verticalArrangement = Arrangement.spacedBy(12.dp),
-    ) {
-        item { TituloSeccion(Icons.Outlined.Handyman, R.string.busqueda_rubro) }
-        item {
-            when (val rubros = estado.rubros) {
-                EstadoRubros.Cargando -> Cargando()
-                is EstadoRubros.Error -> Mensaje(
-                    textoError(rubros.tipo), textoBoton = stringResource(R.string.reintentar),
-                    icono = iconoError(rubros.tipo), onBoton = onReintentarRubros,
+    var vista by rememberSaveable { mutableStateOf(Vista.LISTA) }
+    Column(modifier = Modifier.fillMaxSize()) {
+        BarraUbicacion(
+            direccion = estado.direccion,
+            onClick = onCambiarUbicacion,
+            modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 12.dp, bottom = 4.dp),
+        )
+        LazyColumn(
+            modifier = Modifier.fillMaxSize(),
+            contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 24.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp),
+        ) {
+            item {
+                Text(
+                    stringResource(R.string.busqueda_rubro),
+                    style = MaterialTheme.typography.headlineSmall,
+                    modifier = Modifier.semantics { heading() },
                 )
-                is EstadoRubros.Listo ->
-                    if (rubros.rubros.isEmpty()) {
-                        Mensaje(stringResource(R.string.busqueda_sin_rubros))
+            }
+            item {
+                when (val rubros = estado.rubros) {
+                    EstadoRubros.Cargando -> Cargando()
+                    is EstadoRubros.Error -> Mensaje(
+                        textoError(rubros.tipo), textoBoton = stringResource(R.string.reintentar),
+                        icono = iconoError(rubros.tipo), onBoton = onReintentarRubros,
+                    )
+                    is EstadoRubros.Listo ->
+                        if (rubros.rubros.isEmpty()) Mensaje(stringResource(R.string.busqueda_sin_rubros))
+                        else GrillaRubros(rubros.rubros, estado.rubroId, onRubro)
+                }
+            }
+            if (estado.faltaRubro) item { AvisoError(stringResource(R.string.error_falta_rubro)) }
+            if (estado.faltaDireccion) item { AvisoError(stringResource(R.string.error_falta_direccion)) }
+
+            when (val resultados = estado.resultados) {
+                EstadoResultados.Inicial -> item {
+                    if (estado.direccion == null) {
+                        Mensaje(
+                            stringResource(R.string.busqueda_sin_ubicacion),
+                            textoBoton = stringResource(R.string.ubicacion_elegir_boton),
+                            icono = Icons.Outlined.TravelExplore,
+                            onBoton = onCambiarUbicacion,
+                        )
                     } else {
-                        LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                            items(rubros.rubros, key = { it.id }) { rubro ->
-                                val elegido = rubro.id == estado.rubroId
-                                FilterChip(
-                                    selected = elegido,
-                                    onClick = { onRubro(rubro.id) },
-                                    label = { Text(rubro.nombre) },
-                                    leadingIcon = {
-                                        AnimatedVisibility(elegido, enter = scaleIn() + fadeIn(), exit = scaleOut() + fadeOut()) {
-                                            Icon(Icons.Filled.Check, contentDescription = null, modifier = Modifier.size(FilterChipDefaults.IconSize))
-                                        }
-                                    },
+                        Mensaje(stringResource(R.string.busqueda_inicial), icono = Icons.Outlined.TravelExplore)
+                    }
+                }
+                EstadoResultados.Cargando -> item { Cargando() }
+                EstadoResultados.Vacio -> item {
+                    Mensaje(
+                        stringResource(R.string.busqueda_vacia),
+                        textoBoton = stringResource(R.string.ubicacion_cambiar),
+                        icono = Icons.Outlined.SearchOff,
+                        onBoton = onCambiarUbicacion,
+                    )
+                }
+                is EstadoResultados.Error -> item {
+                    Mensaje(
+                        textoError(resultados.tipo), textoBoton = stringResource(R.string.reintentar),
+                        icono = iconoError(resultados.tipo), onBoton = onReintentar,
+                    )
+                }
+                is EstadoResultados.Exito -> {
+                    if (resultados.desdeCache) item { AvisoSinConexion() }
+                    item(key = "titulo-resultados") {
+                        Row(
+                            modifier = Modifier.fillMaxWidth().padding(top = 8.dp).animateItem(),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(12.dp),
+                        ) {
+                            Text(
+                                pluralStringResource(R.plurals.resultados_encontrados, resultados.prestadores.size, resultados.prestadores.size),
+                                style = MaterialTheme.typography.titleMedium,
+                                modifier = Modifier.weight(1f).semantics { heading() },
+                            )
+                            SelectorVista(vista, onCambiar = { vista = it })
+                        }
+                    }
+                    if (vista == Vista.MAPA) {
+                        item(key = "mapa-resultados") {
+                            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                                MapaBusqueda(
+                                    ubicacion = estado.ubicacion,
+                                    prestadores = resultados.prestadores,
+                                    encuadre = resultados.prestadores.hashCode(),
+                                    onElegirUbicacion = null,
+                                    alto = 420.dp,
+                                )
+                                Text(
+                                    stringResource(R.string.mapa_leyenda),
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                                 )
                             }
                         }
+                    } else {
+                        items(resultados.prestadores, key = { it.id }) { prestador ->
+                            PrestadorCard(
+                                prestador = prestador,
+                                favorito = prestador.id in estado.favoritos,
+                                onAbrir = { onAbrirPrestador(prestador.id) },
+                                onFavorito = { onFavorito(prestador.id) },
+                                modifier = Modifier.animateItem(),
+                            )
+                        }
                     }
+                }
             }
         }
-        if (estado.faltaRubro) {
-            item { AvisoError(stringResource(R.string.error_falta_rubro)) }
+    }
+}
+
+@Composable
+private fun SelectorVista(vista: Vista, onCambiar: (Vista) -> Unit) {
+    val opciones = listOf(
+        Triple(Vista.LISTA, R.string.vista_lista, Icons.AutoMirrored.Outlined.List),
+        Triple(Vista.MAPA, R.string.vista_mapa, Icons.Outlined.Map),
+    )
+    SingleChoiceSegmentedButtonRow {
+        opciones.forEachIndexed { indice, (opcion, texto, icono) ->
+            SegmentedButton(
+                selected = vista == opcion,
+                onClick = { onCambiar(opcion) },
+                shape = SegmentedButtonDefaults.itemShape(indice, opciones.size),
+                icon = { Icon(icono, contentDescription = null, modifier = Modifier.size(SegmentedButtonDefaults.IconSize)) },
+            ) { Text(stringResource(texto)) }
         }
-        item { TituloSeccion(Icons.Outlined.Place, R.string.busqueda_ubicacion) }
-        item {
-            Text(stringResource(R.string.mapa_ayuda), style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
-        }
-        item {
-            MapaBusqueda(
-                ubicacion = estado.ubicacion,
-                prestadores = prestadoresEnMapa,
-                encuadre = encuadre,
-                onElegirUbicacion = onElegirEnMapa,
+    }
+}
+
+/**
+ * Los rubros como un catálogo de íconos (4 por fila): se reconocen de un vistazo y un toque
+ * basta, como las categorías de una app de delivery. El elegido se llena de color.
+ */
+@OptIn(ExperimentalLayoutApi::class)
+@Composable
+private fun GrillaRubros(rubros: List<Rubro>, elegido: Int?, onRubro: (Int) -> Unit) {
+    FlowRow(
+        modifier = Modifier.fillMaxWidth().selectableGroup(),
+        maxItemsInEachRow = 4,
+        verticalArrangement = Arrangement.spacedBy(4.dp),
+    ) {
+        rubros.forEach { rubro ->
+            OpcionRubro(
+                rubro = rubro,
+                elegido = rubro.id == elegido,
+                onClick = { onRubro(rubro.id) },
+                modifier = Modifier.fillMaxWidth(0.25f),
             )
         }
-        item {
-            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                Text(stringResource(R.string.mapa_leyenda), style = MaterialTheme.typography.bodySmall, modifier = Modifier.weight(1f))
-                TextButton(onClick = { reencuadres++ }, enabled = estado.ubicacion != null) {
-                    Icon(Icons.Outlined.CenterFocusStrong, contentDescription = null, modifier = Modifier.size(18.dp))
-                    Text(stringResource(R.string.mapa_encuadrar), modifier = Modifier.padding(start = 6.dp))
-                }
-            }
+    }
+}
+
+@Composable
+private fun OpcionRubro(rubro: Rubro, elegido: Boolean, onClick: () -> Unit, modifier: Modifier = Modifier) {
+    val esquema = MaterialTheme.colorScheme
+    val fondo by animateColorAsState(if (elegido) esquema.primary else esquema.secondaryContainer, label = "fondo-rubro")
+    val icono by animateColorAsState(if (elegido) esquema.onPrimary else esquema.onSecondaryContainer, label = "icono-rubro")
+    Column(
+        modifier = modifier
+            .clip(RoundedCornerShape(16.dp))
+            .selectable(selected = elegido, role = Role.RadioButton, onClick = onClick)
+            .padding(vertical = 8.dp, horizontal = 2.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(6.dp),
+    ) {
+        Box(
+            modifier = Modifier.size(56.dp).clip(RoundedCornerShape(18.dp)).background(fondo),
+            contentAlignment = Alignment.Center,
+        ) {
+            Icon(iconoRubro(rubro.nombre), contentDescription = null, tint = icono, modifier = Modifier.size(28.dp))
         }
-        item {
-            TextButton(onClick = { coordenadas = !coordenadas }) {
-                Icon(
-                    if (coordenadas || estado.latitudInvalida || estado.longitudInvalida) Icons.Filled.ExpandLess else Icons.Filled.ExpandMore,
-                    contentDescription = null,
-                )
-                Text(stringResource(R.string.coordenadas_a_mano), modifier = Modifier.padding(start = 6.dp))
-            }
-        }
-        item {
-          AnimatedVisibility(coordenadas || estado.latitudInvalida || estado.longitudInvalida) {
-            Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                OutlinedTextField(
-                    value = estado.latitud,
-                    onValueChange = onLatitud,
-                    label = { Text(stringResource(R.string.latitud)) },
-                    isError = estado.latitudInvalida,
-                    supportingText = if (estado.latitudInvalida) ({ Text(stringResource(R.string.error_latitud)) }) else null,
-                    singleLine = true,
-                    keyboardOptions = decimal,
-                    modifier = Modifier.weight(1f),
-                )
-                OutlinedTextField(
-                    value = estado.longitud,
-                    onValueChange = onLongitud,
-                    label = { Text(stringResource(R.string.longitud)) },
-                    isError = estado.longitudInvalida,
-                    supportingText = if (estado.longitudInvalida) ({ Text(stringResource(R.string.error_longitud)) }) else null,
-                    singleLine = true,
-                    keyboardOptions = decimal,
-                    modifier = Modifier.weight(1f),
-                )
-            }
-          }
-        }
-        if (estado.ubicacionNoDisponible) {
-            item { AvisoError(stringResource(R.string.ubicacion_no_disponible)) }
-        }
-        item {
-            Row(horizontalArrangement = Arrangement.spacedBy(12.dp), modifier = Modifier.fillMaxWidth()) {
-                OutlinedButton(onClick = onMiUbicacion, enabled = !estado.ubicando, modifier = Modifier.weight(1f).heightIn(min = 52.dp)) {
-                    Icon(Icons.Outlined.MyLocation, contentDescription = null, modifier = Modifier.size(18.dp))
-                    Text(
-                        stringResource(if (estado.ubicando) R.string.ubicando else R.string.usar_mi_ubicacion),
-                        modifier = Modifier.padding(start = 6.dp),
-                    )
-                }
-                BotonPrincipal(
-                    texto = stringResource(R.string.buscar),
-                    onClick = onBuscar,
-                    cargando = estado.resultados == EstadoResultados.Cargando,
-                    icono = Icons.Filled.Search,
-                    modifier = Modifier.weight(1f),
-                )
-            }
-        }
-        when (val resultados = estado.resultados) {
-            EstadoResultados.Inicial -> item { Mensaje(stringResource(R.string.busqueda_inicial), icono = Icons.Outlined.TravelExplore) }
-            EstadoResultados.Cargando -> item { Cargando() }
-            EstadoResultados.Vacio -> item { Mensaje(stringResource(R.string.busqueda_vacia), icono = Icons.Outlined.SearchOff) }
-            is EstadoResultados.Error -> item {
-                Mensaje(
-                    textoError(resultados.tipo), textoBoton = stringResource(R.string.reintentar),
-                    icono = iconoError(resultados.tipo), onBoton = onBuscar,
-                )
-            }
-            is EstadoResultados.Exito -> {
-                if (resultados.desdeCache) item { AvisoSinConexion() }
-                item(key = "titulo-resultados") {
-                    Text(
-                        pluralStringResource(R.plurals.resultados_encontrados, resultados.prestadores.size, resultados.prestadores.size),
-                        style = MaterialTheme.typography.titleMedium,
-                        modifier = Modifier.padding(top = 8.dp).animateItem(),
-                    )
-                }
-                items(resultados.prestadores, key = { it.id }) { prestador ->
-                    PrestadorCard(
-                        prestador = prestador,
-                        favorito = prestador.id in estado.favoritos,
-                        onAbrir = { onAbrirPrestador(prestador.id) },
-                        onFavorito = { onFavorito(prestador.id) },
-                        modifier = Modifier.animateItem(),
-                    )
-                }
-            }
-        }
+        Text(
+            rubro.nombre,
+            style = MaterialTheme.typography.labelMedium,
+            fontWeight = if (elegido) FontWeight.Bold else FontWeight.Medium,
+            color = if (elegido) esquema.primary else esquema.onSurface,
+            textAlign = TextAlign.Center,
+            maxLines = 2,
+            overflow = TextOverflow.Ellipsis,
+        )
     }
 }

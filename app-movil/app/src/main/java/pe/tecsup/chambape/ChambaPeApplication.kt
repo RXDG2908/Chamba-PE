@@ -10,6 +10,8 @@ import pe.tecsup.chambape.data.auth.AlmacenPerfilPreferencias
 import pe.tecsup.chambape.data.auth.ApiPerfiles
 import pe.tecsup.chambape.data.auth.AuthRepository
 import pe.tecsup.chambape.data.auth.FirebaseAuthRepository
+import pe.tecsup.chambape.data.local.AlmacenDireccion
+import pe.tecsup.chambape.data.local.AlmacenDireccionPreferencias
 import pe.tecsup.chambape.data.local.AppDatabase
 import pe.tecsup.chambape.data.remote.RetrofitClient
 import pe.tecsup.chambape.data.repository.DisponibilidadRepository
@@ -21,6 +23,8 @@ import pe.tecsup.chambape.data.repository.PrestadorRepositoryImpl
 import pe.tecsup.chambape.data.repository.RegistroPrestadorRepository
 import pe.tecsup.chambape.data.repository.RegistroPrestadorRepositoryImpl
 import pe.tecsup.chambape.data.repository.SolicitudRepository
+import pe.tecsup.chambape.device.BuscadorDirecciones
+import pe.tecsup.chambape.device.GeocoderDirecciones
 import pe.tecsup.chambape.device.Notificador
 import pe.tecsup.chambape.device.NotificadorAndroid
 import pe.tecsup.chambape.device.UbicacionFused
@@ -51,6 +55,15 @@ class AppContainer(context: Context) {
     val contextoBusqueda = ContextoBusqueda()
     val ubicacionProvider: UbicacionProvider = UbicacionFused(context)
     val notificador: Notificador = NotificadorAndroid(context)
+    // Direcciones escritas por el cliente (sin coordenadas a la vista) y su «Mi dirección».
+    val buscadorDirecciones: BuscadorDirecciones = GeocoderDirecciones(context)
+    val almacenDireccion: AlmacenDireccion = AlmacenDireccionPreferencias(context)
+
+    /** La dirección es de la cuenta: otra persona que entre en este celular no la hereda. */
+    fun cerrarSesion() {
+        almacenDireccion.guardar(null)
+        authRepository.cerrarSesion()
+    }
 }
 
 class ChambaPeApplication : Application() {

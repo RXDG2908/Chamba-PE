@@ -65,6 +65,7 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconToggleButton
 import androidx.compose.material3.ListItem
+import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
@@ -590,8 +591,10 @@ fun PerfilScreen(sesion: Sesion, onCerrarSesion: () -> Unit) {
                 headlineContent = { Text(sesion.correo) },
                 overlineContent = { Text(stringResource(R.string.correo)) },
                 leadingContent = { Icon(Icons.Outlined.Email, contentDescription = null) },
+                colors = ListItemDefaults.colors(containerColor = MaterialTheme.colorScheme.surfaceContainerLowest),
             )
         }
+        if (!esPrestador) TarjetaMiDireccion()
         OutlinedButton(onClick = onCerrarSesion, modifier = Modifier.fillMaxWidth()) {
             Icon(Icons.AutoMirrored.Outlined.Logout, contentDescription = null, modifier = Modifier.size(18.dp))
             Text(stringResource(R.string.cerrar_sesion), modifier = Modifier.padding(start = 8.dp))

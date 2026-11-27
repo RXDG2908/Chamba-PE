@@ -67,22 +67,14 @@
     <!-- Búsqueda -->
     <string name="busqueda_rubro">¿Qué servicio necesitas?</string>
     <string name="busqueda_sin_rubros">Todavía no hay rubros registrados.</string>
-    <string name="busqueda_ubicacion">¿Dónde lo necesitas?</string>
-    <string name="mapa_ayuda">Toca el mapa para elegir dónde necesitas el servicio, usa tu ubicación o escribe las coordenadas.</string>
     <string name="mapa_descripcion">Mapa de prestadores y ubicación. Toca un punto para elegir dónde necesitas el servicio.</string>
     <string name="mapa_tu_ubicacion">Tu ubicación para el servicio</string>
-    <string name="mapa_leyenda">Azul: tu ubicación. Verde numerado: prestadores (zona aproximada).</string>
-    <string name="mapa_encuadrar">Ver todo</string>
-    <string name="latitud">Latitud</string>
-    <string name="longitud">Longitud</string>
+    <string name="mapa_leyenda">Azul: dónde necesitas el servicio. Verde numerado: prestadores (zona aproximada).</string>
     <string name="error_falta_rubro">Elige un rubro.</string>
-    <string name="error_latitud">Entre -90 y 90</string>
-    <string name="error_longitud">Entre -180 y 180</string>
-    <string name="usar_mi_ubicacion">Usar mi ubicación</string>
+    <string name="usar_mi_ubicacion">Usar mi ubicación actual</string>
     <string name="ubicando">Ubicando…</string>
-    <string name="ubicacion_no_disponible">No se pudo obtener tu ubicación. Puedes escribir las coordenadas.</string>
-    <string name="buscar">Buscar</string>
-    <string name="busqueda_inicial">Elige un rubro y una ubicación para ver prestadores cercanos.</string>
+    <string name="ubicacion_no_disponible">No pudimos obtener tu ubicación. Escribe tu dirección o márcala en el mapa.</string>
+    <string name="busqueda_inicial">Elige un servicio y te mostramos quién está cerca.</string>
     <string name="busqueda_vacia">No hay prestadores disponibles para ese rubro en tu zona.</string>
 
     <!-- Detalle y solicitud -->
@@ -210,10 +202,41 @@
     <string name="estrellas_3">Bueno</string>
     <string name="estrellas_4">Muy bueno</string>
     <string name="estrellas_5">Excelente</string>
-    <string name="coordenadas_a_mano">Ingresar coordenadas a mano</string>
     <string name="disponibilidad_verificado">Perfil verificado: los clientes pueden encontrarte.</string>
     <plurals name="resultados_encontrados">
         <item quantity="one">%1$d prestador cerca</item>
         <item quantity="other">%1$d prestadores cerca</item>
     </plurals>
+
+    <!-- Ubicación del cliente: siempre como dirección, nunca como coordenadas. -->
+    <string name="ubicacion_servicio_en">Servicio en</string>
+    <string name="ubicacion_elegir">Elige dónde lo necesitas</string>
+    <string name="ubicacion_elegir_boton">Elegir ubicación</string>
+    <string name="ubicacion_cambiar">Cambiar ubicación</string>
+    <string name="ubicacion_cambiar_descripcion">Ubicación del servicio: %1$s. Toca para cambiarla.</string>
+    <string name="ubicacion_sin_calle">Punto marcado en el mapa</string>
+    <string name="ubicacion_hoja_titulo">¿Dónde necesitas el servicio?</string>
+    <string name="ubicacion_escribe">Calle y número, o distrito</string>
+    <string name="ubicacion_escribe_ayuda">Por ejemplo: Av. Arequipa 1200, Lince</string>
+    <string name="ubicacion_borrar_texto">Borrar texto</string>
+    <string name="ubicacion_sin_resultados">No encontramos «%1$s»</string>
+    <string name="ubicacion_sin_resultados_ayuda">Prueba con la calle y el distrito, o márcala en el mapa.</string>
+    <string name="ubicacion_gps_ayuda">Con el GPS de tu celular</string>
+    <string name="ubicacion_en_mapa">Elegir en el mapa</string>
+    <string name="ubicacion_en_mapa_ayuda">Mueve el mapa hasta tu puerta</string>
+    <string name="ubicacion_mapa_titulo">Mueve el mapa hasta tu puerta</string>
+    <string name="ubicacion_mapa_descripcion">Mapa. El alfiler del centro marca dónde necesitas el servicio.</string>
+    <string name="ubicacion_buscando_calle">Buscando la dirección…</string>
+    <string name="ubicacion_confirmar">Confirmar ubicación</string>
+    <string name="busqueda_sin_ubicacion">Dinos dónde necesitas el servicio y te mostramos a los prestadores cercanos.</string>
+    <string name="error_falta_direccion">Elige dónde necesitas el servicio.</string>
+    <string name="vista_lista">Lista</string>
+    <string name="vista_mapa">Mapa</string>
+    <string name="mi_direccion">Mi dirección</string>
+    <string name="mi_direccion_vacia">Agrega tu dirección</string>
+    <string name="mi_direccion_ayuda">Buscar empieza con ella. Solo se guarda en este celular.</string>
+    <string name="mi_direccion_hoja">¿Cuál es tu dirección?</string>
+    <string name="mi_direccion_cambiar">Cambiar</string>
+    <string name="mi_direccion_agregar">Agregar</string>
+    <string name="mi_direccion_quitar">Quitar mi dirección</string>
 </resources>

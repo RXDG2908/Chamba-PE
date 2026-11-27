@@ -214,4 +214,20 @@ class BusquedaViewModelTest {
         advanceUntilIdle()
         assertEquals("", contexto.ultima?.direccion)
     }
+
+    @Test
+    fun `el lugar elegido en una seccion lo tienen inicio y las demas`() = runTest(dispatcher) {
+        val sesion = kotlinx.coroutines.flow.MutableStateFlow<Direccion?>(null)
+        val almacen = AlmacenDireccionEnMemoria(CASA)
+        val urgente = BusquedaViewModel(repositorio, almacen = almacen, ubicacionSesion = sesion)
+        advanceUntilIdle()
+        assertEquals(CASA, urgente.uiState.value.direccion)
+        urgente.elegirDireccion(OFICINA)
+        assertEquals(OFICINA, sesion.value)
+
+        // Otra sección (o Inicio) que se abre después empieza con el lugar elegido, no con «Mi dirección».
+        val hogar = BusquedaViewModel(repositorio, almacen = almacen, ubicacionSesion = sesion)
+        advanceUntilIdle()
+        assertEquals(OFICINA, hogar.uiState.value.direccion)
+    }
 }

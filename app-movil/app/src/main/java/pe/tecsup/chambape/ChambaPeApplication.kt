@@ -58,10 +58,12 @@ class AppContainer(context: Context) {
     // Direcciones escritas por el cliente (sin coordenadas a la vista) y su «Mi dirección».
     val buscadorDirecciones: BuscadorDirecciones = GeocoderDirecciones(context)
     val almacenDireccion: AlmacenDireccion = AlmacenDireccionPreferencias(context)
+    val ubicacionSesion = kotlinx.coroutines.flow.MutableStateFlow<pe.tecsup.chambape.device.Direccion?>(null)
 
     /** La dirección es de la cuenta: otra persona que entre en este celular no la hereda. */
     fun cerrarSesion() {
         almacenDireccion.guardar(null)
+        ubicacionSesion.value = null
         authRepository.cerrarSesion()
     }
 }

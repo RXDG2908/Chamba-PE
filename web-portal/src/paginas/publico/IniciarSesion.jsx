@@ -57,7 +57,7 @@ function IniciarSesion({ usuario, alIniciar }) {
   }
 
   // Con la sesión iniciada vuelve a la página que pidió o a la de su rol.
-  if (usuario) return <Navigate to={state?.desde || INICIO_POR_ROL[usuario.rol] || '/'} replace />
+  if (usuario) return <Navigate to={state?.desde || INICIO_POR_ROL[usuario.rol] || '/'} state={state?.volverCon} replace />
 
   return (
     <form className="registro cuenta" onSubmit={enviar} noValidate>

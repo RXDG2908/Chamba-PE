@@ -1,8 +1,9 @@
 import { useEffect, useRef, useState } from 'react'
+import { Link } from 'react-router-dom'
 import { enviarJson } from '../nucleo/api.js'
 import Seguimiento from './Seguimiento.jsx'
 import { ESTADOS_FINALES } from '../nucleo/etapasSeguimiento.js'
-import { Send } from 'lucide-react'
+import { LogIn, Send } from 'lucide-react'
 import IconoEstado from './IconoEstado.jsx'
 
 const ESTADOS = {
@@ -14,7 +15,11 @@ const ESTADOS = {
   finalizada: 'El servicio terminó. Puedes calificarlo en «Mis servicios».',
 }
 
+// La API responde en inglés cuando falta la sesión (DRF); se explica en español.
+const SIN_SESION = 'Authentication credentials were not provided.'
+
 function mensajeError(datos, alternativa) {
+  if (datos?.detail === SIN_SESION) return 'Tu sesión venció. Inicia sesión de nuevo para enviar la solicitud.'
   if (typeof datos?.detail === 'string') return datos.detail
   const mensajes = Object.values(datos || {})
     .flatMap((valor) => Array.isArray(valor) ? valor : [valor])
@@ -22,7 +27,7 @@ function mensajeError(datos, alternativa) {
   return mensajes.join(' ') || alternativa
 }
 
-function SolicitudServicio({ prestador, rubro, ubicacion }) {
+function SolicitudServicio({ prestador, rubro, ubicacion, usuario }) {
   const [datosCliente, setDatosCliente] = useState({
     cliente_nombre: '',
     cliente_telefono: '',
@@ -117,6 +122,31 @@ function SolicitudServicio({ prestador, rubro, ubicacion }) {
     } finally {
       setEnviando(false)
     }
+  }
+
+  // Solo un cliente con sesión puede solicitar (la API responde 403 a los demás).
+  if (!solicitud && usuario?.rol !== 'cliente') {
+    return (
+      <div className="solicitud-servicio solicitud-sin-sesion">
+        <h5>Solicitar este servicio</h5>
+        {usuario === undefined ? (
+          <p>Comprobando tu sesión…</p>
+        ) : usuario === null ? (
+          <>
+            <p>Para solicitar un servicio necesitas una cuenta de cliente.</p>
+            <p className="acciones-sin-sesion">
+              <Link className="boton" to="/ingresar"
+                state={{ desde: '/resultados', volverCon: rubro ? { rubro: Number(rubro) } : undefined }}>
+                <LogIn className="icono" size={18} aria-hidden="true" />Inicia sesión para solicitar
+              </Link>
+              <Link to="/crear-cuenta">Crear cuenta de cliente</Link>
+            </p>
+          </>
+        ) : (
+          <p>Solo las cuentas de cliente pueden solicitar servicios.</p>
+        )}
+      </div>
+    )
   }
 
   return (

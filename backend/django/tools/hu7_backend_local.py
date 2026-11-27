@@ -63,6 +63,10 @@ def main():
             p.rubros.add(rubros[rubro])
             fixtures['prestadores'][nombre] = {'id': p.pk, 'username': user.username,
                 'latitud': float(p.latitud), 'longitud': float(p.longitud)}
+        # Solo un cliente con sesión envía solicitudes (bug del 27/11).
+        cliente = get_user_model().objects.create_user(
+            username='hu7_cliente', password='SoloPruebasHU7!2026', email='hu7-cliente@example.invalid')
+        fixtures['cliente'] = {'username': cliente.username}
         destino = REPO / 'docs/evidencias/hu7-local/fixtures.json'
         destino.parent.mkdir(parents=True, exist_ok=True)
         destino.write_text(json.dumps(fixtures, ensure_ascii=False, indent=2), encoding='utf-8')

@@ -279,7 +279,7 @@ class CargaDeCertificacionPorRolTests(AccesoPorRolBase):
 
 
 class RutasPublicasTests(AccesoPorRolBase):
-    """Búsqueda, rubros, registro y envío de solicitudes no piden sesión."""
+    """Búsqueda, rubros y registro no piden sesión; enviar una solicitud sí (solo clientes)."""
 
     def test_busqueda_y_rubros_responden_200_a_cualquier_rol(self):
         parametros = {'rubro': self.rubro.id, 'latitud': '0', 'longitud': '0'}
@@ -291,23 +291,26 @@ class RutasPublicasTests(AccesoPorRolBase):
                 self.assertEqual([p['id'] for p in r.json()], [self.prestador.id])
                 self.assertEqual(cliente.get(reverse('rubros')).status_code, 200)
 
-    def test_anonimo_y_cliente_envian_solicitudes(self):
+    def test_solo_el_cliente_envia_solicitudes(self):
         datos = {
             'prestador': self.prestador.id, 'rubro': self.rubro.id,
             'cliente_nombre': 'Carlos', 'cliente_telefono': '999888777',
             'descripcion': 'Se rompió la tubería.', 'latitud': '0.010000', 'longitud': '0.000000',
         }
-        for nombre in ('anonimo', 'cliente'):
+        for nombre in ('anonimo', 'prestador', 'administrador', 'superusuario'):
             with self.subTest(cuenta=nombre):
                 r = self.sesion(self.cuentas()[nombre]).post(
                     reverse('crear_solicitud'), datos, format='json',
                 )
-                self.assertEqual(r.status_code, 201)
-                # El cliente sigue el estado sin sesión (T4.2) con su código de seguimiento (HU-11).
-                url = reverse('detalle_solicitud', args=[r.json()['id']])
-                detalle = APIClient().get(url, {'codigo': r.json()['codigo_seguimiento']})
-                self.assertEqual(detalle.status_code, 200)
-                self.assertEqual(APIClient().get(url).status_code, 404)
+                self.assertEqual(r.status_code, 403)
+        self.assertFalse(Solicitud.objects.exists())
+        r = self.sesion(self.cliente).post(reverse('crear_solicitud'), datos, format='json')
+        self.assertEqual(r.status_code, 201)
+        # El cliente también la sigue con su código de seguimiento (HU-11), aun sin sesión.
+        url = reverse('detalle_solicitud', args=[r.json()['id']])
+        detalle = APIClient().get(url, {'codigo': r.json()['codigo_seguimiento']})
+        self.assertEqual(detalle.status_code, 200)
+        self.assertEqual(APIClient().get(url).status_code, 404)
 
     def test_rutas_publicas_ignoran_una_sesion_invalida(self):
         cliente = APIClient()

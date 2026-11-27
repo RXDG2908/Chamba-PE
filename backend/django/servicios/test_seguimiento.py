@@ -248,6 +248,7 @@ class DetalleProtegidoTests(TestCase):
         self.assertEqual(self.ver(self.sin_cuenta, codigo='').status_code, 404)
 
     def test_al_crear_se_entrega_el_codigo_y_la_bandeja_no_lo_muestra(self):
+        self.client.force_login(self.cliente)
         r = self.client.post(reverse('crear_solicitud'), {
             'prestador': self.ana.id, 'rubro': self.con_cuenta.rubro_id, 'cliente_nombre': 'Carla',
             'cliente_telefono': '999888777', 'descripcion': 'Corto.', 'latitud': '0.000000', 'longitud': '0.000000',

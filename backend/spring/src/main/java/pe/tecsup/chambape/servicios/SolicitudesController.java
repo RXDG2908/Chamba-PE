@@ -41,7 +41,11 @@ public class SolicitudesController {
         this.cuentas = cuentas;
     }
 
-    /** HU-4: el cliente (con o sin cuenta) envía una solicitud; queda Pendiente. */
+    /**
+     * HU-4: el cliente envía una solicitud; queda Pendiente y a su nombre. Como el permiso EsCliente de
+     * Django: sin sesión ni token es 403 «Authentication credentials were not provided.» y con otra cuenta
+     * (prestador o administrador), 403 «Esta acción es solo para clientes.».
+     */
     @PostMapping("/")
     public ResponseEntity<Map<String, Object>> crear(HttpServletRequest peticion) {
         // HU-13: la sesión de una cuenta sancionada ya no autentica, pero se reconoce por su id:
@@ -52,7 +56,8 @@ public class SolicitudesController {
                 throw RespuestaError.detalle(403, motivo);
             });
         }
-        long id = servicio.crear(CuerpoComoDrf.leer(peticion), FiltroFirebase.usuario(peticion));
+        Cuentas.Usuario cliente = cliente(peticion);
+        long id = servicio.crear(CuerpoComoDrf.leer(peticion), Optional.of(cliente));
         Solicitudes.Solicitud s = solicitudes.buscar(id).orElseThrow();
         Map<String, Object> cuerpo = new LinkedHashMap<>();
         cuerpo.put("id", s.id());
@@ -131,6 +136,15 @@ public class SolicitudesController {
         Cuentas.Usuario prestador = prestador(peticion);
         servicio.delPrestador(id, prestador);  // 404 antes de leer el cuerpo, como Django
         return recibida(servicio.avanzar(id, prestador, CuerpoComoDrf.leer(peticion)));
+    }
+
+    /** Permiso EsCliente de Django. */
+    public static Cuentas.Usuario cliente(HttpServletRequest peticion) {
+        Cuentas.Usuario usuario = FiltroFirebase.usuario(peticion).orElseThrow(RespuestaError::sinCredenciales);
+        if (!Cuentas.CLIENTE.equals(usuario.rol())) {
+            throw RespuestaError.detalle(403, "Esta acción es solo para clientes.");
+        }
+        return usuario;
     }
 
     /** Permiso EsPrestador de Django. */

@@ -45,7 +45,7 @@ El cambio es condicional (`UPDATE ... WHERE estado = <actual>`): si dos pestaña
 
 - Bandeja del prestador (`/api/servicios/solicitudes/recibidas/` y `.../recibidas/<id>/`): suma `estado_display`, `siguiente_estado` (o `null`) e `historial`.
 - Consulta del cliente (`GET /api/servicios/solicitudes/<id>/`): suma `historial` con `estado`, `estado_display` y `fecha`.
-- **Acceso (25/11):** el detalle solo lo ven el cliente dueño (con su sesión) y el prestador asignado. Quien la envió sin cuenta recibe `codigo_seguimiento` al crearla y consulta con `?codigo=<código>`; el código está firmado con `SECRET_KEY`, no se guarda en la base y no sirve para otra solicitud. Cualquier otro recibe 404. La respuesta lleva `Cache-Control: private, no-store`.
+- **Acceso (25/11):** el detalle solo lo ven el cliente dueño (con su sesión) y el prestador asignado. Al crearla se recibe `codigo_seguimiento` (desde el 27/11 solo un cliente con sesión puede crearla; las antiguas sin cuenta se siguen con él) y consulta con `?codigo=<código>`; el código está firmado con `SECRET_KEY`, no se guarda en la base y no sirve para otra solicitud. Cualquier otro recibe 404. La respuesta lleva `Cache-Control: private, no-store`.
 - «Mis servicios» (HU-12) ya muestra `estado_display`, así que «En camino» y «En servicio» aparecen sin cambiar `calificaciones`. Desde T11.3 también recibe el `historial`, para mostrar la hora de cada etapa.
 
 ## Pruebas

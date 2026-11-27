@@ -8,7 +8,7 @@ from unittest.mock import patch
 
 from django.contrib.auth import get_user_model
 from django.core.management import CommandError, call_command
-from django.test import SimpleTestCase, TestCase
+from django.test import Client, SimpleTestCase, TestCase
 from django.urls import reverse
 
 from prestadores.management.commands import medir_busqueda
@@ -270,6 +270,11 @@ class SolicitudTests(TestCase):
             'descripcion': 'Se rompió la tubería del baño.',
             'latitud': '0.010000', 'longitud': '0.000000',
         }
+        # Solo un cliente con sesión envía solicitudes; va en su propio navegador para que
+        # los inicios de sesión del prestador en self.client no la cambien.
+        self.cuenta_cliente = get_user_model().objects.create_user(username='cliente_hu4')
+        self.navegador_cliente = Client()
+        self.navegador_cliente.force_login(self.cuenta_cliente)
 
     def crear_prestador(self, username, **cambios):
         usuario = get_user_model().objects.create_user(username=username)
@@ -283,7 +288,7 @@ class SolicitudTests(TestCase):
         return prestador
 
     def enviar(self, **cambios):
-        return self.client.post(
+        return self.navegador_cliente.post(
             reverse('crear_solicitud'), {**self.datos, **cambios}, content_type='application/json',
         )
 
@@ -297,8 +302,28 @@ class SolicitudTests(TestCase):
         self.assertEqual(r.json()['estado'], 'pendiente')
         self.assertEqual(self.prestador.solicitudes.count(), 1)
 
+    def test_envio_valido_queda_a_nombre_del_cliente(self):
+        r = self.enviar()
+        self.assertEqual(Solicitud.objects.get(pk=r.json()['id']).cliente, self.cuenta_cliente)
+
+    def test_sin_sesion_no_se_envia(self):
+        # Bug del 27/11: un visitante sin cuenta podía solicitar un servicio.
+        r = self.client.post(reverse('crear_solicitud'), self.datos, content_type='application/json')
+        self.assertEqual(r.status_code, 403)
+        self.assertFalse(Solicitud.objects.exists())
+
+    def test_prestador_y_administrador_no_envian(self):
+        administrador = get_user_model().objects.create_user(username='admin_hu4', is_staff=True)
+        for usuario in (self.prestador.usuario, administrador):
+            with self.subTest(usuario=usuario.username):
+                self.client.force_login(usuario)
+                r = self.client.post(reverse('crear_solicitud'), self.datos, content_type='application/json')
+                self.assertEqual(r.status_code, 403)
+                self.assertEqual(r.json()['detail'], 'Esta acción es solo para clientes.')
+        self.assertFalse(Solicitud.objects.exists())
+
     def test_campos_obligatorios(self):
-        r = self.client.post(reverse('crear_solicitud'), {}, content_type='application/json')
+        r = self.navegador_cliente.post(reverse('crear_solicitud'), {}, content_type='application/json')
         self.assertEqual(r.status_code, 400)
         for campo in ['prestador', 'rubro', 'cliente_nombre', 'cliente_telefono', 'descripcion']:
             self.assertIn(campo, r.json())

@@ -103,11 +103,11 @@ class SolicitudesApiTest extends PruebaConBase {
     }
 
     @Test
-    void visitanteEnviaSolicitudYRecibeSuCodigo() throws Exception {
-        long id = crear(null);
+    void clienteEnviaSolicitudYRecibeSuCodigo() throws Exception {
+        long id = crear("token-cliente");
         mvc.perform(get(API + id + "/")).andExpect(status().isNotFound());
         String codigo = codigos.de(id);
-        enviar(post(API), solicitud(""), null)
+        enviar(post(API), solicitud(""), "token-cliente")
             .andExpect(jsonPath("$.prestador").value(1))
             .andExpect(jsonPath("$.latitud").value("-12.044861"))
             .andExpect(jsonPath("$.estado").value("pendiente"))
@@ -128,8 +128,23 @@ class SolicitudesApiTest extends PruebaConBase {
     }
 
     @Test
+    void sinCuentaOSinRolDeClienteNoSeEnvia() throws Exception {
+        // Bug del 27/11: un visitante sin cuenta podía solicitar un servicio.
+        enviar(post(API), solicitud(""), null)
+            .andExpect(status().isForbidden())
+            .andExpect(jsonPath("$.detail").value("Authentication credentials were not provided."));
+        enviar(post(API), solicitud(""), "token-ana")
+            .andExpect(status().isForbidden())
+            .andExpect(jsonPath("$.detail").value("Esta acción es solo para clientes."));
+        // El permiso va antes que la validación, como en DRF.
+        enviar(post(API), "{}", null).andExpect(status().isForbidden());
+        assertEquals(0, jdbc.queryForObject("select count(*) from servicios_solicitud", Integer.class));
+        verify(notificador, never()).solicitudNueva(anyLong(), anyLong());
+    }
+
+    @Test
     void fechasYDecimalesSeGuardanComoDjango() throws Exception {
-        long id = crear(null);
+        long id = crear("token-cliente");
         String creada = jdbc.queryForObject("select creada from servicios_solicitud where id = ?", String.class, id);
         assertEquals(true, creada.matches("\\d{4}-\\d\\d-\\d\\d \\d\\d:\\d\\d:\\d\\d(\\.\\d{6})?"), creada);
         assertEquals("real", jdbc.queryForObject("select typeof(latitud) from servicios_solicitud where id = ?", String.class, id));
@@ -146,13 +161,13 @@ class SolicitudesApiTest extends PruebaConBase {
 
     @Test
     void validacionCampoPorCampo() throws Exception {
-        enviar(post(API), "{}", null)
+        enviar(post(API), "{}", "token-cliente")
             .andExpect(status().isBadRequest())
             .andExpect(jsonPath("$.prestador[0]").value("This field is required."))
             .andExpect(jsonPath("$.longitud[0]").value("This field is required."));
         enviar(post(API), """
             {"prestador": "abc", "rubro": 99, "cliente_nombre": "123", "cliente_telefono": "+51900000000",
-             "descripcion": "   ", "latitud": "91", "longitud": "-77.1234567"}""", null)
+             "descripcion": "   ", "latitud": "91", "longitud": "-77.1234567"}""", "token-cliente")
             .andExpect(jsonPath("$.prestador[0]").value("Incorrect type. Expected pk value, received str."))
             .andExpect(jsonPath("$.rubro[0]").value("Invalid pk \"99\" - object does not exist."))
             .andExpect(jsonPath("$.cliente_nombre[0]")
@@ -163,7 +178,7 @@ class SolicitudesApiTest extends PruebaConBase {
             .andExpect(jsonPath("$.longitud[0]").value("Ensure that there are no more than 6 decimal places."));
         enviar(post(API), """
             {"prestador": true, "rubro": null, "cliente_nombre": "", "cliente_telefono": 900000000,
-             "descripcion": ["a"], "latitud": 1234.5, "longitud": "abc"}""", null)
+             "descripcion": ["a"], "latitud": 1234.5, "longitud": "abc"}""", "token-cliente")
             .andExpect(jsonPath("$.prestador[0]").value("Incorrect type. Expected pk value, received bool."))
             .andExpect(jsonPath("$.rubro[0]").value("This field may not be null."))
             .andExpect(jsonPath("$.cliente_nombre[0]").value("Ingresa un nombre con al menos una letra."))
@@ -171,7 +186,7 @@ class SolicitudesApiTest extends PruebaConBase {
             .andExpect(jsonPath("$.descripcion[0]").value("Not a valid string."))
             .andExpect(jsonPath("$.latitud[0]").value("Ensure that there are no more than 3 digits before the decimal point."))
             .andExpect(jsonPath("$.longitud[0]").value("A valid number is required."));
-        enviar(post(API), "[1, 2]", null)
+        enviar(post(API), "[1, 2]", "token-cliente")
             .andExpect(jsonPath("$.non_field_errors[0]").value("Invalid data. Expected a dictionary, but got list."));
     }
 
@@ -184,7 +199,7 @@ class SolicitudesApiTest extends PruebaConBase {
             {"\"prestador\": 7", "prestador", "Tu ubicación está fuera del área de cobertura del prestador."},
         };
         for (String[] caso : casos) {
-            enviar(post(API), solicitud(", " + caso[0]), null)
+            enviar(post(API), solicitud(", " + caso[0]), "token-cliente")
                 .andExpect(status().isBadRequest()).andExpect(jsonPath("$." + caso[1] + "[0]").value(caso[2]));
         }
         verify(notificador, never()).solicitudNueva(anyLong(), anyLong());
@@ -195,7 +210,7 @@ class SolicitudesApiTest extends PruebaConBase {
         jdbc.update("""
             insert into administracion_sancioncuenta (tipo, motivo, hasta, creada, motivo_levantamiento, usuario_id)
             values ('bloqueo', 'Cobros fuera de la plataforma.', null, '2026-11-25 10:00:00', '', 1)""");
-        enviar(post(API), solicitud(""), null)
+        enviar(post(API), solicitud(""), "token-cliente")
             .andExpect(jsonPath("$.prestador[0]").value("El prestador no está disponible."));
         comoAna(get(API + "recibidas/"))
             .andExpect(status().isForbidden())
@@ -212,7 +227,7 @@ class SolicitudesApiTest extends PruebaConBase {
 
     @Test
     void bandejaAceptarYAvanzarComoDjango() throws Exception {
-        long id = crear(null);
+        long id = crear("token-cliente");
         mvc.perform(get(API + "recibidas/"))
             .andExpect(status().isForbidden()).andExpect(jsonPath("$.detail").value("Authentication credentials were not provided."));
         mvc.perform(get(API + "recibidas/").header("Authorization", "Bearer token-cliente"))
@@ -281,18 +296,18 @@ class SolicitudesApiTest extends PruebaConBase {
 
     @Test
     void formularioYTipoNoSoportado() throws Exception {
-        mvc.perform(post(API).contentType(MediaType.APPLICATION_FORM_URLENCODED)
+        mvc.perform(post(API).header("Authorization", "Bearer token-cliente").contentType(MediaType.APPLICATION_FORM_URLENCODED)
                 .content("prestador=1&rubro=1&cliente_nombre=Carla&cliente_telefono=900000000&descripcion=Fuga"
                     + "&latitud=-12.044861&longitud=-77.026582"))
             .andExpect(status().isCreated());
         // Bytes que no son UTF-8: Django lee el formulario como ISO-8859-1 y el JSON lo rechaza.
         byte[] latin1 = ("prestador=1&rubro=1&cliente_nombre=Carla&cliente_telefono=900000000&descripcion=Caño"
             + "&latitud=-12.044861&longitud=-77.026582").getBytes(java.nio.charset.StandardCharsets.ISO_8859_1);
-        mvc.perform(post(API).contentType(MediaType.APPLICATION_FORM_URLENCODED).content(latin1))
+        mvc.perform(post(API).header("Authorization", "Bearer token-cliente").contentType(MediaType.APPLICATION_FORM_URLENCODED).content(latin1))
             .andExpect(status().isCreated()).andExpect(jsonPath("$.descripcion").value("Caño"));
-        mvc.perform(post(API).contentType(MediaType.APPLICATION_JSON).content(new byte[] {'{', '"', (byte) 0xff, '"', '}'}))
+        mvc.perform(post(API).header("Authorization", "Bearer token-cliente").contentType(MediaType.APPLICATION_JSON).content(new byte[] {'{', '"', (byte) 0xff, '"', '}'}))
             .andExpect(status().isBadRequest());
-        mvc.perform(post(API).contentType(MediaType.TEXT_PLAIN).content("hola"))
+        mvc.perform(post(API).header("Authorization", "Bearer token-cliente").contentType(MediaType.TEXT_PLAIN).content("hola"))
             .andExpect(status().isUnsupportedMediaType())
             .andExpect(jsonPath("$.detail").value("Unsupported media type \"text/plain\" in request."));
     }

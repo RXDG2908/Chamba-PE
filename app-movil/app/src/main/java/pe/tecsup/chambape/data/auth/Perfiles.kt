@@ -25,6 +25,12 @@ interface PerfilesRemotos {
 
     /** Crea (sin duplicar) la cuenta de cliente en Django para este usuario de Firebase. */
     suspend fun crearCliente(token: String, nombre: String): PerfilRemoto
+
+    /**
+     * Vincula esta cuenta de Firebase con la cuenta de la web del mismo correo, con su contraseña:
+     * así el mismo correo y contraseña sirven en la web y en la app.
+     */
+    suspend fun vincularWeb(token: String, clave: String): PerfilRemoto = throw ErrorAuth(TipoErrorAuth.CREDENCIALES)
 }
 
 /**
@@ -53,6 +59,25 @@ class ApiPerfiles(private val api: ApiService) : PerfilesRemotos {
     override suspend fun crearCliente(token: String, nombre: String): PerfilRemoto =
         try {
             api.registrarClienteMovil(bearer(token), RegistroClienteDto(nombre)).aPerfil()
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: Exception) {
+            throw traducir(e)
+        }
+
+    override suspend fun vincularWeb(token: String, clave: String): PerfilRemoto =
+        try {
+            api.vincularCuenta(bearer(token), pe.tecsup.chambape.data.remote.VincularCuentaDto(clave)).aPerfil()
+        } catch (e: HttpException) {
+            val codigo = codigoDe(e)
+            throw when {
+                codigo == CUENTA_SANCIONADA -> ErrorAuth(TipoErrorAuth.CUENTA_SANCIONADA, e)
+                e.code() == 429 -> ErrorAuth(TipoErrorAuth.DEMASIADOS_INTENTOS, e)
+                // 400 (correo o contraseña no coinciden) o 409 (ya vinculada a otra): para la persona,
+                // es «correo o contraseña incorrectos», sin decir si el correo existe.
+                e.code() == 400 || e.code() == 409 -> ErrorAuth(TipoErrorAuth.CREDENCIALES, e)
+                else -> traducir(e, codigo)
+            }
         } catch (e: CancellationException) {
             throw e
         } catch (e: Exception) {

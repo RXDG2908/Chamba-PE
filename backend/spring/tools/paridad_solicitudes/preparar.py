@@ -53,6 +53,12 @@ recomendable('r_lejos', 'Rosa', 6, '4.60', 1)
 recomendable('r_corto', 'Rolando', 3, '5.00', 3, radio=2)
 recomendable('r_inactivo', 'Remo', 0.1, '5.00', 50, disponible=False)
 recomendable('r_pendiente', 'Reina', 0.1, estado='pendiente')
+# Cuenta compartida web/app: cuentas de la web con contraseña y sin Firebase (POST /api/usuarios/vincular/).
+for u, rol in (('web_lucia', 'cliente'), ('web_bloq', 'cliente'), ('web_admin', 'administrador'), ('web_susp', 'cliente')):
+    w = User.objects.create_user(u, f'{u}@example.invalid', 'clave-de-la-web-1')
+    Perfil.objects.update_or_create(usuario=w, defaults={'rol': rol, 'firebase_uid': None})
+SancionCuenta.objects.create(usuario=User.objects.get(username='web_susp'), tipo='suspension', motivo='Prueba de sanción.',
+                             hasta=timezone.now() + timedelta(days=3))
 # Sesiones de la web (las mismas en las dos bases) y un token CSRF, como tras iniciar sesión en Django.
 from django.contrib.sessions.backends.db import SessionStore
 from django.middleware.csrf import _get_new_csrf_string, _mask_cipher_secret

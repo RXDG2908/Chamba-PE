@@ -107,6 +107,7 @@ solo cambien la dirección del servidor:
 | `GET /api/servicios/solicitudes/recibidas/` · `.../recibidas/{id}/` · `POST .../{id}/aceptar/` · `.../rechazar/` · `.../avanzar/` | Bandeja del prestador, respuesta y seguimiento (HU-4, HU-11) | ✅ |
 | `GET` · `PATCH /api/usuarios/disponibilidad/` | Disponibilidad del prestador | ✅ |
 | `POST /api/usuarios/registro-movil/` · `POST /api/prestadores/registro-movil/` | Alta de cliente y de prestador desde la app, con el token de Firebase | ✅ 26/11 |
+| `POST /api/usuarios/vincular/` | Misma cuenta en la web y la app: vincula la cuenta de Firebase con la de la web del mismo correo, con su contraseña (hash PBKDF2 de Django) y hasta 10 fallos por hora | ✅ 27/11 |
 | `GET /api/calificaciones/mis-servicios/` · `POST /api/calificaciones/` | «Mis servicios» del cliente y calificar (HU-12) | ✅ 26/11 |
 | `GET /api/ia/recomendacion/` | Prestador recomendado y hasta 3 alternativas con puntaje, motivo y tiempo estimado (HU-10), con la misma fórmula y textos que `ia/recomendacion.py` ([contrato](../../docs/API_RECOMENDACION.md)). Pública, como la búsqueda; hoy la usa la web | ✅ 27/11 |
 | `POST` · `DELETE /api/servicios/notificaciones/token/` | El prestador registra o quita el token FCM de su navegador (HU-8). Queda ligado a la sesión de Django con la que se registró, como en Django | ✅ 26/11 |
@@ -152,7 +153,7 @@ que token) y al final abre otro Django sobre la base que escribió Spring para c
 python backend/spring/tools/paridad_solicitudes/correr.py
 ```
 
-El 26/11 (con HU-8 y HU-10): 291 de 291 respuestas idénticas (las fechas se comparan por formato) y 14 de 14 en la lectura cruzada
+El 27/11 (con HU-8, HU-10 y la cuenta compartida web/app): 319 de 319 respuestas idénticas (las fechas se comparan por formato) y 14 de 14 en la lectura cruzada
 (la última compara las filas de `servicios_tokenfcm` que dejó cada uno, porque esa tabla no tiene ruta de lectura).
 Además se probó en el navegador: con la sesión iniciada en Django, la web buscó, envió una solicitud, vio «Mis
 servicios» y el prestador aceptó y avanzó, todo por Spring (ninguna de esas rutas apareció en el registro de Django).

@@ -91,6 +91,23 @@ class ApiPerfilesTest {
         assertEquals("carla", perfiles.perfil("tk")?.nombre)
     }
 
+    @Test
+    fun `vincular la cuenta de la web devuelve su perfil y traduce cada rechazo`() = runTest {
+        val ok = ApiPerfiles(api(mapOf("vincularCuenta" to { UsuarioDto("l@x.pe", "Lucía", "", "cliente", null) })))
+        assertEquals(PerfilRemoto("Lucía", Rol.CLIENTE, null), ok.vincularWeb("tk", "clave"))
+        assertEquals("vincularCuenta" to "Bearer tk", llamadas.last())
+
+        fun con(error: () -> Any) = ApiPerfiles(api(mapOf("vincularCuenta" to error)))
+        // Contraseña mala o cuenta ya vinculada a otra: para la persona es «incorrectos».
+        assertError(TipoErrorAuth.CREDENCIALES) { con { http(400, """{"detail":"No coinciden."}""") }.vincularWeb("tk", "x") }
+        assertError(TipoErrorAuth.CREDENCIALES) { con { http(409, """{"detail":"Ya vinculada."}""") }.vincularWeb("tk", "x") }
+        assertError(TipoErrorAuth.DEMASIADOS_INTENTOS) { con { http(429, """{"detail":"Demasiados."}""") }.vincularWeb("tk", "x") }
+        assertError(TipoErrorAuth.CUENTA_SANCIONADA) {
+            con { http(403, """{"detail":"Suspendida.","codigo":"cuenta_sancionada"}""") }.vincularWeb("tk", "x")
+        }
+        assertError(TipoErrorAuth.SIN_CONEXION) { con { IOException("sin red") }.vincularWeb("tk", "x") }
+    }
+
     private suspend fun assertError(tipo: TipoErrorAuth, bloque: suspend () -> Unit) {
         try {
             bloque()

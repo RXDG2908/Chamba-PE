@@ -21,5 +21,6 @@ def preparar_django(base):
     settings.SECRET_KEY = CLAVE_DJANGO
     settings.FIREBASE_AUTH_PROJECT_ID = PROYECTO
     settings.ALLOWED_HOSTS = ['127.0.0.1', 'localhost']
-    settings.PASSWORD_HASHERS = ['django.contrib.auth.hashers.MD5PasswordHasher']
+    # PBKDF2 primero, como en producción: Spring compara las contraseñas de la web con ese hash (vincular).
+    settings.PASSWORD_HASHERS = ['django.contrib.auth.hashers.PBKDF2PasswordHasher', 'django.contrib.auth.hashers.MD5PasswordHasher']
     django.setup()

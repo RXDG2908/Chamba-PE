@@ -258,6 +258,21 @@ Authorization: Bearer <token de identidad de Firebase>
 La usan el registro de prestador y la pantalla «Mi disponibilidad» de Android. (Nota del 26/11: las solicitudes del móvil ya van a Django, AND-23.) Antes, las solicitudes del móvil seguían en
 Firestore; unificarlas con las de Django es una decisión pendiente.
 
+## Una cuenta para la web y la app (27/11)
+
+El mismo correo y contraseña sirven en los dos lados, sin que administración vincule nada:
+
+| Ruta | Quién la usa | Qué hace |
+|---|---|---|
+| `POST /api/usuarios/login-firebase/` (Django) | La web, cuando la contraseña de Django no coincide y se escribió un correo | Firebase ya aceptó el correo y la contraseña de la app; con ese token (`Authorization: Bearer`) y el CSRF, Django abre su sesión de siempre. 403 `cuenta_no_vinculada` o `cuenta_sancionada` si no corresponde |
+| `POST /api/usuarios/vincular/` (Django y Spring, misma respuesta) | La app, cuando Firebase no reconoce el correo y la contraseña | La app crea la cuenta de Firebase con ese correo y contraseña y manda `{"password": "..."}` con su token. Si la contraseña coincide con la de la cuenta de la web de ese correo (cliente o prestador, sin otra cuenta de la app y sin sanción), queda vinculada (200 con el usuario). Si no, 400 con el mismo mensaje exista o no el correo; la app borra la cuenta de Firebase recién creada |
+
+Seguridad (skill `api-security`, OWASP API2): el correo solo no basta, porque en Firebase cualquiera puede
+crear una cuenta con un correo ajeno; se exige la contraseña de la web, comparada con su hash PBKDF2 (Spring
+lo verifica igual que `check_password`). Los fallos por correo tienen límite: 10 por hora (429). Una cuenta
+ya vinculada no se cambia de dueño (409). Pruebas: `usuarios/test_cuentas_compartidas.py`,
+`VincularCuentaApiTest` y 28 casos de la paridad Django–Spring.
+
 ## Qué cambia en lo que ya existe
 
 | Ruta | Cambio | Quién |

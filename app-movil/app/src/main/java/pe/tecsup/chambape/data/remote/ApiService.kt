@@ -127,6 +127,9 @@ data class RecomendacionDto(
     @SerializedName("recomendado") val recomendado: RecomendadoDto?,
 )
 
+/** La contraseña de la cuenta de la web, para vincularla con la cuenta de la app. */
+data class VincularCuentaDto(@SerializedName("password") val password: String)
+
 interface ApiService {
     // HU-10: pública como la búsqueda (sin token), en Spring igual que en Django.
     @GET("api/ia/recomendacion/")
@@ -169,6 +172,10 @@ interface ApiService {
     suspend fun registrarClienteMovil(@Header("Authorization") autorizacion: String, @Body datos: RegistroClienteDto): UsuarioDto
 
     /** Rol y prestador de la cuenta (antes en Firestore `usuarios/{uid}`). 403 con `codigo` si no está vinculada o sancionada. */
+    // Misma cuenta en la web y la app: vincula esta cuenta de Firebase con la de la web del mismo correo.
+    @POST("api/usuarios/vincular/")
+    suspend fun vincularCuenta(@Header("Authorization") autorizacion: String, @Body datos: VincularCuentaDto): UsuarioDto
+
     @GET("api/usuarios/yo/")
     suspend fun yo(@Header("Authorization") autorizacion: String): UsuarioDto
 

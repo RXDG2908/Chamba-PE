@@ -1,0 +1,116 @@
+/*
+ * Secciones de servicios, con los mismos colores que la app (Tema.kt): rojo Urgente, durazno Hogar,
+ * azul Residencial y verde Empresas. Cada bloque define --fondo-seccion y --tinta-seccion y lo usan
+ * su tarjeta, su cabecera y sus fichas (law-of-similarity).
+ */
+.seccion-urgente { --fondo-seccion: #ffdad6; --tinta-seccion: #410002; }
+.seccion-hogar { --fondo-seccion: #ffddb8; --tinta-seccion: #2c1600; }
+.seccion-residencial { --fondo-seccion: #d4e3ff; --tinta-seccion: #001c3a; }
+.seccion-empresas { --fondo-seccion: #b7f0d3; --tinta-seccion: #002114; }
+.seccion-otros { --fondo-seccion: #dee6e1; --tinta-seccion: #475a50; }
+
+/* Buscador */
+.explorar .seccion-titulo { margin-bottom: 16px; }
+.buscador-servicios {
+  display: flex; align-items: center; gap: 10px; max-width: 620px; min-height: 54px; padding: 0 8px 0 18px;
+  border: 2px solid transparent; border-radius: 999px; background: #e4ebe7; color: var(--texto-suave);
+  transition: border-color 0.15s, background 0.15s;
+}
+.buscador-servicios:focus-within { border-color: var(--verde); background: #fff; }
+.buscador-servicios input {
+  flex: 1; min-width: 0; padding: 12px 0; border: 0; background: transparent; color: var(--texto); font-size: 17px; outline: none;
+}
+.buscador-servicios input::-webkit-search-cancel-button { display: none; }
+.buscador-borrar {
+  display: grid; place-items: center; width: 40px; height: 40px; border: 0; border-radius: 50%;
+  background: transparent; color: var(--texto-suave); cursor: pointer;
+}
+.buscador-borrar:hover { background: #dee6e1; }
+.sin-coincidencias { display: flex; align-items: center; gap: 8px; margin-top: 18px; color: var(--texto-suave); }
+
+.resultados-rubros { display: grid; gap: 10px; max-width: 620px; margin: 18px 0 0; padding: 0; list-style: none; }
+.resultado-rubro {
+  display: flex; align-items: center; gap: 14px; padding: 12px 16px; border-radius: 16px; background: #eff4f1;
+  color: var(--texto); text-decoration: none; transition: background 0.15s;
+}
+.resultado-rubro:hover { background: #e4ebe7; }
+.resultado-rubro > span:nth-child(2) { display: grid; flex: 1; }
+.resultado-rubro small { color: var(--texto-suave); }
+
+/*
+ * Tarjetas grandes por sección, en 3 columnas: [Urgente Urgente Hogar] [Residencial Empresas Empresas].
+ * Urgente va primero y ancha, como en la app; las anchas muestran 4 rubros y las demás 3.
+ */
+.tarjetas-secciones {
+  display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; margin: 24px 0 0; padding: 0; list-style: none;
+}
+.tarjeta-seccion.ancha { grid-column: span 2; }
+.tarjeta-seccion:not(.ancha) .tarjeta-seccion-fichas span:nth-child(n + 4) { display: none; }
+.tarjeta-seccion a {
+  position: relative; display: flex; flex-direction: column; gap: 4px; height: 100%; min-height: 200px;
+  padding: 20px; overflow: hidden; border-radius: 24px; background: var(--fondo-seccion); color: var(--tinta-seccion);
+  text-decoration: none; transition: transform 0.2s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.2s;
+}
+.tarjeta-seccion a:hover { transform: translateY(-3px); box-shadow: 0 10px 28px #173b261f; }
+.tarjeta-seccion a:focus-visible { outline: 3px solid var(--verde); outline-offset: 3px; }
+.tarjeta-seccion-fondo {
+  position: absolute; right: -22px; bottom: -22px; width: 150px; height: 150px; opacity: 0.16; pointer-events: none;
+}
+.tarjeta-seccion-titulo {
+  display: flex; align-items: center; gap: 8px; font-size: 24px; font-weight: 800; letter-spacing: -0.4px;
+  overflow-wrap: normal; /* «Residencial» no se parte en «Residencia / l» */
+}
+.tarjeta-seccion-descripcion { max-width: 30ch; font-size: 15px; line-height: 1.4; }
+.tarjeta-seccion-pie { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: auto; padding-top: 16px; }
+.tarjeta-seccion-fichas { display: flex; gap: 6px; }
+.tarjeta-seccion-fichas span {
+  display: grid; place-items: center; width: 38px; height: 38px; border-radius: 50%; background: #ffffffb8;
+}
+.tarjeta-seccion-cuantos { display: inline-flex; align-items: center; gap: 4px; font-size: 14px; font-weight: 700; white-space: nowrap; }
+
+/* Fichas de rubro (Lo más pedido y la página de una sección) */
+.subtitulo-explorar { margin: 32px 0 12px; font-size: 18px; }
+.fichas-rubros { display: flex; flex-wrap: wrap; gap: 8px; margin: 0; padding: 0; list-style: none; }
+.fichas-rubros-grilla { display: grid; grid-template-columns: repeat(auto-fill, minmax(116px, 1fr)); gap: 12px; }
+.ficha-rubro {
+  display: flex; flex-direction: column; align-items: center; gap: 8px; width: 104px; padding: 10px 4px;
+  border-radius: 18px; color: var(--texto); text-align: center; text-decoration: none; transition: background 0.15s;
+}
+.fichas-rubros-grilla .ficha-rubro { width: auto; }
+.ficha-rubro:hover { background: #eff4f1; }
+.ficha-rubro:focus-visible { outline: 3px solid var(--verde); outline-offset: 2px; }
+.ficha-rubro-icono {
+  display: grid; place-items: center; flex-shrink: 0; width: 60px; height: 60px; border-radius: 20px;
+  background: var(--fondo-seccion); color: var(--tinta-seccion); transition: transform 0.2s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.resultado-rubro .ficha-rubro-icono { width: 44px; height: 44px; border-radius: 14px; }
+.ficha-rubro:hover .ficha-rubro-icono { transform: scale(1.06); }
+.ficha-rubro-nombre { font-size: 14px; font-weight: 600; line-height: 1.25; }
+
+/* Página de una sección */
+.cabecera-seccion { position: relative; overflow: hidden; background: var(--fondo-seccion); color: var(--tinta-seccion); }
+.cabecera-seccion .contenedor { position: relative; padding-block: 24px 36px; }
+.cabecera-seccion h2 { display: flex; align-items: center; gap: 10px; margin: 14px 0 4px; font-size: clamp(30px, 5vw, 42px); letter-spacing: -0.8px; }
+.cabecera-seccion p { margin: 0; font-size: 18px; }
+.volver-seccion {
+  display: inline-flex; align-items: center; gap: 6px; padding: 8px 14px; border-radius: 999px; background: #ffffffa6;
+  color: var(--tinta-seccion); font-weight: 600; text-decoration: none;
+}
+.volver-seccion:hover { background: #fff; }
+.cabecera-seccion-fondo { position: absolute; right: 0; bottom: -40px; width: 190px; height: 190px; opacity: 0.14; pointer-events: none; }
+.pie-seccion { margin-top: 20px; }
+
+@media (max-width: 860px) {
+  .tarjetas-secciones { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 520px) {
+  .tarjetas-secciones { gap: 12px; }
+  .tarjeta-seccion a { min-height: 170px; padding: 16px; }
+  .tarjeta-seccion-titulo { gap: 6px; font-size: 19px; }
+  .tarjeta-seccion:not(.ancha) .tarjeta-seccion-fichas span:nth-child(n + 3) { display: none; }
+  .tarjeta-seccion:not(.ancha) .tarjeta-seccion-cuantos { display: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .tarjeta-seccion a, .ficha-rubro-icono { transition: none; }
+  .tarjeta-seccion a:hover { transform: none; }
+}

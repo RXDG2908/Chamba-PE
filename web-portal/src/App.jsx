@@ -16,6 +16,7 @@ import IniciarSesion from './paginas/publico/IniciarSesion.jsx'
 import RegistroCliente from './paginas/publico/RegistroCliente.jsx'
 import RegistroPrestador from './paginas/publico/RegistroPrestador.jsx'
 import ResultadosPrestadores from './paginas/publico/ResultadosPrestadores.jsx'
+import SeccionServicios from './paginas/publico/SeccionServicios.jsx'
 import SinAcceso from './paginas/publico/SinAcceso.jsx'
 import NoEncontrada from './paginas/publico/NoEncontrada.jsx'
 // Cliente
@@ -155,6 +156,7 @@ function App() {
         {/* Público */}
         <Route path="/" element={<Inicio usuario={usuario} />} />
         <Route path="/resultados" element={<ResultadosPrestadores />} />
+        <Route path="/seccion/:clave" element={<SeccionServicios />} />
         <Route path="/registro-prestador" element={usuario ? <Navigate to="/" replace /> : <RegistroPrestador />} />
         <Route path="/ingresar" element={<IniciarSesion usuario={usuario} alIniciar={setUsuario} />} />
         <Route path="/crear-cuenta" element={<RegistroCliente usuario={usuario} alIniciar={setUsuario} />} />

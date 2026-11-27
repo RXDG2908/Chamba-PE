@@ -12,6 +12,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
+import pe.tecsup.chambape.ia.RecomendacionController;
 import tools.jackson.databind.json.JsonMapper;
 
 /**
@@ -59,9 +60,11 @@ public class FiltroFirebase extends OncePerRequestFilter {
     @Override
     protected boolean shouldNotFilter(HttpServletRequest peticion) {
         String ruta = peticion.getRequestURI();
-        // La búsqueda y los registros de la app no autentican en Django (authentication_classes = []):
-        // el registro lee el token por su cuenta, porque la cuenta todavía no está vinculada.
+        // La búsqueda, la recomendación (HU-10) y los registros de la app no autentican en Django
+        // (authentication_classes = []): el registro lee el token por su cuenta, porque la cuenta todavía no
+        // está vinculada.
         return !ruta.startsWith("/api/") || ruta.startsWith("/api/prestadores/buscar")
+            || ruta.startsWith(RecomendacionController.RUTA)
             || ruta.equals(RegistroMovilController.CLIENTE) || ruta.equals(RegistroMovilController.PRESTADOR);
     }
 

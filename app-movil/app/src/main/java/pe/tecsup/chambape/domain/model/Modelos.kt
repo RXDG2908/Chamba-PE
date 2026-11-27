@@ -109,3 +109,6 @@ data class NuevaSolicitud(
     val latitud: Double,
     val longitud: Double,
 )
+
+/** HU-10: por qué la IA recomienda a este prestador y en cuánto llegaría. */
+data class Recomendacion(val prestadorId: Int, val motivo: String, val puntaje: Double?, val minutosEstimados: Int)

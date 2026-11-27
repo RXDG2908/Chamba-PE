@@ -93,6 +93,7 @@ private class ApiFalsa : ApiService {
     override suspend fun calificar(autorizacion: String, datos: CalificarDto) = Unit
     override suspend fun rubros(): List<RubroDto> = error("no usado")
     override suspend fun buscar(rubroId: Int, latitud: Double, longitud: Double): List<PrestadorDto> = error("no usado")
+    override suspend fun recomendacion(rubroId: Int, latitud: Double, longitud: Double): pe.tecsup.chambape.data.remote.RecomendacionDto = error("no usado")
     override suspend fun registrarPrestador(autorizacion: String, datos: RegistroPrestadorDto): ResponseBody = error("no usado")
     override suspend fun disponibilidad(autorizacion: String): DisponibilidadDto = error("no usado")
     override suspend fun cambiarDisponibilidad(autorizacion: String, cambio: CambioDisponibilidadDto): DisponibilidadDto =

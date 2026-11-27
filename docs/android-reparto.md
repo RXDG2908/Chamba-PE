@@ -38,7 +38,7 @@ Firebase queda solo para la identidad (Authentication): la app ya no usa Firesto
 | ID | Tarjeta | Plan decía | Estado | Nota |
 |:---:|---|:---:|:---:|---|
 | AND-01 | Proyecto Kotlin/Compose y versiones | Renzo | ✅ | Compila, pruebas y lint OK |
-| AND-02 | Tema Material 3 y componentes comunes | David | 🟡 | 26/11: tema de marca claro/oscuro (`Tema.kt`), asistente por pasos (`Asistente.kt`), iconos Material, icono adaptable de la app y arranque animado. Falta revisar texto ampliado y pantallas anchas |
+| AND-02 | Tema Material 3 y componentes comunes | David | 🟡 | 26/11: tema de marca claro/oscuro (`Tema.kt`), asistente por pasos (`Asistente.kt`), iconos Material, icono adaptable de la app y arranque animado. 26/11: Inicio con tarjetas por sección, revisado en modo oscuro y con texto al 130 %. Falta pantallas anchas (tablet) |
 | AND-03 | Navigation Compose | Luis | ✅ | Pestañas por rol |
 | AND-04 | Retrofit, DTO y mappers | David | ✅ | Contra Django |
 | AND-05 | Repository de búsqueda | Renzo | ✅ | Con caché en Room |
@@ -50,7 +50,7 @@ Firebase queda solo para la identidad (Authentication): la app ya no usa Firesto
 | AND-11 | Pantalla de acceso y navegación por rol | Luis | ✅ | |
 | AND-12 | Crear y consultar solicitud | David | ✅ | En Firestore; incluye la bandeja del prestador (aceptar/rechazar) |
 | AND-13 | Disponibilidad del prestador | Luis | ✅ | Contra Django con token de Firebase |
-| AND-14 | Mapa y ubicación | David | 🟡 | Mapa hecho (osmdroid); «Usar mi ubicación» sin probar con GPS real |
+| AND-14 | Mapa y ubicación | David | 🟡 | Google Maps; 26/11: la ubicación se escribe como dirección (Geocoder), con alfiler en el mapa o GPS, y «Mi dirección» en Perfil. Falta probar el GPS en un teléfono físico |
 | AND-15 | Cliente FCM y token del dispositivo | Renzo | ☐ | Hoy solo hay una notificación local |
 | AND-16 | Pruebas Compose y de navegación | David | ☐ | No existe `androidTest` |
 | AND-17 | Integración en emulador y **teléfono físico** | Luis | 🟡 | Emulador hecho; teléfono físico no |
@@ -112,7 +112,7 @@ Renzo construyó casi todo, así que **las pruebas y la revisión pasan a Luis y
 
 | ID | Tarea | Responsable | Depende de |
 |:---:|---|---|---|
-| AND-25 | **Nueva.** Recomendación, seguimiento y calificación en la app (HU-10, HU-11 y HU-12) | Quien construye cada historia en la web | Que cierre el Sprint 4; se estima entonces |
+| AND-25 | ✅ 26/11 (Renzo). Recomendación, seguimiento y calificación en la app (HU-10, HU-11 y HU-12): seguimiento y calificación ya estaban; la recomendación con IA se suma en la pantalla de cada sección («Recomendado para ti»), desde Spring | Quien construye cada historia en la web | Que cierre el Sprint 4; se estima entonces |
 
 ### Carga
 

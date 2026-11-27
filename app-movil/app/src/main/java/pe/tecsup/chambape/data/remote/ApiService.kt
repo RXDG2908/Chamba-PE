@@ -115,7 +115,27 @@ data class CalificarDto(
     @SerializedName("comentario") val comentario: String,
 )
 
+/** HU-10: la API devuelve más campos; la app usa los que muestra. */
+data class RecomendadoDto(
+    @SerializedName("id") val id: Int,
+    @SerializedName("motivo") val motivo: String?,
+    @SerializedName("puntaje") val puntaje: Double?,
+    @SerializedName("tiempo_estimado_min") val tiempoEstimadoMin: Int?,
+)
+
+data class RecomendacionDto(
+    @SerializedName("recomendado") val recomendado: RecomendadoDto?,
+)
+
 interface ApiService {
+    // HU-10: pública como la búsqueda (sin token), en Spring igual que en Django.
+    @GET("api/ia/recomendacion/")
+    suspend fun recomendacion(
+        @Query("rubro") rubroId: Int,
+        @Query("latitud") latitud: Double,
+        @Query("longitud") longitud: Double,
+    ): RecomendacionDto
+
     @GET("api/prestadores/rubros/")
     suspend fun rubros(): List<RubroDto>
 

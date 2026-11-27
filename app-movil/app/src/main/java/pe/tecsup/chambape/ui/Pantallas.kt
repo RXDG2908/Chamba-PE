@@ -241,13 +241,20 @@ fun DetalleScreen(prestadorId: Int, sesion: Sesion) {
 // ---------- Favoritos ----------
 
 @Composable
-fun FavoritosScreen(onAbrirPrestador: (Int) -> Unit) {
+fun FavoritosScreen(onAbrirPrestador: (Int) -> Unit, onIrAInicio: () -> Unit) {
     val vm = chambaViewModel { FavoritosViewModel(it.prestadorRepository) }
     val favoritos by vm.favoritos.collectAsStateWithLifecycle()
     val lista = favoritos
     when {
         lista == null -> PantallaCentrada { Cargando() }
-        lista.isEmpty() -> PantallaCentrada { Mensaje(stringResource(R.string.favoritos_vacio), icono = Icons.Outlined.FavoriteBorder) }
+        lista.isEmpty() -> PantallaCentrada {
+            Mensaje(
+                stringResource(R.string.favoritos_vacio),
+                textoBoton = stringResource(R.string.ir_a_inicio),
+                icono = Icons.Outlined.FavoriteBorder,
+                onBoton = onIrAInicio,
+            )
+        }
         else -> LazyColumn(contentPadding = PaddingValues(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
             items(lista, key = { it.id }) { prestador ->
                 // Al quitar un favorito la tarjeta se va y las demás suben en lugar de saltar.
@@ -266,7 +273,7 @@ fun FavoritosScreen(onAbrirPrestador: (Int) -> Unit) {
 // ---------- Solicitudes ----------
 
 @Composable
-fun SolicitudesScreen(sesion: Sesion) {
+fun SolicitudesScreen(sesion: Sesion, onIrAInicio: (() -> Unit)? = null) {
     val vm = chambaViewModel { SolicitudesViewModel(sesion, it.solicitudRepository) }
     val estado by vm.uiState.collectAsStateWithLifecycle()
     val esPrestador = sesion.rol == Rol.PRESTADOR
@@ -285,7 +292,10 @@ fun SolicitudesScreen(sesion: Sesion) {
         estado.solicitudes.isEmpty() -> PantallaCentrada {
             Mensaje(
                 stringResource(if (esPrestador) R.string.solicitudes_vacio_prestador else R.string.solicitudes_vacio_cliente),
+                // El cliente vacío tiene a dónde ir; el prestador espera solicitudes.
+                textoBoton = if (esPrestador || onIrAInicio == null) null else stringResource(R.string.ir_a_inicio),
                 icono = Icons.Outlined.Inbox,
+                onBoton = onIrAInicio ?: {},
             )
         }
         else -> LazyColumn(contentPadding = PaddingValues(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {

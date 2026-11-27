@@ -270,7 +270,7 @@ class SolicitudesViewModel(
         viewModelScope.launch {
             repository.deLaSesion(sesion)
                 .catch { _uiState.update { it.copy(cargando = false, error = true) } }
-                .collect { lista -> _uiState.update { it.copy(cargando = false, solicitudes = lista, error = false) } }
+                .collect { lista -> _uiState.update { it.copy(cargando = false, solicitudes = ordenarSolicitudes(lista), error = false) } }
         }
     }
 
@@ -299,3 +299,10 @@ class SolicitudesViewModel(
         }
     }
 }
+
+/**
+ * Las que siguen en curso (pendiente, confirmada, en camino, en servicio) van primero; las
+ * finalizadas y rechazadas, al final. Dentro de cada grupo se respeta el orden del servidor.
+ */
+internal fun ordenarSolicitudes(lista: List<Solicitud>): List<Solicitud> =
+    lista.sortedBy { it.estado == EstadoSolicitud.FINALIZADA || it.estado == EstadoSolicitud.RECHAZADA }

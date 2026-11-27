@@ -18,23 +18,15 @@
     <!-- Ingreso y registro -->
     <string name="login_titulo">Ingresa a tu cuenta</string>
     <string name="registro_titulo">Crear cuenta</string>
-    <string name="registro_ayuda">Con tu cuenta pides servicios y sigues su avance.</string>
     <string name="nombre">Nombre</string>
     <string name="correo">Correo</string>
     <string name="clave">Contraseña</string>
     <string name="ingresar">Ingresar</string>
-    <string name="ingresando">Ingresando…</string>
     <string name="crear_cuenta">Crear cuenta</string>
-    <string name="registrando">Creando cuenta…</string>
     <string name="ir_a_registro">Necesito un servicio</string>
     <string name="ir_a_registro_prestador">Ofrezco mis servicios</string>
     <string name="registro_prestador_titulo">Registro de prestador</string>
     <string name="registro_prestador_ayuda">Tu perfil quedará pendiente de verificación: aparecerás en las búsquedas cuando administración lo apruebe.</string>
-    <string name="registro_seccion_cuenta">Tu cuenta</string>
-    <string name="registro_seccion_datos">Tus datos</string>
-    <string name="registro_seccion_rubros">¿Qué servicios ofreces?</string>
-    <string name="registro_seccion_cobertura">Zona de cobertura</string>
-    <string name="registro_cobertura_ayuda">Toca el mapa para marcar el centro de tu zona y ajusta el radio.</string>
     <string name="registro_radio">%1$d km</string>
     <string name="registro_prestador_boton">Enviar registro</string>
     <string name="registro_revisa_campos">Revisa los campos marcados.</string>
@@ -49,7 +41,6 @@
     <string name="error_ubicacion_cobertura">Marca en el mapa el centro de tu zona.</string>
     <string name="ya_tengo_cuenta">Ya tengo cuenta</string>
     <string name="error_campos_vacios">Completa todos los campos.</string>
-    <string name="error_clave_corta">La contraseña debe tener al menos %1$d caracteres.</string>
     <string name="error_cuenta_sancionada">Tu cuenta está suspendida o bloqueada. Escribe a administración para saber el motivo.</string>
     <string name="error_credenciales">Correo o contraseña incorrectos.</string>
     <string name="error_correo_en_uso">Ya existe una cuenta con ese correo.</string>
@@ -80,14 +71,11 @@
     <!-- Detalle y solicitud -->
     <string name="detalle_titulo">Prestador</string>
     <string name="detalle_no_encontrado">No se encontró al prestador. Vuelve a buscarlo.</string>
-    <string name="detalle_zona">Zona de atención aproximada: %1$.3f, %2$.3f</string>
     <string name="sin_calificaciones">Sin calificaciones</string>
     <plurals name="calificacion_resumen">
         <item quantity="one">%1$.1f · %2$,d calificación</item>
         <item quantity="other">%1$.1f · %2$,d calificaciones</item>
     </plurals>
-    <string name="guardar_en_favoritos">Guardar en favoritos</string>
-    <string name="quitar_de_favoritos">Quitar de favoritos</string>
     <string name="solicitud_titulo">Pide el servicio</string>
     <string name="solicitud_descripcion">¿Qué necesitas?</string>
     <string name="solicitud_telefono">Tu celular (9 dígitos)</string>
@@ -96,7 +84,6 @@
     <string name="solicitud_contacto">Celular: %1$s</string>
     <string name="error_descripcion_corta">Describe lo que necesitas (mínimo %1$d caracteres).</string>
     <string name="enviar_solicitud">Enviar solicitud</string>
-    <string name="enviando">Enviando…</string>
     <string name="error_envio_solicitud">No se pudo enviar la solicitud. Inténtalo de nuevo.</string>
     <string name="solicitud_enviada">Solicitud enviada a %1$s. Sigue su estado en la pestaña Solicitudes.</string>
 
@@ -109,9 +96,7 @@
     <string name="prestador_sin_vincular">Tu bandeja se activará cuando administración verifique tu perfil de prestador.</string>
     <string name="error_solicitudes">No se pudieron cargar las solicitudes.</string>
     <string name="error_respuesta">No se pudo guardar tu respuesta. Inténtalo de nuevo.</string>
-    <string name="solicitud_en">En: %1$s</string>
     <string name="estado_pendiente">Pendiente</string>
-    <string name="estado_aceptada">Aceptada</string>
     <string name="estado_confirmado">Confirmado</string>
     <string name="estado_en_camino">En camino</string>
     <string name="estado_en_servicio">En servicio</string>
@@ -243,7 +228,6 @@
     <string name="cobertura_hoja_titulo">¿Desde dónde atiendes?</string>
     <string name="solicitud_lugar">Servicio en %1$s. Para cambiarlo, vuelve a Buscar.</string>
     <!-- Secciones de Buscar: lo que la persona necesita hacer. -->
-    <string name="seccion_todo">Todo</string>
     <string name="seccion_urgente">Urgente</string>
     <string name="seccion_urgente_desc">Algo se rompió y no puede esperar</string>
     <string name="seccion_hogar">Hogar</string>
@@ -271,4 +255,5 @@
     <string name="recomendado_llegada">Llega en ≈ %1$d min</string>
     <string name="recomendado_ver">Ver y pedir</string>
     <string name="recomendado_insignia">Recomendado</string>
+    <string name="ir_a_inicio">Ir a Inicio</string>
 </resources>

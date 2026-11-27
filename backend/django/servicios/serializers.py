@@ -61,12 +61,14 @@ class PrestadorBusquedaSerializer(serializers.ModelSerializer):
     # Perfil: nombre de la empresa o de la persona, y la ruta de su foto (o null).
     nombre_publico = serializers.CharField(read_only=True)
     foto = serializers.SerializerMethodField()
+    # Insignia «Nuevo»: registrado hace menos de DIAS_NUEVO días.
+    nuevo = serializers.BooleanField(source='es_nuevo', read_only=True)
 
     class Meta:
         model = Prestador
         fields = [
             'id', 'nombres', 'apellidos', 'rubros', 'latitud', 'longitud', 'distancia_km',
-            'calificacion_promedio', 'calificaciones_total', 'tipo', 'nombre_publico', 'descripcion', 'foto',
+            'calificacion_promedio', 'calificaciones_total', 'tipo', 'nombre_publico', 'descripcion', 'foto', 'nuevo',
         ]
 
     def get_foto(self, prestador):

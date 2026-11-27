@@ -26,6 +26,8 @@ class SembrarDemoSantaAnitaTests(TestCase):
         for p in demo:
             self.assertLess(abs(float(p.latitud) + 12.0445), 0.04)
             self.assertLess(abs(float(p.longitud) + 76.9525), 0.04)
+            # Prestadores «de siempre»: en la demo solo es «Nuevo» quien se registra en vivo.
+            self.assertFalse(p.es_nuevo)
 
     def test_se_puede_correr_varias_veces_sin_duplicar(self):
         self.sembrar()

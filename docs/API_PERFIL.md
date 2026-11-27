@@ -40,6 +40,8 @@ JPG, PNG o WEBP de hasta 5 MB. El servidor la abre con Pillow (un archivo que no
 ## Dónde se ve
 
 - **Búsqueda y recomendación (HU-3, HU-7, HU-10):** cada prestador trae `tipo`, `nombre_publico`, `descripcion` y `foto`. Las tarjetas muestran la foto (o las iniciales), el nombre público, la insignia «Empresa» y la descripción. Django y Spring devuelven lo mismo y en el mismo orden.
+- **Insignia «Nuevo»:** la búsqueda y la recomendación traen `nuevo` (`true` durante los primeros 30 días desde que el prestador se registró, `DIAS_NUEVO` en `prestadores/models.py` y en `BusquedaService` de Spring). La web y la app muestran «Nuevo» en la tarjeta, en «Recomendado para ti», en el detalle y en el mapa, para que los clientes sepan que aún no tiene historial. Los prestadores de relleno de `sembrar_demo_santa_anita` quedan registrados hace 3 a 12 meses, así que en una demo solo es «Nuevo» quien se registra en vivo.
+- **App Android:** muestra el nombre público y las insignias «Nuevo» y «Empresa» (caché Room en versión 3).
 - **Cabecera de la web:** foto y nombre (vía `/api/usuarios/yo/`, que suma `foto` y `nombre_publico` en Django y Spring).
 
 ## Base de datos

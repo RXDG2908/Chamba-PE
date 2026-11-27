@@ -1,6 +1,12 @@
+from datetime import timedelta
+
 from django.conf import settings
 from django.core.validators import MaxValueValidator, MinValueValidator, RegexValidator
 from django.db import models
+from django.utils import timezone
+
+# Un prestador lleva la insignia «Nuevo» durante sus primeros días en la plataforma.
+DIAS_NUEVO = 30
 
 
 class Rubro(models.Model):
@@ -69,6 +75,11 @@ class Prestador(models.Model):
 
     def __str__(self):
         return f'{self.nombres} {self.apellidos} ({self.dni})'
+
+    @property
+    def es_nuevo(self):
+        """True durante los primeros DIAS_NUEVO días desde que se registró."""
+        return self.creado is not None and self.creado >= timezone.now() - timedelta(days=DIAS_NUEVO)
 
     @property
     def nombre_publico(self):

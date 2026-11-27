@@ -16,8 +16,13 @@ data class Prestador(
     /** HU-12: promedio de 1 a 5 estrellas; null sin calificaciones. */
     val calificacionPromedio: Double? = null,
     val calificacionesTotal: Int = 0,
+    /** Nombre que ven los clientes (el de su empresa o el suyo); null con un servidor antiguo. */
+    val nombrePublico: String? = null,
+    val empresa: Boolean = false,
+    /** Registrado hace menos de 30 días: se muestra «Nuevo». */
+    val nuevo: Boolean = false,
 ) {
-    val nombreCompleto: String get() = "$nombres $apellidos".trim()
+    val nombreCompleto: String get() = nombrePublico ?: "$nombres $apellidos".trim()
     val tieneCalificaciones: Boolean get() = calificacionesTotal > 0 && calificacionPromedio?.isFinite() == true
 }
 

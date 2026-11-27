@@ -255,6 +255,9 @@
     <string name="recomendado_llegada">Llega en ≈ %1$d min</string>
     <string name="recomendado_ver">Ver y pedir</string>
     <string name="recomendado_insignia">Recomendado</string>
+    <string name="insignia_nuevo">Nuevo</string>
+    <string name="insignia_nuevo_descripcion">Prestador nuevo: se unió a ChambaPE hace poco</string>
+    <string name="insignia_empresa">Empresa</string>
     <string name="ir_a_inicio">Ir a Inicio</string>
     <string name="error_demasiados_intentos">Demasiados intentos con este correo. Inténtalo de nuevo en una hora.</string>
 </resources>

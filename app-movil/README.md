@@ -34,7 +34,7 @@ con un único módulo `app` y arquitectura MVVM.
 | Favoritos | Room; se conservan al cerrar la app y al volver a buscar | Semana 8 |
 | Ubicación del cliente arriba, como una app de delivery: se **escribe la dirección** (calle y distrito, con sugerencias), se usa el GPS o se mueve el mapa bajo un alfiler; nunca se ven coordenadas | `Geocoder` del sistema (sin clave), limitado al Perú; hoja inferior de Material 3 | Semanas 11 y 12 |
 | «Mi dirección» en Perfil: Buscar empieza con ella | `SharedPreferences`; se borra al cerrar sesión | Semana 8 |
-| Rubros con un ícono cada uno; resultados en **Lista** o **Mapa** (marcadores numerados con ficha y calificación) y círculo de cobertura en el registro de prestador | Íconos Material outlined; Google Maps con `maps-compose`; clave en `local.properties` | Semanas 11 y 12 |
+| Pantalla principal por **secciones** (Urgente, Hogar, Residencial, Empresas y Más servicios), cada una con su color y un filtro arriba; un rubro puede estar en varias. Rubros con un ícono cada uno; resultados en **Lista** o **Mapa** (marcadores numerados con ficha y calificación) y círculo de cobertura en el registro de prestador | Íconos Material outlined; Google Maps con `maps-compose`; clave en `local.properties` | Semanas 11 y 12 |
 | «Usar mi ubicación actual» | Permiso de ubicación aproximada + Fused Location; la calle sale del `Geocoder` | Semana 11 |
 | Enviar solicitud, seguir sus etapas (HU-11) y calificar (HU-12) | API Django `servicios` y `calificaciones` con el token; consulta cada 5 s, como la web | Semanas 9 y 11 |
 | Bandeja del prestador: aceptar, rechazar, avanzar y llamar al cliente | API Django (la misma bandeja que la web) | Semanas 9 y 11 |
@@ -94,6 +94,21 @@ Desde `app-movil/`:
 ./gradlew lintDebug            # lint de Android
 ./gradlew installDebug         # instala en un emulador o dispositivo conectado
 ```
+
+## Datos de prueba cerca de TECSUP (Santa Anita)
+
+Para que la app tenga variedad al probar, con la base local de Django:
+
+```powershell
+$env:DJANGO_DEBUG="true"; python backend/django/manage.py sembrar_demo_santa_anita
+```
+
+Crea o actualiza 30 prestadores verificados a 0,3–4 km de TECSUP (Av. Cascanueces 2221), con nombres de
+personas («Joel Rivas») y de marcas («ElecTools», «GasfiExpress»), rubros repetidos, varios con
+calificaciones, y los 8 rubros que la app agrupa en sus secciones (Cámaras de seguridad, Aire
+acondicionado, Fumigación…). Se puede correr varias veces; `--quitar` borra solo esos datos. Fuera de
+desarrollo (`DJANGO_DEBUG` apagado) no hace nada. En la app, pon «Av. Cascanueces 2221, Santa Anita» como
+«Mi dirección».
 
 ## Conectar con la API (Spring Boot)
 

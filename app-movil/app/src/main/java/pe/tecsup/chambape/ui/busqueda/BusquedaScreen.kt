@@ -47,6 +47,17 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.material.icons.outlined.Apps
+import androidx.compose.material3.FilterChip
+import androidx.compose.material3.FilterChipDefaults
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
+import androidx.compose.ui.graphics.Color
+import pe.tecsup.chambape.ui.Seccion
 import pe.tecsup.chambape.R
 import pe.tecsup.chambape.domain.model.Rubro
 import pe.tecsup.chambape.ui.AvisoError
@@ -99,6 +110,18 @@ fun BusquedaScreen(
     onFavorito: (Int) -> Unit,
 ) {
     var vista by rememberSaveable { mutableStateOf(Vista.LISTA) }
+    // null = todas las secciones, cada una en su fila deslizable.
+    var seccionElegida by rememberSaveable { mutableStateOf<Seccion?>(null) }
+    val lista = rememberLazyListState()
+    val rubros = (estado.rubros as? EstadoRubros.Listo)?.rubros.orEmpty()
+    val secciones = remember(rubros) { Seccion.entries.filter { it.rubrosDe(rubros).isNotEmpty() } }
+    // Al llegar resultados se baja hasta ellos: las secciones ocupan casi toda la pantalla.
+    LaunchedEffect(estado.resultados) {
+        if (estado.resultados is EstadoResultados.Exito || estado.resultados == EstadoResultados.Vacio) {
+            val indice = lista.layoutInfo.totalItemsCount - 1
+            lista.animateScrollToItem(indiceResultados(lista).coerceAtMost(indice.coerceAtLeast(0)))
+        }
+    }
     Column(modifier = Modifier.fillMaxSize()) {
         BarraUbicacion(
             direccion = estado.direccion,
@@ -106,6 +129,7 @@ fun BusquedaScreen(
             modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 12.dp, bottom = 4.dp),
         )
         LazyColumn(
+            state = lista,
             modifier = Modifier.fillMaxSize(),
             contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 24.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp),
@@ -117,17 +141,35 @@ fun BusquedaScreen(
                     modifier = Modifier.semantics { heading() },
                 )
             }
-            item {
-                when (val rubros = estado.rubros) {
-                    EstadoRubros.Cargando -> Cargando()
-                    is EstadoRubros.Error -> Mensaje(
-                        textoError(rubros.tipo), textoBoton = stringResource(R.string.reintentar),
-                        icono = iconoError(rubros.tipo), onBoton = onReintentarRubros,
+            when (val estadoRubros = estado.rubros) {
+                EstadoRubros.Cargando -> item { Cargando() }
+                is EstadoRubros.Error -> item {
+                    Mensaje(
+                        textoError(estadoRubros.tipo), textoBoton = stringResource(R.string.reintentar),
+                        icono = iconoError(estadoRubros.tipo), onBoton = onReintentarRubros,
                     )
-                    is EstadoRubros.Listo ->
-                        if (rubros.rubros.isEmpty()) Mensaje(stringResource(R.string.busqueda_sin_rubros))
-                        else GrillaRubros(rubros.rubros, estado.rubroId, onRubro)
                 }
+                is EstadoRubros.Listo ->
+                    if (rubros.isEmpty()) {
+                        item { Mensaje(stringResource(R.string.busqueda_sin_rubros)) }
+                    } else {
+                        item(key = "filtro-secciones") {
+                            FiltroSecciones(secciones, seccionElegida, onElegir = { seccionElegida = it })
+                        }
+                        val visibles = seccionElegida?.let(::listOf) ?: secciones
+                        visibles.forEach { seccion ->
+                            item(key = "seccion-${seccion.name}") {
+                                FilaSeccion(
+                                    seccion = seccion,
+                                    rubros = seccion.rubrosDe(rubros),
+                                    elegido = estado.rubroId,
+                                    enGrilla = seccionElegida != null,
+                                    onRubro = onRubro,
+                                    modifier = Modifier.animateItem(),
+                                )
+                            }
+                        }
+                    }
             }
             if (estado.faltaRubro) item { AvisoError(stringResource(R.string.error_falta_rubro)) }
             if (estado.faltaDireccion) item { AvisoError(stringResource(R.string.error_falta_direccion)) }
@@ -146,7 +188,7 @@ fun BusquedaScreen(
                     }
                 }
                 EstadoResultados.Cargando -> item { Cargando() }
-                EstadoResultados.Vacio -> item {
+                EstadoResultados.Vacio -> item(key = CLAVE_RESULTADOS) {
                     Mensaje(
                         stringResource(R.string.busqueda_vacia),
                         textoBoton = stringResource(R.string.ubicacion_cambiar),
@@ -162,7 +204,7 @@ fun BusquedaScreen(
                 }
                 is EstadoResultados.Exito -> {
                     if (resultados.desdeCache) item { AvisoSinConexion() }
-                    item(key = "titulo-resultados") {
+                    item(key = CLAVE_RESULTADOS) {
                         Row(
                             modifier = Modifier.fillMaxWidth().padding(top = 8.dp).animateItem(),
                             verticalAlignment = Alignment.CenterVertically,
@@ -201,6 +243,7 @@ fun BusquedaScreen(
                                 onAbrir = { onAbrirPrestador(prestador.id) },
                                 onFavorito = { onFavorito(prestador.id) },
                                 modifier = Modifier.animateItem(),
+                                rubroBuscado = rubros.firstOrNull { it.id == estado.rubroId }?.nombre,
                             )
                         }
                     }
@@ -228,34 +271,121 @@ private fun SelectorVista(vista: Vista, onCambiar: (Vista) -> Unit) {
     }
 }
 
-/**
- * Los rubros como un catálogo de íconos (4 por fila): se reconocen de un vistazo y un toque
- * basta, como las categorías de una app de delivery. El elegido se llena de color.
- */
-@OptIn(ExperimentalLayoutApi::class)
+private const val CLAVE_RESULTADOS = "titulo-resultados"
+
+/** Posición del encabezado de resultados en la lista (o la última, si aún no se compuso). */
+private fun indiceResultados(lista: LazyListState): Int =
+    lista.layoutInfo.visibleItemsInfo.firstOrNull { it.key == CLAVE_RESULTADOS }?.index
+        ?: (lista.layoutInfo.totalItemsCount - 1)
+
+/** Colores de cada sección (law-of-similarity): fondo del ícono y su tinta. */
 @Composable
-private fun GrillaRubros(rubros: List<Rubro>, elegido: Int?, onRubro: (Int) -> Unit) {
-    FlowRow(
-        modifier = Modifier.fillMaxWidth().selectableGroup(),
-        maxItemsInEachRow = 4,
-        verticalArrangement = Arrangement.spacedBy(4.dp),
-    ) {
-        rubros.forEach { rubro ->
-            OpcionRubro(
-                rubro = rubro,
-                elegido = rubro.id == elegido,
-                onClick = { onRubro(rubro.id) },
-                modifier = Modifier.fillMaxWidth(0.25f),
+private fun coloresSeccion(seccion: Seccion): Pair<Color, Color> {
+    val c = MaterialTheme.colorScheme
+    return when (seccion) {
+        Seccion.URGENTE -> c.errorContainer to c.onErrorContainer
+        Seccion.HOGAR -> c.secondaryContainer to c.onSecondaryContainer
+        Seccion.RESIDENCIAL -> c.tertiaryContainer to c.onTertiaryContainer
+        Seccion.EMPRESAS -> c.primaryContainer to c.onPrimaryContainer
+        Seccion.OTROS -> c.surfaceContainerHighest to c.onSurfaceVariant
+    }
+}
+
+/** «Todo · Urgente · Hogar · Residencial · Empresas»: filtra qué secciones se ven. */
+@Composable
+private fun FiltroSecciones(secciones: List<Seccion>, elegida: Seccion?, onElegir: (Seccion?) -> Unit) {
+    LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.selectableGroup()) {
+        item {
+            FilterChip(
+                selected = elegida == null,
+                onClick = { onElegir(null) },
+                label = { Text(stringResource(R.string.seccion_todo)) },
+                leadingIcon = { Icon(Icons.Outlined.Apps, contentDescription = null, modifier = Modifier.size(FilterChipDefaults.IconSize)) },
+            )
+        }
+        items(secciones.filter { it != Seccion.OTROS }, key = { it.name }) { seccion ->
+            FilterChip(
+                selected = elegida == seccion,
+                onClick = { onElegir(if (elegida == seccion) null else seccion) },
+                label = { Text(stringResource(seccion.titulo)) },
+                leadingIcon = { Icon(seccion.icono, contentDescription = null, modifier = Modifier.size(FilterChipDefaults.IconSize)) },
             )
         }
     }
 }
 
+/**
+ * Una sección: su nombre, para qué sirve y sus rubros. Con «Todo» los rubros van en una fila que
+ * se desliza (como las categorías de una app de delivery); al elegir la sección, en grilla.
+ */
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
-private fun OpcionRubro(rubro: Rubro, elegido: Boolean, onClick: () -> Unit, modifier: Modifier = Modifier) {
+private fun FilaSeccion(
+    seccion: Seccion,
+    rubros: List<Rubro>,
+    elegido: Int?,
+    enGrilla: Boolean,
+    onRubro: (Int) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    val (fondo, tinta) = coloresSeccion(seccion)
+    Column(modifier = modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+            Box(
+                modifier = Modifier.size(32.dp).clip(RoundedCornerShape(10.dp)).background(fondo),
+                contentAlignment = Alignment.Center,
+            ) {
+                Icon(seccion.icono, contentDescription = null, tint = tinta, modifier = Modifier.size(18.dp))
+            }
+            Column {
+                Text(
+                    stringResource(seccion.titulo),
+                    style = MaterialTheme.typography.titleMedium,
+                    modifier = Modifier.semantics { heading() },
+                )
+                Text(
+                    stringResource(seccion.descripcion),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
+        }
+        if (enGrilla) {
+            FlowRow(
+                modifier = Modifier.fillMaxWidth().selectableGroup(),
+                maxItemsInEachRow = 4,
+                verticalArrangement = Arrangement.spacedBy(4.dp),
+            ) {
+                rubros.forEach { rubro ->
+                    OpcionRubro(rubro, rubro.id == elegido, fondo, tinta, { onRubro(rubro.id) }, Modifier.fillMaxWidth(0.25f))
+                }
+            }
+        } else {
+            LazyRow(
+                modifier = Modifier.selectableGroup(),
+                horizontalArrangement = Arrangement.spacedBy(4.dp),
+                contentPadding = PaddingValues(end = 16.dp),
+            ) {
+                items(rubros, key = { it.id }) { rubro ->
+                    OpcionRubro(rubro, rubro.id == elegido, fondo, tinta, { onRubro(rubro.id) }, Modifier.width(92.dp))
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun OpcionRubro(
+    rubro: Rubro,
+    elegido: Boolean,
+    fondoSeccion: Color,
+    tintaSeccion: Color,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
     val esquema = MaterialTheme.colorScheme
-    val fondo by animateColorAsState(if (elegido) esquema.primary else esquema.secondaryContainer, label = "fondo-rubro")
-    val icono by animateColorAsState(if (elegido) esquema.onPrimary else esquema.onSecondaryContainer, label = "icono-rubro")
+    val fondo by animateColorAsState(if (elegido) esquema.primary else fondoSeccion, label = "fondo-rubro")
+    val icono by animateColorAsState(if (elegido) esquema.onPrimary else tintaSeccion, label = "icono-rubro")
     Column(
         modifier = modifier
             .clip(RoundedCornerShape(16.dp))

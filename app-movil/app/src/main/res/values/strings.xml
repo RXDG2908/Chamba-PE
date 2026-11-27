@@ -242,4 +242,16 @@
     <string name="cobertura_buscar_direccion">Escribir la dirección o usar mi ubicación</string>
     <string name="cobertura_hoja_titulo">¿Desde dónde atiendes?</string>
     <string name="solicitud_lugar">Servicio en %1$s. Para cambiarlo, vuelve a Buscar.</string>
+    <!-- Secciones de Buscar: lo que la persona necesita hacer. -->
+    <string name="seccion_todo">Todo</string>
+    <string name="seccion_urgente">Urgente</string>
+    <string name="seccion_urgente_desc">Algo se rompió y no puede esperar</string>
+    <string name="seccion_hogar">Hogar</string>
+    <string name="seccion_hogar_desc">Arreglos y cuidado de tu casa</string>
+    <string name="seccion_residencial">Residencial</string>
+    <string name="seccion_residencial_desc">Edificios, condominios y áreas comunes</string>
+    <string name="seccion_empresas">Empresas</string>
+    <string name="seccion_empresas_desc">Oficinas, locales y talleres</string>
+    <string name="seccion_otros">Más servicios</string>
+    <string name="seccion_otros_desc">Otros oficios disponibles</string>
 </resources>

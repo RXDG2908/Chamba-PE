@@ -172,6 +172,14 @@ private fun NavegacionPrincipal(sesion: Sesion, onCerrarSesion: () -> Unit) {
             }
         },
     ) { relleno ->
+        // Igual que tocar la pestaña Inicio: sin apilar pantallas.
+        val irAInicio = {
+            nav.navigate(Rutas.BUSCAR) {
+                popUpTo(nav.graph.findStartDestination().id) { saveState = true }
+                launchSingleTop = true
+                restoreState = true
+            }
+        }
         NavHost(
             navController = nav,
             startDestination = pestanas.first().ruta,
@@ -201,7 +209,7 @@ private fun NavegacionPrincipal(sesion: Sesion, onCerrarSesion: () -> Unit) {
                         onAbrirPrestador = { nav.navigate(Rutas.detalle(it)) },
                     )
                 }
-                composable(Rutas.FAVORITOS) { FavoritosScreen(onAbrirPrestador = { nav.navigate(Rutas.detalle(it)) }) }
+                composable(Rutas.FAVORITOS) { FavoritosScreen(onAbrirPrestador = { nav.navigate(Rutas.detalle(it)) }, onIrAInicio = irAInicio) }
                 composable(Rutas.DETALLE, arguments = listOf(navArgument("id") { type = NavType.IntType })) { entrada ->
                     DetalleScreen(prestadorId = entrada.arguments?.getInt("id") ?: -1, sesion = sesion)
                 }
@@ -209,7 +217,7 @@ private fun NavegacionPrincipal(sesion: Sesion, onCerrarSesion: () -> Unit) {
             if (sesion.rol == Rol.PRESTADOR) {
                 composable(Rutas.DISPONIBILIDAD) { DisponibilidadScreen() }
             }
-            composable(Rutas.SOLICITUDES) { SolicitudesScreen(sesion) }
+            composable(Rutas.SOLICITUDES) { SolicitudesScreen(sesion, onIrAInicio = irAInicio.takeIf { sesion.rol == Rol.CLIENTE }) }
             composable(Rutas.PERFIL) { PerfilScreen(sesion, onCerrarSesion) }
         }
     }

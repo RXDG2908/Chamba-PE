@@ -143,12 +143,13 @@ try:
     total = len(pasos) + len(codigos)
 
     # Registro de la app y calificaciones (HU-12): los ids salen de la respuesta de Django.
-    def paso(metodo, ruta, cuerpo=None, tok=None, tipo='application/json', extra=None):
+    def paso(metodo, ruta, cuerpo=None, tok=None, tipo='application/json', extra=None, solo_estado=False):
+        # solo_estado: un 500 de Django es una página (HTML o texto), no JSON; basta el código.
         nonlocal_estado['total'] += 1
         rd = pedir(PD, metodo, ruta, cuerpo, tipo, tok, extra); rs = pedir(PS, metodo, ruta, cuerpo, tipo, tok, extra)
         if os.environ.get('PARIDAD_VER'):
             print(' ', rd[0], metodo, ruta[:40], json.dumps(rd[1], ensure_ascii=False)[:150])
-        if (rd[0], normal(rd[1])) == (rs[0], normal(rs[1])): nonlocal_estado['iguales'] += 1
+        if solo_estado and rd[0] == rs[0] or (rd[0], normal(rd[1])) == (rs[0], normal(rs[1])): nonlocal_estado['iguales'] += 1
         else: distintos.append((metodo, ruta[:60], json.dumps(cuerpo, ensure_ascii=False)[:80] if cuerpo is not None else None, rd[:2], rs[:2]))
         return rd
     nonlocal_estado = {'total': 0, 'iguales': 0}
@@ -301,6 +302,37 @@ try:
         paso('POST', RP, dict(valido, dni='20000004', nombres=nombres, apellidos=nombres, telefono=telefono), tp4)
     paso('POST', S, dict(base, cliente_nombre='  Ana   María. '), None)
     paso('POST', S, dict(base, cliente_nombre='Ana	María'), None)
+    # HU-8: token FCM de la web del prestador (POST registra, DELETE quita). Va con la sesión de Django.
+    NT = '/api/servicios/notificaciones/token/'
+    FCM = 'fcm-de-prueba_' + 'Ab9:-' * 30
+    paso('POST', NT, {'token': FCM}); paso('POST', NT, {'token': FCM}, T['cli']); paso('POST', NT, {'token': FCM}, T['sanc'])
+    paso('POST', NT, {'token': FCM}, None, extra=web('cli')); paso('POST', NT, {'token': FCM}, None, extra=web('ana', csrf=False))
+    paso('GET', NT, None, None, extra=web('ana', csrf=False)); paso('GET', NT, None, None, extra=web('cli', csrf=False))
+    for cuerpo in ({}, [1], 'null', '"x"', {'token': ''}, {'token': '   '}, {'token': None}, {'token': True}, {'token': ['x']},
+                   {'token': {'a': 1}}, {'token': 'corto'}, {'token': 'a' * 19 + '!'}, {'token': 'a' * 2049},
+                   {'token': 'a' * 2049 + '/'}, {'token': 'a' * 30 + '\u0000'}, {'token': 'ñ' * 25}, {'token': 'a' * 20 + ' b'},
+                   {'token': 'a' * 20 + '\n'}, {'token': 1.5}, {'otro': FCM}):
+        paso('POST', NT, cuerpo, None, extra=web('ana'))
+    paso('POST', NT, {'token': FCM}, None, extra=web('ana'))
+    paso('POST', NT, {'token': FCM}, None, extra=web('ana'))  # mismo token: se actualiza, no se duplica
+    paso('POST', NT, {'token': '  ' + FCM[:40] + '\t\n'}, None, extra=web('ana'))  # se registra sin los espacios
+    paso('POST', NT, {'token': 12345678901234567890123}, None, extra=web('ana'))  # DRF acepta números como texto
+    paso('POST', NT, {'token': 'a' * 2048}, None, extra=web('ana'))
+    paso('POST', NT, 'token=' + 'formulario-' * 3, None, 'application/x-www-form-urlencoded', extra=web('ana'))
+    # Con el token de la app no hay sesión de Django: session_key queda en None y la base lo rechaza (500 en los dos).
+    paso('POST', NT, {'token': 'sin-sesion-' * 3}, T['ana'], solo_estado=True)
+    paso('POST', NT, {'token': 'sesion-inventada-' * 2}, T['ana'], extra={'Cookie': 'sessionid=inventada123'}, solo_estado=True)
+    paso('POST', NT, {'token': 'sesion-hash-malo-' * 2}, T['ana'], extra=web('cli_hash_malo', csrf=False), solo_estado=True)
+    paso('POST', NT, {'token': 'sesion-sancionada-' * 2}, T['ana'], extra=web('cli_susp', csrf=False))  # la sesión sigue
+    for cuerpo in ({}, [1], {'token': 'corto'}):
+        paso('DELETE', NT, cuerpo, None, extra=web('ana'))
+    paso('DELETE', NT, {'token': FCM}); paso('DELETE', NT, {'token': FCM}, None, extra=web('ana', csrf=False))
+    paso('DELETE', NT, {'token': FCM}, None, extra=web('cli'))
+    paso('DELETE', NT, {'token': 'formulario-' * 3}, T['cli'])
+    paso('DELETE', NT, {'token': FCM}, None, extra=web('ana'))
+    paso('DELETE', NT, {'token': FCM}, None, extra=web('ana'))  # ya no está: también 204
+    paso('DELETE', NT, {'token': 'a' * 2048}, T['dino'])  # de otro prestador: no lo borra
+    paso('PATCH', NT, {'token': FCM}, None, extra=web('ana'))
     iguales += nonlocal_estado['iguales']; total += nonlocal_estado['total']
     print(f'Django vs Spring: {iguales} iguales, {len(distintos)} distintos de {total}')
     for d in distintos: print('  DISTINTO', json.dumps(d, ensure_ascii=False)[:900])
@@ -316,6 +348,14 @@ try:
         r1, r2 = pedir(PD, metodo, ruta, tok=tok), pedir(PD2, metodo, ruta, tok=tok)
         if (r1[0], normal(r1[1])) != (r2[0], normal(r2[1])):
             malos += 1; print('  CRUCE DISTINTO', ruta, json.dumps([r1[:2], r2[:2]], ensure_ascii=False)[:900])
+    # Los tokens FCM no tienen ruta de lectura: se comparan las filas que dejaron Django (a) y Spring (b).
+    import sqlite3
+    def tokens(base):
+        with sqlite3.connect(AQUI / base) as con:
+            return con.execute('select usuario_id, token, sesion from servicios_tokenfcm order by token').fetchall()
+    if tokens('a.sqlite3') != tokens('b.sqlite3'):
+        malos += 1; print('  TOKENS FCM DISTINTOS', tokens('a.sqlite3'), tokens('b.sqlite3'))
+    cruz.append('tokens FCM')
     print(f'Lectura cruzada (Django lee lo que escribió Spring): {len(cruz) - malos}/{len(cruz)} iguales')
     sys.exit(1 if distintos or malos else 0)
 finally:

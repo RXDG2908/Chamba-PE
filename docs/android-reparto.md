@@ -17,8 +17,8 @@ Compara el [plan Android](PLAN_DESARROLLO_ANDROID.md) (21 tarjetas `AND-*`, de L
 | Dato | Valor |
 |---|---|
 | Tarjetas del plan construidas | **11 de 21**, todas por Renzo; en `main` desde el 16/11 (PR #39), **sin revisión de otro integrante** |
-| Tarjetas parciales | 3: AND-02, AND-14 y AND-17 |
-| Tarjetas sin iniciar | 7: AND-08, AND-15, AND-16 y AND-18 a AND-21 |
+| Tarjetas parciales | 4: AND-02, AND-08, AND-14 y AND-17 |
+| Tarjetas sin iniciar | 6: AND-15, AND-16 y AND-18 a AND-21 |
 | Trabajo nuevo que el plan no tenía | 4 tarjetas: AND-22 a AND-25 |
 | Horas estimadas de lo que falta | **≈ 29 h** (estimación del Scrum Master, por confirmar) |
 | Capacidad en el Sprint 4 | **0 h**: está completo con 30 h ([reparto](sprint4-reparto.md), en el [PR #40](https://github.com/RXDG2908/Chamba-PE/pull/40)) |
@@ -44,7 +44,7 @@ Firebase queda solo para la identidad (Authentication): la app ya no usa Firesto
 | AND-05 | Repository de búsqueda | Renzo | ✅ | Con caché en Room |
 | AND-06 | `BusquedaViewModel` y UiState | Luis | ✅ | |
 | AND-07 | Filtros y lista de búsqueda | David | ✅ | |
-| AND-08 | Pruebas de Repository y contrato HTTP | Renzo | ☐ | No hay pruebas de repositorios ni de mappers |
+| AND-08 | Pruebas de Repository y contrato HTTP | Renzo | 🟡 | 26/11: hay pruebas de `ApiSolicitudRepository` y `ApiPerfiles`; faltan búsqueda, disponibilidad, registro y mappers |
 | AND-09 | Pruebas de ViewModel | Luis | ✅ | 19 pruebas (búsqueda, disponibilidad y registro) |
 | AND-10 | Identidad y sesión | Renzo | ✅ | Con Firebase Auth, no Spring |
 | AND-11 | Pantalla de acceso y navegación por rol | Luis | ✅ | |

@@ -74,3 +74,21 @@
   .busqueda-fila { grid-template-columns: 1fr; }
   .busqueda .busqueda-fila .boton-buscar { width: 100%; }
 }
+
+/* Sin sesión de cliente: en lugar del formulario, enlaces para entrar o crear la cuenta. */
+.solicitud-sin-sesion .acciones-sin-sesion {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem;
+  margin: 0.5rem 0 0;
+}
+.solicitud-sin-sesion .boton {
+  text-decoration: none;
+}
+.solicitud-sin-sesion .acciones-sin-sesion .boton {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.6rem 1rem;
+}

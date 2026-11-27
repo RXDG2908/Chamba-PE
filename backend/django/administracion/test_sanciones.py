@@ -196,7 +196,7 @@ class EfectosDeLaSancionTests(BaseSanciones):
         self.assertEqual(anonimo.get(reverse('buscar_prestadores'), buscar).json(), [])
         self.assertFalse(TokenFCM.objects.filter(usuario=self.usuario_prestador).exists())
 
-        respuesta = self.solicitud(anonimo)
+        respuesta = self.solicitud(self.sesion('cliente_hu13')[0])
         self.assertEqual(respuesta.status_code, 400)
         self.assertEqual(respuesta.json()['prestador'], ['El prestador no está disponible.'])
         _, ingreso = self.sesion('prestador_hu13')
@@ -205,7 +205,7 @@ class EfectosDeLaSancionTests(BaseSanciones):
     def test_aunque_se_reactive_a_mano_la_disponibilidad_no_recibe(self):
         self.sancionar(self.usuario_prestador, tipo='suspension', dias=5, motivo='Cobros fuera de la plataforma.')
         Prestador.objects.filter(pk=self.prestador.pk).update(disponible=True)  # p. ej. desde el admin
-        respuesta = self.solicitud(APIClient())
+        respuesta = self.solicitud(self.sesion('cliente_hu13')[0])
         self.assertEqual(respuesta.status_code, 400)
 
     @override_settings(FIREBASE_AUTH_PROJECT_ID='proyecto-de-prueba')

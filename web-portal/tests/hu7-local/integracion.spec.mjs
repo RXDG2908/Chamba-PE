@@ -198,7 +198,22 @@ test('disponibilidad real mediante sesión/CSRF cambia lista y mapa', async ({ p
   expect(restaurado.some((p) => p.id === fixtures.prestadores.Centro.id)).toBe(true)
 })
 
+test('sin sesión la tarjeta pide iniciar sesión y no muestra el formulario', async ({ page }) => {
+  await preparar(page)
+  await buscar(page)
+  const card = cards(page).first()
+  await expect(card.getByRole('link', { name: 'Inicia sesión para solicitar' })).toBeVisible()
+  await expect(card.getByRole('button', { name: 'Enviar solicitud' })).toHaveCount(0)
+})
+
 test('solicitud desde tarjeta se guarda realmente solo en la BD ficticia', async ({ page }) => {
+  // Solo un cliente con sesión envía solicitudes: se inicia sesión antes de abrir la página.
+  await page.request.get('/api/usuarios/csrf/')
+  const login = await page.request.post('/api/usuarios/login/', {
+    headers: { 'X-CSRFToken': await csrf(page.request) },
+    data: { username: fixtures.cliente.username, password: 'SoloPruebasHU7!2026' },
+  })
+  expect(login.status()).toBe(200)
   await preparar(page)
   const data = await buscar(page)
   const card = cards(page).first()

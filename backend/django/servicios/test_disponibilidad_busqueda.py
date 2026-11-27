@@ -181,7 +181,9 @@ class FlujoVerificacionYDisponibilidadTests(TestCase):
     def test_inactivo_tampoco_recibe_solicitudes(self):
         self.decidir(self.subir_certificado(), 'aprobado')
         self.cambiar_disponibilidad(False)
-        respuesta = self.cliente.post(reverse('crear_solicitud'), {
+        cliente = Client()
+        cliente.force_login(get_user_model().objects.create_user(username='cliente_t63'))
+        respuesta = cliente.post(reverse('crear_solicitud'), {
             'prestador': self.prestador.id, 'rubro': self.rubro.id, 'cliente_nombre': 'Ana',
             'cliente_telefono': '912345678', 'descripcion': 'Fuga en el baño', **CENTRO,
         }, content_type='application/json')

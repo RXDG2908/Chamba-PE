@@ -29,6 +29,7 @@ class EntregaAvisoSolicitudTests(TestCase):
         self.rubro = Rubro.objects.get(nombre='Gasfitería')
         self.prestador = self.crear_prestador('prestador_t83')
         self.cliente = Client()
+        self.cliente.force_login(get_user_model().objects.create_user(username='cliente_t83'))
         self.sesion_prestador = Client()
         self.sesion_prestador.force_login(self.prestador.usuario)
         self.datos = {

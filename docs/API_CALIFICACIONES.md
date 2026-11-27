@@ -11,7 +11,7 @@ Implementación de T12.1 (API) y T12.2 (pantalla), David Valcarcel, 23/11/2026. 
 | Tema | Decisión |
 |---|---|
 | Estado Finalizado | Se agrega solo el valor `finalizada` a `Solicitud.Estado`. Los estados intermedios de HU-11 (en camino, en servicio) y quién marca cada uno los define Luis en T11.1. **Actualizado con HU-11 (24/11):** el prestador asignado lleva la solicitud de Confirmado a En camino, En servicio y Finalizada desde su bandeja; el estado ya no se edita en `/admin/` ([seguimiento](API_SEGUIMIENTO.md)). |
-| Quién califica | El **cliente con sesión iniciada**. Si envía la solicitud con su sesión, la solicitud guarda su cuenta (`Solicitud.cliente`) y solo él puede calificarla. Las solicitudes enviadas sin cuenta se siguen aceptando, pero no se califican. |
+| Quién califica | El **cliente con sesión iniciada**. Si envía la solicitud con su sesión, la solicitud guarda su cuenta (`Solicitud.cliente`) y solo él puede calificarla. Desde el 27/11 solo un cliente con sesión (o token de la app) puede enviar solicitudes; las antiguas enviadas sin cuenta no se califican. |
 
 ## Cambios en modelos
 

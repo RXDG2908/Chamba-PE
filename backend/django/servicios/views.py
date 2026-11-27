@@ -5,12 +5,12 @@ from django.shortcuts import get_object_or_404
 from django.utils import timezone
 from django.db import transaction
 from rest_framework import generics, status
+from rest_framework.exceptions import PermissionDenied
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from usuarios.models import Perfil, rol_de
-from usuarios.permisos import EsPrestador
+from usuarios.permisos import EsCliente, EsPrestador
 
 from .busqueda import prestadores_en_cobertura
 from .codigo_seguimiento import puede_ver
@@ -37,14 +37,17 @@ class BuscarPrestadoresView(APIView):
 
 
 class CrearSolicitudView(generics.CreateAPIView):
-    """El cliente envía una solicitud a un prestador; queda Pendiente."""
-    serializer_class = SolicitudSerializer
-    # Sigue abierta a visitantes; con sesión de cliente (y su CSRF) la solicitud queda a su nombre.
-    permission_classes = [AllowAny]
+    """El cliente envía una solicitud a un prestador; queda Pendiente.
 
-    def create(self, request, *args, **kwargs):
+    Solo un cliente con sesión (web) o token de la app: un visitante sin cuenta, un prestador o un
+    administrador reciben 403, como el resto de rutas privadas. La solicitud queda a su nombre.
+    """
+    serializer_class = SolicitudSerializer
+    permission_classes = [EsCliente]
+
+    def check_permissions(self, request):
         # HU-13: la sesión de una cuenta sancionada ya no autentica, pero se reconoce por su id
-        # en la sesión: se explica el motivo en vez de enviar la solicitud como visitante.
+        # en la sesión: se explica el motivo en vez del mensaje genérico de «sin sesión».
         from django.contrib.auth import SESSION_KEY, get_user_model
         from administracion.models import sancion_vigente
         from administracion.sanciones import mensaje_para_la_cuenta
@@ -52,15 +55,13 @@ class CrearSolicitudView(generics.CreateAPIView):
         if id_en_sesion and not request.user.is_authenticated:
             sancion = sancion_vigente(get_user_model()._meta.pk.to_python(id_en_sesion))
             if sancion is not None:
-                return Response({'detail': mensaje_para_la_cuenta(sancion)}, status=status.HTTP_403_FORBIDDEN)
-        return super().create(request, *args, **kwargs)
+                raise PermissionDenied(mensaje_para_la_cuenta(sancion))
+        super().check_permissions(request)
 
     def perform_create(self, serializer):
         from .push import notificar_solicitud
-        usuario = self.request.user
-        cliente = usuario if usuario.is_authenticated and rol_de(usuario) == Perfil.Rol.CLIENTE else None
         with transaction.atomic():
-            solicitud = serializer.save(cliente=cliente)
+            solicitud = serializer.save(cliente=self.request.user)
             transaction.on_commit(lambda: notificar_solicitud(solicitud.pk))
 
 

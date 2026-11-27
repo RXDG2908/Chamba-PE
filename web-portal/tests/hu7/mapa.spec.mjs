@@ -42,7 +42,9 @@ async function preparar(page, opciones = {}) {
   await page.context().route('**/api/**', async (route) => {
     const url = new URL(route.request().url())
     if (url.pathname.endsWith('/csrf/')) return route.fulfill({ json: {} })
-    if (url.pathname.endsWith('/yo/')) return route.fulfill({ status: 403, json: {} })
+    if (url.pathname.endsWith('/yo/')) {
+      return opciones.usuario ? route.fulfill({ json: opciones.usuario }) : route.fulfill({ status: 403, json: {} })
+    }
     if (url.pathname.endsWith('/rubros/')) return route.fulfill({ json: rubros })
     if (url.pathname.endsWith('/buscar/')) {
       if (opciones.buscar) return opciones.buscar(route, url)
@@ -242,8 +244,29 @@ test('seleccionar punto libre limpia resultados; volver al mapa no cambia ubicac
   await expect(page.locator('.ubicacion-elegida')).toContainText('Punto marcado en el mapa')
 })
 
-test('solicitar desde tarjeta conserva prestador, rubro y coordenadas elegidas', async ({ page }) => {
+test('sin sesión la tarjeta pide iniciar sesión en lugar del formulario', async ({ page }) => {
   await preparar(page)
+  let intentos = 0
+  await page.context().route('**/api/servicios/solicitudes/', (route) => { intentos += 1; return route.abort() })
+  await buscar(page)
+  const tarjeta = tarjetas(page).first()
+  await expect(tarjeta.getByRole('link', { name: 'Inicia sesión para solicitar' })).toHaveAttribute('href', '/ingresar')
+  await expect(tarjeta.getByRole('link', { name: 'Crear cuenta de cliente' })).toBeVisible()
+  await expect(tarjeta.getByRole('button', { name: 'Enviar solicitud' })).toHaveCount(0)
+  await expect(tarjeta.getByLabel('Tu nombre', { exact: true })).toHaveCount(0)
+  expect(intentos).toBe(0)
+})
+
+test('un prestador con sesión tampoco ve el formulario', async ({ page }) => {
+  await preparar(page, { usuario: { id: 9, username: 'ana', rol: 'prestador', nombres: 'Ana', prestador_id: 1 } })
+  await buscar(page)
+  const tarjeta = tarjetas(page).first()
+  await expect(tarjeta.getByText('Solo las cuentas de cliente pueden solicitar servicios.')).toBeVisible()
+  await expect(tarjeta.getByRole('button', { name: 'Enviar solicitud' })).toHaveCount(0)
+})
+
+test('solicitar desde tarjeta conserva prestador, rubro y coordenadas elegidas', async ({ page }) => {
+  await preparar(page, { usuario: { id: 7, username: 'carla', rol: 'cliente', nombres: 'Carla', prestador_id: null } })
   let enviada
   await page.context().route('**/api/servicios/solicitudes/', async (route) => {
     enviada = route.request().postDataJSON()

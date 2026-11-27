@@ -1,0 +1,961 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Chamba PE en contenedores</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Saira+Stencil+One&family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: un contenedor de carga en la portada; al abrirlo, la arquitectura como patio de contenedores conectados; cada contenedor abre su ficha. */
+:root{
+  --bg:#EEF2EF; --surface:#FFFFFF; --surface-2:#F6F8F6; --fg:#13211A; --muted:#55675E; --line:#D3DCD6;
+  --brand:#16734F; --brand-ink:#0F5A3D; --accent:#F29F3D; --accent-ink:#9A5A0C;
+  --t-http:#16734F; --t-push:#E08A1E; --t-sql:#2F6DB5; --t-ia:#8B4FD6; --t-ext:#6B7A72;
+  --steel:#16734F; --steel-dark:#0E553A; --steel-light:#1F8C61; --interior:#0B1510;
+  --code-bg:#F1F5F2;
+  --f-display:"Saira Stencil One","Impact","Arial Narrow",sans-serif;
+  --f-body:"Manrope",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-mono:"JetBrains Mono",ui-monospace,"Cascadia Code",Consolas,monospace;
+  --shadow:0 1px 2px rgba(19,33,26,.06),0 6px 20px rgba(19,33,26,.07);
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0C1310; --surface:#141E19; --surface-2:#18241E; --fg:#E5EDE8; --muted:#93A69B; --line:#27362F;
+  --brand:#33B07D; --brand-ink:#5FD3A0; --accent:#F5AE57; --accent-ink:#F7C07A;
+  --t-http:#3FBF8A; --t-push:#F5AE57; --t-sql:#6EA8F0; --t-ia:#B38BF5; --t-ext:#8B9C93;
+  --steel:#15694A; --steel-dark:#0D4A33; --steel-light:#1C7D57; --interior:#050A07;
+  --code-bg:#0F1814; --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.35); color-scheme:dark;}}
+:root[data-theme="dark"]{
+  --bg:#0C1310; --surface:#141E19; --surface-2:#18241E; --fg:#E5EDE8; --muted:#93A69B; --line:#27362F;
+  --brand:#33B07D; --brand-ink:#5FD3A0; --accent:#F5AE57; --accent-ink:#F7C07A;
+  --t-http:#3FBF8A; --t-push:#F5AE57; --t-sql:#6EA8F0; --t-ia:#B38BF5; --t-ext:#8B9C93;
+  --steel:#15694A; --steel-dark:#0D4A33; --steel-light:#1C7D57; --interior:#050A07;
+  --code-bg:#0F1814; --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.35); color-scheme:dark;}
+
+*{box-sizing:border-box}
+html,body{margin:0}
+html,body{height:100%}
+body{background:var(--bg);color:var(--fg);font:16px/1.5 var(--f-body);-webkit-font-smoothing:antialiased;overflow:hidden}
+/* lienzo de presentación: 1600×900 escalado para llenar la pantalla */
+#deck{position:absolute;left:50%;top:50%;width:1600px;height:900px;transform:translate(-50%,-50%) scale(var(--s,1));transform-origin:center;display:flex;flex-direction:column;overflow:hidden;background:var(--bg)}
+#deck>.view{flex:1;min-height:0}
+#deck>.view>.wrap{height:100%}
+button{font:inherit;color:inherit}
+:focus-visible{outline:2.5px solid var(--accent);outline-offset:3px;border-radius:6px}
+code,pre,.mono{font-family:var(--f-mono)}
+h1,h2,h3{text-wrap:balance;margin:0}
+
+.wrap{width:100%;padding-left:36px;padding-right:36px}
+
+/* barra superior */
+.top{position:relative;z-index:9;background:var(--bg);border-bottom:1px solid var(--line);flex:none}
+.fs{display:inline-flex;align-items:center;gap:7px;border:1.5px solid var(--line);background:var(--surface);border-radius:8px;padding:5px 11px;cursor:pointer;font-weight:700;font-size:13px}
+.fs:hover{border-color:var(--brand)}
+.fs svg{width:14px;height:14px}
+.top .wrap{display:flex;align-items:center;gap:14px;padding-block:10px;flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:9px;font-weight:800;letter-spacing:.01em;background:none;border:0;cursor:pointer;padding:4px}
+.brand svg{width:30px;height:22px}
+.crumbs{display:flex;align-items:center;gap:6px;color:var(--muted);font-size:13.5px;flex-wrap:wrap;min-width:0}
+.crumbs button{background:none;border:0;padding:3px 6px;border-radius:6px;cursor:pointer;color:var(--muted)}
+.crumbs button:hover{color:var(--fg);background:var(--surface-2)}
+.crumbs .here{color:var(--fg);font-weight:700}
+.crumbs .sep{opacity:.5}
+.top .hint{margin-left:auto;font-size:12.5px;color:var(--muted)}
+.top .hint kbd{font-family:var(--f-mono);font-size:11px;border:1px solid var(--line);border-bottom-width:2px;border-radius:4px;padding:0 5px;background:var(--surface)}
+
+.view{display:none}
+.view.on{display:block;animation:viewIn .42s cubic-bezier(.2,.8,.2,1)}
+@keyframes viewIn{from{opacity:0;transform:scale(.975)}to{opacity:1;transform:none}}
+
+/* ---------- PORTADA: el contenedor ---------- */
+.intro{padding-block:30px;display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);grid-template-rows:auto auto auto auto;align-content:center;column-gap:56px;row-gap:24px;text-align:left}
+.intro>*{grid-column:1}
+.intro>.yard{grid-column:2;grid-row:1/span 4;align-self:center}
+.intro .cta{width:max-content}
+.intro .team{justify-content:flex-start}
+.intro .eyebrow{font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--brand-ink);font-weight:800}
+.intro h1{font-size:50px;line-height:1.08;font-weight:800;max-width:16ch;margin-top:10px}
+.intro p.lead{color:var(--muted);max-width:52ch;margin:14px 0 0;font-size:18px}
+
+.yard{width:100%;perspective:1600px}
+.box{position:relative;display:block;width:100%;aspect-ratio:2.35/1;border:0;padding:0;cursor:pointer;background:var(--interior);border-radius:6px;box-shadow:0 30px 50px -28px rgba(0,0,0,.55);transform-style:preserve-3d}
+.box .inside{position:absolute;inset:6% 4%;display:grid;grid-template-columns:repeat(4,1fr);gap:8%;align-items:center;padding:4%}
+.box .inside i{display:block;aspect-ratio:1.5;border-radius:4px;background:var(--c);opacity:.0;box-shadow:0 0 22px var(--c);transition:opacity .5s .35s}
+.box.open .inside i{opacity:.85}
+.door{position:absolute;top:0;bottom:0;width:50%;background:
+   repeating-linear-gradient(90deg,var(--steel) 0 14px,var(--steel-light) 14px 18px,var(--steel-dark) 18px 22px,var(--steel) 22px 28px);
+  border:3px solid var(--steel-dark);transition:transform .9s cubic-bezier(.6,.05,.25,1);backface-visibility:hidden;display:flex;align-items:center;justify-content:center;overflow:hidden}
+.door.l{left:0;transform-origin:left center;border-radius:6px 0 0 6px}
+.door.r{right:0;transform-origin:right center;border-radius:0 6px 6px 0}
+.box.open .door.l{transform:rotateY(-104deg)}
+.box.open .door.r{transform:rotateY(104deg)}
+.door::before,.door::after{content:"";position:absolute;top:6%;bottom:6%;width:5px;border-radius:3px;background:linear-gradient(#C9D3CD,#8E9C94);box-shadow:0 0 0 1px rgba(0,0,0,.25)}
+.door.l::before{right:16%}.door.l::after{right:34%}
+.door.r::before{left:16%}.door.r::after{left:34%}
+.stencil{font-family:var(--f-display);color:#F4F1E6;font-size:84px;letter-spacing:.04em;line-height:1;position:relative;z-index:1;text-shadow:0 2px 0 rgba(0,0,0,.18);mix-blend-mode:normal}
+.door.l .stencil{margin-left:-12%}
+.door.r .stencil{margin-right:8%;color:var(--accent)}
+.plate{position:absolute;z-index:1;font-family:var(--f-mono);color:#F4F1E6;font-size:12px;line-height:1.45;text-align:left;letter-spacing:.04em}
+.plate.code{top:7%;left:5%;font-size:18px;font-weight:600}
+.plate.code b{display:inline-block;border:1.5px solid #F4F1E6;padding:0 4px;margin-left:4px}
+.plate.data{bottom:8%;left:5%;background:rgba(0,0,0,.18);padding:6px 9px;border-radius:3px}
+.plate.iso{top:7%;right:8%;text-align:right}
+.box:hover .door.l{transform:rotateY(-6deg)}
+.box:hover .door.r{transform:rotateY(6deg)}
+.box.open:hover .door.l{transform:rotateY(-104deg)}
+.box.open:hover .door.r{transform:rotateY(104deg)}
+.cta{display:inline-flex;align-items:center;gap:10px;background:var(--brand);color:#fff;border:0;border-radius:999px;padding:11px 20px;font-weight:700;cursor:pointer;box-shadow:var(--shadow)}
+.cta:hover{background:var(--brand-ink)}
+.cta .pulse{width:9px;height:9px;border-radius:50%;background:var(--accent);box-shadow:0 0 0 0 var(--accent);animation:pulse 1.8s infinite}
+@keyframes pulse{70%{box-shadow:0 0 0 9px transparent}100%{box-shadow:0 0 0 0 transparent}}
+
+.stats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;width:100%}
+.stat{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:14px 12px;text-align:left}
+.stat b{display:block;font-size:28px;font-weight:800;font-variant-numeric:tabular-nums;line-height:1.1}
+.stat span{font-size:13px;color:var(--muted)}
+.team{display:flex;gap:8px 18px;flex-wrap:wrap;justify-content:center;color:var(--muted);font-size:13.5px}
+.team b{color:var(--fg)}
+
+/* ---------- SISTEMA ---------- */
+.sys{padding-block:18px 22px;display:grid;grid-template-columns:minmax(0,1fr) 380px;grid-template-rows:auto minmax(0,1fr);gap:16px 20px}
+.sys-head{grid-column:1/-1;display:flex;flex-wrap:wrap;gap:12px 20px;align-items:end;justify-content:space-between}
+.sys-head h2{font-size:clamp(22px,3vw,30px);font-weight:800}
+.sys-head p{margin:2px 0 0;color:var(--muted);font-size:14px}
+.flows{display:flex;gap:8px;flex-wrap:wrap}
+.fbtn{display:inline-flex;align-items:center;gap:8px;border:1.5px solid var(--line);background:var(--surface);border-radius:999px;padding:8px 14px;font-weight:700;font-size:13.5px;cursor:pointer}
+.fbtn:hover{border-color:var(--brand)}
+.fbtn.on{background:var(--brand);border-color:var(--brand);color:#fff}
+.fbtn svg{width:14px;height:14px}
+
+.board{position:relative;background:var(--surface);border:1px solid var(--line);border-radius:14px;overflow:hidden;box-shadow:var(--shadow);min-height:0}
+.board-grid{position:absolute;inset:0;background-image:radial-gradient(var(--line) 1px,transparent 1px);background-size:22px 22px;opacity:.7;pointer-events:none}
+.stage{position:relative;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));grid-template-rows:repeat(3,minmax(0,1fr));align-items:center;gap:40px 80px;padding:26px 50px;height:100%}
+.stage svg.wires{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;overflow:visible;z-index:1}
+.wire{fill:none;stroke-width:2.2;transition:opacity .25s,stroke-width .25s}
+.wire.http{stroke:var(--t-http)}
+.wire.push{stroke:var(--t-push);stroke-dasharray:7 5}
+.wire.sql{stroke:var(--t-sql);stroke-dasharray:2 5;stroke-linecap:round;stroke-width:2.8}
+.wire.ia{stroke:var(--t-ia)}
+.wire.ext{stroke:var(--t-ext);stroke-dasharray:10 4 2 4}
+.hit{fill:none;stroke:transparent;stroke-width:18;pointer-events:stroke;cursor:pointer}
+.dot{transition:opacity .25s}
+.stage.dim .wire,.stage.dim .dot{opacity:.12}
+.stage.dim .wire.hl,.stage.dim .dot.hl{opacity:1}
+.wire.hl{stroke-width:3.4}
+.stage.dim .node{opacity:.35}
+.stage.dim .node.hl{opacity:1}
+
+.node{position:relative;z-index:2;display:flex;flex-direction:column;text-align:left;background:var(--surface);border:1.5px solid var(--line);border-radius:8px;padding:0;cursor:pointer;overflow:hidden;transition:transform .18s,border-color .18s,box-shadow .18s,opacity .25s;min-width:0}
+.node:hover,.node.hl{border-color:var(--c);box-shadow:0 8px 24px -10px var(--c)}
+@media (hover:hover){.node:hover{transform:translateY(-3px)}}
+.node:active{transform:scale(.98)}
+.node .ribs{height:12px;background:repeating-linear-gradient(90deg,var(--c) 0 9px,color-mix(in srgb,var(--c) 70%,#000) 9px 11px);opacity:.9}
+.node .nb{display:flex;gap:11px;align-items:center;padding:12px 13px 10px}
+.node .lg{width:40px;height:40px;flex:none}
+.node .kind{display:block;font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);font-weight:700}
+.node b{display:block;font-size:16px;line-height:1.2}
+.node small{display:block;color:var(--muted);font-size:12.5px;line-height:1.35;padding:0 13px}
+.node .chips{display:flex;gap:5px;padding:9px 13px 12px;flex-wrap:wrap}
+.node .chips .lg{width:20px;height:20px}
+.node .open{position:absolute;right:9px;top:19px;font-size:11px;color:var(--muted);opacity:0;transition:opacity .2s}
+.node:hover .open{opacity:1}
+.node.pulse{animation:npulse 1s ease}
+@keyframes npulse{30%{box-shadow:0 0 0 6px color-mix(in srgb,var(--c) 35%,transparent)}}
+.legend{position:relative;z-index:2;align-self:start;border:1.5px dashed var(--line);border-radius:8px;padding:12px 14px;font-size:12.5px;color:var(--muted);background:var(--surface)}
+.legend h4{margin:0 0 8px;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--fg)}
+.legend ul{list-style:none;margin:0;padding:0;display:grid;gap:6px}
+.legend li{display:flex;align-items:center;gap:8px}
+.legend svg{width:34px;height:8px;flex:none}
+
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:18px;box-shadow:var(--shadow);display:flex;flex-direction:column;gap:12px;min-width:0;min-height:0;overflow:auto}
+.panel h3{font-size:18px;font-weight:800;display:flex;gap:10px;align-items:center}
+.panel h3 .lg{width:30px;height:30px}
+.panel p{margin:0;color:var(--muted);font-size:14px}
+.pill{display:inline-flex;align-items:center;gap:6px;font-size:11.5px;font-weight:700;border-radius:999px;padding:3px 9px;background:color-mix(in srgb,var(--pc) 14%,transparent);color:var(--pc);width:max-content}
+.pill::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--pc)}
+pre.code{margin:0;background:var(--code-bg);border:1px solid var(--line);border-radius:8px;padding:11px 12px;font-size:12px;line-height:1.55;overflow-x:auto;white-space:pre;color:var(--fg)}
+pre.code .k{color:var(--brand-ink);font-weight:600}
+pre.code .s{color:var(--accent-ink)}
+.panel .tip{font-size:13px;color:var(--muted);display:grid;gap:8px}
+.panel .tip div{display:flex;gap:9px;align-items:flex-start}
+.panel .tip svg{width:16px;height:16px;flex:none;margin-top:2px;color:var(--brand)}
+.linkbtn{background:none;border:1.5px solid var(--line);border-radius:8px;padding:8px 12px;cursor:pointer;font-weight:700;font-size:13.5px;text-align:left;display:flex;align-items:center;gap:8px}
+.linkbtn svg:not(.lg){width:14px;height:14px;flex:none}
+.linkbtn:hover{border-color:var(--brand);color:var(--brand-ink)}
+
+/* reproductor de recorridos */
+.player{display:grid;gap:10px}
+.player .bar{height:5px;border-radius:3px;background:var(--line);overflow:hidden}
+.player .bar i{display:block;height:100%;background:var(--accent);transition:width .35s}
+.player .stepno{font-size:12px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--accent-ink)}
+.player .txt{font-size:15.5px;font-weight:600;color:var(--fg);min-height:3.1em}
+.player .ctrls{display:flex;gap:8px}
+.player .ctrls button{flex:1;border:1.5px solid var(--line);background:var(--surface-2);border-radius:8px;padding:8px;cursor:pointer;font-weight:700;display:flex;align-items:center;justify-content:center;gap:6px;font-size:13px}
+.player .ctrls button:hover{border-color:var(--brand)}
+.player .ctrls svg{width:15px;height:15px}
+.steps{list-style:none;margin:0;padding:0;display:grid;gap:2px;overflow:auto;min-height:0}
+.player{min-height:0;display:flex!important;flex-direction:column;flex:1}
+.steps li button{width:100%;text-align:left;background:none;border:0;border-radius:6px;padding:5px 8px;font-size:12.5px;color:var(--muted);cursor:pointer;display:flex;gap:8px}
+.steps li button span{font-family:var(--f-mono);font-variant-numeric:tabular-nums;opacity:.7}
+.steps li button:hover{background:var(--surface-2)}
+.steps li.cur button{color:var(--fg);background:color-mix(in srgb,var(--accent) 14%,transparent);font-weight:700}
+
+/* ---------- DETALLE ---------- */
+.det{padding-block:22px 56px;display:grid;gap:22px}
+.det-hero{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:18px 22px;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:14px;overflow:hidden;position:relative;padding:28px 24px 22px}
+.det-hero::before{content:"";position:absolute;inset:0 0 auto;height:14px;background:repeating-linear-gradient(90deg,var(--c) 0 12px,color-mix(in srgb,var(--c) 70%,#000) 12px 15px)}
+.det-hero .lg{width:76px;height:76px}
+.det-hero .kind{font-size:11.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);font-weight:800}
+.det-hero h2{font-size:clamp(26px,4vw,40px);font-weight:800;line-height:1.1}
+.det-hero p{margin:6px 0 0;color:var(--muted);max-width:68ch}
+.det-hero .tests{text-align:right}
+.det-hero .tests b{display:block;font-size:34px;font-weight:800;font-variant-numeric:tabular-nums;line-height:1;color:var(--brand-ink)}
+.det-hero .tests span{font-size:12.5px;color:var(--muted)}
+.backbtn{display:inline-flex;align-items:center;gap:8px;background:none;border:1.5px solid var(--line);border-radius:999px;padding:7px 14px;cursor:pointer;font-weight:700;font-size:13.5px;width:max-content}
+.backbtn:hover{border-color:var(--brand)}
+.backbtn svg{width:15px;height:15px}
+.sec h3{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);font-weight:800;margin:0 0 10px}
+.techs{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:10px}
+.tech{display:flex;gap:12px;align-items:flex-start;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:12px;min-width:0;transition:border-color .2s,transform .2s}
+.tech:hover{border-color:var(--tc)}
+.tech .lg{width:38px;height:38px;flex:none}
+.tech b{display:block;font-size:14.5px}
+.tech .ver{font-family:var(--f-mono);font-size:11.5px;color:var(--tc2);font-weight:600}
+.tech p{margin:3px 0 0;font-size:12.8px;color:var(--muted);line-height:1.4}
+.cols{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(0,1fr);gap:22px;align-items:start}
+.parts{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:10px}
+.part{background:var(--surface-2);border:1px solid var(--line);border-radius:6px;padding:11px 12px;min-width:0;position:relative}
+.part::before{content:"";position:absolute;left:0;top:10px;bottom:10px;width:0}
+.part code{font-size:12.5px;font-weight:600;color:var(--fg);word-break:break-word}
+.part p{margin:4px 0 0;font-size:12.8px;color:var(--muted);line-height:1.4}
+.part .tags{display:flex;flex-wrap:wrap;gap:4px;margin-top:7px}
+.part .tags span{font-family:var(--f-mono);font-size:10.5px;border:1px solid var(--line);border-radius:4px;padding:1px 5px;color:var(--muted);background:var(--surface)}
+.conns{display:grid;gap:8px}
+.conn{display:grid;grid-template-columns:auto minmax(0,1fr);gap:4px 10px;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:10px 12px;cursor:pointer;text-align:left}
+.conn:hover{border-color:var(--brand)}
+.conn .lg{width:28px;height:28px;grid-row:span 2}
+.conn b{font-size:14px}
+.conn span{font-size:12.5px;color:var(--muted)}
+.facts{margin:0;padding-left:18px;color:var(--muted);font-size:14px;display:grid;gap:5px}
+.facts b{color:var(--fg)}
+.pager{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap}
+
+/* pestañas entre contenedores */
+.tabs{display:flex;gap:6px 14px;flex-wrap:wrap;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:8px 10px}
+.tabs .grp{display:flex;align-items:center;gap:4px;flex-wrap:wrap}
+.tabs .grp>span{font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);font-weight:800;margin-right:2px}
+.tab{display:inline-flex;align-items:center;gap:6px;border:1.5px solid transparent;background:none;border-radius:8px;padding:5px 9px;cursor:pointer;font-weight:700;font-size:13px}
+.tab .lg{width:18px;height:18px}
+.tab:hover{background:var(--surface-2)}
+.tab.on{border-color:var(--c);background:color-mix(in srgb,var(--c) 12%,transparent)}
+/* cadena interna */
+.chain-wrap{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:16px;display:grid;gap:14px;box-shadow:var(--shadow)}
+.chain-head{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:center}
+.chain-head p{margin:2px 0 0;color:var(--muted);font-size:13.5px}
+.chain{display:flex;align-items:stretch;overflow-x:auto;padding:6px 2px 10px}
+.stg{flex:0 0 150px;display:flex;flex-direction:column;gap:6px;text-align:left;background:var(--surface-2);border:1.5px solid var(--line);border-radius:7px;padding:0 0 10px;cursor:pointer;overflow:hidden;transition:border-color .2s,transform .2s,box-shadow .2s}
+.stg .ribs{height:8px;background:repeating-linear-gradient(90deg,var(--sc) 0 7px,color-mix(in srgb,var(--sc) 70%,#000) 7px 9px);opacity:.85}
+.stg .lg{width:26px;height:26px;margin:2px 10px 0}
+.stg b{font-size:13px;line-height:1.25;padding:0 10px}
+.stg code{font-size:10.5px;color:var(--muted);padding:0 10px;word-break:break-word}
+.stg:hover{border-color:var(--sc)}
+.stg.on{border-color:var(--sc);box-shadow:0 0 0 3px color-mix(in srgb,var(--sc) 25%,transparent);transform:translateY(-2px)}
+.stg.ext{border-style:dashed}
+.arw{flex:0 0 86px;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:3px;position:relative}
+.arw span{font-size:10.5px;color:var(--muted);text-align:center;line-height:1.2;font-weight:600}
+.arw svg{width:80px;height:14px;color:var(--line);overflow:visible}
+.arw.on svg{color:var(--accent)}
+.arw.on span{color:var(--accent-ink)}
+.arw i{position:absolute;top:50%;left:4px;width:9px;height:9px;margin-top:-4.5px;border-radius:50%;background:var(--accent);opacity:0}
+.arw.on i{animation:travel .9s ease-in-out forwards}
+@keyframes travel{0%{opacity:1;left:4px}100%{opacity:1;left:calc(100% - 13px)}}
+.chain-info{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:14px;align-items:start;border-top:1px solid var(--line);padding-top:14px}
+.chain-info h4{margin:0 0 4px;font-size:16px}
+.chain-info p{margin:0;color:var(--muted);font-size:14px}
+.chain-ctrl{display:flex;gap:6px}
+.chain-ctrl button{border:1.5px solid var(--line);background:var(--surface-2);border-radius:8px;padding:6px 10px;cursor:pointer;font-weight:700;font-size:12.5px;display:inline-flex;gap:5px;align-items:center}
+.chain-ctrl button:hover{border-color:var(--brand)}
+.chain-ctrl svg{width:13px;height:13px}
+.zones{position:absolute;inset:0;pointer-events:none;z-index:0}
+/* ficha a pantalla completa: todo en 1600×900 */
+.det{padding-block:14px 18px;display:grid;grid-template-rows:auto auto auto minmax(0,1fr);gap:12px}
+.det-top{display:flex;gap:12px;align-items:center}
+.det-top .tabs{flex:1}
+.det-hero{padding:22px 22px 14px;grid-template-columns:auto minmax(0,1fr) auto;gap:18px}
+.det-hero .lg{width:58px;height:58px}
+.det-hero h2{font-size:32px}
+.det-hero p{font-size:14.5px;max-width:110ch}
+.det-hero .tests b{font-size:38px}
+.chain-wrap{padding:12px 16px;gap:8px}
+.chain{padding:4px 2px 6px}
+.stg{flex:1 1 0;min-width:0}
+.arw{flex:0 0 74px}
+.arw svg{width:68px}
+.chain-info{padding-top:10px;grid-template-columns:minmax(0,1fr) minmax(0,1.1fr)}
+.chain-info pre.code{max-height:96px}
+.det-info{min-height:0;display:flex;flex-direction:column;gap:10px;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:10px 14px 12px}
+.seg{display:flex;gap:6px;flex:none}
+.seg button{border:1.5px solid var(--line);background:var(--surface-2);border-radius:999px;padding:5px 14px;font-weight:700;font-size:13.5px;cursor:pointer}
+.seg button span{font-family:var(--f-mono);font-size:11.5px;color:var(--muted);margin-left:3px}
+.seg button.on{background:var(--brand);border-color:var(--brand);color:#fff}
+.seg button.on span{color:#fff;opacity:.8}
+.pane{min-height:0;overflow:auto;flex:1}
+.pane .techs{grid-template-columns:repeat(5,minmax(0,1fr));gap:8px}
+.pane .tech{padding:8px 10px;gap:9px}
+.pane .tech .lg{width:28px;height:28px}
+.pane .tech b{font-size:13.5px}
+.pane .tech p{font-size:12px}
+.pane .parts{grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+.pane .part{padding:8px 10px}
+.pane .part p{font-size:12.5px}
+.pane .conns{grid-template-columns:repeat(3,minmax(0,1fr))}
+.pane .conn{padding:8px 10px}
+.pane .conn span{font-size:12px}
+.pane .facts{font-size:13.5px;margin-top:10px}
+.det .tabs{padding:5px 8px;gap:4px 10px;flex-wrap:nowrap}
+.det .tab{padding:4px 7px;font-size:12.5px;gap:5px;white-space:nowrap}
+.det .tabs .grp{flex-wrap:nowrap}
+.det .tabs .grp>span{font-size:9.5px}
+.det-hero{padding:20px 20px 10px}
+.det-hero h2{font-size:28px}
+.pane .conns{grid-template-columns:repeat(4,minmax(0,1fr))}
+.pane .part .tags{margin-top:4px}
+.pane .part p{font-size:12px;margin-top:2px}
+.chain-info pre.code{max-height:82px}
+.chain-info p{font-size:13.5px}
+.det-hero p{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.001ms!important;transition-duration:.001ms!important}
+}
+</style>
+</head>
+<body>
+<div id="deck">
+<header class="top">
+  <div class="wrap">
+    <button class="brand" id="brandBtn" aria-label="Ir a la portada">
+      <svg viewBox="0 0 30 22" aria-hidden="true"><rect x="1" y="1" width="28" height="20" rx="2" fill="#16734F"/><path d="M6 4v14M10 4v14M14 4v14M18 4v14M22 4v14" stroke="#0E553A" stroke-width="1.6"/><rect x="15" y="1" width="14" height="20" rx="2" fill="#F29F3D" opacity=".95"/><path d="M19 4v14M24 4v14" stroke="#B86E14" stroke-width="1.6"/></svg>
+      Chamba PE
+    </button>
+    <nav class="crumbs" id="crumbs" aria-label="Ubicación"></nav>
+    <span class="hint"><kbd>←</kbd> <kbd>→</kbd> avanzar · <kbd>Esc</kbd> volver · <kbd>F</kbd> pantalla completa</span>
+    <button class="fs" id="fsBtn"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M2 6V2h4M10 2h4v4M14 10v4h-4M6 14H2v-4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>Pantalla completa</button>
+  </div>
+</header>
+
+<!-- PORTADA -->
+<section class="view" id="v-inicio">
+  <div class="wrap intro">
+    <div>
+      <div class="eyebrow">Proyecto Integrador · Tecsup 2026-2</div>
+      <h1>Servicios bajo demanda, al instante y cerca</h1>
+      <p class="lead">Chamba PE conecta a clientes con gasfiteros, electricistas, costureros y técnicos verificados que están disponibles ahora. Abre el contenedor para ver cómo está construido por dentro.</p>
+    </div>
+    <div class="yard">
+      <button class="box" id="box" aria-label="Abrir el contenedor Chamba PE y ver su arquitectura">
+        <div class="inside" aria-hidden="true">
+          <i style="--c:#61DAFB"></i><i style="--c:#3DDC84"></i><i style="--c:#2BA977"></i><i style="--c:#6DB33F"></i>
+          <i style="--c:#4A8BD6"></i><i style="--c:#FFCA28"></i><i style="--c:#EA4335"></i><i style="--c:#8B4FD6"></i>
+        </div>
+        <div class="door l">
+          <div class="plate code" id="isoCode">CHPU 202602</div>
+          <div class="plate data">MAX. GROSS &nbsp;21 HU<br>TARE &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;62 SP<br>NET &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;693 PRUEBAS</div>
+          <span class="stencil">CHAMBA</span>
+        </div>
+        <div class="door r">
+          <div class="plate iso">LIMA · PE<br>22G1 · 4 SPRINTS</div>
+          <span class="stencil">PE</span>
+        </div>
+      </button>
+    </div>
+    <button class="cta" id="openBtn"><span class="pulse"></span>Abrir el contenedor</button>
+    <div class="stats">
+      <div class="stat"><b>8</b><span>contenedores en la arquitectura</span></div>
+      <div class="stat"><b>21</b><span>historias de usuario · 62 SP</span></div>
+      <div class="stat"><b>693</b><span>pruebas automatizadas que pasan</span></div>
+      <div class="stat"><b>4</b><span>sprints de 2 semanas</span></div>
+    </div>
+    <div class="team"><span><b>Renzo León</b> · Scrum Master</span><span><b>Luis Abad</b> · Desarrollo</span><span><b>David Valcarcel</b> · Product Owner</span></div>
+  </div>
+</section>
+
+<!-- SISTEMA -->
+<section class="view" id="v-sistema">
+  <div class="wrap sys">
+    <div class="sys-head">
+      <div>
+        <h2>Dentro del contenedor</h2>
+        <p>Pasa el mouse por un contenedor para ver sus conexiones. Haz clic en una línea para ver qué datos viajan.</p>
+      </div>
+      <div class="flows">
+        <button class="fbtn" data-flow="servicio"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M4 2.5v11l9-5.5z" fill="currentColor"/></svg>Recorrer: pedir un servicio</button>
+        <button class="fbtn" data-flow="identidad"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M4 2.5v11l9-5.5z" fill="currentColor"/></svg>Recorrer: verificar identidad</button>
+      </div>
+    </div>
+    <div class="board">
+      <div class="board-grid"></div>
+      <div class="stage" id="stage">
+        <svg class="wires" id="wires" aria-hidden="true"></svg>
+      </div>
+    </div>
+    <aside class="panel" id="panel" aria-live="polite"></aside>
+  </div>
+</section>
+
+<!-- DETALLE -->
+<section class="view" id="v-detalle"><div class="wrap det" id="det"></div></section>
+</div>
+
+<script>
+/* ================= LOGOS (dibujados a mano, colores de cada marca) ================= */
+const T=(bg,inner,stroke)=>`<svg class="lg" viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="7" fill="${bg}"${stroke?` stroke="${stroke}" stroke-width="1"`:''}/>${inner}</svg>`;
+const M=(bg,txt,fg='#fff')=>{const s=txt.length<=2?14:txt.length===3?11:8.6;return T(bg,`<text x="16" y="${16+s*0.36}" text-anchor="middle" font-family="Manrope,Arial,sans-serif" font-weight="800" font-size="${s}" fill="${fg}">${txt}</text>`)};
+const PY='M15.8 4C10 4 10.5 6.5 10.5 6.5V9.5H16v1H8.2S4.5 10.1 4.5 16s3.2 5.6 3.2 5.6h2v-2.8s-.1-3.2 3.1-3.2h5.4s3-.1 3-3V7.7S21.7 4 15.8 4z';
+const LOGO={
+ react:T('#20232A',`<g fill="none" stroke="#61DAFB" stroke-width="1.5"><ellipse cx="16" cy="16" rx="11" ry="4.3"/><ellipse cx="16" cy="16" rx="11" ry="4.3" transform="rotate(60 16 16)"/><ellipse cx="16" cy="16" rx="11" ry="4.3" transform="rotate(120 16 16)"/></g><circle cx="16" cy="16" r="2.2" fill="#61DAFB"/>`),
+ vite:T('#1B1B30',`<path d="M4.5 7.5L16 27.5 27.5 7.5 16 10z" fill="#9474FF"/><path d="M18 4l-7 2.6 2.2 8.2-2.4.6L16.6 26l-1-9.4 2.6-.6z" fill="#FFC517"/>`),
+ router:M('#CA4245','RR'),
+ lucide:T('#F56565',`<g fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="16" cy="16" r="8"/><path d="M16 11v5l3 2"/></g>`),
+ leaflet:T('#EAF6E6',`<path d="M7.5 25C7.5 13 15 7 26 6c-1 11-7.5 18.5-18.5 19z" fill="#199900"/><path d="M8 24.5L19 13.5" stroke="#EAF6E6" stroke-width="1.5"/>`),
+ gmaps:T('#FFFFFF',`<path d="M16 4a8 8 0 0 0-8 8c0 6 8 16 8 16s8-10 8-16a8 8 0 0 0-8-8z" fill="#EA4335"/><path d="M8.6 9A8 8 0 0 1 16 4v5a3 3 0 0 0-3 3H8.1z" fill="#4285F4"/><path d="M8 12h5a3 3 0 0 0 1 2.2L9.4 18.6C8.5 16.4 8 14 8 12z" fill="#FBBC04"/><circle cx="16" cy="12" r="3" fill="#B31412"/>`,'#E2E6E4'),
+ playwright:M('#2EAD33','PW'),
+ mediapipe:M('#0097A7','MP'),
+ firebase:T('#1F2430',`<path d="M8 25L11.8 4.5 16 12z" fill="#FFA000"/><path d="M8 25L20.5 8.5 24 25l-8 4.5z" fill="#F57C00"/><path d="M8 25l8-11.5 8 11.5-8 4.5z" fill="#FFCA28"/>`),
+ kotlin:T('#FFFFFF',`<path d="M6 6h20L16 16l10 10H6z" fill="#7F52FF"/><path d="M6 6h10L6 16z" fill="#E44857"/><path d="M16 16L6 26h8z" fill="#C711E1" opacity=".75"/>`,'#E2E6E4'),
+ compose:T('#0B2A4A',`<path d="M16 5l9.5 5.5v11L16 27l-9.5-5.5v-11z" fill="none" stroke="#4285F4" stroke-width="2.2"/><path d="M16 10.5l4.8 2.75v5.5L16 21.5l-4.8-2.75v-5.5z" fill="#3DDC84"/>`),
+ material:T('#6750A4',`<circle cx="11" cy="11" r="4" fill="#fff"/><rect x="18" y="7" width="8" height="8" rx="1.6" fill="#EADDFF"/><path d="M11 18.5l4.5 7.5h-9z" fill="#EADDFF"/><circle cx="22" cy="22" r="3.8" fill="none" stroke="#fff" stroke-width="2"/>`),
+ android:T('#073042',`<path d="M6.5 22a9.5 9.5 0 0 1 19 0z" fill="#3DDC84"/><circle cx="12" cy="18" r="1.3" fill="#073042"/><circle cx="20" cy="18" r="1.3" fill="#073042"/><path d="M10.2 13.6l-2.2-3.4M21.8 13.6l2.2-3.4" stroke="#3DDC84" stroke-width="1.7" stroke-linecap="round"/>`),
+ retrofit:M('#48B983','Rf'),
+ room:T('#4285F4',`<g fill="#fff"><ellipse cx="16" cy="9.5" rx="8" ry="3"/><path d="M8 11v4.5c0 1.7 3.6 3 8 3s8-1.3 8-3V11c0 1.7-3.6 3-8 3s-8-1.3-8-3z" opacity=".85"/><path d="M8 18v4.5c0 1.7 3.6 3 8 3s8-1.3 8-3V18c0 1.7-3.6 3-8 3s-8-1.3-8-3z" opacity=".7"/></g>`),
+ coroutines:M('#7F52FF','co'),
+ location:T('#E8F0FE',`<circle cx="16" cy="16" r="9" fill="none" stroke="#4285F4" stroke-width="2"/><circle cx="16" cy="16" r="3.6" fill="#4285F4"/><path d="M16 3v4M16 25v4M3 16h4M25 16h4" stroke="#4285F4" stroke-width="2"/>`),
+ gradle:M('#02303A','G','#5FD3D0'),
+ python:T('#FFFFFF',`<path d="${PY}" fill="#3776AB"/><path d="${PY}" fill="#FFD43B" transform="rotate(180 16 16)"/><circle cx="13" cy="6.9" r="1" fill="#fff"/><circle cx="19" cy="25.1" r="1" fill="#fff"/>`,'#E2E6E4'),
+ django:T('#092E20',`<text x="16" y="21.5" text-anchor="middle" font-family="Manrope,Arial,sans-serif" font-weight="800" font-size="16" fill="#fff">dj</text>`),
+ drf:M('#A30000','DRF'),
+ cors:M('#44B78B','CORS'),
+ easyocr:M('#FF6F00','OCR'),
+ opencv:T('#FFFFFF',`<g fill="none" stroke-width="3.4"><circle cx="16" cy="9.5" r="4.6" stroke="#FF2A2A"/><circle cx="9.3" cy="21.3" r="4.6" stroke="#2ACB4A"/><circle cx="22.7" cy="21.3" r="4.6" stroke="#2A6BFF"/></g>`,'#E2E6E4'),
+ pillow:M('#1F6FB2','PIL'),
+ gauth:T('#FFFFFF',`<text x="16" y="22" text-anchor="middle" font-family="Arial,sans-serif" font-weight="700" font-size="17" fill="#4285F4">G</text>`,'#E2E6E4'),
+ java:T('#FFFFFF',`<path d="M9 15h13v4a6 6 0 0 1-6 6h-1a6 6 0 0 1-6-6z" fill="#5382A1"/><path d="M22 16.5h1.5a2.5 2.5 0 0 1 0 5H21" fill="none" stroke="#5382A1" stroke-width="1.6"/><path d="M14 5.5c2 2-2 3.5 0 6.5M18 4.5c2 2.5-2 4 0 7.5" fill="none" stroke="#E76F00" stroke-width="1.7" stroke-linecap="round"/><path d="M7 27.5h17" stroke="#5382A1" stroke-width="1.6" stroke-linecap="round"/>`,'#E2E6E4'),
+ spring:T('#6DB33F',`<path d="M24.5 6.5c-.8 9.5-6.2 15.5-14 15.5-1.6 0-2.7-.3-3.3-.6C8.3 13.5 15 8.5 24.5 6.5z" fill="#fff"/><path d="M8.5 23.5c3-5.2 7-9 12-12" stroke="#6DB33F" stroke-width="1.5" fill="none" stroke-linecap="round"/><circle cx="24" cy="24" r="2" fill="#fff"/>`),
+ jpa:M('#59666C','JPA'),
+ jwt:M('#1C1C1C','JWT','#FB4F8C'),
+ maven:M('#C71A36','mvn'),
+ sqlite:T('#003B57',`<rect x="7" y="7" width="13" height="18" rx="2" fill="#97D9F5"/><path d="M25 4c-5 3-8 10-9.5 21" stroke="#fff" stroke-width="2.2" fill="none" stroke-linecap="round"/><path d="M25 4c-2 4-4 6-8 8" stroke="#44A8D8" stroke-width="2" fill="none"/>`),
+ postgres:T('#336791',`<path d="M10 9c0-3 3-4.5 6-4.5s6 1.5 6 4.5v7c0 3-1.5 5-3 6l.5 5h-3l-.5-4.5h-0c-3 0-6-2-6-6z" fill="#fff"/><circle cx="14" cy="11.5" r="1.1" fill="#336791"/><circle cx="18" cy="11.5" r="1.1" fill="#336791"/><path d="M22 13c2 .5 3 2 3 3.5" stroke="#fff" stroke-width="1.8" fill="none" stroke-linecap="round"/>`),
+ fcm:T('#1F2430',`<path d="M8 10a8 8 0 0 1 16 0v6l2.5 4h-21L8 16z" fill="#FFCA28"/><path d="M13 22a3 3 0 0 0 6 0" fill="#FFA000"/><circle cx="23" cy="8" r="3.4" fill="#F57C00"/>`),
+ sface:T('#5C3EE8',`<g fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round"><path d="M6 11V7h4M22 7h4v4M26 21v4h-4M10 25H6v-4"/><circle cx="16" cy="14" r="4"/><path d="M10 23c1.5-3 3.5-4 6-4s4.5 1 6 4"/></g>`),
+ brain:T('#8B4FD6',`<g fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round"><circle cx="9" cy="22" r="2.4"/><circle cx="16" cy="9" r="2.4"/><circle cx="23" cy="22" r="2.4"/><circle cx="16" cy="18" r="2.4"/><path d="M11 21l3-2M18 19l3 2M16 11.5v4"/></g>`),
+ poll:M('#16734F','5s'),
+ sw:M('#F29F3D','SW','#2B1A05'),
+};
+const lg=k=>LOGO[k]||M('#888',k.slice(0,2).toUpperCase());
+
+/* ================= CONTENEDORES ================= */
+const NODES={
+ mapas:{name:'Google Maps',kind:'Servicio externo',c:'#EA4335',logo:'gmaps',area:'1 / 1',blurb:'Mapa de prestadores en web y app',chips:['gmaps','leaflet'],
+   summary:'Muestra a los prestadores dentro del radio de cobertura del cliente y la zona que cubre cada prestador. Si Google Maps no carga, la web usa OpenStreetMap con Leaflet como respaldo.',
+   techs:[['gmaps','Maps JavaScript API','@vis.gl/react-google-maps 1.5','Mapa de la web con marcadores por rubro'],['gmaps','maps-compose','8.4.0','Mapa nativo en la app Android, con radio de cobertura'],['leaflet','Leaflet + OpenStreetMap','react-leaflet 5','Respaldo cuando no hay clave de Google'],['location','Play Services Location','21.4.0','Ubicación del teléfono']],
+   parts:[{n:'componentes/mapa/',d:'Mapa de la web con los prestadores cercanos y su distancia.',tags:['HU-7']},{n:'ui/busqueda/',d:'Búsqueda en la app con Google Maps.',tags:['Android']},{n:'Registro: zona',d:'El prestador marca su zona y el radio que cubre (paso 4 de 5).',tags:['HU-1']}],
+   facts:['La distancia se calcula en el servidor (<b>Distancias.java</b> y su par en Django), no en el mapa.','El mapa solo dibuja: recibe coordenadas y distancia ya calculadas.']},
+ firebase:{name:'Firebase',kind:'Servicio externo',c:'#FFA000',logo:'firebase',area:'1 / 2',blurb:'Identidad de la app y avisos push',chips:['firebase','fcm','jwt'],
+   summary:'Firebase se usa para dos cosas: la identidad de quien entra desde la app Android (Firebase Auth) y los avisos push al prestador cuando le llega una solicitud (Cloud Messaging). Los datos del negocio no viven aquí: están en la base compartida.',
+   techs:[['firebase','Firebase Auth','BOM 35.2.0','Ingreso desde la app; entrega un ID token (JWT)'],['fcm','Cloud Messaging (FCM)','firebase 13.1 (web)','Push al navegador y al teléfono del prestador'],['sw','Service worker','firebase-messaging-sw.js','Recibe el push aunque la pestaña esté cerrada'],['python','firebase-admin','6.5+','Django verifica tokens y envía avisos'],['jwt','Nimbus JOSE + JWT','9.40','Spring valida el ID token con las claves públicas de Google']],
+   parts:[{n:'TokenFCM',d:'Tabla con el token de avisos de cada dispositivo.',tags:['servicios']},{n:'FiltroFirebase.java',d:'Lee el Bearer token de la app y arma el usuario.',tags:['Spring']},{n:'push-worker.js',d:'Muestra la notificación en el navegador.',tags:['web']},{n:'Meta T8.3',d:'Que el aviso llegue en menos de 5 segundos.',tags:['HU-8']}],
+   facts:['El token de la app se intercambia por la misma cuenta que usa la web (<b>/api/usuarios/login-firebase/</b> y <b>vincular/</b>).']},
+ leyenda:null,
+ web:{name:'Portal web',kind:'Cliente',c:'#2BB3D9',logo:'react',area:'2 / 1',blurb:'Una sola web para cliente, prestador y administración',chips:['react','vite','router','mediapipe'],
+   summary:'Aplicación React con pantallas separadas por rol. El visitante busca y ve el mapa; el cliente pide y sigue sus servicios; el prestador recibe solicitudes y se verifica; el administrador revisa documentos y cuentas.',
+   techs:[['react','React','19.2','Interfaz por componentes'],['vite','Vite','8.3','Servidor de desarrollo y build'],['router','React Router','7.18','Rutas por rol con RutaPrivada'],['gmaps','Google Maps','vis.gl 1.5','Mapa de prestadores'],['leaflet','Leaflet','1.9','Mapa de respaldo'],['firebase','Firebase SDK','13.1','Token de avisos push'],['mediapipe','MediaPipe Tasks Vision','0.10.21','Prueba de vida: detecta el parpadeo en la selfie'],['lucide','lucide-react','1.71','Una familia de iconos para todo'],['playwright','Playwright','1.64','Pruebas de punta a punta por historia']],
+   parts:[{n:'paginas/publico/',d:'Portada, buscador y mapa para el visitante.',tags:['HU-3','HU-7']},{n:'paginas/cliente/',d:'Mis servicios, seguimiento en vivo y calificación.',tags:['HU-4','HU-11','HU-12']},{n:'paginas/prestador/',d:'Solicitudes recibidas, disponibilidad y verificación.',tags:['HU-6','HU-19','HU-20']},{n:'paginas/admin/',d:'Colas de revisión, suspensión y bloqueo.',tags:['HU-9','HU-13']},{n:'nucleo/api.js',d:'fetch con la cookie de sesión y el token CSRF.',tags:['sesión']},{n:'nucleo/useConsultas.js',d:'Vuelve a consultar el estado cada 5 s.',tags:['tiempo real']},{n:'nucleo/pruebaDeVida.js',d:'Usa face_landmarker para pedir un parpadeo.',tags:['IA']},{n:'estilos/Tema.css',d:'Tokens de la marca: verde #16734F y naranja #F29F3D.',tags:['diseño']}],
+   tests:[115,'pruebas Playwright'],
+   facts:['Habla con <b>dos backends</b> con la misma sesión: Django para cuentas y verificación, Spring para búsqueda y solicitudes.','Duraciones de animación bajo 300 ms y respeto a «reducir movimiento».']},
+ django:{name:'Django + DRF',kind:'Servidor',c:'#2BA977',logo:'django',area:'2 / 2',blurb:'Backend principal: cuentas, admin y verificación',chips:['python','django','drf','firebase'],
+   summary:'El backend principal y dueño de la base de datos: define las tablas y sus migraciones. Maneja cuentas y roles, la revisión del administrador, la verificación de identidad y también expone búsqueda, solicitudes y calificaciones.',
+   techs:[['python','Python','3.12','Lenguaje del backend y de la IA'],['django','Django','6.1','Modelos, migraciones, sesiones y admin'],['drf','Django REST Framework','3.16','API JSON y permisos por rol'],['cors','django-cors-headers','4.4','Permite al portal web en otro puerto'],['firebase','firebase-admin','6.5+','Verifica tokens y envía push'],['easyocr','EasyOCR','1.7','Lee la MRZ del DNI'],['opencv','OpenCV','4.8','YuNet + SFace para comparar rostros'],['pillow','Pillow','10+','Procesa las fotos subidas']],
+   parts:[{n:'prestadores',d:'Perfil del prestador, rubros y cobertura.',tags:['Prestador','Rubro']},{n:'usuarios',d:'Cuentas, login con roles, perfil y disponibilidad.',tags:['Perfil']},{n:'servicios',d:'Solicitudes y su historial de estados.',tags:['Solicitud','CambioEstado','TokenFCM']},{n:'calificaciones',d:'Estrellas de 1 a 5 y promedio del prestador.',tags:['Calificacion']},{n:'certificaciones',d:'Documentos que acreditan el oficio.',tags:['CertificacionPrestador']},{n:'verificacion',d:'DNI, selfie, consentimiento y eliminación de datos.',tags:['IntentoDni','IntentoFacial','Consentimiento']},{n:'administracion',d:'Revisión de documentos y sanciones.',tags:['RevisionDocumento','SancionCuenta']},{n:'ia',d:'Recomendación del prestador por puntaje.',tags:['HU-10']}],
+   tests:[478,'pruebas de Django'],
+   sample:['Rutas principales',`<span class="k">POST</span> /api/usuarios/login/
+<span class="k">GET</span>  /api/usuarios/yo/
+<span class="k">POST</span> /api/verificacion/dni/
+<span class="k">POST</span> /api/verificacion/facial/
+<span class="k">GET</span>  /api/ia/recomendacion/
+<span class="k">POST</span> /api/administracion/cuentas/<span class="s">&lt;id&gt;</span>/sancionar/`],
+   facts:['Las fotos del DNI se guardan en un <b>almacén privado</b> y se pueden eliminar a pedido (Ley 29733).']},
+ ia:{name:'Verificación e IA',kind:'Inteligencia artificial',c:'#8B4FD6',logo:'brain',area:'2 / 3',blurb:'DNI, selfie con prueba de vida y recomendación',chips:['easyocr','mediapipe','opencv','sface'],
+   summary:'Todo lo que da confianza al cliente: confirma que el prestador es quien dice ser antes de poder trabajar, y elige al prestador más adecuado cuando alguien pide un servicio.',
+   techs:[['easyocr','EasyOCR','1.7','Lee la zona MRZ del DNI: número y nombres'],['mediapipe','MediaPipe','0.10.21','Prueba de vida con parpadeo, en el navegador'],['opencv','OpenCV YuNet','4.8','Detecta el rostro en la selfie y en el DNI'],['sface','OpenCV SFace','4.8','Compara los dos rostros y da una similitud'],['brain','Recomendación','HU-10','Puntaje por distancia, calificación y disponibilidad']],
+   parts:[{n:'1 · Consentimiento',d:'El prestador acepta el uso de sus datos biométricos.',tags:['Ley 29733']},{n:'2 · Escaneo del DNI',d:'Se lee la MRZ y se valida el número.',tags:['HU-19']},{n:'3 · Selfie en vivo',d:'Se pide un parpadeo para descartar una foto impresa.',tags:['HU-20']},{n:'4 · Comparación facial',d:'Selfie contra la foto del DNI.',tags:['SFace']},{n:'5 · Resultado',d:'Insignia «Identidad verificada» o revisión manual del admin.',tags:['HU-9']}],
+   sample:['Respuesta de la verificación facial',`{
+  <span class="k">"estado"</span>: <span class="s">"aprobado"</span>,
+  <span class="k">"similitud"</span>: 0.71,
+  <span class="k">"umbral"</span>: 0.36,
+  <span class="k">"prueba_de_vida"</span>: true
+}`],
+   facts:['El umbral de similitud aún se calibra con fotos del equipo (T20.4).','Con OCR real, varias fotos de DNI pasan a revisión manual: se prefiere dudar a aprobar mal.']},
+ android:{name:'App Android',kind:'Cliente',c:'#3DDC84',logo:'android',area:'3 / 1',blurb:'Kotlin + Jetpack Compose, registro por pasos',chips:['kotlin','compose','retrofit','room'],
+   summary:'App nativa con arquitectura MVVM. El registro del prestador va por pasos, una pregunta por pantalla, con progreso visible. Firebase solo da la identidad: los datos se piden a la API.',
+   techs:[['kotlin','Kotlin','2.4.21','Lenguaje de la app'],['compose','Jetpack Compose','BOM 2026.09','Pantallas declarativas'],['material','Material 3','claro y oscuro','Tema con la marca (ui/Tema.kt)'],['retrofit','Retrofit','3.0.0','Cliente HTTP con Gson'],['room','Room','2.8.5','Caché local en SQLite del teléfono'],['firebase','Firebase Auth','BOM 35.2.0','Ingreso y ID token'],['gmaps','maps-compose','8.4.0','Mapa nativo'],['coroutines','Coroutines','1.11.0','Llamadas sin bloquear la pantalla'],['gradle','Gradle + AGP','9.5.1','Build con catálogo de versiones']],
+   parts:[{n:'ui/',d:'Pantallas Compose: ingreso, registro en 5 pasos, búsqueda.',tags:['View']},{n:'domain/model/',d:'Modelos del negocio sin dependencias de Android.',tags:['Model']},{n:'data/remote/',d:'Interfaces Retrofit hacia la API.',tags:['HTTP']},{n:'data/local/',d:'Base Room para trabajar sin conexión.',tags:['Room']},{n:'data/auth/',d:'Sesión con Firebase Auth.',tags:['Firebase']},{n:'data/repository/',d:'Decide si leer de la red o de la caché.',tags:['MVVM']},{n:'device/',d:'Ubicación del teléfono.',tags:['GPS']}],
+   tests:[42,'pruebas de Android'],
+   facts:['El botón Atrás del sistema retrocede un paso del registro sin perder datos.','Los errores del servidor llevan al paso donde se corrigen.']},
+ spring:{name:'Spring Boot',kind:'Servidor',c:'#6DB33F',logo:'spring',area:'3 / 2',blurb:'API de usuario con respuestas idénticas a Django',chips:['java','spring','jpa','maven'],
+   summary:'API para el cliente y el prestador. Atiende a la app Android y a la web en búsqueda, recomendación, solicitudes, seguimiento, disponibilidad y calificaciones. Responde con el mismo JSON que Django, campo por campo.',
+   techs:[['java','Java','21','Lenguaje del backend'],['spring','Spring Boot','4.1.3','Web MVC y configuración'],['jpa','Spring Data JPA','Hibernate','Lee y escribe las tablas que creó Django'],['sqlite','sqlite-jdbc','dialecto community','Base local de desarrollo'],['postgres','Driver PostgreSQL','previsto','Base de producción'],['jwt','Nimbus JOSE + JWT','9.40','Valida el token de Firebase'],['gauth','Google Auth Library','1.30.0','Credenciales para enviar push'],['maven','Maven','wrapper','Build y pruebas']],
+   parts:[{n:'prestadores/',d:'Búsqueda por rubro y distancia.',tags:['BusquedaService','Distancias']},{n:'ia/',d:'Recomendación del mejor prestador.',tags:['RecomendacionService']},{n:'servicios/',d:'Solicitudes, estados y aviso push.',tags:['SolicitudesService','Notificador']},{n:'usuarios/',d:'Sesión de Django, CSRF y token de Firebase.',tags:['SesionDjango','FiltroFirebase']},{n:'calificaciones/',d:'Calificar y recalcular el promedio.',tags:['CalificacionesService']},{n:'comun/',d:'Imita el formato de Django: fechas, números y errores.',tags:['ComoDrf','PythonRepr','FechasDjango']}],
+   tests:[58,'pruebas de Spring Boot'],
+   sample:['Búsqueda de prestadores',`<span class="k">GET</span> /api/prestadores/buscar/?rubro=<span class="s">gasfiteria</span>&amp;lat=-12.05&amp;lng=-77.04
+
+[{
+  <span class="k">"id"</span>: 7,
+  <span class="k">"nombre"</span>: <span class="s">"Prestador de ejemplo"</span>,
+  <span class="k">"distancia_km"</span>: 1.2,
+  <span class="k">"calificacion"</span>: 4.8,
+  <span class="k">"recomendado"</span>: true
+}]`],
+   facts:['Lee la <b>cookie de sesión de Django</b> (SesionDjango, ClaveDjango): el usuario no inicia sesión dos veces.','Si Django y Spring responden distinto, una prueba falla.']},
+ datos:{name:'Base compartida',kind:'Datos',c:'#3E7FCB',logo:'sqlite',area:'3 / 3',blurb:'SQLite hoy · PostgreSQL previsto',chips:['sqlite','postgres'],
+   summary:'Una sola base de datos para los dos backends. Django es el dueño de las tablas y sus migraciones; Spring Boot las usa a través de JPA. La conexión se configura con variables de entorno.',
+   techs:[['sqlite','SQLite','hoy','Archivo local db.sqlite3 para desarrollo'],['postgres','PostgreSQL','previsto','Base para producción'],['django','Migraciones de Django','dueño','Crean y cambian las tablas'],['jpa','JPA / Hibernate','Spring','Usa las mismas tablas sin migrar']],
+   parts:[{n:'auth_user + usuarios_perfil',d:'Cuenta, rol y foto.',tags:['cliente','prestador','admin']},{n:'prestadores_prestador',d:'Rubros, cobertura, ubicación y disponibilidad.',tags:['→ rubro']},{n:'servicios_solicitud',d:'Quién pide, a quién y en qué estado.',tags:['→ cliente','→ prestador']},{n:'servicios_cambioestado',d:'Historial: Confirmado → En camino → En servicio → Finalizado.',tags:['→ solicitud']},{n:'calificaciones_calificacion',d:'Una calificación por solicitud finalizada.',tags:['→ solicitud']},{n:'verificacion_*',d:'Intentos de DNI y facial, consentimientos y eliminaciones.',tags:['privado']},{n:'administracion_*',d:'Revisiones de documentos y sanciones de cuentas.',tags:['admin']},{n:'django_session',d:'Sesiones que leen Django y Spring.',tags:['compartida']}],
+   facts:['Las respuestas de Spring y Django son idénticas porque leen las mismas filas.']},
+};
+
+/* ================= CADENAS INTERNAS (qué pasa dentro de cada contenedor) ================= */
+const S=(l,n,f,d,c,o={})=>({l,n,f,d,c,...o});
+const CHAINS={
+ web:{title:'Cadena del portal web',sub:'Lo que pasa desde que el cliente toca «Buscar» hasta que ve la respuesta.',
+  arrows:['clic','ruta','llama','fetch + CSRF','JSON','re-render'],
+  steps:[
+   S('lucide','Cliente','navegador','La persona escribe el rubro y su dirección en la portada.','rubro = "gasfiteria"'),
+   S('router','React Router','App.jsx · RutaPrivada','Elige la página según la URL y el rol. Si la ruta es privada y no hay sesión, manda a Ingresar.','&lt;Route path="/cliente/*"\n  element={&lt;RutaPrivada rol="cliente"/&gt;}/&gt;'),
+   S('react','Página y componentes','paginas/publico · ExplorarServicios.jsx','Arma el buscador, la lista y el mapa. El estado vive en hooks.','const { datos } = useConsultas(url)'),
+   S('react','Hook de consultas','nucleo/useConsultas.js','Pide los datos y, en el seguimiento, vuelve a pedirlos cada 5 segundos.','setInterval(refrescar, 5000)'),
+   S('vite','Cliente HTTP','nucleo/api.js','Un solo lugar para hablar con los backends: agrega la cookie de sesión y el token CSRF.','fetch(url, { credentials: "include",\n  headers: { "X-CSRFToken": csrf } })'),
+   S('spring','Backend','Spring Boot o Django','Spring responde búsqueda y solicitudes; Django, cuentas y verificación.','GET /api/prestadores/buscar/',{ext:1,go:'spring'}),
+   S('gmaps','Pantalla actualizada','componentes/mapa','React vuelve a dibujar la lista y los marcadores del mapa.','prestadores.map(p =&gt; &lt;Marcador … /&gt;)',{go:'mapas'}),
+  ]},
+ android:{title:'Cadena de la app Android (MVVM)',sub:'Capas por las que pasa una acción del prestador, por ejemplo aceptar una solicitud.',
+  arrows:['toca','evento','suspend fun','HTTP','token','guarda'],
+  steps:[
+   S('compose','Pantalla Compose','ui/','El prestador toca «Aceptar». La pantalla solo muestra estado y avisa eventos.','Button(onClick = { vm.aceptar(id) })'),
+   S('android','ViewModel','ui/…ViewModel','Guarda el estado de la pantalla y lanza el trabajo en una corrutina.','viewModelScope.launch { repo.aceptar(id) }'),
+   S('coroutines','Repositorio','data/repository/','Decide de dónde salen los datos: red o caché local.','suspend fun aceptar(id: Int)'),
+   S('retrofit','Retrofit','data/remote/','Convierte la llamada en una petición HTTP con Gson.','@POST("solicitudes/{id}/aceptar/")'),
+   S('firebase','Firebase Auth','data/auth/','Agrega el ID token del usuario en la cabecera Authorization.','Authorization: Bearer &lt;ID token&gt;',{go:'firebase'}),
+   S('spring','API Spring Boot','backend/spring','Valida el token y cambia el estado de la solicitud.','→ { "estado": "confirmada" }',{ext:1,go:'spring'}),
+   S('room','Room','data/local/','La respuesta se guarda para mostrarla aunque no haya señal.','@Insert(onConflict = REPLACE)'),
+  ]},
+ django:{title:'Cadena del backend Django',sub:'El camino de una petición dentro de Django REST Framework.',
+  arrows:['HTTP','enruta','autoriza','valida','ORM','SQL'],
+  steps:[
+   S('cors','Petición','web o app','Llega la petición con la cookie de sesión. django-cors-headers deja pasar al portal web.','POST /api/verificacion/dni/'),
+   S('django','URLs','core/urls.py · app/urls.py','Cada app tiene su prefijo: /api/usuarios/, /api/servicios/, /api/verificacion/…','path("api/verificacion/", include(…))'),
+   S('drf','Vista + permisos','views.py · permissions','La vista revisa la sesión y el rol: un cliente no entra a rutas de administración.','permission_classes = [EsPrestador]'),
+   S('drf','Serializer','serializers.py','Valida y limpia los datos de entrada; arma el JSON de salida.','serializer.is_valid(raise_exception=True)'),
+   S('easyocr','Servicio / IA','verificacion · ia','Si hace falta, corre la lógica pesada: OCR del DNI, comparación facial o recomendación.','leer_mrz(foto) → IntentoDni',{go:'ia'}),
+   S('django','Modelo (ORM)','models.py','Los modelos son la fuente de verdad: Django crea las tablas con migraciones.','IntentoDni.objects.create(…)'),
+   S('sqlite','Base compartida','db.sqlite3 · PostgreSQL','Las filas quedan donde Spring también las lee.','INSERT INTO verificacion_intentodni …',{ext:1,go:'datos'}),
+  ]},
+ spring:{title:'Cadena del backend Spring Boot',sub:'Cómo Spring responde lo mismo que Django, sin crear tablas propias.',
+  arrows:['HTTP','identifica','llama','consulta','SQL','formatea'],
+  steps:[
+   S('java','Petición','web o app','Llega con cookie de sesión de Django (web) o con Bearer token (app).','GET /api/prestadores/buscar/?rubro=…'),
+   S('jwt','Filtros de identidad','usuarios/FiltroFirebase · SesionDjango','Lee el token de Firebase o la sesión de Django y arma el usuario actual. Revisa CSRF en escrituras.','VerificadorFirebase.verificar(token)'),
+   S('spring','Controller','PrestadoresController.java','Recibe los parámetros y delega; no tiene lógica de negocio.','@GetMapping("/buscar/")'),
+   S('brain','Service','BusquedaService · RecomendacionService','Filtra por rubro, verificación, disponibilidad y radio; calcula distancia y puntaje.','Distancias.km(cliente, prestador)'),
+   S('jpa','Repository JPA','PrestadorRepository.java','Spring Data arma la consulta sobre las tablas de Django.','findByRubroAndDisponibleTrue(r)'),
+   S('sqlite','Base compartida','prestadores_prestador','Las mismas filas que ve Django.','SELECT … FROM prestadores_prestador',{ext:1,go:'datos'}),
+   S('drf','Respuesta «como DRF»','comun/ComoDrf · FechasDjango','Imita fechas, números y errores de Django para que el JSON sea idéntico.','{"detail": "…"} · 2026-11-26T10:00:00Z'),
+  ]},
+ datos:{title:'Cadena de los datos',sub:'Quién crea las tablas y quién las usa.',
+  arrows:['define','genera','aplica','lee/escribe','misma fila'],
+  steps:[
+   S('django','models.py','backend/django/*/models.py','Los modelos de Django describen cada tabla y sus relaciones.','class Solicitud(models.Model)'),
+   S('python','Migraciones','*/migrations/','makemigrations convierte el cambio de modelo en un archivo versionado.','python manage.py makemigrations'),
+   S('sqlite','Base compartida','SQLite hoy · PostgreSQL','migrate crea o cambia las tablas. Nadie más las altera.','python manage.py migrate'),
+   S('jpa','Entidades JPA','@Table(name="servicios_solicitud")','Spring mapea esas tablas con entidades Java, sin migraciones propias.','@Entity class Solicitud'),
+   S('spring','Spring Boot','backend/spring','Lee y escribe las mismas filas que Django.','solicitudes.save(s)',{go:'spring'}),
+   S('drf','Respuestas iguales','web y app','Como la fuente es una sola, web y app ven siempre lo mismo.','✓ Django = Spring'),
+  ]},
+ ia:{title:'Cadena de verificación de identidad',sub:'De la foto del DNI a la insignia «Identidad verificada».',
+  arrows:['acepta','foto','MRZ','selfie','rostros','similitud'],
+  steps:[
+   S('lucide','Consentimiento','verificacion/Consentimiento','El prestador acepta el uso de sus datos biométricos. Sin esto no se captura nada.','POST /api/verificacion/consentimiento/'),
+   S('easyocr','EasyOCR','verificacion · MRZ','Lee la zona MRZ del DNI y extrae número y nombres.','"I&lt;PER12345678&lt;…"'),
+   S('django','IntentoDni','almacén privado','Se guarda el intento; si la lectura es dudosa, va a revisión manual.','estado = "revision_manual"'),
+   S('mediapipe','Prueba de vida','web · pruebaDeVida.js','MediaPipe pide un parpadeo en vivo para descartar una foto impresa.','parpadeos &gt;= 1'),
+   S('opencv','YuNet','OpenCV 4.8','Detecta y recorta el rostro en la selfie y en la foto del DNI.','detector.detect(imagen)'),
+   S('sface','SFace','OpenCV 4.8','Compara los dos rostros y entrega una similitud.','similitud = 0.71'),
+   S('brain','Decisión','IntentoFacial · admin','Sobre el umbral: insignia. Si hay dudas: lo revisa un administrador.','✓ Identidad verificada',{go:'django'}),
+  ]},
+ firebase:{title:'Cadena de un aviso push',sub:'Del momento en que llega una solicitud hasta que suena el teléfono del prestador.',
+  arrows:['guarda','busca token','envía','entrega','muestra'],
+  steps:[
+   S('spring','Nueva solicitud','SolicitudesService','El cliente pidió un servicio y la solicitud quedó guardada.','solicitudes.save(s)',{go:'spring'}),
+   S('sqlite','TokenFCM','servicios_tokenfcm','Se busca el token de avisos que registró el dispositivo del prestador.','WHERE usuario_id = 7'),
+   S('gauth','Notificador','servicios/Notificador.java','Se autentica con Google y arma el mensaje.','Notificador.avisar(prestador, …)'),
+   S('fcm','Firebase Cloud Messaging','FCM','Google entrega el mensaje al navegador o al teléfono. Meta: menos de 5 s.','messages:send'),
+   S('sw','Service worker','firebase-messaging-sw.js','Recibe el push aunque la pestaña esté cerrada.','onBackgroundMessage(…)'),
+   S('lucide','Notificación','prestador','«Nueva solicitud #42» aparece en pantalla.','Nueva solicitud #42 · Gasfitería',{go:'web'}),
+  ]},
+ mapas:{title:'Cadena del mapa',sub:'Cómo se llena el mapa de prestadores.',
+  arrows:['ubicación','busca','calcula','coordenadas','dibuja'],
+  steps:[
+   S('location','Ubicación','navegador o GPS','Se toma la ubicación del cliente o la dirección que escribió.','lat -12.05, lng -77.04'),
+   S('spring','Búsqueda','BusquedaService','El servidor filtra por radio de cobertura del prestador.','GET /api/prestadores/buscar/',{go:'spring'}),
+   S('brain','Distancias','Distancias.java','Distancia en km y puntaje del recomendado.','haversine(a, b) = 1.2 km'),
+   S('react','Componente mapa','componentes/mapa','Recibe la lista con coordenadas ya calculadas.','&lt;Map center={ubicacion}&gt;'),
+   S('gmaps','Google Maps','JS API · maps-compose','Dibuja los marcadores. Sin clave, usa OpenStreetMap con Leaflet.','&lt;AdvancedMarker position={p}/&gt;'),
+   S('leaflet','Respaldo','react-leaflet','Mismo mapa con teselas de OpenStreetMap.','&lt;TileLayer url="…osm…"/&gt;'),
+  ]},
+};
+const GROUPS=[['Frontend',['web']],['Móvil',['android']],['Backend',['django','spring']],['Datos',['datos']],['IA',['ia']],['Externos',['firebase','mapas']]];
+
+/* ================= CONEXIONES ================= */
+const TYPES={http:['HTTP · JSON','--t-http'],push:['Push / eventos','--t-push'],sql:['SQL · ORM','--t-sql'],ia:['IA · imágenes','--t-ia'],ext:['SDK externo','--t-ext']};
+const EDGES=[
+ {id:'web-django',a:'web',as:'r',ao:-.18,b:'django',bs:'l',bo:-.18,t:'http',title:'Web → Django',d:'Cuentas, perfil, verificación de identidad y panel del administrador. Viaja con la cookie de sesión y el token CSRF.',code:`<span class="k">POST</span> /api/usuarios/login/
+X-CSRFToken: <span class="s">…</span>
+{ <span class="k">"username"</span>: <span class="s">"cliente1"</span>, <span class="k">"password"</span>: <span class="s">"••••"</span> }
+
+→ { <span class="k">"rol"</span>: <span class="s">"cliente"</span> }`},
+ {id:'web-spring',a:'web',as:'r',ao:.22,b:'spring',bs:'l',bo:-.22,t:'http',title:'Web → Spring Boot',d:'Búsqueda, recomendación, solicitudes, seguimiento, disponibilidad y calificaciones, con la misma sesión de Django.',code:`<span class="k">POST</span> /api/servicios/solicitudes/
+{ <span class="k">"prestador"</span>: 7, <span class="k">"rubro"</span>: <span class="s">"gasfiteria"</span>,
+  <span class="k">"direccion"</span>: <span class="s">"Av. Ejemplo 123"</span> }
+
+→ 201 { <span class="k">"id"</span>: 42, <span class="k">"estado"</span>: <span class="s">"pendiente"</span> }`},
+ {id:'android-spring',a:'android',as:'r',ao:.18,b:'spring',bs:'l',bo:.2,t:'http',title:'App Android → Spring Boot',d:'La app llama a la API con Retrofit y se identifica con el ID token de Firebase.',code:`<span class="k">POST</span> /api/servicios/solicitudes/42/aceptar/
+Authorization: Bearer <span class="s">&lt;ID token de Firebase&gt;</span>
+
+→ { <span class="k">"estado"</span>: <span class="s">"confirmada"</span> }`},
+ {id:'django-datos',a:'django',as:'r',ao:.26,b:'datos',bs:'l',bo:-.26,t:'sql',title:'Django → Base compartida',d:'El ORM de Django crea las tablas con migraciones y lee y escribe todo el modelo.',code:`Solicitud.objects.filter(
+    prestador=p, estado=<span class="s">"pendiente"</span>
+).select_related(<span class="s">"cliente"</span>)`},
+ {id:'spring-datos',a:'spring',as:'r',ao:.18,b:'datos',bs:'l',bo:.22,t:'sql',title:'Spring Boot → Base compartida',d:'JPA e Hibernate usan las mismas tablas que creó Django, sin migraciones propias.',code:`<span class="k">@Table</span>(name = <span class="s">"prestadores_prestador"</span>)
+<span class="k">class</span> Prestador { … }
+
+prestadorRepository.findByRubroAndDisponibleTrue(r)`},
+ {id:'django-ia',a:'django',as:'r',ao:-.22,b:'ia',bs:'l',bo:0,t:'ia',title:'Django → Verificación e IA',d:'Django pasa la foto del DNI y la selfie a EasyOCR y OpenCV, y guarda el resultado.',code:`foto DNI  → EasyOCR  → MRZ: <span class="s">"I&lt;PER12345678&lt;…"</span>
+selfie    → YuNet    → rostro
+rostros   → SFace    → similitud 0.71`},
+ {id:'web-firebase',a:'web',as:'t',ao:.25,b:'firebase',bs:'l',bo:.15,t:'push',title:'Web ↔ Firebase Cloud Messaging',d:'El navegador del prestador registra su token de avisos y recibe el push en el service worker.',code:`<span class="k">POST</span> /api/servicios/notificaciones/token/
+{ <span class="k">"token"</span>: <span class="s">"fcm_…"</span>, <span class="k">"plataforma"</span>: <span class="s">"web"</span> }`},
+ {id:'android-firebase',a:'android',as:'r',ao:-.3,b:'firebase',bs:'l',bo:-.2,t:'ext',k:34,title:'App Android → Firebase Auth',d:'El usuario ingresa con Firebase Auth y obtiene un ID token (JWT) que luego envía a la API.',code:`FirebaseAuth.getInstance()
+  .signInWithEmailAndPassword(correo, clave)
+  .await().user?.getIdToken(true)`},
+ {id:'django-firebase',a:'django',as:'t',ao:-.15,b:'firebase',bs:'b',bo:-.15,t:'push',title:'Django → Firebase',d:'Con firebase-admin, Django verifica los tokens de la app y envía avisos push.',code:`messaging.send(messaging.Message(
+    token=token_fcm,
+    notification=Notification(<span class="s">"Nueva solicitud"</span>, …)))`},
+ {id:'spring-firebase',a:'spring',as:'r',ao:-.3,b:'firebase',bs:'r',bo:.1,t:'push',k:44,title:'Spring Boot → Firebase',d:'Spring valida el ID token de la app (Nimbus JOSE) y su Notificador envía el push al prestador cuando llega una solicitud.',code:`VerificadorFirebase.verificar(idToken)
+Notificador.avisar(prestador, <span class="s">"Nueva solicitud #42"</span>)`},
+ {id:'web-mapas',a:'web',as:'t',ao:-.2,b:'mapas',bs:'b',bo:0,t:'ext',title:'Web → Google Maps',d:'La web dibuja el mapa con los prestadores que devolvió la búsqueda.',code:`&lt;Map center={ubicacion}&gt;
+  {prestadores.map(p =&gt; &lt;AdvancedMarker position={p} /&gt;)}
+&lt;/Map&gt;`},
+ {id:'android-mapas',a:'android',as:'l',ao:0,b:'mapas',bs:'l',bo:.1,t:'ext',k:40,title:'App Android → Google Maps',d:'La app muestra la zona y el radio de cobertura con maps-compose.',code:`GoogleMap(cameraPositionState = camara) {
+  Circle(center = zona, radius = radioMetros)
+}`},
+];
+
+/* ================= RECORRIDOS ================= */
+const FLOWS={
+ servicio:{title:'Pedir un servicio',steps:[
+  {e:'web-spring',n:'web',t:'El cliente busca un gasfitero cerca de su ubicación.'},
+  {e:'spring-datos',n:'spring',t:'Spring Boot consulta prestadores verificados y disponibles dentro del radio.'},
+  {e:'spring-datos',rev:1,n:'spring',t:'La IA ordena por distancia, calificación y disponibilidad: el recomendado va primero.'},
+  {e:'web-mapas',n:'mapas',t:'La web muestra a los prestadores en el mapa con su tiempo estimado.'},
+  {e:'web-spring',n:'spring',t:'El cliente envía la solicitud al prestador elegido.'},
+  {e:'spring-datos',n:'datos',t:'Se guarda la solicitud con estado «pendiente».'},
+  {e:'spring-firebase',n:'firebase',t:'El Notificador envía un aviso push al prestador.'},
+  {e:'android-spring',n:'android',t:'El prestador acepta desde la app, identificado con su token de Firebase.'},
+  {e:'web-spring',n:'web',t:'La web del cliente consulta el estado cada 5 segundos.'},
+  {e:'android-spring',n:'spring',t:'El prestador avanza: En camino → En servicio → Finalizada.'},
+  {e:'web-spring',n:'spring',t:'El cliente califica de 1 a 5 estrellas.'},
+  {e:'spring-datos',n:'datos',t:'Se recalcula el promedio que aparece en la ficha del prestador.'},
+ ]},
+ identidad:{title:'Verificar identidad',steps:[
+  {e:'web-django',n:'django',t:'El prestador acepta el uso de sus datos biométricos (Ley 29733).'},
+  {e:'web-django',n:'django',t:'Sube la foto de su DNI.'},
+  {e:'django-ia',n:'ia',t:'EasyOCR lee la MRZ: número de DNI y nombres.'},
+  {e:'django-datos',n:'datos',t:'Se guarda el intento de DNI en un almacén privado.'},
+  {e:null,n:'web',t:'En el navegador, MediaPipe pide un parpadeo: prueba de vida.'},
+  {e:'web-django',n:'django',t:'Se envía la selfie en vivo.'},
+  {e:'django-ia',n:'ia',t:'OpenCV SFace compara la selfie con la foto del DNI.'},
+  {e:'django-ia',rev:1,n:'django',t:'Si coinciden, insignia «Identidad verificada». Si hay dudas, pasa a revisión manual.'},
+  {e:'django-datos',n:'datos',t:'El administrador ve el caso en su cola de revisión.'},
+ ]},
+};
+
+/* ================= utilidades ================= */
+const $=s=>document.querySelector(s);
+const ic={
+ arrow:'<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M10 3L5 8l5 5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+ next:'<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M6 3l5 5-5 5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+ pause:'<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M5 3v10M11 3v10" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg>',
+ play:'<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M4 2.5v11l9-5.5z" fill="currentColor"/></svg>',
+ hand:'<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+ close:'<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>',
+};
+const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+const css=v=>getComputedStyle(document.documentElement).getPropertyValue(v).trim();
+
+/* código ISO 6346 real del contenedor, con dígito de control */
+(function(){
+  const own='CHPU',ser='202602';const val={};let n=10;
+  for(const ch of 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'){if(n%11===0)n++;val[ch]=n++;}
+  let sum=0;[...own+ser].forEach((ch,i)=>{const v=/\d/.test(ch)?+ch:val[ch];sum+=v*Math.pow(2,i)});
+  const chk=(sum%11)%10;$('#isoCode').innerHTML=`${own} ${ser}<b>${chk}</b>`;
+})();
+
+/* ================= SISTEMA: nodos y cables ================= */
+const stage=$('#stage'),svg=$('#wires');
+let dots=[];
+function buildStage(){
+  for(const [id,n] of Object.entries(NODES)){
+    if(!n){const lgd=document.createElement('div');lgd.className='legend';lgd.style.gridArea='1 / 3';
+      lgd.innerHTML='<h4>Cómo leer las líneas</h4><ul>'+Object.entries(TYPES).map(([k,[l]])=>`<li><svg viewBox="0 0 34 8"><path class="wire ${k}" d="M1 4H33"/></svg>${l}</li>`).join('')+'</ul>';
+      stage.appendChild(lgd);continue}
+    const b=document.createElement('button');b.className='node';b.dataset.id=id;b.style.gridArea=n.area;b.style.setProperty('--c',n.c);
+    b.setAttribute('aria-label',`${n.name}: ${n.blurb}. Abrir ficha.`);
+    b.innerHTML=`<div class="ribs"></div><div class="nb">${lg(n.logo)}<div><span class="kind">${n.kind}</span><b>${n.name}</b></div></div><small>${n.blurb}</small><div class="chips">${n.chips.map(lg).join('')}</div><span class="open">Entrar ›</span>`;
+    b.addEventListener('mouseenter',()=>{if(!flow)focusNode(id)});
+    b.addEventListener('mouseleave',()=>{if(!flow)clearFocus()});
+    b.addEventListener('focus',()=>{if(!flow)focusNode(id)});
+    b.addEventListener('blur',()=>{if(!flow)clearFocus()});
+    b.addEventListener('click',()=>go(id));
+    stage.appendChild(b);
+  }
+  svg.innerHTML=EDGES.map(e=>`<path id="w-${e.id}" class="wire ${e.t}"/><path class="hit" data-e="${e.id}"/>`).join('')+EDGES.map(e=>`<circle class="dot" id="d-${e.id}" r="3.6"/>`).join('')+'<circle id="flowDot" r="7" opacity="0"/>';
+  svg.querySelectorAll('.hit').forEach(h=>{
+    h.addEventListener('click',()=>{if(flow)return;showEdge(h.dataset.e,true)});
+    h.addEventListener('mouseenter',()=>{if(flow||pinned)return;highlight([h.dataset.e],[]);});
+    h.addEventListener('mouseleave',()=>{if(flow||pinned)return;clearFocus()});
+  });
+  dots=EDGES.map(e=>({e,el:$('#d-'+e.id),off:Math.random()}));
+}
+function anchor(r,side,off,base){
+  const x=r.left-base.left,y=r.top-base.top;
+  switch(side){
+    case 'l':return [x,y+r.height/2+off*r.height,-1,0];
+    case 'r':return [x+r.width,y+r.height/2+off*r.height,1,0];
+    case 't':return [x+r.width/2+off*r.width,y,0,-1];
+    default:return [x+r.width/2+off*r.width,y+r.height,0,1];
+  }
+}
+function layout(){
+  if(!stage.offsetParent)return;
+  const base=stage.getBoundingClientRect();
+  svg.setAttribute('viewBox',`0 0 ${base.width} ${base.height}`);
+  for(const e of EDGES){
+    const ra=stage.querySelector(`[data-id="${e.a}"]`).getBoundingClientRect(),rb=stage.querySelector(`[data-id="${e.b}"]`).getBoundingClientRect();
+    const [x1,y1,dx1,dy1]=anchor(ra,e.as,e.ao,base),[x2,y2,dx2,dy2]=anchor(rb,e.bs,e.bo,base);
+    const dist=Math.hypot(x2-x1,y2-y1);const k=e.k||Math.max(28,Math.min(110,dist*.38));
+    const d=`M${x1.toFixed(1)} ${y1.toFixed(1)} C${(x1+dx1*k).toFixed(1)} ${(y1+dy1*k).toFixed(1)} ${(x2+dx2*k).toFixed(1)} ${(y2+dy2*k).toFixed(1)} ${x2.toFixed(1)} ${y2.toFixed(1)}`;
+    $('#w-'+e.id).setAttribute('d',d);svg.querySelector(`.hit[data-e="${e.id}"]`).setAttribute('d',d);
+  }
+  dots.forEach(o=>{o.len=$('#w-'+o.e.id).getTotalLength();o.el.setAttribute('fill',css(TYPES[o.e.t][1]))});
+}
+new ResizeObserver(()=>layout()).observe(stage);
+
+let last=0;
+function tick(ts){
+  const dt=Math.min(64,ts-(last||ts));last=ts;
+  if(!reduce&&stage.offsetParent){
+    const path=id=>$('#w-'+id);
+    for(const o of dots){if(!o.len)continue;o.off=(o.off+dt*0.045/o.len)%1;const p=path(o.e.id).getPointAtLength(o.off*o.len);o.el.setAttribute('cx',p.x);o.el.setAttribute('cy',p.y)}
+  }
+  requestAnimationFrame(tick);
+}
+
+function edgesOf(id){return EDGES.filter(e=>e.a===id||e.b===id)}
+function highlight(eids,nids){
+  stage.classList.add('dim');
+  stage.querySelectorAll('.wire,.dot,.node').forEach(x=>x.classList.remove('hl'));
+  eids.forEach(id=>{$('#w-'+id)?.classList.add('hl');$('#d-'+id)?.classList.add('hl');const e=EDGES.find(x=>x.id===id);if(e)nids.push(e.a,e.b)});
+  nids.forEach(n=>stage.querySelector(`[data-id="${n}"]`)?.classList.add('hl'));
+}
+let pinned=null;
+function clearFocus(){if(pinned){showEdge(pinned,false);return}stage.classList.remove('dim');stage.querySelectorAll('.hl').forEach(x=>x.classList.remove('hl'));panelDefault()}
+function focusNode(id){
+  const es=edgesOf(id);highlight(es.map(e=>e.id),[id]);const n=NODES[id];
+  panel.innerHTML=`<span class="pill" style="--pc:${n.c}">${n.kind}</span><h3>${lg(n.logo)}${n.name}</h3><p>${n.summary}</p>
+  <div class="sec"><h3 style="font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)">Se conecta con</h3>
+  <div class="tip">${es.map(e=>{const o=e.a===id?e.b:e.a;return `<div>${ic.hand}<span><b style="color:var(--fg)">${NODES[o].name}</b> · ${TYPES[e.t][0]}</span></div>`}).join('')}</div></div>
+  <p style="font-size:13px">Haz clic para entrar al contenedor.</p>`;
+}
+const panel=$('#panel');
+function panelDefault(){
+  if(flow)return;
+  panel.innerHTML=`<h3>Cómo explorar</h3>
+  <div class="tip">
+   <div>${ic.hand}<span><b style="color:var(--fg)">Pasa el mouse</b> por un contenedor para resaltar con quién habla.</span></div>
+   <div>${ic.hand}<span><b style="color:var(--fg)">Haz clic en un contenedor</b> para ver sus tecnologías, módulos y pruebas.</span></div>
+   <div>${ic.hand}<span><b style="color:var(--fg)">Haz clic en una línea</b> para ver un ejemplo de los datos que viajan.</span></div>
+   <div>${ic.hand}<span><b style="color:var(--fg)">Recorre un flujo</b> completo con los botones de arriba.</span></div>
+  </div>
+  <button class="linkbtn" data-flow="servicio">${ic.play} Ver cómo viaja una solicitud</button>`;
+  panel.querySelector('[data-flow]').onclick=()=>startFlow('servicio');
+}
+function showEdge(id,toggle){
+  if(toggle&&pinned===id){pinned=null;clearFocus();return}
+  pinned=id;const e=EDGES.find(x=>x.id===id);highlight([id],[]);
+  const [lab,tv]=TYPES[e.t];
+  panel.innerHTML=`<span class="pill" style="--pc:var(${tv})">${lab}</span><h3>${e.title}</h3><p>${e.d}</p><pre class="code">${e.code}</pre>
+  <div style="display:flex;gap:8px;flex-wrap:wrap"><button class="linkbtn" data-go="${e.a}">${lg(NODES[e.a].logo).replace('class="lg"','class="lg" style="width:18px;height:18px"')} ${NODES[e.a].name}</button><button class="linkbtn" data-go="${e.b}">${lg(NODES[e.b].logo).replace('class="lg"','class="lg" style="width:18px;height:18px"')} ${NODES[e.b].name}</button><button class="linkbtn" id="unpin">${ic.close} Cerrar</button></div>`;
+  panel.querySelectorAll('[data-go]').forEach(b=>b.onclick=()=>go(b.dataset.go));
+  $('#unpin').onclick=()=>{pinned=null;clearFocus()};
+}
+
+/* ================= reproductor de recorridos ================= */
+let flow=null,timer=null,playing=false,anim=null;
+document.querySelectorAll('.fbtn').forEach(b=>b.onclick=()=>flow&&flow.key===b.dataset.flow?stopFlow():startFlow(b.dataset.flow));
+function startFlow(key){
+  pinned=null;flow={key,i:0};playing=true;
+  document.querySelectorAll('.fbtn').forEach(b=>b.classList.toggle('on',b.dataset.flow===key));
+  renderStep();
+}
+function stopFlow(){
+  flow=null;playing=false;clearTimeout(timer);cancelAnimationFrame(anim);$('#flowDot').setAttribute('opacity',0);
+  document.querySelectorAll('.fbtn').forEach(b=>b.classList.remove('on'));clearFocus();
+}
+function renderStep(){
+  clearTimeout(timer);const F=FLOWS[flow.key],s=F.steps[flow.i],N=F.steps.length;
+  highlight(s.e?[s.e]:[],[s.n]);
+  const nodeEl=stage.querySelector(`[data-id="${s.n}"]`);nodeEl.classList.remove('pulse');void nodeEl.offsetWidth;nodeEl.classList.add('pulse');
+  panel.innerHTML=`<div class="player"><span class="pill" style="--pc:var(--accent-ink)">Recorrido · ${F.title}</span>
+   <div class="bar"><i style="width:${(flow.i+1)/N*100}%"></i></div>
+   <div class="stepno">Paso ${flow.i+1} de ${N}</div><div class="txt">${s.t}</div>
+   <div class="ctrls"><button id="pv" aria-label="Paso anterior">${ic.arrow}Atrás</button><button id="pp">${playing?ic.pause+'Pausa':ic.play+'Seguir'}</button><button id="nx" aria-label="Paso siguiente">Siguiente${ic.next}</button></div>
+   <ol class="steps">${F.steps.map((x,i)=>`<li class="${i===flow.i?'cur':''}"><button data-i="${i}"><span>${String(i+1).padStart(2,'0')}</span>${x.t}</button></li>`).join('')}</ol>
+   <button class="linkbtn" id="fx">${ic.close} Salir del recorrido</button></div>`;
+  $('#pv').onclick=()=>{playing=false;flow.i=Math.max(0,flow.i-1);renderStep()};
+  $('#nx').onclick=()=>{playing=false;next()};
+  $('#pp').onclick=()=>{playing=!playing;if(playing)next();else renderStep()};
+  $('#fx').onclick=stopFlow;
+  panel.querySelectorAll('.steps button').forEach(b=>b.onclick=()=>{playing=false;flow.i=+b.dataset.i;renderStep()});
+  {const ol=panel.querySelector('.steps'),li=ol&&ol.querySelector('.cur');if(li)ol.scrollTop=li.offsetTop-ol.offsetTop-ol.clientHeight/2;}
+  if(s.e)runPacket(s.e,s.rev);else $('#flowDot').setAttribute('opacity',0);
+  if(playing)timer=setTimeout(next,2900);
+}
+function next(){const N=FLOWS[flow.key].steps.length;if(flow.i<N-1){flow.i++;renderStep()}else{playing=false;renderStep()}}
+function runPacket(eid,rev){
+  cancelAnimationFrame(anim);const p=$('#w-'+eid),dot=$('#flowDot'),L=p.getTotalLength(),e=EDGES.find(x=>x.id===eid);
+  dot.setAttribute('fill',css('--accent'));dot.setAttribute('stroke',css('--surface'));dot.setAttribute('stroke-width',2.5);dot.setAttribute('opacity',1);
+  if(reduce){const q=p.getPointAtLength(rev?0:L);dot.setAttribute('cx',q.x);dot.setAttribute('cy',q.y);return}
+  const t0=performance.now(),dur=1200;
+  const step=t=>{let k=Math.min(1,(t-t0)/dur);k=k<.5?2*k*k:1-Math.pow(-2*k+2,2)/2;const q=p.getPointAtLength((rev?1-k:k)*L);dot.setAttribute('cx',q.x);dot.setAttribute('cy',q.y);if(k<1)anim=requestAnimationFrame(step)};
+  anim=requestAnimationFrame(step);
+}
+
+/* ================= DETALLE ================= */
+const ORDER=['web','android','django','spring','datos','ia','firebase','mapas'];
+function renderDetail(id){
+  const n=NODES[id],i=ORDER.indexOf(id),prev=ORDER[(i+ORDER.length-1)%ORDER.length],nxt=ORDER[(i+1)%ORDER.length];
+  const es=edgesOf(id);
+  $('#det').innerHTML=`
+  <div class="det-top"><button class="backbtn" id="bk">${ic.arrow} Arquitectura</button>
+  <nav class="tabs" aria-label="Cambiar de contenedor">${GROUPS.map(([g,ids])=>`<div class="grp"><span>${g}</span>${ids.map(x=>`<button class="tab ${x===id?'on':''}" style="--c:${NODES[x].c}" data-go="${x}" ${x===id?'aria-current="page"':''}>${lg(NODES[x].logo)}${NODES[x].name}</button>`).join('')}</div>`).join('')}</nav></div>
+  <div class="det-hero" style="--c:${n.c}">${lg(n.logo)}<div><div class="kind">${n.kind}</div><h2>${n.name}</h2><p>${n.summary}</p></div>
+   ${n.tests?`<div class="tests"><b data-count="${n.tests[0]}">${n.tests[0]}</b><span>${n.tests[1]}</span></div>`:''}</div>
+  ${chainHTML(id)}
+  <div class="det-info">
+    <div class="seg" role="tablist">
+      <button class="on" data-p="t" role="tab">Tecnologías <span>${n.techs.length}</span></button>
+      <button data-p="p" role="tab">Por dentro <span>${n.parts.length}</span></button>
+      <button data-p="c" role="tab">Conexiones <span>${es.length}</span></button>
+    </div>
+    <div class="pane" data-p="t"><div class="techs">${n.techs.map(([k,name,ver,what])=>`<div class="tech" style="--tc:${n.c};--tc2:var(--brand-ink)">${lg(k)}<div style="min-width:0"><b>${name}</b> <span class="ver">${ver}</span><p>${what}</p></div></div>`).join('')}</div></div>
+    <div class="pane" data-p="p" hidden><div class="parts">${n.parts.map(p=>`<div class="part"><code>${p.n}</code><p>${p.d}</p>${p.tags?`<div class="tags">${p.tags.map(t=>`<span>${t}</span>`).join('')}</div>`:''}</div>`).join('')}</div></div>
+    <div class="pane" data-p="c" hidden><div class="conns">${es.map(e=>{const o=e.a===id?e.b:e.a;return `<button class="conn" data-go="${o}">${lg(NODES[o].logo)}<b>${NODES[o].name}</b><span>${TYPES[e.t][0]} · ${e.d}</span></button>`}).join('')}</div>
+      ${n.facts?`<ul class="facts">${n.facts.map(f=>`<li>${f}</li>`).join('')}</ul>`:''}</div>
+  </div>`;
+  $('#bk').onclick=()=>go('sistema');
+  $('#det').querySelectorAll('.seg button').forEach(b=>b.onclick=()=>{$('#det').querySelectorAll('.seg button').forEach(x=>x.classList.toggle('on',x===b));$('#det').querySelectorAll('.pane').forEach(x=>x.hidden=x.dataset.p!==b.dataset.p)});
+  $('#det').querySelectorAll('[data-go]').forEach(b=>b.onclick=()=>go(b.dataset.go));
+  initChain(id);
+  const c=$('#det [data-count]');
+  if(c&&!reduce){const target=+c.dataset.count,t0=performance.now();const s=t=>{const k=Math.min(1,(t-t0)/700);c.textContent=Math.round(target*(1-Math.pow(1-k,3)));if(k<1)requestAnimationFrame(s)};requestAnimationFrame(s)}
+}
+
+/* ================= cadena interna ================= */
+const ARROW='<svg viewBox="0 0 80 14" aria-hidden="true"><path d="M2 7H72" stroke="currentColor" stroke-width="2.4"/><path d="M70 1.5L78 7l-8 5.5z" fill="currentColor"/></svg>';
+let chainT=null,chainI=0,chainPlay=false;
+function chainHTML(id){
+  const C=CHAINS[id];if(!C)return'';const n=NODES[id];
+  return `<section class="chain-wrap" aria-label="${C.title}">
+   <div class="chain-head"><div><h3 style="font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);font-weight:800">Cadena de contenedores · flujo</h3><h4 style="margin:2px 0 0;font-size:18px">${C.title}</h4><p>${C.sub} Haz clic en cada contenedor.</p></div>
+   <div class="chain-ctrl"><button id="cPrev">${ic.arrow}Atrás</button><button id="cPlay">${ic.play}Reproducir</button><button id="cNext">Siguiente${ic.next}</button></div></div>
+   <div class="chain" id="chain">${C.steps.map((s,i)=>`${i?`<div class="arw" data-a="${i}"><span>${C.arrows[i-1]||''}</span>${ARROW}<i></i></div>`:''}<button class="stg ${s.ext?'ext':''}" data-s="${i}" style="--sc:${s.go?NODES[s.go].c:n.c}"><div class="ribs"></div>${lg(s.l)}<b>${s.n}</b><code>${s.f}</code></button>`).join('')}</div>
+   <div class="chain-info" id="chainInfo"></div></section>`;
+}
+function initChain(id){
+  clearTimeout(chainT);chainPlay=false;chainI=0;const C=CHAINS[id];if(!C)return;
+  const set=(i,fromPlay)=>{
+    chainI=i;const s=C.steps[i];
+    document.querySelectorAll('#chain .stg').forEach(b=>b.classList.toggle('on',+b.dataset.s===i));
+    document.querySelectorAll('#chain .arw').forEach(a=>{a.classList.remove('on');if(+a.dataset.a===i){void a.offsetWidth;a.classList.add('on')}});
+    $('#chainInfo').innerHTML=`<div><div class="stepno" style="font-size:12px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--accent-ink)">Paso ${i+1} de ${C.steps.length}</div><h4>${s.n}</h4><p>${s.d}</p>${s.go&&s.go!==id?`<button class="linkbtn" style="margin-top:10px" data-go="${s.go}">${lg(NODES[s.go].logo).replace('class="lg"','class="lg" style="width:18px;height:18px"')} Entrar a ${NODES[s.go].name} ${ic.next}</button>`:''}</div><pre class="code">${s.c}</pre>`;
+    $('#chainInfo [data-go]')?.addEventListener('click',e=>go(e.currentTarget.dataset.go));
+    if(chainPlay&&fromPlay!==false){chainT=setTimeout(()=>{if(chainI<C.steps.length-1)set(chainI+1);else{chainPlay=false;btn()}},2300)}
+  };
+  const btn=()=>{$('#cPlay').innerHTML=chainPlay?ic.pause+'Pausa':ic.play+'Reproducir'};
+  document.querySelectorAll('#chain .stg').forEach(b=>b.onclick=()=>{chainPlay=false;clearTimeout(chainT);btn();set(+b.dataset.s)});
+  $('#cPrev').onclick=()=>{chainPlay=false;clearTimeout(chainT);btn();set(Math.max(0,chainI-1))};
+  $('#cNext').onclick=()=>{chainPlay=false;clearTimeout(chainT);btn();set(Math.min(C.steps.length-1,chainI+1))};
+  $('#cPlay').onclick=()=>{clearTimeout(chainT);chainPlay=!chainPlay;btn();if(chainPlay)set(chainI>=C.steps.length-1?0:chainI)};
+  set(0,false);chainPlay=!reduce;btn();if(chainPlay)chainT=setTimeout(()=>set(1),2300);
+}
+
+/* ================= navegación ================= */
+const box=$('#box');
+function openBox(){
+  if(box.classList.contains('open'))return go('sistema');
+  box.classList.add('open');setTimeout(()=>go('sistema'),reduce?0:1050);
+}
+box.onclick=openBox;$('#openBtn').onclick=openBox;$('#brandBtn').onclick=()=>go('inicio');
+let cur='';
+function go(h){cur=h;try{if(location.hash.slice(1)!==h)location.hash=h}catch(e){}route()}
+function crumbs(parts){
+  $('#crumbs').innerHTML=parts.map((p,i)=>i===parts.length-1?`<span class="here">${p[0]}</span>`:`<button data-go="${p[1]}">${p[0]}</button><span class="sep">›</span>`).join('');
+  $('#crumbs').querySelectorAll('[data-go]').forEach(b=>b.onclick=()=>go(b.dataset.go));
+}
+function show(v){document.querySelectorAll('.view').forEach(x=>x.classList.toggle('on',x.id==='v-'+v))}
+function route(){
+  const h=cur;
+  clearTimeout(chainT);chainPlay=false;
+  if(flow&&h!=='sistema')stopFlow();
+  if(!h||h==='inicio'){box.classList.remove('open');show('inicio');crumbs([['Portada']]);}
+  else if(h==='sistema'){show('sistema');crumbs([['Portada','inicio'],['Arquitectura']]);requestAnimationFrame(()=>{layout();if(!flow&&!pinned)panelDefault()})}
+  else if(NODES[h]){renderDetail(h);show('detalle');crumbs([['Portada','inicio'],['Arquitectura','sistema'],[NODES[h].name]]);}
+  else{show('inicio');crumbs([['Portada']])}
+}
+addEventListener('hashchange',()=>{const h=location.hash.slice(1);if(h!==cur){cur=h;route()}});
+cur=location.hash.slice(1);
+/* escala del lienzo y pantalla completa */
+function fit(){document.getElementById('deck').style.setProperty('--s',Math.min(innerWidth/1600,innerHeight/900))}
+addEventListener('resize',fit);fit();
+function toggleFs(){try{if(document.fullscreenElement)document.exitFullscreen();else document.documentElement.requestFullscreen().catch(()=>{})}catch(e){}}
+$('#fsBtn').onclick=toggleFs;
+addEventListener('keydown',e=>{
+  if(e.target.closest&&e.target.closest('input,textarea'))return;
+  const h=cur,k=e.key;
+  if(k==='f'||k==='F'){toggleFs();return}
+  if(k==='ArrowRight'||k==='ArrowLeft'||k===' '||k==='PageDown'||k==='PageUp'){
+    const fwd=k==='ArrowRight'||k==='PageDown'||k===' ';e.preventDefault();
+    if(!h||h==='inicio'){if(fwd)openBox();return}
+    if(h==='sistema'){if(flow){playing=false;if(fwd)next();else{flow.i=Math.max(0,flow.i-1);renderStep()}}else if(fwd)go(ORDER[0]);else go('inicio');return}
+    if(NODES[h]){const i=ORDER.indexOf(h);if(!fwd&&i===0)return go('sistema');go(ORDER[(i+(fwd?1:-1)+ORDER.length)%ORDER.length]);return}
+  }
+  if(k!=='Escape')return;
+  if(flow)return stopFlow();if(pinned){pinned=null;return clearFocus()}
+  if(NODES[h])go('sistema');else if(h==='sistema')go('inicio');
+});
+buildStage();route();requestAnimationFrame(tick);
+document.fonts?.ready.then(layout);
+</script>
+</body>
+</html>

@@ -222,7 +222,10 @@ fun PrestadorCard(
     onAbrir: () -> Unit,
     onFavorito: () -> Unit,
     modifier: Modifier = Modifier,
+    /** El rubro buscado va primero (su ícono y su nombre), aunque el prestador tenga otros. */
+    rubroBuscado: String? = null,
 ) {
+    val rubros = prestador.rubros.sortedByDescending { it == rubroBuscado }
     Card(
         onClick = onAbrir,
         modifier = modifier.fillMaxWidth(),
@@ -237,10 +240,10 @@ fun PrestadorCard(
             Iniciales(prestador.nombreCompleto)
             Column(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(3.dp)) {
                 Text(prestador.nombreCompleto, style = MaterialTheme.typography.titleMedium)
-                if (prestador.rubros.isNotEmpty()) {
+                if (rubros.isNotEmpty()) {
                     Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-                        Icon(iconoRubro(prestador.rubros.first()), contentDescription = null, modifier = Modifier.size(16.dp), tint = MaterialTheme.colorScheme.primary)
-                        Text(prestador.rubros.joinToString(" · "), style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.primary)
+                        Icon(iconoRubro(rubros.first()), contentDescription = null, modifier = Modifier.size(16.dp), tint = MaterialTheme.colorScheme.primary)
+                        Text(rubros.joinToString(" · "), style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.primary)
                     }
                 }
                 Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {

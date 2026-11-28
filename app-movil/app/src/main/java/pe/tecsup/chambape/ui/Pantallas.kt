@@ -38,6 +38,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.outlined.Chat
 import androidx.compose.material.icons.automirrored.outlined.Logout
 import androidx.compose.material.icons.automirrored.outlined.Send
 import androidx.compose.material.icons.filled.Check
@@ -274,7 +275,7 @@ fun FavoritosScreen(onAbrirPrestador: (Int) -> Unit, onIrAInicio: () -> Unit) {
 // ---------- Solicitudes ----------
 
 @Composable
-fun SolicitudesScreen(sesion: Sesion, onIrAInicio: (() -> Unit)? = null) {
+fun SolicitudesScreen(sesion: Sesion, onIrAInicio: (() -> Unit)? = null, onAbrirChat: (Int) -> Unit = {}) {
     val vm = chambaViewModel { SolicitudesViewModel(sesion, it.solicitudRepository) }
     val estado by vm.uiState.collectAsStateWithLifecycle()
     val esPrestador = sesion.rol == Rol.PRESTADOR
@@ -312,12 +313,18 @@ fun SolicitudesScreen(sesion: Sesion, onIrAInicio: (() -> Unit)? = null) {
                     onResponder = { aceptar -> vm.responder(solicitud.id, aceptar) },
                     onAvanzar = { siguiente -> vm.avanzar(solicitud.id, siguiente) },
                     onCalificar = { estrellas, comentario -> vm.calificar(solicitud.id, estrellas, comentario) },
+                    onChat = { onAbrirChat(solicitud.id) },
                     modifier = Modifier.animateItem(),
                 )
             }
         }
     }
 }
+
+/** Estados con chat: desde Confirmado; al finalizar queda solo para leer. */
+private val ESTADOS_CON_CHAT = setOf(
+    EstadoSolicitud.ACEPTADA, EstadoSolicitud.EN_CAMINO, EstadoSolicitud.EN_SERVICIO, EstadoSolicitud.FINALIZADA,
+)
 
 private val ETAPAS = listOf(
     EstadoSolicitud.ACEPTADA, EstadoSolicitud.EN_CAMINO, EstadoSolicitud.EN_SERVICIO, EstadoSolicitud.FINALIZADA,
@@ -439,6 +446,7 @@ private fun SolicitudCard(
     onResponder: (Boolean) -> Unit,
     onAvanzar: (EstadoSolicitud) -> Unit,
     onCalificar: (Int, String) -> Unit,
+    onChat: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val contexto = LocalContext.current
@@ -479,6 +487,13 @@ private fun SolicitudCard(
                 }
             }
             Seguimiento(solicitud)
+            if (solicitud.estado in ESTADOS_CON_CHAT) {
+                // Desde que se acepta, el cliente y el prestador coordinan por chat.
+                OutlinedButton(onClick = onChat, modifier = Modifier.fillMaxWidth()) {
+                    Icon(Icons.AutoMirrored.Outlined.Chat, contentDescription = null, modifier = Modifier.size(18.dp))
+                    Text(stringResource(R.string.chat_abrir), modifier = Modifier.padding(start = 8.dp))
+                }
+            }
             when {
                 esPrestador && solicitud.estado == EstadoSolicitud.PENDIENTE ->
                     Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {

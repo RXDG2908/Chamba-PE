@@ -117,3 +117,19 @@ data class NuevaSolicitud(
 
 /** HU-10: por qué la IA recomienda a este prestador y en cuánto llegaría. */
 data class Recomendacion(val prestadorId: Int, val motivo: String, val puntaje: Double?, val minutosEstimados: Int)
+
+/** Un mensaje del chat; [mio] si lo escribió quien tiene la sesión. [enviado] en ISO 8601. */
+data class MensajeChat(val id: Int, val mio: Boolean, val texto: String, val enviado: String)
+
+/**
+ * Chat de una solicitud aceptada. [activo] mientras el servicio no termina; al finalizar queda
+ * solo para leer. [telefono] es el de la otra parte (null si no hay o si ya no se muestra).
+ */
+data class Chat(
+    val solicitudId: Int,
+    val estadoTexto: String,
+    val activo: Boolean,
+    val contraparte: String,
+    val telefono: String?,
+    val mensajes: List<MensajeChat>,
+)

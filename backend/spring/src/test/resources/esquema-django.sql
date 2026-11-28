@@ -1,10 +1,11 @@
--- Copia del esquema que crean las migraciones de Django en SQLite (main del 26/11/2026, con HU-12 y HU-13),
+-- Copia del esquema que crean las migraciones de Django en SQLite (main del 28/11/2026, con HU-12, HU-13 y el chat),
 -- solo con las tablas que usa Spring. Las pruebas no tocan la base real. Si cambia una migración,
 -- backend/django/core/test_esquema_spring.py avisa que hay que actualizar esta copia.
 DROP TABLE IF EXISTS calificaciones_calificacion;
 DROP TABLE IF EXISTS administracion_sancioncuenta;
 DROP TABLE IF EXISTS django_session;
 DROP TABLE IF EXISTS servicios_tokenfcm;
+DROP TABLE IF EXISTS servicios_mensaje;
 DROP TABLE IF EXISTS servicios_cambioestado;
 DROP TABLE IF EXISTS servicios_solicitud;
 DROP TABLE IF EXISTS usuarios_perfil;
@@ -19,6 +20,7 @@ CREATE TABLE "prestadores_prestador_rubros" ("id" integer NOT NULL PRIMARY KEY A
 CREATE TABLE "usuarios_perfil" ("id" integer NOT NULL PRIMARY KEY AUTOINCREMENT, "rol" varchar(13) NOT NULL, "usuario_id" integer NOT NULL UNIQUE REFERENCES "auth_user" ("id") DEFERRABLE INITIALLY DEFERRED, "firebase_uid" varchar(128) NULL UNIQUE, "foto" varchar(100) NULL, "telefono" varchar(20) DEFAULT '' NOT NULL);
 CREATE TABLE "servicios_solicitud" ("id" integer NOT NULL PRIMARY KEY AUTOINCREMENT, "cliente_nombre" varchar(100) NOT NULL, "cliente_telefono" varchar(20) NOT NULL, "descripcion" varchar(500) NOT NULL, "latitud" decimal NOT NULL, "longitud" decimal NOT NULL, "creada" datetime NOT NULL, "respondida" datetime NULL, "prestador_id" bigint NOT NULL REFERENCES "prestadores_prestador" ("id") DEFERRABLE INITIALLY DEFERRED, "rubro_id" bigint NOT NULL REFERENCES "prestadores_rubro" ("id") DEFERRABLE INITIALLY DEFERRED, "cliente_id" integer NULL REFERENCES "auth_user" ("id") DEFERRABLE INITIALLY DEFERRED, "estado" varchar(20) NOT NULL);
 CREATE TABLE "servicios_cambioestado" ("id" integer NOT NULL PRIMARY KEY AUTOINCREMENT, "estado" varchar(20) NOT NULL, "fecha" datetime NOT NULL, "solicitud_id" bigint NOT NULL REFERENCES "servicios_solicitud" ("id") DEFERRABLE INITIALLY DEFERRED);
+CREATE TABLE "servicios_mensaje" ("id" integer NOT NULL PRIMARY KEY AUTOINCREMENT, "texto" varchar(500) NOT NULL, "enviado" datetime NOT NULL, "autor_id" integer NOT NULL REFERENCES "auth_user" ("id") DEFERRABLE INITIALLY DEFERRED, "solicitud_id" bigint NOT NULL REFERENCES "servicios_solicitud" ("id") DEFERRABLE INITIALLY DEFERRED);
 CREATE TABLE "servicios_tokenfcm" ("id" integer NOT NULL PRIMARY KEY AUTOINCREMENT, "token" varchar(2048) NOT NULL UNIQUE, "sesion" varchar(40) NOT NULL, "actualizado" datetime NOT NULL, "usuario_id" integer NOT NULL REFERENCES "auth_user" ("id") DEFERRABLE INITIALLY DEFERRED);
 CREATE TABLE "django_session" ("session_key" varchar(40) NOT NULL PRIMARY KEY, "session_data" text NOT NULL, "expire_date" datetime NOT NULL);
 CREATE TABLE "administracion_sancioncuenta" ("id" integer NOT NULL PRIMARY KEY AUTOINCREMENT, "tipo" varchar(10) NOT NULL, "motivo" text NOT NULL, "hasta" datetime NULL, "creada" datetime NOT NULL, "levantada" datetime NULL, "motivo_levantamiento" text NOT NULL, "creada_por_id" integer NULL REFERENCES "auth_user" ("id") DEFERRABLE INITIALLY DEFERRED, "levantada_por_id" integer NULL REFERENCES "auth_user" ("id") DEFERRABLE INITIALLY DEFERRED, "usuario_id" integer NOT NULL REFERENCES "auth_user" ("id") DEFERRABLE INITIALLY DEFERRED, CONSTRAINT "solo_la_suspension_tiene_fin" CHECK ((("hasta" IS NULL AND "tipo" = 'bloqueo') OR ("hasta" IS NOT NULL AND "tipo" = 'suspension'))));

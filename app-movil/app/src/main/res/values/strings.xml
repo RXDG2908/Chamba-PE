@@ -179,6 +179,16 @@
     <string name="solicitud_descripcion_ayuda">Cuenta el problema con detalle.</string>
     <string name="solicitud_telefono_ayuda">El prestador te llamará a este número.</string>
     <string name="llamar_a">Llamar al %1$s</string>
+    <!-- Chat de la solicitud -->
+    <string name="chat_abrir">Chat</string>
+    <string name="chat_titulo">Chat</string>
+    <string name="chat_subtitulo">Solicitud #%1$d · %2$s</string>
+    <string name="chat_escribe">Escribe un mensaje</string>
+    <string name="chat_enviar">Enviar</string>
+    <string name="chat_llamar">Llamar a %1$s</string>
+    <string name="chat_vacio">Escribe para coordinar la hora, la dirección o lo que necesites.</string>
+    <string name="chat_solo_lectura">El servicio finalizó; el chat queda solo para leer.</string>
+    <string name="chat_error_envio">No se pudo enviar el mensaje. Inténtalo de nuevo.</string>
     <string name="seguimiento_resumen">Estado: %1$s, etapa %2$d de %3$d</string>
     <string name="tu_calificacion_titulo">Tu calificación</string>
     <string name="estrellas_n">%1$d estrellas</string>

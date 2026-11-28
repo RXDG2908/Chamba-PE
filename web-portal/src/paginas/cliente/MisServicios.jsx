@@ -2,13 +2,14 @@ import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { enviarJson } from '../../nucleo/api.js'
 import Seguimiento from '../../componentes/Seguimiento.jsx'
-import { ESTADOS_FINALES } from '../../nucleo/etapasSeguimiento.js'
+import { ESTADOS_CON_CHAT, ESTADOS_FINALES } from '../../nucleo/etapasSeguimiento.js'
 import '../publico/RegistroPrestador.css'
 import '../../estilos/Cuenta.css'
 import './MisServicios.css'
 import { ClipboardList, Star } from 'lucide-react'
 import Cargando from '../../componentes/Cargando.jsx'
 import IconoEstado from '../../componentes/IconoEstado.jsx'
+import ChatFlotante, { BotonChat } from '../../componentes/ChatFlotante.jsx'
 
 const ESTRELLAS = [1, 2, 3, 4, 5]
 const formatoFecha = new Intl.DateTimeFormat('es-PE', { dateStyle: 'medium', timeStyle: 'short' })
@@ -93,6 +94,7 @@ function FormularioCalificacion({ servicio, alCalificar }) {
 function MisServicios() {
   const [servicios, setServicios] = useState([])
   const [estado, setEstado] = useState('cargando') // cargando | listo | fallo
+  const [chat, setChat] = useState(null)
 
   const enCurso = servicios.some((s) => !ESTADOS_FINALES.includes(s.estado))
 
@@ -165,6 +167,9 @@ function MisServicios() {
             </div>
             {s.descripcion && <p className="servicio-descripcion">{s.descripcion}</p>}
             <Seguimiento estado={s.estado} historial={s.historial} />
+            {ESTADOS_CON_CHAT.includes(s.estado) && (
+              <BotonChat alAbrir={() => setChat({ id: s.id, titulo: s.prestador.nombre })} />
+            )}
             {s.calificacion && (
               <div className="calificacion-dada">
                 <p><strong>Tu calificación:</strong> <Estrellas cantidad={s.calificacion.estrellas} /></p>
@@ -178,6 +183,7 @@ function MisServicios() {
           </li>
         ))}
       </ul>
+      {chat && <ChatFlotante key={chat.id} solicitudId={chat.id} titulo={chat.titulo} alCerrar={() => setChat(null)} />}
     </section>
   )
 }

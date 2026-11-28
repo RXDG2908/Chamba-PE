@@ -11,3 +11,6 @@ export const ACCION_SIGUIENTE = {
   en_servicio: 'Empecé el servicio',
   finalizada: 'Finalizar servicio',
 }
+
+// Estados con chat entre cliente y prestador: desde que se acepta (al finalizar queda solo para leer).
+export const ESTADOS_CON_CHAT = ['aceptada', 'en_camino', 'en_servicio', 'finalizada']

@@ -99,6 +99,10 @@ private class ApiFalsa : ApiService {
     override suspend fun disponibilidad(autorizacion: String): DisponibilidadDto = error("no usado")
     override suspend fun cambiarDisponibilidad(autorizacion: String, cambio: CambioDisponibilidadDto): DisponibilidadDto =
         error("no usado")
+    override suspend fun chat(autorizacion: String, id: Int): pe.tecsup.chambape.data.remote.ChatDto = error("no usado")
+    override suspend fun enviarMensaje(
+        autorizacion: String, id: Int, datos: pe.tecsup.chambape.data.remote.NuevoMensajeDto,
+    ): pe.tecsup.chambape.data.remote.MensajeDto = error("no usado")
 }
 
 private class AuthFalsa(var token: String? = "tk") : AuthRepository {

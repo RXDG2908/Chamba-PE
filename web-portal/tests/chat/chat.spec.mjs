@@ -75,9 +75,11 @@ test('el cliente abre el chat desde Mis servicios, escribe y ve el teléfono del
   await expect(chat.getByRole('textbox', { name: 'Mensaje' })).toHaveValue('')
   expect(datos.enviados).toEqual([{ texto: '¿A qué hora llega?', csrf: 'token-ficticio' }])
 
-  await chat.getByRole('button', { name: 'Llamar a Ana Pérez' }).click()
-  await expect(chat.getByRole('link', { name: 'Llamar' })).toHaveAttribute('href', 'tel:987654321')
+  // En la PC no hay marcador: se ve el número para copiarlo, sin «Llamar».
+  await chat.getByRole('button', { name: 'Teléfono de Ana Pérez' }).click()
+  await expect(chat.getByText('987654321')).toBeVisible()
   await expect(chat.getByRole('button', { name: 'Copiar' })).toBeVisible()
+  await expect(chat.getByRole('link', { name: 'Llamar' })).toHaveCount(0)
   await page.screenshot({ path: '../.chat-local/cliente.png' })
 })
 
@@ -97,8 +99,8 @@ test('el prestador abre el chat desde su bandeja, lo minimiza y lo cierra', asyn
   await page.getByRole('button', { name: 'Chat', exact: true }).click()
   const chat = page.getByRole('region', { name: 'Chat con Carlos Cliente' })
   await expect(chat.getByText('Hola, ya vi tu solicitud.')).toBeVisible()
-  await chat.getByRole('button', { name: 'Llamar a Carlos Cliente' }).click()
-  await expect(chat.getByRole('link', { name: 'Llamar' })).toHaveAttribute('href', 'tel:900000000')
+  await chat.getByRole('button', { name: 'Teléfono de Carlos Cliente' }).click()
+  await expect(chat.getByText('900000000')).toBeVisible()
   await page.screenshot({ path: '../.chat-local/prestador.png' })
 
   await chat.getByRole('button', { name: 'Minimizar chat' }).click()
@@ -116,7 +118,7 @@ test('finalizado: el chat queda solo para leer y sin teléfono del prestador', a
   const chat = page.getByRole('region', { name: 'Chat con Ana Pérez' })
   await expect(chat.getByText('El servicio finalizó; el chat queda solo para leer.')).toBeVisible()
   await expect(chat.getByRole('textbox', { name: 'Mensaje' })).toHaveCount(0)
-  await expect(chat.getByRole('button', { name: /Llamar/ })).toHaveCount(0)
+  await expect(chat.getByRole('button', { name: /Teléfono/ })).toHaveCount(0)
 })
 
 test('pendiente o rechazada no muestran el botón de chat', async ({ page }) => {
@@ -140,4 +142,19 @@ test('en el celular la ventana ocupa el ancho de la pantalla', async ({ page }) 
   expect(caja.x).toBe(0)
   expect(caja.width).toBe(390)
   await page.screenshot({ path: '../.chat-local/cliente-movil.png' })
+})
+
+test.describe('en un celular (pantalla táctil)', () => {
+  test.use({ viewport: { width: 390, height: 800 }, hasTouch: true, isMobile: true })
+
+  test('«Llamar» abre el marcador con el número del prestador', async ({ page }) => {
+    await preparar(page)
+    await page.goto('/mis-servicios')
+    await page.getByRole('button', { name: 'Chat', exact: true }).click()
+    const chat = page.getByRole('region', { name: 'Chat con Ana Pérez' })
+    await chat.getByRole('button', { name: 'Teléfono de Ana Pérez' }).click()
+    await expect(chat.getByRole('link', { name: 'Llamar' })).toHaveAttribute('href', 'tel:987654321')
+    await expect(chat.getByRole('button', { name: 'Copiar' })).toBeVisible()
+    await page.screenshot({ path: '../.chat-local/cliente-movil-telefono.png' })
+  })
 })

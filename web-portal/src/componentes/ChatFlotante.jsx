@@ -6,6 +6,12 @@ import './ChatFlotante.css'
 
 const hora = new Intl.DateTimeFormat('es-PE', { hour: '2-digit', minute: '2-digit' })
 
+// Celular o tablet (pantalla táctil): ahí «Llamar» abre el marcador. En la PC no hay marcador,
+// así que solo se muestra el número para copiarlo y marcarlo desde el teléfono.
+function esTactil() {
+  try { return window.matchMedia('(pointer: coarse)').matches } catch { return false }
+}
+
 function chatValido(c) {
   return c && Number.isInteger(c.solicitud) && typeof c.activo === 'boolean' && Array.isArray(c.mensajes)
     && c.contraparte && typeof c.contraparte.nombre === 'string'
@@ -20,8 +26,8 @@ export function BotonChat({ alAbrir }) {
 
 /**
  * Ventana flotante abajo a la derecha, como la de Messenger: el cliente y el prestador coordinan.
- * Se actualiza sola cada 5 s mientras está abierta. El ícono del teléfono muestra el número: en el
- * celular «Llamar» abre el marcador; en la PC se copia para marcarlo desde el teléfono.
+ * Se actualiza sola cada 5 s mientras está abierta. El ícono del teléfono muestra el número con
+ * «Copiar»; en el celular, además, «Llamar» abre el marcador.
  */
 export default function ChatFlotante({ solicitudId, titulo, alCerrar, alVencer }) {
   const [chat, setChat] = useState(null)
@@ -105,7 +111,7 @@ export default function ChatFlotante({ solicitudId, titulo, alCerrar, alVencer }
         </span>
       </button>
       {telefono && <button type="button" className="chat-icono" onClick={() => { setMinimizado(false); setVerTelefono((v) => !v) }}
-        aria-label={`Llamar a ${nombre}`} aria-expanded={verTelefono} title="Llamar">
+        aria-label={`Teléfono de ${nombre}`} aria-expanded={verTelefono} title="Teléfono">
         <Phone size={18} aria-hidden="true" />
       </button>}
       <button type="button" className="chat-icono" onClick={() => setMinimizado((m) => !m)}
@@ -119,7 +125,7 @@ export default function ChatFlotante({ solicitudId, titulo, alCerrar, alVencer }
     {!minimizado && <>
       {telefono && verTelefono && <div className="chat-telefono">
         <span>{telefono}</span>
-        <a className="boton boton-principal" href={`tel:${telefono}`}><Phone className="icono" size={16} aria-hidden="true" />Llamar</a>
+        {esTactil() && <a className="boton boton-principal" href={`tel:${telefono}`}><Phone className="icono" size={16} aria-hidden="true" />Llamar</a>}
         <button type="button" className="boton-secundario" onClick={copiar}>
           <Copy className="icono" size={16} aria-hidden="true" />{copiado ? 'Copiado' : 'Copiar'}
         </button>

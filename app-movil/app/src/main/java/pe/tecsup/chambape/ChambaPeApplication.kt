@@ -16,7 +16,9 @@ import pe.tecsup.chambape.data.local.AppDatabase
 import pe.tecsup.chambape.data.remote.RetrofitClient
 import pe.tecsup.chambape.data.repository.DisponibilidadRepository
 import pe.tecsup.chambape.data.repository.DisponibilidadRepositoryImpl
+import pe.tecsup.chambape.data.repository.ApiChatRepository
 import pe.tecsup.chambape.data.repository.ApiSolicitudRepository
+import pe.tecsup.chambape.data.repository.ChatRepository
 import pe.tecsup.chambape.data.repository.ContextoBusqueda
 import pe.tecsup.chambape.data.repository.PrestadorRepository
 import pe.tecsup.chambape.data.repository.PrestadorRepositoryImpl
@@ -52,6 +54,7 @@ class AppContainer(context: Context) {
     val registroPrestadorRepository: RegistroPrestadorRepository = RegistroPrestadorRepositoryImpl(api)
     // Solicitudes en la API (Spring, sobre la misma base que Django), las mismas que ve la web.
     val solicitudRepository: SolicitudRepository = ApiSolicitudRepository(api, authRepository)
+    val chatRepository: ChatRepository = ApiChatRepository(api, authRepository)
     val contextoBusqueda = ContextoBusqueda()
     val ubicacionProvider: UbicacionProvider = UbicacionFused(context)
     val notificador: Notificador = NotificadorAndroid(context)

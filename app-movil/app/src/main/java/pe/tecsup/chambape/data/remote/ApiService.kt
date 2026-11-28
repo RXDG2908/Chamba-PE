@@ -134,6 +134,31 @@ data class RecomendacionDto(
 /** La contraseña de la cuenta de la web, para vincularla con la cuenta de la app. */
 data class VincularCuentaDto(@SerializedName("password") val password: String)
 
+// ---------- Chat de la solicitud (desde que el prestador la acepta) ----------
+
+data class MensajeDto(
+    @SerializedName("id") val id: Int?,
+    /** "cliente" o "prestador": quién lo escribió. */
+    @SerializedName("de") val de: String?,
+    @SerializedName("texto") val texto: String?,
+    @SerializedName("enviado") val enviado: String?,
+)
+
+data class ContraparteDto(@SerializedName("nombre") val nombre: String?, @SerializedName("telefono") val telefono: String?)
+
+/** `GET api/servicios/solicitudes/{id}/chat/`. */
+data class ChatDto(
+    @SerializedName("solicitud") val solicitud: Int?,
+    @SerializedName("estado") val estado: String?,
+    @SerializedName("estado_display") val estadoDisplay: String?,
+    @SerializedName("activo") val activo: Boolean?,
+    @SerializedName("yo") val yo: String?,
+    @SerializedName("contraparte") val contraparte: ContraparteDto?,
+    @SerializedName("mensajes") val mensajes: List<MensajeDto>?,
+)
+
+data class NuevoMensajeDto(@SerializedName("texto") val texto: String)
+
 interface ApiService {
     // HU-10: pública como la búsqueda (sin token), en Spring igual que en Django.
     @GET("api/ia/recomendacion/")
@@ -207,6 +232,17 @@ interface ApiService {
 
     @POST("api/calificaciones/")
     suspend fun calificar(@Header("Authorization") autorizacion: String, @Body datos: CalificarDto)
+
+    // Chat de la solicitud: solo el cliente y el prestador de esa solicitud (otro recibe 404).
+    @GET("api/servicios/solicitudes/{id}/chat/")
+    suspend fun chat(@Header("Authorization") autorizacion: String, @Path("id") id: Int): ChatDto
+
+    @POST("api/servicios/solicitudes/{id}/chat/")
+    suspend fun enviarMensaje(
+        @Header("Authorization") autorizacion: String,
+        @Path("id") id: Int,
+        @Body datos: NuevoMensajeDto,
+    ): MensajeDto
 }
 
 object RetrofitClient {

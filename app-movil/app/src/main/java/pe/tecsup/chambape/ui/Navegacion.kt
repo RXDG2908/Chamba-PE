@@ -68,6 +68,8 @@ private object Rutas {
     const val PERFIL = "perfil"
     const val DETALLE = "prestador/{id}"
     fun detalle(id: Int) = "prestador/$id"
+    const val CHAT = "chat/{id}"
+    fun chat(id: Int) = "chat/$id"
     // Una sección de Inicio («Urgente», «Hogar»…), opcionalmente con un rubro ya elegido.
     const val SECCION = "seccion/{clave}?rubro={rubro}"
     fun seccion(seccion: Seccion, rubro: Int?) = "seccion/${seccion.name}" + (rubro?.let { "?rubro=$it" } ?: "")
@@ -137,7 +139,8 @@ private fun NavegacionPrincipal(sesion: Sesion, onCerrarSesion: () -> Unit) {
     val pestanaActual = pestanas.firstOrNull { it.ruta == rutaActual }
 
     // Inicio y las secciones dibujan su propia cabecera (ubicación arriba, color de la sección).
-    val sinBarra = rutaActual == Rutas.BUSCAR || rutaActual == Rutas.SECCION
+    // El chat también: arriba van el nombre de la otra persona y el ícono para llamar.
+    val sinBarra = rutaActual == Rutas.BUSCAR || rutaActual == Rutas.SECCION || rutaActual == Rutas.CHAT
     Scaffold(
         topBar = {
             if (!sinBarra) TopAppBar(
@@ -217,7 +220,16 @@ private fun NavegacionPrincipal(sesion: Sesion, onCerrarSesion: () -> Unit) {
             if (sesion.rol == Rol.PRESTADOR) {
                 composable(Rutas.DISPONIBILIDAD) { DisponibilidadScreen() }
             }
-            composable(Rutas.SOLICITUDES) { SolicitudesScreen(sesion, onIrAInicio = irAInicio.takeIf { sesion.rol == Rol.CLIENTE }) }
+            composable(Rutas.SOLICITUDES) {
+                SolicitudesScreen(
+                    sesion,
+                    onIrAInicio = irAInicio.takeIf { sesion.rol == Rol.CLIENTE },
+                    onAbrirChat = { nav.navigate(Rutas.chat(it)) },
+                )
+            }
+            composable(Rutas.CHAT, arguments = listOf(navArgument("id") { type = NavType.IntType })) { entrada ->
+                ChatScreen(solicitudId = entrada.arguments?.getInt("id") ?: -1, onVolver = { nav.popBackStack() })
+            }
             composable(Rutas.PERFIL) { PerfilScreen(sesion, onCerrarSesion) }
         }
     }

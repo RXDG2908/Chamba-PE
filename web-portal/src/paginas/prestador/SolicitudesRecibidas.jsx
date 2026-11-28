@@ -3,12 +3,13 @@ import { Link, useParams } from 'react-router-dom'
 import { enviarJson } from '../../nucleo/api.js'
 import { activarNotificaciones, desactivarNotificaciones } from '../../nucleo/notificaciones.js'
 import Seguimiento from '../../componentes/Seguimiento.jsx'
-import { ACCION_SIGUIENTE } from '../../nucleo/etapasSeguimiento.js'
+import { ACCION_SIGUIENTE, ESTADOS_CON_CHAT } from '../../nucleo/etapasSeguimiento.js'
 import '../../estilos/Paneles.css'
 import './SolicitudesRecibidas.css'
 import { Bell, BellOff, Check, Inbox, RotateCcw, X } from 'lucide-react'
 import Cargando from '../../componentes/Cargando.jsx'
 import IconoEstado from '../../componentes/IconoEstado.jsx'
+import ChatFlotante, { BotonChat } from '../../componentes/ChatFlotante.jsx'
 
 export default function SolicitudesRecibidas({ usuario, alVencer }) {
   const { id } = useParams()
@@ -18,6 +19,7 @@ export default function SolicitudesRecibidas({ usuario, alVencer }) {
   const [errorCarga, setErrorCarga] = useState(null)
   const [revision, setRevision] = useState(0)
   const [ocupado, setOcupado] = useState(false)
+  const [chat, setChat] = useState(null)
   const solicitudes = vista?.clave === clave ? vista.solicitudes : null
   const errorActual = errorCarga?.clave === clave ? errorCarga.mensaje : ''
 
@@ -109,9 +111,11 @@ export default function SolicitudesRecibidas({ usuario, alVencer }) {
               {ACCION_SIGUIENTE[s.siguiente_estado]}
             </button>
             : <p className="solicitud-cerrada">{s.estado === 'finalizada' ? 'Servicio finalizado.' : 'Esta solicitud ya fue respondida.'}</p>}
+          {ESTADOS_CON_CHAT.includes(s.estado) && <BotonChat alAbrir={() => setChat({ id: s.id, titulo: s.cliente_nombre })} />}
         </div>
       </article>)}
     </div>
     {id && <Link className="volver" to="/solicitudes">← Volver a la bandeja</Link>}
+    {chat && <ChatFlotante key={chat.id} solicitudId={chat.id} titulo={chat.titulo} alCerrar={() => setChat(null)} alVencer={alVencer} />}
   </main>
 }

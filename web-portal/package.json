@@ -15,7 +15,8 @@
     "test:hu21": "playwright test --config playwright.hu21.config.mjs",
     "test:hu12": "playwright test --config playwright.hu12.config.mjs",
     "test:hu11": "playwright test --config playwright.hu11.config.mjs",
-    "test:hu11-local": "playwright test --config playwright.hu11-local.config.mjs"
+    "test:hu11-local": "playwright test --config playwright.hu11-local.config.mjs",
+    "test:chat": "playwright test --config playwright.chat.config.mjs"
   },
   "dependencies": {
     "@mediapipe/tasks-vision": "0.10.21",

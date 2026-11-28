@@ -31,7 +31,7 @@ class EsquemaSpringTests(TestCase):
             "select name from sqlite_master where type = 'table' and name not like 'sqlite_%'")]
         self.assertEqual(set(tablas), {
             'auth_user', 'prestadores_rubro', 'prestadores_prestador', 'prestadores_prestador_rubros',
-            'usuarios_perfil', 'servicios_solicitud', 'servicios_cambioestado', 'servicios_tokenfcm',
+            'usuarios_perfil', 'servicios_solicitud', 'servicios_cambioestado', 'servicios_mensaje', 'servicios_tokenfcm',
             'django_session', 'administracion_sancioncuenta', 'calificaciones_calificacion',
         })
 

@@ -83,3 +83,21 @@ class CambioEstado(models.Model):
 
     def __str__(self):
         return f'Solicitud {self.solicitud_id}: {self.get_estado_display()}'
+
+
+class Mensaje(models.Model):
+    """Chat de la solicitud: el cliente y el prestador coordinan desde que se acepta."""
+    solicitud = models.ForeignKey(Solicitud, on_delete=models.CASCADE, related_name='mensajes')
+    autor = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='mensajes_enviados')
+    texto = models.CharField(max_length=500)
+    enviado = models.DateTimeField()
+
+    # Se escribe en Confirmado, En camino y En servicio; al finalizar queda solo para leer.
+    ESTADOS_ACTIVOS = (Solicitud.Estado.ACEPTADA, Solicitud.Estado.EN_CAMINO, Solicitud.Estado.EN_SERVICIO)
+    ESTADOS_CON_CHAT = ESTADOS_ACTIVOS + (Solicitud.Estado.FINALIZADA,)
+
+    class Meta:
+        ordering = ['enviado', 'id']
+
+    def __str__(self):
+        return f'Mensaje {self.pk} de la solicitud {self.solicitud_id}'

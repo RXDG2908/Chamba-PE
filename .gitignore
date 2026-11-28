@@ -33,3 +33,4 @@ Thumbs.db
 # Artefactos de las pruebas de navegador de HU-12
 .hu12-local/
 .hu11-local/
+.chat-local/
